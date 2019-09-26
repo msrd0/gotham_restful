@@ -15,4 +15,4 @@ mod result;
 pub use result::ResourceResult;
 
 mod routing;
-pub use routing::ResourceRouter;
+pub use routing::{DrawResources, DrawResourceRoutes};

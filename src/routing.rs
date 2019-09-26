@@ -11,6 +11,15 @@ use mime::APPLICATION_JSON;
 use serde::Serialize;
 use std::panic::RefUnwindSafe;
 
+/// This trait adds the `resource` method to gotham's routing. It allows you to register
+/// any RESTful `Resource` with a path.
+pub trait DrawResources
+{
+	fn resource<R : Resource, T : ToString>(&mut self, path : T);
+}
+
+/// This trait allows to draw routes within an resource. Use this only inside the
+/// `Resource::setup` method.
 pub trait DrawResourceRoutes
 {
 	fn index<R : Serialize, E : Serialize, Res : ResourceResult<R, E>, IR : IndexResource<R, E, Res>>(&mut self);
@@ -49,6 +58,17 @@ where
 
 macro_rules! implDrawResourceRoutes {
 	($implType:ident) => {
+		impl<'a, C, P> DrawResources for $implType<'a, C, P>
+		where
+			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
+			P : RefUnwindSafe + Send + Sync + 'static
+		{
+			fn resource<R : Resource, T : ToString>(&mut self, path : T)
+			{
+				R::setup();
+			}
+		}
+		
 		impl<'a, C, P> DrawResourceRoutes for ($implType<'a, C, P>, String)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
@@ -65,29 +85,3 @@ macro_rules! implDrawResourceRoutes {
 
 implDrawResourceRoutes!(RouterBuilder);
 implDrawResourceRoutes!(ScopeBuilder);
-
-/// Allows you to setup routes inside a RESTful `Resource`. Currently supported are
-/// index (GET without any id), get (GET with an id) and post (POST with a body).
-pub struct ResourceSetupRoutes<D : DrawResourceRoutes>
-{
-	route : D,
-	path : String
-}
-
-/// This trait adds the `resource` method to gotham's routing. It allows you to register
-/// any RESTful `Resource` with a path.
-pub trait ResourceRouter
-{
-	fn resource<R : Resource>(&mut self, path : &str);
-}
-
-fn resource<D, C, P, R, T>(route : D, path : T)
-where
-	C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
-	P : RefUnwindSafe + Send + Sync + 'static,
-	D : DrawRoutes<C, P>,
-	R : Resource,
-	T : ToString
-{
-	R::setup();
-}
