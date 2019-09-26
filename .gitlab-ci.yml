@@ -1,0 +1,9 @@
+
+stages:
+  - check
+
+check:
+  stage: check
+  image: msrd0/rust-pq
+  script:
+    - cargo check
