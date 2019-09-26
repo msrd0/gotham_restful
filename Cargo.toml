@@ -1,0 +1,26 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[package]
+name = "gotham-restful"
+version = "0.0.1"
+authors = ["Dominic Meiser <git@msrd0.de>"]
+edition = "2018"
+description = "RESTful additions for Gotham"
+keywords = ["gotham", "rest", "restful"]
+license = "EPL-2.0"
+readme = "README.md"
+include = ["src/**/*", "Cargo.toml", "LICENSE"]
+repository = "https://gitlab.com/msrd0/gotham-restful"
+
+[badges]
+gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
+
+[dependencies]
+failure = "0.1"
+futures = "0.1"
+gotham = "0.4"
+hyper = "0.12"
+mime = "0.3"
+serde = "1"
+serde_derive = "1"
+serde_json = "1"
