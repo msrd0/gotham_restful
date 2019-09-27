@@ -8,7 +8,9 @@ pub use resource::{
 	Resource,
 	IndexResource,
 	GetResource,
-	CreateResource
+	CreateResource,
+	ChangeAllResource,
+	ChangeResource
 };
 
 mod result;

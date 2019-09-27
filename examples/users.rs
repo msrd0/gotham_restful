@@ -54,6 +54,24 @@ impl CreateResource<User, Success<()>> for Users
 	}
 }
 
+impl ChangeAllResource<Vec<User>, Success<()>> for Users
+{
+	fn change_all(_state : &mut State, body : Vec<User>) -> Success<()>
+	{
+		info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
+		().into()
+	}
+}
+
+impl ChangeResource<u64, User, Success<()>> for Users
+{
+	fn change(_state : &mut State, id : u64, body : User) -> Success<()>
+	{
+		info!("Change User {} to {}", id, body.username);
+		().into()
+	}
+}
+
 impl Resource for Users
 {
 	fn setup<D : DrawResourceRoutes>(mut route : D)
@@ -61,6 +79,8 @@ impl Resource for Users
 		route.index::<_, Self>();
 		route.get::<_, _, Self>();
 		route.create::<_, _, Self>();
+		route.change_all::<_, _, Self>();
+		route.change::<_, _, _, Self>();
 	}
 }
 

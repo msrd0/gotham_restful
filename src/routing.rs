@@ -1,5 +1,7 @@
 use crate::{
 	result::ResourceError,
+	ChangeAllResource,
+	ChangeResource,
 	CreateResource,
 	GetResource,
 	IndexResource,
@@ -56,6 +58,19 @@ pub trait DrawResourceRoutes
 		Body : DeserializeOwned,
 		R : ResourceResult,
 		CR : CreateResource<Body, R>;
+
+	fn change_all<Body, R, CR>(&mut self)
+	where
+		Body : DeserializeOwned,
+		R : ResourceResult,
+		CR : ChangeAllResource<Body, R>;
+
+	fn change<ID, Body, R, CR>(&mut self)
+	where
+		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+		Body : DeserializeOwned,
+		R : ResourceResult,
+		CR : ChangeResource<ID, Body, R>;
 }
 
 fn to_handler_future<F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
@@ -137,6 +152,25 @@ fn create_handler<Body : DeserializeOwned, R : ResourceResult, CR : CreateResour
 	handle_with_body::<Body, _, _>(state, |state, body| CR::create(state, body))
 }
 
+fn change_all_handler<Body : DeserializeOwned, R : ResourceResult, CR : ChangeAllResource<Body, R>>(state : State) -> Box<HandlerFuture>
+{
+	handle_with_body::<Body, _, _>(state, |state, body| CR::change_all(state, body))
+}
+
+fn change_handler<ID, Body, R, CR>(state : State) -> Box<HandlerFuture>
+where
+	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+	Body : DeserializeOwned,
+	R : ResourceResult,
+	CR : ChangeResource<ID, Body, R>
+{
+	let id = {
+		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
+		path.id.clone()
+	};
+	handle_with_body::<Body, _, _>(state, |state, body| CR::change(state, id, body))
+}
+
 macro_rules! implDrawResourceRoutes {
 	($implType:ident) => {
 		impl<'a, C, P> DrawResources for $implType<'a, C, P>
@@ -183,6 +217,28 @@ macro_rules! implDrawResourceRoutes {
 			{
 				self.0.post(&self.1)
 					.to(|state| create_handler::<Body, R, CR>(state));
+			}
+
+			fn change_all<Body, R, CR>(&mut self)
+			where
+				Body : DeserializeOwned,
+				R : ResourceResult,
+				CR : ChangeAllResource<Body, R>
+			{
+				self.0.put(&self.1)
+					.to(|state| change_all_handler::<Body, R, CR>(state));
+			}
+
+			fn change<ID, Body, R, CR>(&mut self)
+			where
+				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+				Body : DeserializeOwned,
+				R : ResourceResult,
+				CR : ChangeResource<ID, Body, R>
+			{
+				self.0.put(&format!("{}/:id", self.1))
+					.with_path_extractor::<PathExtractor<ID>>()
+					.to(|state| change_handler::<ID, Body, R, CR>(state));
 			}
 		}
 	}

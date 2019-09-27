@@ -29,3 +29,17 @@ pub trait CreateResource<Body : DeserializeOwned, R : ResourceResult>
 {
 	fn create(state : &mut State, body : Body) -> R;
 }
+
+/// Handle a PUT request on the Resource root.
+pub trait ChangeAllResource<Body : DeserializeOwned, R : ResourceResult>
+{
+	fn change_all(state : &mut State, body : Body) -> R;
+}
+
+/// Handle a PUT request on the Resource with an id.
+pub trait ChangeResource<ID, Body : DeserializeOwned, R : ResourceResult>
+where
+	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
+{
+	fn change(state : &mut State, id : ID, body : Body) -> R;
+}
