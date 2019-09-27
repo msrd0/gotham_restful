@@ -27,4 +27,4 @@ serde_json = "1"
 
 [dev-dependencies]
 fake = "2.2"
-reqwest = "0.9"
+log = "0.4"
