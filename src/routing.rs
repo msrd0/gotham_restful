@@ -8,7 +8,6 @@ use gotham::{
 	state::State
 };
 use mime::APPLICATION_JSON;
-use serde::Serialize;
 use std::panic::RefUnwindSafe;
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -22,22 +21,17 @@ pub trait DrawResources
 /// `Resource::setup` method.
 pub trait DrawResourceRoutes
 {
-	fn index<R : Serialize, E : Serialize, Res : ResourceResult<R, E>, IR : IndexResource<R, E, Res>>(&mut self);
+	fn index<R : ResourceResult, IR : IndexResource<R>>(&mut self);
 }
 
-fn to_handler_future<R, E, Res>(state : State, r : Res) -> Box<HandlerFuture>
+fn to_handler_future<F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
 where
-	R : Serialize,
-	E : Serialize,
-	Res : ResourceResult<R, E>
+	F : FnOnce(&mut State) -> R,
+	R : ResourceResult
 {
-	let (status, res) = r.to_result();
-	let json = match res {
-		Ok(json) => serde_json::to_string(&json),
-		Err(json) => serde_json::to_string(&json)
-	};
-	match json {
-		Ok(body) => {
+	let res = get_result(&mut state).to_json();
+	match res {
+		Ok((status, body)) => {
 			let res = create_response(&state, status, APPLICATION_JSON, body);
 			Box::new(ok((state, res)))
 		},
@@ -45,15 +39,9 @@ where
 	}
 }
 
-fn index_handler<R, E, Res, IR>(mut state : State) -> Box<HandlerFuture>
-where
-	R : Serialize,
-	E : Serialize,
-	Res : ResourceResult<R, E>,
-	IR : IndexResource<R, E, Res>
+fn index_handler<R : ResourceResult, IR : IndexResource<R>>(state : State) -> Box<HandlerFuture>
 {
-	let res = IR::index(&mut state);
-	to_handler_future(state, res)
+	to_handler_future(state, |state| IR::index(state))
 }
 
 macro_rules! implDrawResourceRoutes {
@@ -65,19 +53,19 @@ macro_rules! implDrawResourceRoutes {
 		{
 			fn resource<R : Resource, T : ToString>(&mut self, path : T)
 			{
-				R::setup();
+				R::setup((self, path.to_string()));
 			}
 		}
 		
-		impl<'a, C, P> DrawResourceRoutes for ($implType<'a, C, P>, String)
+		impl<'a, C, P> DrawResourceRoutes for (&mut $implType<'a, C, P>, String)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
 			/// Register an `IndexResource` with this resource.
-			fn index<R : Serialize, E : Serialize, Res : ResourceResult<R, E>, IR : IndexResource<R, E, Res>>(&mut self)
+			fn index<R : ResourceResult, IR : IndexResource<R>>(&mut self)
 			{
-				self.0.get(&self.1).to(|state| index_handler::<R, E, Res, IR>(state));
+				self.0.get(&self.1).to(|state| index_handler::<R, IR>(state));
 			}
 		}
 	}

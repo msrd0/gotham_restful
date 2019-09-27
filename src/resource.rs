@@ -1,26 +1,23 @@
-use crate::ResourceResult;
+use crate::{DrawResourceRoutes, ResourceResult};
 use gotham::state::State;
-use serde::{
-	de::DeserializeOwned,
-	ser::Serialize
-};
+use serde::de::DeserializeOwned;
 
 pub trait Resource
 {
-	fn setup();
+	fn setup<D : DrawResourceRoutes>(route : D);
 }
 
-pub trait IndexResource<R : Serialize, E : Serialize, Res : ResourceResult<R, E>>
+pub trait IndexResource<R : ResourceResult>
 {
-	fn index(state : &mut State) -> Res;
+	fn index(state : &mut State) -> R;
 }
 
-pub trait GetResource<ID : DeserializeOwned, R : Serialize, E : Serialize, Res : ResourceResult<R, E>>
+pub trait GetResource<ID : DeserializeOwned>
 {
-	fn get(state : State, id : ID) -> Res;
+	fn get(state : State, id : ID) -> dyn ResourceResult;
 }
 
-pub trait PostResource<Body : DeserializeOwned, R : Serialize, E : Serialize, Res : ResourceResult<R, E>>
+pub trait PostResource<Body : DeserializeOwned>
 {
-	fn post(state : State, body : Body) -> Res;
+	fn post(state : State, body : Body) -> dyn ResourceResult;
 }
