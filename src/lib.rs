@@ -1,5 +1,5 @@
-#[macro_use]
-extern crate serde_derive;
+#[macro_use] extern crate gotham_derive;
+#[macro_use] extern crate serde;
 
 pub use hyper::StatusCode;
 
@@ -8,7 +8,7 @@ pub use resource::{
 	Resource,
 	IndexResource,
 	GetResource,
-	PostResource
+	CreateResource
 };
 
 mod result;

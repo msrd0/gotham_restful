@@ -19,10 +19,10 @@ gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 failure = "0.1"
 futures = "0.1"
 gotham = "0.4"
+gotham_derive = "0.4"
 hyper = "0.12"
 mime = "0.3"
-serde = "1"
-serde_derive = "1"
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 [dev-dependencies]
