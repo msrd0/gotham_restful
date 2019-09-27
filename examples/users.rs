@@ -1,3 +1,4 @@
+#[macro_use] extern crate log;
 #[macro_use] extern crate serde;
 
 use fake::{faker::internet::en::Username, Fake};
@@ -7,7 +8,7 @@ use gotham::{
 	router::builder::*,
 	state::State
 };
-use gotham_restful::{DrawResources, DrawResourceRoutes, GetResource, IndexResource, Resource, Success};
+use gotham_restful::*;
 use log::LevelFilter;
 use log4rs::{
 	append::console::ConsoleAppender,
@@ -17,7 +18,7 @@ use log4rs::{
 
 struct Users;
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 struct User
 {
 	username : String
@@ -44,12 +45,22 @@ impl GetResource<u64, Success<User>> for Users
 	}
 }
 
+impl CreateResource<User, Success<()>> for Users
+{
+	fn create(_state : &mut State, body : User) -> Success<()>
+	{
+		info!("Created User: {}", body.username);
+		().into()
+	}
+}
+
 impl Resource for Users
 {
 	fn setup<D : DrawResourceRoutes>(mut route : D)
 	{
 		route.index::<_, Self>();
 		route.get::<_, _, Self>();
+		route.create::<_, _, Self>();
 	}
 }
 

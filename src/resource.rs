@@ -27,5 +27,5 @@ where
 /// Handle a POST request on the Resource root.
 pub trait CreateResource<Body : DeserializeOwned, R : ResourceResult>
 {
-	fn post(state : &mut State, body : Body) -> R;
+	fn create(state : &mut State, body : Body) -> R;
 }
