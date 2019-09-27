@@ -10,6 +10,12 @@ use gotham::{
 	state::State
 };
 use gotham_restful::{DrawResources, DrawResourceRoutes, IndexResource, Resource, Success};
+use log::LevelFilter;
+use log4rs::{
+	append::console::ConsoleAppender,
+	config::{Appender, Config, Root},
+	encode::pattern::PatternEncoder
+};
 
 struct Users;
 
@@ -43,6 +49,19 @@ const ADDR : &str = "127.0.0.1:18080";
 
 fn main()
 {
+	let encoder = PatternEncoder::new("{d(%Y-%m-%d %H:%M:%S%.3f %Z)} [{l}] {M} - {m}\n");
+	let config = Config::builder()
+		.appender(
+			Appender::builder()
+				.build("stdout", Box::new(
+					ConsoleAppender::builder()
+						.encoder(Box::new(encoder))
+						.build()
+				)))
+		.build(Root::builder().appender("stdout").build(LevelFilter::Info))
+		.unwrap();
+	log4rs::init_config(config).unwrap();
+	
 	let logging = RequestLogger::new(log::Level::Info);
 	let (chain, pipelines) = single_pipeline(
 		new_pipeline()
