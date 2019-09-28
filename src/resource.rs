@@ -11,35 +11,35 @@ pub trait Resource
 }
 
 /// Handle a GET request on the Resource root.
-pub trait IndexResource<R : ResourceResult>
+pub trait ResourceReadAll<R : ResourceResult>
 {
-	fn index(state : &mut State) -> R;
+	fn read_all(state : &mut State) -> R;
 }
 
 /// Handle a GET request on the Resource with an id.
-pub trait GetResource<ID, R : ResourceResult>
+pub trait ResourceRead<ID, R : ResourceResult>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
 {
-	fn get(state : &mut State, id : ID) -> R;
+	fn read(state : &mut State, id : ID) -> R;
 }
 
 /// Handle a POST request on the Resource root.
-pub trait CreateResource<Body : DeserializeOwned, R : ResourceResult>
+pub trait ResourceCreate<Body : DeserializeOwned, R : ResourceResult>
 {
 	fn create(state : &mut State, body : Body) -> R;
 }
 
 /// Handle a PUT request on the Resource root.
-pub trait ChangeAllResource<Body : DeserializeOwned, R : ResourceResult>
+pub trait ResourceUpdateAll<Body : DeserializeOwned, R : ResourceResult>
 {
-	fn change_all(state : &mut State, body : Body) -> R;
+	fn update_all(state : &mut State, body : Body) -> R;
 }
 
 /// Handle a PUT request on the Resource with an id.
-pub trait ChangeResource<ID, Body : DeserializeOwned, R : ResourceResult>
+pub trait ResourceUpdate<ID, Body : DeserializeOwned, R : ResourceResult>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
 {
-	fn change(state : &mut State, id : ID, body : Body) -> R;
+	fn update(state : &mut State, id : ID, body : Body) -> R;
 }

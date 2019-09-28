@@ -24,9 +24,9 @@ struct User
 	username : String
 }
 
-impl IndexResource<Success<Vec<User>>> for Users
+impl ResourceReadAll<Success<Vec<User>>> for Users
 {
-	fn index(_state : &mut State) -> Success<Vec<User>>
+	fn read_all(_state : &mut State) -> Success<Vec<User>>
 	{
 		vec![Username().fake(), Username().fake()]
 			.into_iter()
@@ -36,16 +36,16 @@ impl IndexResource<Success<Vec<User>>> for Users
 	}
 }
 
-impl GetResource<u64, Success<User>> for Users
+impl ResourceRead<u64, Success<User>> for Users
 {
-	fn get(_state : &mut State, id : u64) -> Success<User>
+	fn read(_state : &mut State, id : u64) -> Success<User>
 	{
 		let username : String = Username().fake();
 		User { username: format!("{}{}", username, id) }.into()
 	}
 }
 
-impl CreateResource<User, Success<()>> for Users
+impl ResourceCreate<User, Success<()>> for Users
 {
 	fn create(_state : &mut State, body : User) -> Success<()>
 	{
@@ -54,18 +54,18 @@ impl CreateResource<User, Success<()>> for Users
 	}
 }
 
-impl ChangeAllResource<Vec<User>, Success<()>> for Users
+impl ResourceUpdateAll<Vec<User>, Success<()>> for Users
 {
-	fn change_all(_state : &mut State, body : Vec<User>) -> Success<()>
+	fn update_all(_state : &mut State, body : Vec<User>) -> Success<()>
 	{
 		info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
 		().into()
 	}
 }
 
-impl ChangeResource<u64, User, Success<()>> for Users
+impl ResourceUpdate<u64, User, Success<()>> for Users
 {
-	fn change(_state : &mut State, id : u64, body : User) -> Success<()>
+	fn update(_state : &mut State, id : u64, body : User) -> Success<()>
 	{
 		info!("Change User {} to {}", id, body.username);
 		().into()
@@ -76,11 +76,11 @@ impl Resource for Users
 {
 	fn setup<D : DrawResourceRoutes>(mut route : D)
 	{
-		route.index::<_, Self>();
-		route.get::<_, _, Self>();
-		route.create::<_, _, Self>();
-		route.change_all::<_, _, Self>();
-		route.change::<_, _, _, Self>();
+		route.read_all::<Self, _>();
+		route.read::<Self, _, _>();
+		route.create::<Self, _, _>();
+		route.update_all::<Self, _, _>();
+		route.update::<Self, _, _, _>();
 	}
 }
 

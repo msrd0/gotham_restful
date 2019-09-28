@@ -1,12 +1,6 @@
 use crate::{
-	result::ResourceError,
-	ChangeAllResource,
-	ChangeResource,
-	CreateResource,
-	GetResource,
-	IndexResource,
-	Resource,
-	ResourceResult,
+	resource::*,
+	result::{ResourceError, ResourceResult},
 	StatusCode
 };
 use futures::{
@@ -42,35 +36,35 @@ pub trait DrawResources
 /// `Resource::setup` method.
 pub trait DrawResourceRoutes
 {
-	fn index<R, IR>(&mut self)
+	fn read_all<Handler, Res>(&mut self)
 	where
-		R : ResourceResult,
-		IR : IndexResource<R>;
+		Res : ResourceResult,
+		Handler : ResourceReadAll<Res>;
 	
-	fn get<ID, R, GR>(&mut self)
+	fn read<Handler, ID, Res>(&mut self)
 	where
 		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		R : ResourceResult,
-		GR : GetResource<ID, R>;
+		Res : ResourceResult,
+		Handler : ResourceRead<ID, Res>;
 	
-	fn create<Body, R, CR>(&mut self)
+	fn create<Handler, Body, Res>(&mut self)
 	where
 		Body : DeserializeOwned,
-		R : ResourceResult,
-		CR : CreateResource<Body, R>;
+		Res : ResourceResult,
+		Handler : ResourceCreate<Body, Res>;
 
-	fn change_all<Body, R, CR>(&mut self)
+	fn update_all<Handler, Body, Res>(&mut self)
 	where
 		Body : DeserializeOwned,
-		R : ResourceResult,
-		CR : ChangeAllResource<Body, R>;
+		Res : ResourceResult,
+		Handler : ResourceUpdateAll<Body, Res>;
 
-	fn change<ID, Body, R, CR>(&mut self)
+	fn update<Handler, ID, Body, Res>(&mut self)
 	where
 		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
 		Body : DeserializeOwned,
-		R : ResourceResult,
-		CR : ChangeResource<ID, Body, R>;
+		Res : ResourceResult,
+		Handler : ResourceUpdate<ID, Body, Res>;
 }
 
 fn to_handler_future<F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
@@ -131,44 +125,57 @@ where
 	Box::new(f)
 }
 
-fn index_handler<R : ResourceResult, IR : IndexResource<R>>(state : State) -> Box<HandlerFuture>
+fn read_all_handler<Handler, Res>(state : State) -> Box<HandlerFuture>
+where
+	Res : ResourceResult,
+	Handler : ResourceReadAll<Res>
 {
-	to_handler_future(state, |state| IR::index(state))
+	to_handler_future(state, |state| Handler::read_all(state))
 }
 
-fn get_handler<ID, R : ResourceResult, GR : GetResource<ID, R>>(state : State) -> Box<HandlerFuture>
+fn read_handler<Handler, ID, Res>(state : State) -> Box<HandlerFuture>
 where
-	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
+	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+	Res : ResourceResult,
+	Handler : ResourceRead<ID, Res>
 {
 	let id = {
 		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	to_handler_future(state, |state| GR::get(state, id))
+	to_handler_future(state, |state| Handler::read(state, id))
 }
 
-fn create_handler<Body : DeserializeOwned, R : ResourceResult, CR : CreateResource<Body, R>>(state : State) -> Box<HandlerFuture>
+fn create_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
+where
+	Body : DeserializeOwned,
+	Res : ResourceResult,
+	Handler : ResourceCreate<Body, Res>
 {
-	handle_with_body::<Body, _, _>(state, |state, body| CR::create(state, body))
+	handle_with_body::<Body, _, _>(state, |state, body| Handler::create(state, body))
 }
 
-fn change_all_handler<Body : DeserializeOwned, R : ResourceResult, CR : ChangeAllResource<Body, R>>(state : State) -> Box<HandlerFuture>
+fn update_all_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
+where
+	Body : DeserializeOwned,
+	Res : ResourceResult,
+	Handler : ResourceUpdateAll<Body, Res>
 {
-	handle_with_body::<Body, _, _>(state, |state, body| CR::change_all(state, body))
+	handle_with_body::<Body, _, _>(state, |state, body| Handler::update_all(state, body))
 }
 
-fn change_handler<ID, Body, R, CR>(state : State) -> Box<HandlerFuture>
+fn update_handler<Handler, ID, Body, Res>(state : State) -> Box<HandlerFuture>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
 	Body : DeserializeOwned,
-	R : ResourceResult,
-	CR : ChangeResource<ID, Body, R>
+	Res : ResourceResult,
+	Handler : ResourceUpdate<ID, Body, Res>
 {
 	let id = {
 		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	handle_with_body::<Body, _, _>(state, |state, body| CR::change(state, id, body))
+	handle_with_body::<Body, _, _>(state, |state, body| Handler::update(state, id, body))
 }
 
 macro_rules! implDrawResourceRoutes {
@@ -189,56 +196,56 @@ macro_rules! implDrawResourceRoutes {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn index<R, IR>(&mut self)
+			fn read_all<Handler, Res>(&mut self)
 			where
-				R : ResourceResult,
-				IR : IndexResource<R>
+				Res : ResourceResult,
+				Handler : ResourceReadAll<Res>
 			{
 				self.0.get(&self.1)
-					.to(|state| index_handler::<R, IR>(state));
+					.to(|state| read_all_handler::<Handler, Res>(state));
 			}
 
-			fn get<ID, R, IR>(&mut self)
+			fn read<Handler, ID, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				R : ResourceResult,
-				IR : GetResource<ID, R>
+				Res : ResourceResult,
+				Handler : ResourceRead<ID, Res>
 			{
 				self.0.get(&format!("{}/:id", self.1))
 					.with_path_extractor::<PathExtractor<ID>>()
-					.to(|state| get_handler::<ID, R, IR>(state));
+					.to(|state| read_handler::<Handler, ID, Res>(state));
 			}
 
-			fn create<Body, R, CR>(&mut self)
+			fn create<Handler, Body, Res>(&mut self)
 			where
 				Body : DeserializeOwned,
-				R : ResourceResult,
-				CR : CreateResource<Body, R>
+				Res : ResourceResult,
+				Handler : ResourceCreate<Body, Res>
 			{
 				self.0.post(&self.1)
-					.to(|state| create_handler::<Body, R, CR>(state));
+					.to(|state| create_handler::<Handler, Body, Res>(state));
 			}
 
-			fn change_all<Body, R, CR>(&mut self)
+			fn update_all<Handler, Body, Res>(&mut self)
 			where
 				Body : DeserializeOwned,
-				R : ResourceResult,
-				CR : ChangeAllResource<Body, R>
+				Res : ResourceResult,
+				Handler : ResourceUpdateAll<Body, Res>
 			{
 				self.0.put(&self.1)
-					.to(|state| change_all_handler::<Body, R, CR>(state));
+					.to(|state| update_all_handler::<Handler, Body, Res>(state));
 			}
 
-			fn change<ID, Body, R, CR>(&mut self)
+			fn update<Handler, ID, Body, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
 				Body : DeserializeOwned,
-				R : ResourceResult,
-				CR : ChangeResource<ID, Body, R>
+				Res : ResourceResult,
+				Handler : ResourceUpdate<ID, Body, Res>
 			{
 				self.0.put(&format!("{}/:id", self.1))
 					.with_path_extractor::<PathExtractor<ID>>()
-					.to(|state| change_handler::<ID, Body, R, CR>(state));
+					.to(|state| update_handler::<Handler, ID, Body, Res>(state));
 			}
 		}
 	}

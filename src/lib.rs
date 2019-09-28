@@ -6,11 +6,11 @@ pub use hyper::StatusCode;
 mod resource;
 pub use resource::{
 	Resource,
-	IndexResource,
-	GetResource,
-	CreateResource,
-	ChangeAllResource,
-	ChangeResource
+	ResourceReadAll,
+	ResourceRead,
+	ResourceCreate,
+	ResourceUpdateAll,
+	ResourceUpdate
 };
 
 mod result;
