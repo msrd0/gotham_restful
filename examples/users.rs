@@ -72,6 +72,24 @@ impl ResourceUpdate<u64, User, Success<()>> for Users
 	}
 }
 
+impl ResourceDeleteAll<Success<()>> for Users
+{
+	fn delete_all(_state : &mut State) -> Success<()>
+	{
+		info!("Delete all Users");
+		().into()
+	}
+}
+
+impl ResourceDelete<u64, Success<()>> for Users
+{
+	fn delete(_state : &mut State, id : u64) -> Success<()>
+	{
+		info!("Delete User {}", id);
+		().into()
+	}
+}
+
 impl Resource for Users
 {
 	fn setup<D : DrawResourceRoutes>(mut route : D)

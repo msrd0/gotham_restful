@@ -43,3 +43,17 @@ where
 {
 	fn update(state : &mut State, id : ID, body : Body) -> R;
 }
+
+/// Handle a DELETE request on the Resource root.
+pub trait ResourceDeleteAll<R : ResourceResult>
+{
+	fn delete_all(state : &mut State) -> R;
+}
+
+/// Handle a DELETE request on the Resource with an id.
+pub trait ResourceDelete<ID, R : ResourceResult>
+where
+	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
+{
+	fn delete(state : &mut State, id : ID) -> R;
+}

@@ -10,7 +10,9 @@ pub use resource::{
 	ResourceRead,
 	ResourceCreate,
 	ResourceUpdateAll,
-	ResourceUpdate
+	ResourceUpdate,
+	ResourceDeleteAll,
+	ResourceDelete
 };
 
 mod result;

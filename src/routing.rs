@@ -65,6 +65,17 @@ pub trait DrawResourceRoutes
 		Body : DeserializeOwned,
 		Res : ResourceResult,
 		Handler : ResourceUpdate<ID, Body, Res>;
+
+	fn delete_all<Handler, Res>(&mut self)
+	where
+		Res : ResourceResult,
+		Handler : ResourceDeleteAll<Res>;
+	
+	fn delete<Handler, ID, Res>(&mut self)
+	where
+		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+		Res : ResourceResult,
+		Handler : ResourceDelete<ID, Res>;
 }
 
 fn to_handler_future<F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
@@ -178,6 +189,27 @@ where
 	handle_with_body::<Body, _, _>(state, |state, body| Handler::update(state, id, body))
 }
 
+fn delete_all_handler<Handler, Res>(state : State) -> Box<HandlerFuture>
+where
+	Res : ResourceResult,
+	Handler : ResourceDeleteAll<Res>
+{
+	to_handler_future(state, |state| Handler::delete_all(state))
+}
+
+fn delete_handler<Handler, ID, Res>(state : State) -> Box<HandlerFuture>
+where
+	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+	Res : ResourceResult,
+	Handler : ResourceDelete<ID, Res>
+{
+	let id = {
+		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
+		path.id.clone()
+	};
+	to_handler_future(state, |state| Handler::delete(state, id))
+}
+
 macro_rules! implDrawResourceRoutes {
 	($implType:ident) => {
 		impl<'a, C, P> DrawResources for $implType<'a, C, P>
@@ -246,6 +278,26 @@ macro_rules! implDrawResourceRoutes {
 				self.0.put(&format!("{}/:id", self.1))
 					.with_path_extractor::<PathExtractor<ID>>()
 					.to(|state| update_handler::<Handler, ID, Body, Res>(state));
+			}
+
+			fn delete_all<Handler, Res>(&mut self)
+			where
+				Res : ResourceResult,
+				Handler : ResourceDeleteAll<Res>
+			{
+				self.0.delete(&self.1)
+					.to(|state| delete_all_handler::<Handler, Res>(state));
+			}
+
+			fn delete<Handler, ID, Res>(&mut self)
+			where
+				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
+				Res : ResourceResult,
+				Handler : ResourceDelete<ID, Res>
+			{
+				self.0.delete(&format!("{}/:id", self.1))
+					.with_path_extractor::<PathExtractor<ID>>()
+					.to(|state| delete_handler::<Handler, ID, Res>(state));
 			}
 		}
 	}
