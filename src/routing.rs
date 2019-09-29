@@ -3,6 +3,9 @@ use crate::{
 	result::{ResourceError, ResourceResult},
 	StatusCode
 };
+#[cfg(feature = "openapi")]
+use crate::openapi::OpenapiRouter;
+
 use futures::{
 	future::{Future, err, ok},
 	stream::Stream
@@ -23,6 +26,19 @@ use std::panic::RefUnwindSafe;
 struct PathExtractor<ID : RefUnwindSafe + Send + 'static>
 {
 	id : ID
+}
+
+/// This trait adds the `with_openapi` method to gotham's routing. It turns the default
+/// router into one that will only allow RESTful resources, but record them and generate
+/// an OpenAPI specification on request.
+#[cfg(feature = "openapi")]
+pub trait WithOpenapi<D>
+{
+	fn with_openapi<F, Title, Version>(&mut self, title : Title, version : Version, block : F)
+	where
+		F : FnOnce(OpenapiRouter<D>),
+		Title : ToString,
+		Version : ToString;
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -212,6 +228,24 @@ where
 
 macro_rules! implDrawResourceRoutes {
 	($implType:ident) => {
+		
+		#[cfg(feature = "openapi")]
+		impl<'a, C, P> WithOpenapi<Self> for $implType<'a, C, P>
+		where
+			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
+			P : RefUnwindSafe + Send + Sync + 'static
+		{
+			fn with_openapi<F, Title, Version>(&mut self, title : Title, version : Version, block : F)
+			where
+				F : FnOnce(OpenapiRouter<Self>),
+				Title : ToString,
+				Version : ToString
+			{
+				let router : OpenapiRouter<Self> = OpenapiRouter::new(self, title, version);
+				block(router);
+			}
+		}
+		
 		impl<'a, C, P> DrawResources for $implType<'a, C, P>
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,

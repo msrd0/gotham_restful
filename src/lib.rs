@@ -3,6 +3,9 @@
 
 pub use hyper::StatusCode;
 
+#[cfg(feature = "openapi")]
+pub mod openapi;
+
 mod resource;
 pub use resource::{
 	Resource,
