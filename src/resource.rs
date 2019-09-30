@@ -1,4 +1,4 @@
-use crate::{DrawResourceRoutes, ResourceResult};
+use crate::{DrawResourceRoutes, ResourceResult, ResourceType};
 use gotham::state::State;
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -30,7 +30,7 @@ where
 }
 
 /// Handle a POST request on the Resource root.
-pub trait ResourceCreate<Body : DeserializeOwned, R : ResourceResult>
+pub trait ResourceCreate<Body : ResourceType, R : ResourceResult>
 {
 	fn create(state : &mut State, body : Body) -> R;
 }
@@ -42,7 +42,7 @@ pub trait ResourceUpdateAll<Body : DeserializeOwned, R : ResourceResult>
 }
 
 /// Handle a PUT request on the Resource with an id.
-pub trait ResourceUpdate<ID, Body : DeserializeOwned, R : ResourceResult>
+pub trait ResourceUpdate<ID, Body : ResourceType, R : ResourceResult>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
 {

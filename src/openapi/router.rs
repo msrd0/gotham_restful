@@ -2,7 +2,8 @@ use crate::{
 	resource::*,
 	result::*,
 	routing::*,
-	OpenapiType
+	OpenapiType,
+	ResourceType
 };
 use futures::future::ok;
 use gotham::{
@@ -68,7 +69,7 @@ impl OpenapiRouter
 		self.0.paths.insert(path.to_string(), Item(item));
 	}
 
-	fn add_schema<T : ResourceResult>(&mut self, path : &str, method : &str, desc : &str) -> String
+	fn add_schema<T : OpenapiType>(&mut self, path : &str, method : &str, desc : &str) -> String
 	{
 		let name = T::schema_name().unwrap_or_else(|| format!("path_{}_{}_{}", path, method, desc));
 		let item = Schema {
@@ -278,15 +279,16 @@ macro_rules! implOpenapiRouter {
 			
 			fn create<Handler, Body, Res>(&mut self)
 			where
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
 				let schema = (self.0).1.add_schema::<Res>(&self.1, "create", "result_body");
+				let body_schema = (self.0).1.add_schema::<Body>(&self.1, "create", "body");
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.post = Some(new_operation(&schema, vec![], None));
+				item.post = Some(new_operation(&schema, vec![], Some(&body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
@@ -294,15 +296,16 @@ macro_rules! implOpenapiRouter {
 			
 			fn update_all<Handler, Body, Res>(&mut self)
 			where
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
 				let schema = (self.0).1.add_schema::<Res>(&self.1, "update_all", "result_body");
+				let body_schema = (self.0).1.add_schema::<Body>(&self.1, "create", "body");
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(&schema, vec![], None));
+				item.put = Some(new_operation(&schema, vec![], Some(&body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
@@ -311,15 +314,16 @@ macro_rules! implOpenapiRouter {
 			fn update<Handler, ID, Body, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{
 				let schema = (self.0).1.add_schema::<Res>(&self.1, "update", "result_body");
+				let body_schema = (self.0).1.add_schema::<Body>(&self.1, "create", "body");
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(&schema, vec!["id"], None));
+				item.put = Some(new_operation(&schema, vec!["id"], Some(&body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()

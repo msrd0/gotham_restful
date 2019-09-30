@@ -2,8 +2,7 @@
 #[macro_use] extern crate serde;
 
 pub use hyper::StatusCode;
-#[cfg(not(feature = "openapi"))]
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 
 pub mod helper;
 
@@ -40,12 +39,12 @@ pub use routing::WithOpenapi;
 /// that is serializable with serde, however, it is recommended to use the rest_struct!
 /// macro to create one.
 #[cfg(not(feature = "openapi"))]
-pub trait ResourceType : Serialize
+pub trait ResourceType : DeserializeOwned + Serialize
 {
 }
 
 #[cfg(not(feature = "openapi"))]
-impl<T : Serialize> ResourceType for T
+impl<T : DeserializeOwned + Serialize> ResourceType for T
 {
 }
 
@@ -53,11 +52,11 @@ impl<T : Serialize> ResourceType for T
 /// that is serializable with serde, however, it is recommended to use the rest_struct!
 /// macro to create one.
 #[cfg(feature = "openapi")]
-pub trait ResourceType : OpenapiType
+pub trait ResourceType : OpenapiType + DeserializeOwned + Serialize
 {
 }
 
 #[cfg(feature = "openapi")]
-impl<T : OpenapiType> ResourceType for T
+impl<T : OpenapiType + DeserializeOwned + Serialize> ResourceType for T
 {
 }

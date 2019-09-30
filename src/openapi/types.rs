@@ -1,11 +1,9 @@
-use indexmap::IndexMap;
 use openapiv3::{
 	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, Schema, SchemaData, SchemaKind, StringType, Type
 };
-use serde::Serialize;
 
 
-pub trait OpenapiType : Serialize
+pub trait OpenapiType
 {
 	fn schema_name() -> Option<String>
 	{

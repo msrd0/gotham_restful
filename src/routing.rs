@@ -1,6 +1,7 @@
 use crate::{
 	resource::*,
 	result::{ResourceError, ResourceResult},
+	ResourceType,
 	StatusCode
 };
 #[cfg(feature = "openapi")]
@@ -66,20 +67,20 @@ pub trait DrawResourceRoutes
 	
 	fn create<Handler, Body, Res>(&mut self)
 	where
-		Body : DeserializeOwned,
+		Body : ResourceType,
 		Res : ResourceResult,
 		Handler : ResourceCreate<Body, Res>;
 
 	fn update_all<Handler, Body, Res>(&mut self)
 	where
-		Body : DeserializeOwned,
+		Body : ResourceType,
 		Res : ResourceResult,
 		Handler : ResourceUpdateAll<Body, Res>;
 
 	fn update<Handler, ID, Body, Res>(&mut self)
 	where
 		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		Body : DeserializeOwned,
+		Body : ResourceType,
 		Res : ResourceResult,
 		Handler : ResourceUpdate<ID, Body, Res>;
 
@@ -176,7 +177,7 @@ where
 
 fn create_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
-	Body : DeserializeOwned,
+	Body : ResourceType,
 	Res : ResourceResult,
 	Handler : ResourceCreate<Body, Res>
 {
@@ -185,7 +186,7 @@ where
 
 fn update_all_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
-	Body : DeserializeOwned,
+	Body : ResourceType,
 	Res : ResourceResult,
 	Handler : ResourceUpdateAll<Body, Res>
 {
@@ -195,7 +196,7 @@ where
 fn update_handler<Handler, ID, Body, Res>(state : State) -> Box<HandlerFuture>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-	Body : DeserializeOwned,
+	Body : ResourceType,
 	Res : ResourceResult,
 	Handler : ResourceUpdate<ID, Body, Res>
 {
@@ -286,7 +287,7 @@ macro_rules! implDrawResourceRoutes {
 
 			fn create<Handler, Body, Res>(&mut self)
 			where
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
@@ -296,7 +297,7 @@ macro_rules! implDrawResourceRoutes {
 
 			fn update_all<Handler, Body, Res>(&mut self)
 			where
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
@@ -307,7 +308,7 @@ macro_rules! implDrawResourceRoutes {
 			fn update<Handler, ID, Body, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{
