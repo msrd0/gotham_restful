@@ -3,6 +3,8 @@
 
 pub use hyper::StatusCode;
 
+pub mod helper;
+
 #[cfg(feature = "openapi")]
 pub mod openapi;
 #[cfg(feature = "openapi")]

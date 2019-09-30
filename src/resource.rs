@@ -7,6 +7,11 @@ use std::panic::RefUnwindSafe;
 /// allow you to register the different methods for this Resource.
 pub trait Resource
 {
+	/// The name of this resource. Must be unique.
+	fn name() -> String;
+
+	/// Setup all routes of this resource. Take a look at the rest_resource!
+	/// macro if you don't feel like caring yourself.
 	fn setup<D : DrawResourceRoutes>(route : D);
 }
 

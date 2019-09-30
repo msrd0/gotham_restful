@@ -1,5 +1,4 @@
 #[macro_use] extern crate log;
-#[macro_use] extern crate serde;
 
 use fake::{faker::internet::en::Username, Fake};
 use gotham::{
@@ -16,13 +15,17 @@ use log4rs::{
 	encode::pattern::PatternEncoder
 };
 
-struct Users;
+rest_resource!{Users, route => {
+	route.read_all::<Self, _>();
+	route.read::<Self, _, _>();
+	route.create::<Self, _, _>();
+	route.update_all::<Self, _, _>();
+	route.update::<Self, _, _, _>();
+}}
 
-#[derive(Deserialize, Serialize)]
-struct User
-{
+rest_struct!{User {
 	username : String
-}
+}}
 
 impl ResourceReadAll<Success<Vec<User>>> for Users
 {
@@ -87,18 +90,6 @@ impl ResourceDelete<u64, Success<()>> for Users
 	{
 		info!("Delete User {}", id);
 		().into()
-	}
-}
-
-impl Resource for Users
-{
-	fn setup<D : DrawResourceRoutes>(mut route : D)
-	{
-		route.read_all::<Self, _>();
-		route.read::<Self, _, _>();
-		route.create::<Self, _, _>();
-		route.update_all::<Self, _, _>();
-		route.update::<Self, _, _, _>();
 	}
 }
 
