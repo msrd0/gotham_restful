@@ -15,7 +15,13 @@ use log4rs::{
 	encode::pattern::PatternEncoder
 };
 
-rest_resource!{Users}
+rest_resource!{Users, route => {
+	route.read_all::<Self, _>();
+	route.read::<Self, _, _>();
+	route.create::<Self, _, _>();
+	route.update_all::<Self, _, _>();
+	route.update::<Self, _, _, _>();
+}}
 
 rest_struct!{User {
 	username : String
@@ -86,18 +92,6 @@ impl ResourceDelete<u64, Success<()>> for Users
 		().into()
 	}
 }
-
-// impl Resource for Users
-// {
-// 	fn setup<D : DrawResourceRoutes>(mut route : D)
-// 	{
-// 		route.read_all::<Self, _>();
-// 		route.read::<Self, _, _>();
-// 		route.create::<Self, _, _>();
-// 		route.update_all::<Self, _, _>();
-// 		route.update::<Self, _, _, _>();
-// 	}
-// }
 
 const ADDR : &str = "127.0.0.1:18080";
 

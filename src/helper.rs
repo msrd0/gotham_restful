@@ -12,7 +12,7 @@ macro_rules! rest_struct {
 
 #[macro_export]
 macro_rules! rest_resource {
-	($res_name:ident) => {
+	($res_name:ident, $route:ident => $setup:block) => {
 		struct $res_name;
 
 		impl ::gotham_restful::Resource for $res_name
@@ -22,10 +22,7 @@ macro_rules! rest_resource {
 				stringify!($res_name).to_string()
 			}
 
-			fn setup<D : ::gotham_restful::DrawResourceRoutes>(mut route : D)
-			{
-				unimplemented!();
-			}
+			fn setup<D : ::gotham_restful::DrawResourceRoutes>(mut $route : D) $setup
 		}
 	}
 }
