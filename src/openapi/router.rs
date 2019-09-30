@@ -17,8 +17,8 @@ use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
 	Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
-	PathStyle, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, Response, Responses, Schema,
-	SchemaData, Server, StatusCode
+	PathStyle, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody, Response, Responses,
+	Schema, SchemaData, Server, StatusCode
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -147,7 +147,7 @@ pub trait GetOpenapi
 	fn get_openapi(&mut self, path : &str);
 }
 
-fn new_operation(schema : &str, path_params : Vec<&str>) -> Operation
+fn schema_to_content(schema : &str) -> IndexMap<String, MediaType>
 {
 	let mut content : IndexMap<String, MediaType> = IndexMap::new();
 	content.insert(APPLICATION_JSON.to_string(), MediaType {
@@ -158,12 +158,16 @@ fn new_operation(schema : &str, path_params : Vec<&str>) -> Operation
 		examples: IndexMap::new(),
 		encoding: IndexMap::new()
 	});
-	
+	content
+}
+
+fn new_operation(schema : &str, path_params : Vec<&str>, body_schema : Option<&str>) -> Operation
+{
 	let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
 	responses.insert(StatusCode::Code(200), Item(Response {
 		description: "OK".to_string(),
 		headers: IndexMap::new(),
-		content,
+		content: schema_to_content(schema),
 		links: IndexMap::new()
 	}));
 	
@@ -186,6 +190,12 @@ fn new_operation(schema : &str, path_params : Vec<&str>) -> Operation
 			style: PathStyle::default(),
 		}));
 	}
+
+	let request_body = body_schema.map(|schema| Item(RequestBody {
+		description: None,
+		content: schema_to_content(schema),
+		required: true
+	}));
 	
 	Operation {
 		tags: Vec::new(),
@@ -194,7 +204,7 @@ fn new_operation(schema : &str, path_params : Vec<&str>) -> Operation
 		external_documentation: None,
 		operation_id: None, // TODO
 		parameters: params,
-		request_body: None,
+		request_body,
 		responses: Responses {
 			default: None,
 			responses
@@ -244,7 +254,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(&schema, vec![]));
+				item.get = Some(new_operation(&schema, vec![], None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
@@ -260,7 +270,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(&schema, vec!["id"]));
+				item.get = Some(new_operation(&schema, vec!["id"], None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
@@ -272,6 +282,13 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "create", "result_body");
+
+				let path = format!("/{}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
+				item.post = Some(new_operation(&schema, vec![], None));
+				(self.0).1.add_path(path, item);
+				
 				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
 			}
 			
@@ -281,6 +298,13 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "update_all", "result_body");
+
+				let path = format!("/{}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
+				item.put = Some(new_operation(&schema, vec![], None));
+				(self.0).1.add_path(path, item);
+				
 				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
 			}
 			
@@ -291,6 +315,13 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "update", "result_body");
+
+				let path = format!("/{}/{{id}}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
+				item.put = Some(new_operation(&schema, vec!["id"], None));
+				(self.0).1.add_path(path, item);
+				
 				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
 			}
 			
@@ -299,6 +330,13 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceDeleteAll<Res>
 			{
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "delete_all", "result_body");
+
+				let path = format!("/{}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
+				item.delete = Some(new_operation(&schema, vec![], None));
+				(self.0).1.add_path(path, item);
+				
 				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
 			}
 			
@@ -308,6 +346,13 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceDelete<ID, Res>
 			{
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "delete", "result_body");
+
+				let path = format!("/{}/{{id}}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
+				item.delete = Some(new_operation(&schema, vec!["id"], None));
+				(self.0).1.add_path(path, item);
+				
 				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()
 			}
 		}
