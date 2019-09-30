@@ -10,7 +10,7 @@ pub mod openapi
 macro_rules! rest_struct {
 	($struct_name:ident { $($field_id:ident : $field_ty:ty),* }) => {
 		#[derive(serde::Deserialize, serde::Serialize)]
-		struct $struct_name
+		pub struct $struct_name
 		{
 			$($field_id : $field_ty),*
 		}
@@ -66,7 +66,7 @@ macro_rules! rest_struct {
 #[macro_export]
 macro_rules! rest_resource {
 	($res_name:ident, $route:ident => $setup:block) => {
-		struct $res_name;
+		pub struct $res_name;
 
 		impl ::gotham_restful::Resource for $res_name
 		{
