@@ -127,7 +127,7 @@ fn main()
 	);
 
 	gotham::start(ADDR, build_router(chain, pipelines, |route| {
-		route.with_openapi("Users Example", "0.0.1", |mut route| {
+		route.with_openapi("Users Example", "0.0.1", ADDR, |mut route| {
 			route.resource::<Users, _>("users");
 			route.get_openapi("openapi");
 		});

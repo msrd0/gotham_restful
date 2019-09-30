@@ -34,11 +34,12 @@ struct PathExtractor<ID : RefUnwindSafe + Send + 'static>
 #[cfg(feature = "openapi")]
 pub trait WithOpenapi<D>
 {
-	fn with_openapi<F, Title, Version>(&mut self, title : Title, version : Version, block : F)
+	fn with_openapi<F, Title, Version, Url>(&mut self, title : Title, version : Version, server_url : Url, block : F)
 	where
 		F : FnOnce((&mut D, &mut OpenapiRouter)),
 		Title : ToString,
-		Version : ToString;
+		Version : ToString,
+		Url : ToString;
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -235,13 +236,14 @@ macro_rules! implDrawResourceRoutes {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn with_openapi<F, Title, Version>(&mut self, title : Title, version : Version, block : F)
+			fn with_openapi<F, Title, Version, Url>(&mut self, title : Title, version : Version, server_url : Url, block : F)
 			where
 				F : FnOnce((&mut Self, &mut OpenapiRouter)),
 				Title : ToString,
-				Version : ToString
+				Version : ToString,
+				Url : ToString
 			{
-				let mut router = OpenapiRouter::new(title, version);
+				let mut router = OpenapiRouter::new(title, version, server_url);
 				block((self, &mut router));
 			}
 		}

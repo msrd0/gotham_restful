@@ -14,7 +14,7 @@ use gotham::{
 use indexmap::IndexMap;
 use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
-use openapiv3::{MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, Response, Responses, StatusCode};
+use openapiv3::{MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, Response, Responses, Server, StatusCode};
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
@@ -22,7 +22,7 @@ pub struct OpenapiRouter(OpenAPI);
 
 impl OpenapiRouter
 {
-	pub fn new<Title : ToString, Version : ToString>(title : Title, version : Version) -> Self
+	pub fn new<Title : ToString, Version : ToString, Url : ToString>(title : Title, version : Version, server_url : Url) -> Self
 	{
 		Self(OpenAPI {
 			openapi: "3.0.2".to_string(),
@@ -34,7 +34,11 @@ impl OpenapiRouter
 				license: None,
 				version: version.to_string()
 			},
-			servers: Vec::new(),
+			servers: vec![Server {
+				url: server_url.to_string(),
+				description: None,
+				variables: None
+			}],
 			paths: Paths::new(),
 			components: None,
 			security: Vec::new(),
