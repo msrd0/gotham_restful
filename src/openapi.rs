@@ -156,19 +156,19 @@ macro_rules! implOpenapiRouter {
 				let path = &self.1;
 				let mut item = (self.0).1.remove_path(path);
 				let mut content : IndexMap<String, MediaType> = IndexMap::new();
-				content[&APPLICATION_JSON.to_string()] = MediaType {
+				content.insert(APPLICATION_JSON.to_string(), MediaType {
 					schema: None, // TODO
 					example: None,
 					examples: IndexMap::new(),
 					encoding: IndexMap::new()
-				};
+				});
 				let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
-				responses[&StatusCode::Code(200)] = Item(Response {
+				responses.insert(StatusCode::Code(200), Item(Response {
 					description: "OK".to_string(),
 					headers: IndexMap::new(),
 					content,
 					links: IndexMap::new()
-				});
+				}));
 				item.get = Some(Operation {
 					tags: Vec::new(),
 					summary: None,
