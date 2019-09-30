@@ -7,6 +7,8 @@ use std::panic::RefUnwindSafe;
 /// allow you to register the different methods for this Resource.
 pub trait Resource
 {
+	fn name() -> String;
+	
 	fn setup<D : DrawResourceRoutes>(route : D);
 }
 

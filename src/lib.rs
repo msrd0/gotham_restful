@@ -3,6 +3,8 @@
 
 pub use hyper::StatusCode;
 
+pub mod helper;
+
 mod resource;
 pub use resource::{
 	Resource,
