@@ -1,5 +1,10 @@
+#[cfg(feature = "chrono")]
+use chrono::{
+	Date, DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc
+};
 use openapiv3::{
-	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, Schema, SchemaData, SchemaKind, StringType, Type
+	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, Schema, SchemaData, SchemaKind,
+	StringFormat, StringType, Type, VariantOrUnknownOrEmpty
 };
 
 
@@ -66,7 +71,21 @@ macro_rules! str_types {
 				SchemaKind::Type(Type::String(StringType::default()))
 			}
 		}
-	)*}
+	)*};
+
+	(format = $format:ident, $($str_ty:ty),*) => {$(
+		impl OpenapiType  for $str_ty
+		{
+			fn to_schema() -> SchemaKind
+			{
+				SchemaKind::Type(Type::String(StringType {
+					format: VariantOrUnknownOrEmpty::Item(StringFormat::$format),
+					pattern: None,
+					enumeration: Vec::new()
+				}))
+			}
+		}
+	)*};
 }
 
 str_types!(String, &str);
@@ -91,3 +110,8 @@ impl<T : OpenapiType> OpenapiType for Vec<T>
 		}))
 	}
 }
+
+#[cfg(feature = "chrono")]
+str_types!(format = Date, Date<FixedOffset>, Date<Local>, Date<Utc>, NaiveDate);
+#[cfg(feature = "chrono")]
+str_types!(format = DateTime, DateTime<FixedOffset>, DateTime<Local>, DateTime<Utc>, NaiveDateTime);

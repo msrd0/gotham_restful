@@ -16,6 +16,7 @@ repository = "https://gitlab.com/msrd0/gotham-restful"
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 
 [dependencies]
+chrono = { version = "0.4", optional = true }
 failure = "0.1"
 futures = "0.1"
 gotham = "0.4"
@@ -34,5 +35,5 @@ log = "0.4"
 log4rs = { version = "0.8", features = ["console_appender"], default-features = false }
 
 [features]
-default = ["openapi"]
+default = ["openapi", "chrono"]
 openapi = ["indexmap", "log", "openapiv3"]
