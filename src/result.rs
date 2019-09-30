@@ -8,7 +8,10 @@ use std::error::Error;
 pub trait ResourceResult
 {
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>;
-
+	
+	#[cfg(feature = "openapi")]
+	fn schema_name() -> Option<String>;
+	
 	#[cfg(feature = "openapi")]
 	fn to_schema() -> SchemaKind;
 }
@@ -44,7 +47,14 @@ impl<R : ResourceType, E : Error> ResourceResult for Result<R, E>
 			}
 		})
 	}
-
+	
+	#[cfg(feature = "openapi")]
+	fn schema_name() -> Option<String>
+	{
+		R::schema_name()
+	}
+	
+	#[cfg(feature = "openapi")]
 	fn to_schema() -> SchemaKind
 	{
 		R::to_schema()
@@ -68,7 +78,14 @@ impl<T : ResourceType> ResourceResult for Success<T>
 	{
 		Ok((StatusCode::OK, serde_json::to_string(&self.0)?))
 	}
-
+	
+	#[cfg(feature = "openapi")]
+	fn schema_name() -> Option<String>
+	{
+		T::schema_name()
+	}
+	
+	#[cfg(feature = "openapi")]
 	fn to_schema() -> SchemaKind
 	{
 		T::to_schema()

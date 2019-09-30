@@ -1,12 +1,17 @@
 use indexmap::IndexMap;
 use openapiv3::{
-	IntegerType, NumberType, ObjectType, SchemaKind, StringType, Type
+	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, Schema, SchemaData, SchemaKind, StringType, Type
 };
 use serde::Serialize;
 
 
 pub trait OpenapiType : Serialize
 {
+	fn schema_name() -> Option<String>
+	{
+		None
+	}
+	
 	fn to_schema() -> SchemaKind;
 }
 
@@ -67,3 +72,24 @@ macro_rules! str_types {
 }
 
 str_types!(String, &str);
+
+impl<T : OpenapiType> OpenapiType for Vec<T>
+{
+	fn schema_name() -> Option<String>
+	{
+		T::schema_name().map(|name| format!("{}Array", name))
+	}
+	
+	fn to_schema() -> SchemaKind
+	{
+		SchemaKind::Type(Type::Array(ArrayType {
+			items: Item(Box::new(Schema {
+				schema_data: SchemaData::default(),
+				schema_kind: T::to_schema()
+			})),
+			min_items: None,
+			max_items: None,
+			unique_items: false
+		}))
+	}
+}

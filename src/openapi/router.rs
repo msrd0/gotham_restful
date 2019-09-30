@@ -15,7 +15,8 @@ use indexmap::IndexMap;
 use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
-	MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, Response, Responses, Server, StatusCode
+	Components, MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference,
+	Response, Responses, Schema, SchemaData, Server, StatusCode
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -57,23 +58,26 @@ impl OpenapiRouter
 		{
 			return item;
 		}
-		return PathItem {
-			get: None,
-			put: None,
-			post: None,
-			delete: None,
-			options: None,
-			head: None,
-			patch: None,
-			trace: None,
-			servers: Vec::new(),
-			parameters: Vec::new()
-		};
+		return PathItem::default()
 	}
 
 	fn add_path<Path : ToString>(&mut self, path : Path, item : PathItem)
 	{
 		self.0.paths.insert(path.to_string(), Item(item));
+	}
+
+	fn add_schema<Name : ToString>(&mut self, name : Name, item : Schema)
+	{
+		match &mut self.0.components {
+			Some(comp) => {
+				comp.schemas.insert(name.to_string(), Item(item));
+			},
+			None => {
+				let mut comp = Components::default();
+				comp.schemas.insert(name.to_string(), Item(item));
+				self.0.components = Some(comp);
+			}
+		};
 	}
 }
 
@@ -159,11 +163,21 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceReadAll<Res>
 			{
-				let path = &self.1;
-				let mut item = (self.0).1.remove_path(path);
+				let schema = Res::schema_name().unwrap_or_else(|| {
+					format!("Resource_{}_ReadAllResult", self.1)
+				});
+				(self.0).1.add_schema(&schema, Schema {
+					schema_data: SchemaData::default(),
+					schema_kind: Res::to_schema()
+				});
+				
+				let path = format!("/{}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
 				let mut content : IndexMap<String, MediaType> = IndexMap::new();
 				content.insert(APPLICATION_JSON.to_string(), MediaType {
-					schema: None, // TODO
+					schema: Some(Reference {
+						reference: format!("#/components/schemas/{}", schema)
+					}),
 					example: None,
 					examples: IndexMap::new(),
 					encoding: IndexMap::new()
