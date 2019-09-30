@@ -2,13 +2,18 @@
 #[macro_use] extern crate serde;
 
 pub use hyper::StatusCode;
+#[cfg(not(feature = "openapi"))]
+use serde::Serialize;
 
 pub mod helper;
 
 #[cfg(feature = "openapi")]
 pub mod openapi;
 #[cfg(feature = "openapi")]
-pub use openapi::{GetOpenapi, OpenapiRouter};
+pub use openapi::{
+	router::{GetOpenapi, OpenapiRouter},
+	types::OpenapiType
+};
 
 mod resource;
 pub use resource::{
@@ -29,3 +34,30 @@ mod routing;
 pub use routing::{DrawResources, DrawResourceRoutes};
 #[cfg(feature = "openapi")]
 pub use routing::WithOpenapi;
+
+
+/// A type that can be used inside a request or response body. Implemented for every type
+/// that is serializable with serde, however, it is recommended to use the rest_struct!
+/// macro to create one.
+#[cfg(not(feature = "openapi"))]
+pub trait ResourceType : Serialize
+{
+}
+
+#[cfg(not(feature = "openapi"))]
+impl<T : Serialize> ResourceType for T
+{
+}
+
+/// A type that can be used inside a request or response body. Implemented for every type
+/// that is serializable with serde, however, it is recommended to use the rest_struct!
+/// macro to create one.
+#[cfg(feature = "openapi")]
+pub trait ResourceType : OpenapiType
+{
+}
+
+#[cfg(feature = "openapi")]
+impl<T : OpenapiType> ResourceType for T
+{
+}

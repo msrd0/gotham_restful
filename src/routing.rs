@@ -4,7 +4,7 @@ use crate::{
 	StatusCode
 };
 #[cfg(feature = "openapi")]
-use crate::openapi::OpenapiRouter;
+use crate::OpenapiRouter;
 
 use futures::{
 	future::{Future, err, ok},

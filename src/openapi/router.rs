@@ -14,7 +14,9 @@ use gotham::{
 use indexmap::IndexMap;
 use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
-use openapiv3::{MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, Response, Responses, Server, StatusCode};
+use openapiv3::{
+	MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, Response, Responses, Server, StatusCode
+};
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
