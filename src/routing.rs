@@ -36,7 +36,7 @@ pub trait WithOpenapi<D>
 {
 	fn with_openapi<F, Title, Version>(&mut self, title : Title, version : Version, block : F)
 	where
-		F : FnOnce(OpenapiRouter<D>),
+		F : FnOnce((&mut D, &mut OpenapiRouter)),
 		Title : ToString,
 		Version : ToString;
 }
@@ -237,12 +237,12 @@ macro_rules! implDrawResourceRoutes {
 		{
 			fn with_openapi<F, Title, Version>(&mut self, title : Title, version : Version, block : F)
 			where
-				F : FnOnce(OpenapiRouter<Self>),
+				F : FnOnce((&mut Self, &mut OpenapiRouter)),
 				Title : ToString,
 				Version : ToString
 			{
-				let router : OpenapiRouter<Self> = OpenapiRouter::new(self, title, version);
-				block(router);
+				let mut router = OpenapiRouter::new(title, version);
+				block((self, &mut router));
 			}
 		}
 		

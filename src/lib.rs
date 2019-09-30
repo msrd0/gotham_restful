@@ -5,6 +5,8 @@ pub use hyper::StatusCode;
 
 #[cfg(feature = "openapi")]
 pub mod openapi;
+#[cfg(feature = "openapi")]
+pub use openapi::{GetOpenapi, OpenapiRouter};
 
 mod resource;
 pub use resource::{
@@ -23,3 +25,5 @@ pub use result::{ResourceResult, Success};
 
 mod routing;
 pub use routing::{DrawResources, DrawResourceRoutes};
+#[cfg(feature = "openapi")]
+pub use routing::WithOpenapi;

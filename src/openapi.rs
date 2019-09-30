@@ -18,43 +18,36 @@ use openapiv3::{MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, Ref
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
-pub struct OpenapiRouter<'a, D>
-{
-	route : &'a mut D,
-	openapi : OpenAPI
-}
+pub struct OpenapiRouter(OpenAPI);
 
-impl<'a, D> OpenapiRouter<'a, D>
+impl OpenapiRouter
 {
-	pub fn new<Title : ToString, Version : ToString>(route : &'a mut D, title : Title, version : Version) -> Self
+	pub fn new<Title : ToString, Version : ToString>(title : Title, version : Version) -> Self
 	{
-		Self {
-			route,
-			openapi: OpenAPI {
-				openapi: "3.0.2".to_string(),
-				info: openapiv3::Info {
-					title: title.to_string(),
-					description: None,
-					terms_of_service: None,
-					contact: None,
-					license: None,
-					version: version.to_string()
-				},
-				servers: Vec::new(),
-				paths: Paths::new(),
-				components: None,
-				security: Vec::new(),
-				tags: Vec::new(),
-				external_docs: None
-			}
-		}
+		Self(OpenAPI {
+			openapi: "3.0.2".to_string(),
+			info: openapiv3::Info {
+				title: title.to_string(),
+				description: None,
+				terms_of_service: None,
+				contact: None,
+				license: None,
+				version: version.to_string()
+			},
+			servers: Vec::new(),
+			paths: Paths::new(),
+			components: None,
+			security: Vec::new(),
+			tags: Vec::new(),
+			external_docs: None
+		})
 	}
 
 	/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to
 	/// modify the path and add it back after the modification
 	fn remove_path(&mut self, path : &str) -> PathItem
 	{
-		if let Some(Item(item)) = self.openapi.paths.swap_remove(path)
+		if let Some(Item(item)) = self.0.paths.swap_remove(path)
 		{
 			return item;
 		}
@@ -74,7 +67,7 @@ impl<'a, D> OpenapiRouter<'a, D>
 
 	fn add_path<Path : ToString>(&mut self, path : Path, item : PathItem)
 	{
-		self.openapi.paths.insert(path.to_string(), Item(item));
+		self.0.paths.insert(path.to_string(), Item(item));
 	}
 }
 
@@ -86,9 +79,9 @@ impl RefUnwindSafe for OpenapiHandler {}
 
 impl OpenapiHandler
 {
-	fn new(openapi : &OpenAPI) -> Self
+	fn new(openapi : &OpenapiRouter) -> Self
 	{
-		Self(serde_json::to_string(openapi).map_err(|e| format!("{}", e)))
+		Self(serde_json::to_string(&openapi.0).map_err(|e| format!("{}", e)))
 	}
 }
 
@@ -120,21 +113,26 @@ impl Handler for OpenapiHandler
 	}
 }
 
+pub trait GetOpenapi
+{
+	fn get_openapi(&mut self, path : &str);
+}
+
 macro_rules! implOpenapiRouter {
 	($implType:ident) => {
 
-		impl<'a, C, P> OpenapiRouter<'a, $implType<'a, C, P>>
+		impl<'a, C, P> GetOpenapi for (&mut $implType<'a, C, P>, &mut OpenapiRouter)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			pub fn get_openapi(&mut self, path : &str)
+			fn get_openapi(&mut self, path : &str)
 			{
-				self.route.get(path).to_new_handler(OpenapiHandler::new(&self.openapi));
+				self.0.get(path).to_new_handler(OpenapiHandler::new(&self.1));
 			}
 		}
 		
-		impl<'a, C, P> DrawResources for OpenapiRouter<'a, $implType<'a, C, P>>
+		impl<'a, C, P> DrawResources for (&mut $implType<'a, C, P>, &mut OpenapiRouter)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
@@ -145,7 +143,7 @@ macro_rules! implOpenapiRouter {
 			}
 		}
 
-		impl<'a, C, P> DrawResourceRoutes for (&mut OpenapiRouter<'a, $implType<'a, C, P>>, String)
+		impl<'a, C, P> DrawResourceRoutes for (&mut (&mut $implType<'a, C, P>, &mut OpenapiRouter), String)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
@@ -156,7 +154,7 @@ macro_rules! implOpenapiRouter {
 				Handler : ResourceReadAll<Res>
 			{
 				let path = &self.1;
-				let mut item = self.0.remove_path(path);
+				let mut item = (self.0).1.remove_path(path);
 				let mut content : IndexMap<String, MediaType> = IndexMap::new();
 				content[&APPLICATION_JSON.to_string()] = MediaType {
 					schema: None, // TODO
@@ -187,9 +185,9 @@ macro_rules! implOpenapiRouter {
 					security: Vec::new(),
 					servers: Vec::new()
 				});
-				self.0.add_path(path, item);
+				(self.0).1.add_path(path, item);
 				
-				(&mut *self.0.route, self.1.to_string()).read_all::<Handler, Res>()
+				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
 			}
 			
 			fn read<Handler, ID, Res>(&mut self)
@@ -198,7 +196,7 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceRead<ID, Res>
 			{
-				(&mut *self.0.route, self.1.to_string()).read::<Handler, ID, Res>()
+				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
 			}
 			
 			fn create<Handler, Body, Res>(&mut self)
@@ -207,7 +205,7 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
-				(&mut *self.0.route, self.1.to_string()).create::<Handler, Body, Res>()
+				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
 			}
 			
 			fn update_all<Handler, Body, Res>(&mut self)
@@ -216,7 +214,7 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
-				(&mut *self.0.route, self.1.to_string()).update_all::<Handler, Body, Res>()
+				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
 			}
 			
 			fn update<Handler, ID, Body, Res>(&mut self)
@@ -226,7 +224,7 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{
-				(&mut *self.0.route, self.1.to_string()).update::<Handler, ID, Body, Res>()
+				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
 			}
 			
 			fn delete_all<Handler, Res>(&mut self)
@@ -234,7 +232,7 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceDeleteAll<Res>
 			{
-				(&mut *self.0.route, self.1.to_string()).delete_all::<Handler, Res>()
+				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
 			}
 			
 			fn delete<Handler, ID, Res>(&mut self)
@@ -243,7 +241,7 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceDelete<ID, Res>
 			{
-				(&mut *self.0.route, self.1.to_string()).delete::<Handler, ID, Res>()
+				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()
 			}
 		}
 

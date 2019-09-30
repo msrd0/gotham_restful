@@ -125,9 +125,12 @@ fn main()
 			.add(logging)
 			.build()
 	);
-	
+
 	gotham::start(ADDR, build_router(chain, pipelines, |route| {
-		route.resource::<Users, _>("users");
+		route.with_openapi("Users Example", "0.0.1", |mut route| {
+			route.resource::<Users, _>("users");
+			route.get_openapi("openapi");
+		});
 	}));
 	println!("Gotham started on {} for testing", ADDR);
 }
