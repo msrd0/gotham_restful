@@ -1,7 +1,8 @@
 use crate::{
 	resource::*,
 	result::*,
-	routing::*
+	routing::*,
+	OpenapiType
 };
 use futures::future::ok;
 use gotham::{
@@ -15,8 +16,9 @@ use indexmap::IndexMap;
 use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
-	Components, MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference,
-	Response, Responses, Schema, SchemaData, Server, StatusCode
+	Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
+	PathStyle, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, Response, Responses, Schema,
+	SchemaData, Server, StatusCode
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -66,8 +68,24 @@ impl OpenapiRouter
 		self.0.paths.insert(path.to_string(), Item(item));
 	}
 
-	fn add_schema<Name : ToString>(&mut self, name : Name, item : Schema)
+	fn add_schema<T : ResourceResult>(&mut self, path : &str, method : &str, desc : &str) -> String
 	{
+		let name = T::schema_name().unwrap_or_else(|| format!("path_{}_{}_{}", path, method, desc));
+		let item = Schema {
+			schema_data: SchemaData {
+				nullable: false,
+				read_only: false,
+				write_only: false,
+				deprecated: false,
+				external_docs: None,
+				example: None,
+				title: Some(name.to_string()),
+				description: None,
+				discriminator: None,
+				default: None
+			},
+			schema_kind: T::to_schema()
+		};
 		match &mut self.0.components {
 			Some(comp) => {
 				comp.schemas.insert(name.to_string(), Item(item));
@@ -78,6 +96,7 @@ impl OpenapiRouter
 				self.0.components = Some(comp);
 			}
 		};
+		name
 	}
 }
 
@@ -128,6 +147,64 @@ pub trait GetOpenapi
 	fn get_openapi(&mut self, path : &str);
 }
 
+fn new_operation(schema : &str, path_params : Vec<&str>) -> Operation
+{
+	let mut content : IndexMap<String, MediaType> = IndexMap::new();
+	content.insert(APPLICATION_JSON.to_string(), MediaType {
+		schema: Some(Reference {
+			reference: format!("#/components/schemas/{}", schema)
+		}),
+		example: None,
+		examples: IndexMap::new(),
+		encoding: IndexMap::new()
+	});
+	
+	let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
+	responses.insert(StatusCode::Code(200), Item(Response {
+		description: "OK".to_string(),
+		headers: IndexMap::new(),
+		content,
+		links: IndexMap::new()
+	}));
+	
+	let mut params : Vec<ReferenceOr<Parameter>> = Vec::new();
+	for param in path_params
+	{
+		params.push(Item(Parameter::Path {
+			parameter_data: ParameterData {
+				name: param.to_string(),
+				description: None,
+				required: true,
+				deprecated: None,
+				format: ParameterSchemaOrContent::Schema(Item(Schema {
+					schema_data: SchemaData::default(),
+					schema_kind: String::to_schema()
+				})),
+				example: None,
+				examples: IndexMap::new()
+			},
+			style: PathStyle::default(),
+		}));
+	}
+	
+	Operation {
+		tags: Vec::new(),
+		summary: None,
+		description: None,
+		external_documentation: None,
+		operation_id: None, // TODO
+		parameters: params,
+		request_body: None,
+		responses: Responses {
+			default: None,
+			responses
+		},
+		deprecated: false,
+		security: Vec::new(),
+		servers: Vec::new()
+	}
+}
+
 macro_rules! implOpenapiRouter {
 	($implType:ident) => {
 
@@ -163,48 +240,11 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceReadAll<Res>
 			{
-				let schema = Res::schema_name().unwrap_or_else(|| {
-					format!("Resource_{}_ReadAllResult", self.1)
-				});
-				(self.0).1.add_schema(&schema, Schema {
-					schema_data: SchemaData::default(),
-					schema_kind: Res::to_schema()
-				});
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "read_all", "result_body");
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				let mut content : IndexMap<String, MediaType> = IndexMap::new();
-				content.insert(APPLICATION_JSON.to_string(), MediaType {
-					schema: Some(Reference {
-						reference: format!("#/components/schemas/{}", schema)
-					}),
-					example: None,
-					examples: IndexMap::new(),
-					encoding: IndexMap::new()
-				});
-				let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
-				responses.insert(StatusCode::Code(200), Item(Response {
-					description: "OK".to_string(),
-					headers: IndexMap::new(),
-					content,
-					links: IndexMap::new()
-				}));
-				item.get = Some(Operation {
-					tags: Vec::new(),
-					summary: None,
-					description: None,
-					external_documentation: None,
-					operation_id: None, // TODO
-					parameters: Vec::new(),
-					request_body: None,
-					responses: Responses {
-						default: None,
-						responses
-					},
-					deprecated: false,
-					security: Vec::new(),
-					servers: Vec::new()
-				});
+				item.get = Some(new_operation(&schema, vec![]));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
@@ -216,6 +256,13 @@ macro_rules! implOpenapiRouter {
 				Res : ResourceResult,
 				Handler : ResourceRead<ID, Res>
 			{
+				let schema = (self.0).1.add_schema::<Res>(&self.1, "read", "result_body");
+
+				let path = format!("/{}/{{id}}", &self.1);
+				let mut item = (self.0).1.remove_path(&path);
+				item.get = Some(new_operation(&schema, vec!["id"]));
+				(self.0).1.add_path(path, item);
+				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
 			}
 			

@@ -1,4 +1,5 @@
 use crate::{ResourceType, StatusCode};
+#[cfg(feature = "openapi")]
 use openapiv3::SchemaKind;
 use serde::Serialize;
 use serde_json::error::Error as SerdeJsonError;
