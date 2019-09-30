@@ -22,6 +22,7 @@ gotham = "0.4"
 gotham_derive = "0.4"
 hyper = "0.12"
 indexmap = { version = "1.0", optional = true }
+log = { version = "0.4", optional = true }
 mime = "0.3"
 openapiv3 = { version = "0.3", optional = true }
 serde = { version = "1", features = ["derive"] }
@@ -34,4 +35,4 @@ log4rs = { version = "0.8", features = ["console_appender"], default-features = 
 
 [features]
 default = ["openapi"]
-openapi = ["indexmap", "openapiv3"]
+openapi = ["indexmap", "log", "openapiv3"]

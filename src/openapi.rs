@@ -3,16 +3,17 @@ use crate::{
 	result::*,
 	routing::*
 };
-use futures::future::{err, ok};
+use futures::future::ok;
 use gotham::{
-	handler::{HandlerFuture, IntoHandlerError},
+	handler::{Handler, HandlerFuture, NewHandler},
 	helpers::http::response::create_response,
 	pipeline::chain::PipelineHandleChain,
 	router::builder::*,
 	state::State
 };
 use indexmap::IndexMap;
-use mime::APPLICATION_JSON;
+use log::error;
+use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{MediaType, OpenAPI, Operation, PathItem, Paths, ReferenceOr, ReferenceOr::Item, Response, Responses, StatusCode};
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -77,15 +78,45 @@ impl<'a, D> OpenapiRouter<'a, D>
 	}
 }
 
-fn handle_get_openapi(state : State, openapi : &'static OpenAPI) -> Box<HandlerFuture>
+#[derive(Clone)]
+struct OpenapiHandler(Result<String, String>);
+
+// dunno what/why/whatever
+impl RefUnwindSafe for OpenapiHandler {}
+
+impl OpenapiHandler
 {
-	let res = serde_json::to_string(openapi);
-	match res {
-		Ok(body) => {
-			let res = create_response(&state, hyper::StatusCode::OK, APPLICATION_JSON, body);
-			Box::new(ok((state, res)))
-		},
-		Err(e) => Box::new(err((state, e.into_handler_error())))
+	fn new(openapi : &OpenAPI) -> Self
+	{
+		Self(serde_json::to_string(openapi).map_err(|e| format!("{}", e)))
+	}
+}
+
+impl NewHandler for OpenapiHandler
+{
+	type Instance = Self;
+	
+	fn new_handler(&self) -> gotham::error::Result<Self::Instance>
+	{
+		Ok(self.clone())
+	}
+}
+
+impl Handler for OpenapiHandler
+{
+	fn handle(self, state : State) -> Box<HandlerFuture>
+	{
+		match self.0 {
+			Ok(body) => {
+				let res = create_response(&state, hyper::StatusCode::OK, APPLICATION_JSON, body);
+				Box::new(ok((state, res)))
+			},
+			Err(e) => {
+				error!("Unable to handle OpenAPI request due to error: {}", e);
+				let res = create_response(&state, hyper::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
+				Box::new(ok((state, res)))
+			}
+		}
 	}
 }
 
@@ -99,10 +130,7 @@ macro_rules! implOpenapiRouter {
 		{
 			pub fn get_openapi(&mut self, path : &str)
 			{
-				let openapi = Box::leak(Box::new(self.openapi.clone()));
-				self.route.get(path).to(|state| {
-					handle_get_openapi(state, openapi)
-				});
+				self.route.get(path).to_new_handler(OpenapiHandler::new(&self.openapi));
 			}
 		}
 		
