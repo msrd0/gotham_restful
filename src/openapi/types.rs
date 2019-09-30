@@ -101,7 +101,18 @@ impl<T : OpenapiType> OpenapiType for Vec<T>
 	{
 		SchemaKind::Type(Type::Array(ArrayType {
 			items: Item(Box::new(Schema {
-				schema_data: SchemaData::default(),
+				schema_data: SchemaData {
+					nullable: false,
+					read_only:  false,
+					write_only: false,
+					deprecated: false,
+					external_docs: None,
+					example: None,
+					title: T::schema_name(),
+					description: None,
+					discriminator: None,
+					default: None
+				},
 				schema_kind: T::to_schema()
 			})),
 			min_items: None,

@@ -45,7 +45,18 @@ macro_rules! rest_struct {
 					properties.insert(
 						stringify!($field_id).to_string(),
 						ReferenceOr::Item(Box::new(Schema {
-							schema_data: SchemaData::default(),
+							schema_data: SchemaData {
+								nullable: false,
+								read_only:  false,
+								write_only: false,
+								deprecated: false,
+								external_docs: None,
+								example: None,
+								title: <$field_ty>::schema_name(),
+								description: None,
+								discriminator: None,
+								default: None
+							},
 							schema_kind: <$field_ty>::to_schema()
 						}))
 					);
