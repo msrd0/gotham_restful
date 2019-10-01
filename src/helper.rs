@@ -40,17 +40,26 @@ macro_rules! rest_struct {
 				$(
 					{
 						let mut schema = <$field_ty>::to_schema();
+						
+						if schema.nullable
+						{
+							schema.nullable = false;
+							schema.name = schema.name.map(|name|
+														  if name.ends_with("OrNull") {
+															  name[..(name.len()-6)].to_string()
+														  } else { name });
+						}
+						else
+						{
+							required.push(stringify!($field_id).to_string());
+						}
+						
 						if let Some(name) = schema.name.clone()
 						{
 							properties.insert(
 								stringify!($field_id).to_string(),
 								ReferenceOr::Reference { reference: format!("#/components/schemas/{}", name) }
 							);
-							if schema.nullable
-							{
-								required.push(stringify!($field_id).to_string());
-								schema.nullable = false;
-							}
 							dependencies.insert(name, schema);
 						}
 						else
