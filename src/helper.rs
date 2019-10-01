@@ -29,14 +29,9 @@ macro_rules! rest_struct {
 
 		impl ::gotham_restful::OpenapiType for $struct_name
 		{
-			fn schema_name() -> Option<String>
+			fn to_schema() -> ::gotham_restful::OpenapiSchema
 			{
-				Some(stringify!($struct_name).to_string())
-			}
-			
-			fn to_schema() -> ::gotham_restful::helper::openapi::SchemaKind
-			{
-				use ::gotham_restful::helper::openapi::*;
+				use ::gotham_restful::{helper::openapi::*, OpenapiSchema};
 
 				let mut properties : IndexMap<String, ReferenceOr<Box<Schema>>> = IndexMap::new();
 				let mut required : Vec<String> = Vec::new();
@@ -44,31 +39,23 @@ macro_rules! rest_struct {
 				$(
 					properties.insert(
 						stringify!($field_id).to_string(),
-						ReferenceOr::Item(Box::new(Schema {
-							schema_data: SchemaData {
-								nullable: false,
-								read_only:  false,
-								write_only: false,
-								deprecated: false,
-								external_docs: None,
-								example: None,
-								title: <$field_ty>::schema_name(),
-								description: None,
-								discriminator: None,
-								default: None
-							},
-							schema_kind: <$field_ty>::to_schema()
-						}))
+						ReferenceOr::Item(Box::new(<$field_ty>::to_schema().to_schema()))
 					);
 				)*
 				
-				SchemaKind::Type(Type::Object(ObjectType {
+				let schema = SchemaKind::Type(Type::Object(ObjectType {
 					properties,
 					required,
 					additional_properties: None,
 					min_properties: None,
 					max_properties: None
-				}))
+				}));
+
+				OpenapiSchema {
+					name: Some(stringify!($struct_name).to_string()),
+					nullable: false,
+					schema
+				}
 			}
 		}
 	}

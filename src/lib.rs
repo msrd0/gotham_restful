@@ -11,7 +11,7 @@ pub mod openapi;
 #[cfg(feature = "openapi")]
 pub use openapi::{
 	router::{GetOpenapi, OpenapiRouter},
-	types::OpenapiType
+	types::{OpenapiSchema, OpenapiType}
 };
 
 mod resource;

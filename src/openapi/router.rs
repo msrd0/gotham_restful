@@ -19,7 +19,7 @@ use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
 	Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
 	PathStyle, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody, Response, Responses,
-	Schema, SchemaData, Server, StatusCode
+	Server, StatusCode
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -71,22 +71,9 @@ impl OpenapiRouter
 
 	fn add_schema<T : OpenapiType>(&mut self, path : &str, method : &str, desc : &str) -> String
 	{
-		let name = T::schema_name().unwrap_or_else(|| format!("path_{}_{}_{}", path, method, desc));
-		let item = Schema {
-			schema_data: SchemaData {
-				nullable: false,
-				read_only: false,
-				write_only: false,
-				deprecated: false,
-				external_docs: None,
-				example: None,
-				title: Some(name.to_string()),
-				description: None,
-				discriminator: None,
-				default: None
-			},
-			schema_kind: T::to_schema()
-		};
+		let schema = T::to_schema();
+		let name = schema.name.clone().unwrap_or_else(|| format!("path_{}_{}_{}", path, method, desc));
+		let item = schema.to_schema();
 		match &mut self.0.components {
 			Some(comp) => {
 				comp.schemas.insert(name.to_string(), Item(item));
@@ -181,10 +168,7 @@ fn new_operation(schema : &str, path_params : Vec<&str>, body_schema : Option<&s
 				description: None,
 				required: true,
 				deprecated: None,
-				format: ParameterSchemaOrContent::Schema(Item(Schema {
-					schema_data: SchemaData::default(),
-					schema_kind: String::to_schema()
-				})),
+				format: ParameterSchemaOrContent::Schema(Item(String::to_schema().to_schema())),
 				example: None,
 				examples: IndexMap::new()
 			},

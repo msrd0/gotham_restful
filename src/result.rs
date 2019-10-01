@@ -1,6 +1,6 @@
 use crate::{ResourceType, StatusCode};
 #[cfg(feature = "openapi")]
-use openapiv3::SchemaKind;
+use crate::OpenapiSchema;
 use serde::Serialize;
 use serde_json::error::Error as SerdeJsonError;
 use std::error::Error;
@@ -11,21 +11,13 @@ pub trait ResourceResult
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>;
 	
 	#[cfg(feature = "openapi")]
-	fn schema_name() -> Option<String>;
-	
-	#[cfg(feature = "openapi")]
-	fn to_schema() -> SchemaKind;
+	fn to_schema() -> OpenapiSchema;
 }
 
 #[cfg(feature = "openapi")]
 impl<Res : ResourceResult> crate::OpenapiType for Res
 {
-	fn schema_name() -> Option<String>
-	{
-		Self::schema_name()
-	}
-
-	fn to_schema() -> SchemaKind
+	fn to_schema() -> OpenapiSchema
 	{
 		Self::to_schema()
 	}
@@ -64,13 +56,7 @@ impl<R : ResourceType, E : Error> ResourceResult for Result<R, E>
 	}
 	
 	#[cfg(feature = "openapi")]
-	fn schema_name() -> Option<String>
-	{
-		R::schema_name()
-	}
-	
-	#[cfg(feature = "openapi")]
-	fn to_schema() -> SchemaKind
+	fn to_schema() -> OpenapiSchema
 	{
 		R::to_schema()
 	}
@@ -95,13 +81,7 @@ impl<T : ResourceType> ResourceResult for Success<T>
 	}
 	
 	#[cfg(feature = "openapi")]
-	fn schema_name() -> Option<String>
-	{
-		T::schema_name()
-	}
-	
-	#[cfg(feature = "openapi")]
-	fn to_schema() -> SchemaKind
+	fn to_schema() -> OpenapiSchema
 	{
 		T::to_schema()
 	}
