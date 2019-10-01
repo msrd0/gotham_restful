@@ -27,14 +27,14 @@ rest_struct!{User {
 	username : String
 }}
 
-impl ResourceReadAll<Success<Vec<User>>> for Users
+impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
 {
-	fn read_all(_state : &mut State) -> Success<Vec<User>>
+	fn read_all(_state : &mut State) -> Success<Vec<Option<User>>>
 	{
 		vec![Username().fake(), Username().fake()]
 			.into_iter()
-			.map(|username| User { username })
-			.collect::<Vec<User>>()
+			.map(|username| Some(User { username }))
+			.collect::<Vec<Option<User>>>()
 			.into()
 	}
 }

@@ -2,6 +2,7 @@
 use chrono::{
 	Date, DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc
 };
+use indexmap::IndexMap;
 use openapiv3::{
 	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, ReferenceOr::Reference, Schema,
 	SchemaData, SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty
@@ -13,7 +14,8 @@ pub struct OpenapiSchema
 	/// The name of this schema. If it is None, the schema will be inlined.
 	pub name : Option<String>,
 	pub nullable : bool,
-	pub schema : SchemaKind
+	pub schema : SchemaKind,
+	pub dependencies : IndexMap<String, OpenapiSchema>
 }
 
 impl OpenapiSchema
@@ -23,7 +25,8 @@ impl OpenapiSchema
 		Self {
 			name: None,
 			nullable: false,
-			schema
+			schema,
+			dependencies: IndexMap::new()
 		}
 	}
 
@@ -124,20 +127,61 @@ macro_rules! str_types {
 
 str_types!(String, &str);
 
+impl<T : OpenapiType> OpenapiType for Option<T>
+{
+	fn to_schema() -> OpenapiSchema
+	{
+		let schema = T::to_schema();
+		let mut dependencies : IndexMap<String, OpenapiSchema> = IndexMap::new();
+		let refor = if let Some(name) = schema.name.clone()
+		{
+			let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+			dependencies.insert(name, schema);
+			reference
+		}
+		else
+		{
+			Item(schema.to_schema())
+		};
+		
+		OpenapiSchema {
+			nullable: true,
+			name: None,
+			schema: SchemaKind::AllOf { all_of: vec![refor] },
+			dependencies
+		}
+	}
+}
+
 impl<T : OpenapiType> OpenapiType for Vec<T>
 {
 	fn to_schema() -> OpenapiSchema
 	{
 		let schema = T::to_schema();
-		OpenapiSchema::new(SchemaKind::Type(Type::Array(ArrayType {
-			items: match schema.name {
-				Some(name) => Reference { reference: format!("#/components/schemas/{}", name) },
-				None => Item(Box::new(schema.to_schema()))
-			},
-			min_items: None,
-			max_items: None,
-			unique_items: false
-		})))
+		let mut dependencies : IndexMap<String, OpenapiSchema> = IndexMap::new();
+
+		let items = if let Some(name) = schema.name.clone()
+		{
+			let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+			dependencies.insert(name, schema);
+			reference
+		}
+		else
+		{
+			Item(Box::new(schema.to_schema()))
+		};
+		
+		OpenapiSchema {
+			nullable: false,
+			name: None,
+			schema: SchemaKind::Type(Type::Array(ArrayType {
+				items,
+				min_items: None,
+				max_items: None,
+				unique_items: false
+			})),
+			dependencies
+		}
 	}
 }
 

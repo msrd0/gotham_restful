@@ -35,12 +35,32 @@ macro_rules! rest_struct {
 
 				let mut properties : IndexMap<String, ReferenceOr<Box<Schema>>> = IndexMap::new();
 				let mut required : Vec<String> = Vec::new();
+				let mut dependencies : IndexMap<String, OpenapiSchema> = IndexMap::new();
 
 				$(
-					properties.insert(
-						stringify!($field_id).to_string(),
-						ReferenceOr::Item(Box::new(<$field_ty>::to_schema().to_schema()))
-					);
+					{
+						let mut schema = <$field_ty>::to_schema();
+						if let Some(name) = schema.name.clone()
+						{
+							properties.insert(
+								stringify!($field_id).to_string(),
+								ReferenceOr::Reference { reference: format!("#/components/schemas/{}", name) }
+							);
+							if schema.nullable
+							{
+								required.push(stringify!($field_id).to_string());
+								schema.nullable = false;
+							}
+							dependencies.insert(name, schema);
+						}
+						else
+						{
+							properties.insert(
+								stringify!($field_id).to_string(),
+								ReferenceOr::Item(Box::new(<$field_ty>::to_schema().to_schema()))
+							);
+						}
+					}
 				)*
 				
 				let schema = SchemaKind::Type(Type::Object(ObjectType {
@@ -54,7 +74,8 @@ macro_rules! rest_struct {
 				OpenapiSchema {
 					name: Some(stringify!($struct_name).to_string()),
 					nullable: false,
-					schema
+					schema,
+					dependencies
 				}
 			}
 		}
