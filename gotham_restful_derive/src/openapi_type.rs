@@ -48,7 +48,7 @@ fn expand_field(field : &Field) -> TokenStream2
 	}}
 }
 
-pub fn expand(tokens : proc_macro::TokenStream) -> TokenStream
+pub fn expand(tokens : TokenStream) -> TokenStream
 {
 	let input = parse_macro_input!(tokens as ItemStruct);
 	
@@ -94,6 +94,5 @@ pub fn expand(tokens : proc_macro::TokenStream) -> TokenStream
 		}
 	};
 	
-	eprintln!("output: {}", output);
 	output.into()
 }
