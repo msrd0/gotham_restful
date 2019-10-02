@@ -1,4 +1,5 @@
 #[macro_use] extern crate log;
+#[macro_use] extern crate gotham_restful_derive;
 
 use fake::{faker::internet::en::Username, Fake};
 use gotham::{
@@ -14,6 +15,7 @@ use log4rs::{
 	config::{Appender, Config, Root},
 	encode::pattern::PatternEncoder
 };
+use serde::{Deserialize, Serialize};
 
 rest_resource!{Users, route => {
 	route.read_all::<Self, _>();
@@ -23,9 +25,10 @@ rest_resource!{Users, route => {
 	route.update::<Self, _, _, _>();
 }}
 
-rest_struct!{User {
+#[derive(Deserialize, OpenapiType, Serialize)]
+struct User {
 	username : String
-}}
+}
 
 impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
 {
