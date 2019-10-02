@@ -2,7 +2,7 @@
 pub mod openapi
 {
 	pub use indexmap::IndexMap;
-	pub use openapiv3::{ObjectType, ReferenceOr, Schema, SchemaData, SchemaKind, Type};
+	pub use openapiv3::{ObjectType, ReferenceOr, Schema, SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty};
 }
 
 #[cfg(not(feature = "openapi"))]

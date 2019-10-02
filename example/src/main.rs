@@ -26,8 +26,17 @@ rest_resource!{Users, route => {
 }}
 
 #[derive(Deserialize, OpenapiType, Serialize)]
-struct User {
-	username : String
+enum TestEnum
+{
+	Foo,
+	Bar
+}
+
+#[derive(Deserialize, OpenapiType, Serialize)]
+struct User
+{
+	username : String,
+	test : Option<TestEnum>
 }
 
 impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
@@ -36,7 +45,7 @@ impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
 	{
 		vec![Username().fake(), Username().fake()]
 			.into_iter()
-			.map(|username| Some(User { username }))
+			.map(|username| Some(User { username, test: None }))
 			.collect::<Vec<Option<User>>>()
 			.into()
 	}
@@ -47,7 +56,7 @@ impl ResourceRead<u64, Success<User>> for Users
 	fn read(_state : &mut State, id : u64) -> Success<User>
 	{
 		let username : String = Username().fake();
-		User { username: format!("{}{}", username, id) }.into()
+		User { username: format!("{}{}", username, id), test: None }.into()
 	}
 }
 
