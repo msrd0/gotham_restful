@@ -78,8 +78,6 @@ fn expand_field(field : &Field) -> TokenStream2
 		if schema.nullable
 		{
 			schema.nullable = false;
-			schema.name = schema.name.map(|name|
-				if name.ends_with("OrNull") { name[..(name.len()-6)].to_string() } else { name });
 		}
 		else
 		{
@@ -97,7 +95,7 @@ fn expand_field(field : &Field) -> TokenStream2
 			None => {
 				properties.insert(
 					stringify!(#ident).to_string(),
-					ReferenceOr::Item(Box::new(<#ty>::to_schema().to_schema()))
+					ReferenceOr::Item(Box::new(schema.to_schema()))
 				);
 			}
 		}

@@ -132,22 +132,20 @@ impl<T : OpenapiType> OpenapiType for Option<T>
 	fn to_schema() -> OpenapiSchema
 	{
 		let schema = T::to_schema();
-		let mut dependencies : IndexMap<String, OpenapiSchema> = IndexMap::new();
-		let refor = if let Some(name) = schema.name.clone()
-		{
-			let reference = Reference { reference: format!("#/components/schemas/{}", name) };
-			dependencies.insert(name, schema);
-			reference
-		}
-		else
-		{
-			Item(schema.to_schema())
+		let mut dependencies = schema.dependencies.clone();
+		let schema = match schema.name.clone() {
+			Some(name) => {
+				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				dependencies.insert(name, schema);
+				SchemaKind::AllOf { all_of: vec![reference] }
+			},
+			None => schema.schema
 		};
 		
 		OpenapiSchema {
 			nullable: true,
 			name: None,
-			schema: SchemaKind::AllOf { all_of: vec![refor] },
+			schema,
 			dependencies
 		}
 	}
