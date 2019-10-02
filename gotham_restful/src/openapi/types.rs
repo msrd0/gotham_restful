@@ -156,7 +156,7 @@ impl<T : OpenapiType> OpenapiType for Vec<T>
 	fn to_schema() -> OpenapiSchema
 	{
 		let schema = T::to_schema();
-		let mut dependencies : IndexMap<String, OpenapiSchema> = IndexMap::new();
+		let mut dependencies = schema.dependencies.clone();
 
 		let items = if let Some(name) = schema.name.clone()
 		{

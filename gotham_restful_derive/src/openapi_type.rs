@@ -84,6 +84,16 @@ fn expand_field(field : &Field) -> TokenStream2
 			required.push(stringify!(#ident).to_string());
 		}
 		
+		let keys : Vec<String> = schema.dependencies.keys().map(|k| k.to_string()).collect();
+		for dep in keys
+		{
+			let dep_schema = schema.dependencies.swap_remove(&dep);
+			if let Some(dep_schema) = dep_schema
+			{
+				dependencies.insert(dep, dep_schema);
+			}
+		}
+		
 		match schema.name.clone() {
 			Some(name) => {
 				properties.insert(

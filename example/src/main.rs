@@ -26,17 +26,16 @@ rest_resource!{Users, route => {
 }}
 
 #[derive(Deserialize, OpenapiType, Serialize)]
-enum TestEnum
+struct TestStruct
 {
-	Foo,
-	Bar
+	foo : String
 }
 
 #[derive(Deserialize, OpenapiType, Serialize)]
 struct User
 {
 	username : String,
-	test : Option<TestEnum>
+	test : Option<Vec<TestStruct>>
 }
 
 impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
