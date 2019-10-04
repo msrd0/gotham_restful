@@ -26,82 +26,61 @@ rest_resource!{Users, route => {
 }}
 
 #[derive(Deserialize, OpenapiType, Serialize)]
-struct TestStruct
-{
-	foo : String
-}
-
-#[derive(Deserialize, OpenapiType, Serialize)]
 struct User
 {
-	username : String,
-	test : Option<Vec<TestStruct>>
+	username : String
 }
 
-impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
+#[rest_read_all(Users)]
+fn read_all(_state : &mut State) -> Success<Vec<Option<User>>>
 {
-	fn read_all(_state : &mut State) -> Success<Vec<Option<User>>>
-	{
-		vec![Username().fake(), Username().fake()]
-			.into_iter()
-			.map(|username| Some(User { username, test: None }))
-			.collect::<Vec<Option<User>>>()
-			.into()
-	}
+	vec![Username().fake(), Username().fake()]
+		.into_iter()
+		.map(|username| Some(User { username }))
+		.collect::<Vec<Option<User>>>()
+		.into()
 }
 
-impl ResourceRead<u64, Success<User>> for Users
+#[rest_read(Users)]
+fn read(_state : &mut State, id : u64) -> Success<User>
 {
-	fn read(_state : &mut State, id : u64) -> Success<User>
-	{
-		let username : String = Username().fake();
-		User { username: format!("{}{}", username, id), test: None }.into()
-	}
+	let username : String = Username().fake();
+	User { username: format!("{}{}", username, id) }.into()
 }
 
-impl ResourceCreate<User, Success<()>> for Users
+#[rest_create(Users)]
+fn create(_state : &mut State, body : User) -> Success<()>
 {
-	fn create(_state : &mut State, body : User) -> Success<()>
-	{
-		info!("Created User: {}", body.username);
-		().into()
-	}
+	info!("Created User: {}", body.username);
+	().into()
 }
 
-impl ResourceUpdateAll<Vec<User>, Success<()>> for Users
+#[rest_update_all(Users)]
+fn update_all(_state : &mut State, body : Vec<User>) -> Success<()>
 {
-	fn update_all(_state : &mut State, body : Vec<User>) -> Success<()>
-	{
-		info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
-		().into()
-	}
+	info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
+	().into()
 }
 
-impl ResourceUpdate<u64, User, Success<()>> for Users
+#[rest_update(Users)]
+fn update(_state : &mut State, id : u64, body : User) -> Success<()>
 {
-	fn update(_state : &mut State, id : u64, body : User) -> Success<()>
-	{
-		info!("Change User {} to {}", id, body.username);
-		().into()
-	}
+	info!("Change User {} to {}", id, body.username);
+	().into()
 }
 
-impl ResourceDeleteAll<Success<()>> for Users
+#[rest_delete_all(Users)]
+fn delete_all(_state : &mut State) -> Success<()>
 {
-	fn delete_all(_state : &mut State) -> Success<()>
-	{
-		info!("Delete all Users");
-		().into()
-	}
+	info!("Delete all Users");
+	().into()
 }
 
-impl ResourceDelete<u64, Success<()>> for Users
+#[rest_delete(Users)]
+fn delete(_state : &mut State, id : u64) -> Success<()>
 {
-	fn delete(_state : &mut State, id : u64) -> Success<()>
-	{
-		info!("Delete User {}", id);
-		().into()
-	}
+	info!("Delete User {}", id);
+	().into()
 }
 
 const ADDR : &str = "127.0.0.1:18080";
