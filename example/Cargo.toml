@@ -1,0 +1,28 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[package]
+name = "example"
+version = "0.0.1"
+authors = ["Dominic Meiser <git@msrd0.de>"]
+edition = "2018"
+license = "Unlicense"
+readme = "README.md"
+include = ["src/**/*", "Cargo.toml", "LICENSE"]
+repository = "https://gitlab.com/msrd0/gotham-restful"
+
+[badges]
+gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
+
+[dependencies]
+fake = "2.2"
+gotham = "0.4"
+gotham_restful = { path = "../gotham_restful", features = ["openapi"] }
+gotham_restful_derive = { path = "../gotham_restful_derive", features = ["openapi"] }
+log = "0.4"
+log4rs = { version = "0.8", features = ["console_appender"], default-features = false }
+serde = "1"
+
+[dev-dependencies]
+fake = "2.2"
+log = "0.4"
+log4rs = { version = "0.8", features = ["console_appender"], default-features = false }

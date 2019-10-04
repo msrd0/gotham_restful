@@ -1,4 +1,5 @@
 #[macro_use] extern crate log;
+#[macro_use] extern crate gotham_restful_derive;
 
 use fake::{faker::internet::en::Username, Fake};
 use gotham::{
@@ -14,6 +15,7 @@ use log4rs::{
 	config::{Appender, Config, Root},
 	encode::pattern::PatternEncoder
 };
+use serde::{Deserialize, Serialize};
 
 rest_resource!{Users, route => {
 	route.read_all::<Self, _>();
@@ -23,18 +25,27 @@ rest_resource!{Users, route => {
 	route.update::<Self, _, _, _>();
 }}
 
-rest_struct!{User {
-	username : String
-}}
-
-impl ResourceReadAll<Success<Vec<User>>> for Users
+#[derive(Deserialize, OpenapiType, Serialize)]
+struct TestStruct
 {
-	fn read_all(_state : &mut State) -> Success<Vec<User>>
+	foo : String
+}
+
+#[derive(Deserialize, OpenapiType, Serialize)]
+struct User
+{
+	username : String,
+	test : Option<Vec<TestStruct>>
+}
+
+impl ResourceReadAll<Success<Vec<Option<User>>>> for Users
+{
+	fn read_all(_state : &mut State) -> Success<Vec<Option<User>>>
 	{
 		vec![Username().fake(), Username().fake()]
 			.into_iter()
-			.map(|username| User { username })
-			.collect::<Vec<User>>()
+			.map(|username| Some(User { username, test: None }))
+			.collect::<Vec<Option<User>>>()
 			.into()
 	}
 }
@@ -44,7 +55,7 @@ impl ResourceRead<u64, Success<User>> for Users
 	fn read(_state : &mut State, id : u64) -> Success<User>
 	{
 		let username : String = Username().fake();
-		User { username: format!("{}{}", username, id) }.into()
+		User { username: format!("{}{}", username, id), test: None }.into()
 	}
 }
 
@@ -116,9 +127,12 @@ fn main()
 			.add(logging)
 			.build()
 	);
-	
+
 	gotham::start(ADDR, build_router(chain, pipelines, |route| {
-		route.resource::<Users, _>("users");
+		route.with_openapi("Users Example", "0.0.1", format!("http://{}", ADDR), |mut route| {
+			route.resource::<Users, _>("users");
+			route.get_openapi("openapi");
+		});
 	}));
 	println!("Gotham started on {} for testing", ADDR);
 }

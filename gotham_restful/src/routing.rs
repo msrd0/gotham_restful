@@ -1,8 +1,12 @@
 use crate::{
 	resource::*,
 	result::{ResourceError, ResourceResult},
+	ResourceType,
 	StatusCode
 };
+#[cfg(feature = "openapi")]
+use crate::OpenapiRouter;
+
 use futures::{
 	future::{Future, err, ok},
 	stream::Stream
@@ -23,6 +27,20 @@ use std::panic::RefUnwindSafe;
 struct PathExtractor<ID : RefUnwindSafe + Send + 'static>
 {
 	id : ID
+}
+
+/// This trait adds the `with_openapi` method to gotham's routing. It turns the default
+/// router into one that will only allow RESTful resources, but record them and generate
+/// an OpenAPI specification on request.
+#[cfg(feature = "openapi")]
+pub trait WithOpenapi<D>
+{
+	fn with_openapi<F, Title, Version, Url>(&mut self, title : Title, version : Version, server_url : Url, block : F)
+	where
+		F : FnOnce((&mut D, &mut OpenapiRouter)),
+		Title : ToString,
+		Version : ToString,
+		Url : ToString;
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -49,20 +67,20 @@ pub trait DrawResourceRoutes
 	
 	fn create<Handler, Body, Res>(&mut self)
 	where
-		Body : DeserializeOwned,
+		Body : ResourceType,
 		Res : ResourceResult,
 		Handler : ResourceCreate<Body, Res>;
 
 	fn update_all<Handler, Body, Res>(&mut self)
 	where
-		Body : DeserializeOwned,
+		Body : ResourceType,
 		Res : ResourceResult,
 		Handler : ResourceUpdateAll<Body, Res>;
 
 	fn update<Handler, ID, Body, Res>(&mut self)
 	where
 		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		Body : DeserializeOwned,
+		Body : ResourceType,
 		Res : ResourceResult,
 		Handler : ResourceUpdate<ID, Body, Res>;
 
@@ -159,7 +177,7 @@ where
 
 fn create_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
-	Body : DeserializeOwned,
+	Body : ResourceType,
 	Res : ResourceResult,
 	Handler : ResourceCreate<Body, Res>
 {
@@ -168,7 +186,7 @@ where
 
 fn update_all_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
-	Body : DeserializeOwned,
+	Body : ResourceType,
 	Res : ResourceResult,
 	Handler : ResourceUpdateAll<Body, Res>
 {
@@ -178,7 +196,7 @@ where
 fn update_handler<Handler, ID, Body, Res>(state : State) -> Box<HandlerFuture>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-	Body : DeserializeOwned,
+	Body : ResourceType,
 	Res : ResourceResult,
 	Handler : ResourceUpdate<ID, Body, Res>
 {
@@ -212,6 +230,25 @@ where
 
 macro_rules! implDrawResourceRoutes {
 	($implType:ident) => {
+		
+		#[cfg(feature = "openapi")]
+		impl<'a, C, P> WithOpenapi<Self> for $implType<'a, C, P>
+		where
+			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
+			P : RefUnwindSafe + Send + Sync + 'static
+		{
+			fn with_openapi<F, Title, Version, Url>(&mut self, title : Title, version : Version, server_url : Url, block : F)
+			where
+				F : FnOnce((&mut Self, &mut OpenapiRouter)),
+				Title : ToString,
+				Version : ToString,
+				Url : ToString
+			{
+				let mut router = OpenapiRouter::new(title, version, server_url);
+				block((self, &mut router));
+			}
+		}
+		
 		impl<'a, C, P> DrawResources for $implType<'a, C, P>
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
@@ -250,7 +287,7 @@ macro_rules! implDrawResourceRoutes {
 
 			fn create<Handler, Body, Res>(&mut self)
 			where
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
@@ -260,7 +297,7 @@ macro_rules! implDrawResourceRoutes {
 
 			fn update_all<Handler, Body, Res>(&mut self)
 			where
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
@@ -271,7 +308,7 @@ macro_rules! implDrawResourceRoutes {
 			fn update<Handler, ID, Body, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : DeserializeOwned,
+				Body : ResourceType,
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{

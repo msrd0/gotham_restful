@@ -1,4 +1,6 @@
-use crate::StatusCode;
+use crate::{ResourceType, StatusCode};
+#[cfg(feature = "openapi")]
+use crate::OpenapiSchema;
 use serde::Serialize;
 use serde_json::error::Error as SerdeJsonError;
 use std::error::Error;
@@ -7,6 +9,18 @@ use std::error::Error;
 pub trait ResourceResult
 {
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>;
+	
+	#[cfg(feature = "openapi")]
+	fn to_schema() -> OpenapiSchema;
+}
+
+#[cfg(feature = "openapi")]
+impl<Res : ResourceResult> crate::OpenapiType for Res
+{
+	fn to_schema() -> OpenapiSchema
+	{
+		Self::to_schema()
+	}
 }
 
 /// The default json returned on an 500 Internal Server Error.
@@ -28,7 +42,7 @@ impl<T : ToString> From<T> for ResourceError
 	}
 }
 
-impl<R : Serialize, E : Error> ResourceResult for Result<R, E>
+impl<R : ResourceType, E : Error> ResourceResult for Result<R, E>
 {
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
 	{
@@ -39,6 +53,12 @@ impl<R : Serialize, E : Error> ResourceResult for Result<R, E>
 				(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
 			}
 		})
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn to_schema() -> OpenapiSchema
+	{
+		R::to_schema()
 	}
 }
 
@@ -53,10 +73,16 @@ impl<T> From<T> for Success<T>
 	}
 }
 
-impl<T : Serialize> ResourceResult for Success<T>
+impl<T : ResourceType> ResourceResult for Success<T>
 {
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
 	{
 		Ok((StatusCode::OK, serde_json::to_string(&self.0)?))
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn to_schema() -> OpenapiSchema
+	{
+		T::to_schema()
 	}
 }
