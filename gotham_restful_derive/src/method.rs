@@ -59,9 +59,9 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	let ident = parse_macro_input!(attrs as Ident);
 	let fun = parse_macro_input!(item as ItemFn);
 	
-	let ret = match fun.sig.output {
-		ReturnType::Default => quote!(()),
-		ReturnType::Type(_, ty) => quote!(#ty)
+	let (ret, is_no_content) = match fun.sig.output {
+		ReturnType::Default => (quote!(::gotham_restful::NoContent), true),
+		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
 	let args : Vec<(TokenStream2, TokenStream2)> = fun.sig.inputs.iter().map(|arg| match arg {
 		FnArg::Typed(arg) => {
@@ -79,7 +79,11 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	}
 	generics.push(quote!(#ret));
 	let args : Vec<TokenStream2> = args.into_iter().map(|(pat, ty)| quote!(#pat : #ty)).collect();
-	let block = fun.block;
+	let block = fun.block.stmts;
+	let ret_stmt = match is_no_content {
+		true => Some(quote!(().into())),
+		false => None
+	};
 	
 	let trait_ident = method.trait_ident();
 	let fn_ident = method.fn_ident();
@@ -89,7 +93,10 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 		where #ident : ::gotham_restful::Resource
 		{
 			fn #fn_ident(#(#args),*) -> #ret
-			#block
+			{
+				#(#block)*
+				#ret_stmt
+			}
 		}
 	};
 	output.into()

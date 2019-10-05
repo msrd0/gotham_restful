@@ -49,38 +49,33 @@ fn read(_state : &mut State, id : u64) -> Success<User>
 }
 
 #[rest_create(Users)]
-fn create(_state : &mut State, body : User) -> NoContent
+fn create(_state : &mut State, body : User)
 {
 	info!("Created User: {}", body.username);
-	().into()
 }
 
 #[rest_update_all(Users)]
-fn update_all(_state : &mut State, body : Vec<User>) -> NoContent
+fn update_all(_state : &mut State, body : Vec<User>)
 {
 	info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
-	().into()
 }
 
 #[rest_update(Users)]
-fn update(_state : &mut State, id : u64, body : User) -> NoContent
+fn update(_state : &mut State, id : u64, body : User)
 {
 	info!("Change User {} to {}", id, body.username);
-	().into()
 }
 
 #[rest_delete_all(Users)]
-fn delete_all(_state : &mut State) -> NoContent
+fn delete_all(_state : &mut State)
 {
 	info!("Delete all Users");
-	().into()
 }
 
 #[rest_delete(Users)]
-fn delete(_state : &mut State, id : u64) -> NoContent
+fn delete(_state : &mut State, id : u64)
 {
 	info!("Delete User {}", id);
-	().into()
 }
 
 const ADDR : &str = "127.0.0.1:18080";
