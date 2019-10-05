@@ -175,13 +175,18 @@ fn schema_to_content(schema : ReferenceOr<Schema>) -> IndexMap<String, MediaType
 	content
 }
 
-fn new_operation(schema : ReferenceOr<Schema>, path_params : Vec<&str>, body_schema : Option<ReferenceOr<Schema>>) -> Operation
+fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema>, path_params : Vec<&str>, body_schema : Option<ReferenceOr<Schema>>) -> Operation
 {
+	let content = match default_status.as_u16() {
+		204 => IndexMap::new(),
+		_ => schema_to_content(schema)
+	};
+	
 	let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
-	responses.insert(StatusCode::Code(200), Item(Response {
-		description: "OK".to_string(),
+	responses.insert(StatusCode::Code(default_status.as_u16()), Item(Response {
+		description: default_status.canonical_reason().map(|d| d.to_string()).unwrap_or_default(),
 		headers: IndexMap::new(),
-		content: schema_to_content(schema),
+		content,
 		links: IndexMap::new()
 	}));
 	
@@ -265,7 +270,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(schema, vec![], None));
+				item.get = Some(new_operation(Res::default_status(), schema, vec![], None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
@@ -281,7 +286,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(schema, vec!["id"], None));
+				item.get = Some(new_operation(Res::default_status(), schema, vec!["id"], None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
@@ -298,7 +303,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.post = Some(new_operation(schema, vec![], Some(body_schema)));
+				item.post = Some(new_operation(Res::default_status(), schema, vec![], Some(body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
@@ -315,7 +320,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(schema, vec![], Some(body_schema)));
+				item.put = Some(new_operation(Res::default_status(), schema, vec![], Some(body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
@@ -333,7 +338,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(schema, vec!["id"], Some(body_schema)));
+				item.put = Some(new_operation(Res::default_status(), schema, vec!["id"], Some(body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
@@ -348,7 +353,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(schema, vec![], None));
+				item.delete = Some(new_operation(Res::default_status(), schema, vec![], None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
@@ -364,7 +369,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(schema, vec!["id"], None));
+				item.delete = Some(new_operation(Res::default_status(), schema, vec!["id"], None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()

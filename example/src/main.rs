@@ -49,35 +49,35 @@ fn read(_state : &mut State, id : u64) -> Success<User>
 }
 
 #[rest_create(Users)]
-fn create(_state : &mut State, body : User) -> Success<()>
+fn create(_state : &mut State, body : User) -> NoContent
 {
 	info!("Created User: {}", body.username);
 	().into()
 }
 
 #[rest_update_all(Users)]
-fn update_all(_state : &mut State, body : Vec<User>) -> Success<()>
+fn update_all(_state : &mut State, body : Vec<User>) -> NoContent
 {
 	info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
 	().into()
 }
 
 #[rest_update(Users)]
-fn update(_state : &mut State, id : u64, body : User) -> Success<()>
+fn update(_state : &mut State, id : u64, body : User) -> NoContent
 {
 	info!("Change User {} to {}", id, body.username);
 	().into()
 }
 
 #[rest_delete_all(Users)]
-fn delete_all(_state : &mut State) -> Success<()>
+fn delete_all(_state : &mut State) -> NoContent
 {
 	info!("Delete all Users");
 	().into()
 }
 
 #[rest_delete(Users)]
-fn delete(_state : &mut State, id : u64) -> Success<()>
+fn delete(_state : &mut State, id : u64) -> NoContent
 {
 	info!("Delete User {}", id);
 	().into()

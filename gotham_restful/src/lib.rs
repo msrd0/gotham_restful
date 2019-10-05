@@ -27,7 +27,11 @@ pub use resource::{
 };
 
 mod result;
-pub use result::{ResourceResult, Success};
+pub use result::{
+	NoContent,
+	ResourceResult,
+	Success
+};
 
 mod routing;
 pub use routing::{DrawResources, DrawResourceRoutes};

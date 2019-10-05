@@ -1,6 +1,6 @@
 use crate::{ResourceType, StatusCode};
 #[cfg(feature = "openapi")]
-use crate::OpenapiSchema;
+use crate::{OpenapiSchema, OpenapiType};
 use serde::Serialize;
 use serde_json::error::Error as SerdeJsonError;
 use std::error::Error;
@@ -12,6 +12,12 @@ pub trait ResourceResult
 	
 	#[cfg(feature = "openapi")]
 	fn to_schema() -> OpenapiSchema;
+	
+	#[cfg(feature = "openapi")]
+	fn default_status() -> StatusCode
+	{
+		StatusCode::OK
+	}
 }
 
 #[cfg(feature = "openapi")]
@@ -84,5 +90,36 @@ impl<T : ResourceType> ResourceResult for Success<T>
 	fn to_schema() -> OpenapiSchema
 	{
 		T::to_schema()
+	}
+}
+
+/// This can be returned from a resource when there is no content to send.
+pub struct NoContent;
+
+impl From<()> for NoContent
+{
+	fn from(_ : ()) -> Self
+	{
+		Self {}
+	}
+}
+
+impl ResourceResult for NoContent
+{
+	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
+	{
+		Ok((StatusCode::NO_CONTENT, "".to_string()))
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn to_schema() -> OpenapiSchema
+	{
+		<()>::to_schema()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn default_status() -> StatusCode
+	{
+		StatusCode::NO_CONTENT
 	}
 }
