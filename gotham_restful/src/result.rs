@@ -123,3 +123,29 @@ impl ResourceResult for NoContent
 		StatusCode::NO_CONTENT
 	}
 }
+
+impl<E : Error> ResourceResult for Result<NoContent, E>
+{
+	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
+	{
+		Ok(match self {
+			Ok(_) => (StatusCode::NO_CONTENT, "".to_string()),
+			Err(e) => {
+				let err : ResourceError = e.into();
+				(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
+			}
+		})
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn to_schema() -> OpenapiSchema
+	{
+		<()>::to_schema()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn default_status() -> StatusCode
+	{
+		StatusCode::NO_CONTENT
+	}
+}
