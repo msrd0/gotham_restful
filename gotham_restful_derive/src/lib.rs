@@ -4,6 +4,8 @@ use proc_macro::TokenStream;
 
 mod method;
 use method::{expand_method, Method};
+mod resource;
+use resource::expand_resource;
 #[cfg(feature = "openapi")]
 mod openapi_type;
 
@@ -12,6 +14,12 @@ mod openapi_type;
 pub fn derive_openapi_type(tokens : TokenStream) -> TokenStream
 {
 	openapi_type::expand(tokens)
+}
+
+#[proc_macro_derive(Resource, attributes(rest_resource))]
+pub fn derive_resource(tokens : TokenStream) -> TokenStream
+{
+	expand_resource(tokens)
 }
 
 #[proc_macro_attribute]

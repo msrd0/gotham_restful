@@ -7,6 +7,7 @@ use syn::{
 	ReturnType,
 	parse_macro_input
 };
+use std::str::FromStr;
 
 pub enum Method
 {
@@ -19,9 +20,27 @@ pub enum Method
 	Delete
 }
 
+impl FromStr for Method
+{
+	type Err = String;
+	fn from_str(str : &str) -> Result<Self, Self::Err>
+	{
+		match str {
+			"ReadAll" | "read_all" => Ok(Self::ReadAll),
+			"Read" | "read" => Ok(Self::Read),
+			"Create" | "create" => Ok(Self::Create),
+			"UpdateAll" | "update_all" => Ok(Self::UpdateAll),
+			"Update" | "update" => Ok(Self::Update),
+			"DeleteAll" | "delete_all" => Ok(Self::DeleteAll),
+			"Delete" | "delete" => Ok(Self::Delete),
+			_ => Err("unknown method".to_string())
+		}
+	}
+}
+
 impl Method
 {
-	fn trait_ident(&self) -> Ident
+	pub fn trait_ident(&self) -> Ident
 	{
 		use Method::*;
 		
@@ -37,7 +56,7 @@ impl Method
 		format_ident!("Resource{}", name)
 	}
 	
-	fn fn_ident(&self) -> Ident
+	pub fn fn_ident(&self) -> Ident
 	{
 		use Method::*;
 		
@@ -51,6 +70,11 @@ impl Method
 			Delete => "delete"
 		};
 		format_ident!("{}", name)
+	}
+	
+	pub fn setup_ident(&self) -> Ident
+	{
+		format_ident!("{}_setup_impl", self.fn_ident())
 	}
 }
 
@@ -87,6 +111,7 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	
 	let trait_ident = method.trait_ident();
 	let fn_ident = method.fn_ident();
+	let setup_ident = method.setup_ident();
 	
 	let output = quote! {
 		impl ::gotham_restful::#trait_ident<#(#generics),*> for #ident
@@ -97,6 +122,12 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 				#(#block)*
 				#ret_stmt
 			}
+		}
+		
+		#[deny(dead_code)]
+		fn #setup_ident<D : ::gotham_restful::DrawResourceRoutes>(route : &mut D)
+		{
+			route.#fn_ident::<#ident, #(#generics),*>();
 		}
 	};
 	output.into()

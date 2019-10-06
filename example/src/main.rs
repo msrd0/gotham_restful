@@ -1,5 +1,4 @@
 #[macro_use] extern crate log;
-#[macro_use] extern crate gotham_restful_derive;
 
 use fake::{faker::internet::en::Username, Fake};
 use gotham::{
@@ -17,13 +16,19 @@ use log4rs::{
 };
 use serde::{Deserialize, Serialize};
 
-rest_resource!{Users, route => {
-	route.read_all::<Self, _>();
-	route.read::<Self, _, _>();
-	route.create::<Self, _, _>();
-	route.update_all::<Self, _, _>();
-	route.update::<Self, _, _, _>();
-}}
+#[derive(Resource)]
+#[rest_resource(ReadAll, Read, Create, DeleteAll, Delete, Update, UpdateAll)]
+struct Users
+{
+}
+
+// rest_resource!{Users, route => {
+// 	route.read_all::<Self, _>();
+// 	route.read::<Self, _, _>();
+// 	route.create::<Self, _, _>();
+// 	route.update_all::<Self, _, _>();
+// 	route.update::<Self, _, _, _>();
+// }}
 
 #[derive(Deserialize, OpenapiType, Serialize)]
 struct User

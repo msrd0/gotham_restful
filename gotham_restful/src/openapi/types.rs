@@ -5,8 +5,10 @@ use chrono::{
 use indexmap::IndexMap;
 use openapiv3::{
 	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, ReferenceOr::Reference, Schema,
-	SchemaData, SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty
+	SchemaData, SchemaKind, StringType, Type
 };
+#[cfg(feature = "chrono")]
+use openapiv3::{StringFormat, VariantOrUnknownOrEmpty};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OpenapiSchema
