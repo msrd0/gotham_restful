@@ -1,5 +1,8 @@
 use crate::{DrawResourceRoutes, ResourceResult, ResourceType};
-use gotham::state::State;
+use gotham::{
+	router::response::extender::StaticResponseExtender,
+	state::{State, StateData}
+};
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
@@ -29,6 +32,14 @@ where
 	fn read(state : &mut State, id : ID) -> R;
 }
 
+/// Handle a GET request on the Resource with additional search parameters.
+pub trait ResourceSearch<Query : ResourceType, R : ResourceResult>
+where
+	Query : ResourceType + StateData + StaticResponseExtender
+{
+	fn search(state : &mut State, query : Query) -> R;
+}
+
 /// Handle a POST request on the Resource root.
 pub trait ResourceCreate<Body : ResourceType, R : ResourceResult>
 {
@@ -36,7 +47,7 @@ pub trait ResourceCreate<Body : ResourceType, R : ResourceResult>
 }
 
 /// Handle a PUT request on the Resource root.
-pub trait ResourceUpdateAll<Body : DeserializeOwned, R : ResourceResult>
+pub trait ResourceUpdateAll<Body : ResourceType, R : ResourceResult>
 {
 	fn update_all(state : &mut State, body : Body) -> R;
 }

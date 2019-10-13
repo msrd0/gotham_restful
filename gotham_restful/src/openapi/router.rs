@@ -8,12 +8,14 @@ use crate::{
 };
 use futures::future::ok;
 use gotham::{
+	extractor::QueryStringExtractor,
 	handler::{Handler, HandlerFuture, NewHandler},
 	helpers::http::response::create_response,
 	pipeline::chain::PipelineHandleChain,
 	router::builder::*,
 	state::State
 };
+use hyper::Body;
 use indexmap::IndexMap;
 use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
@@ -290,6 +292,22 @@ macro_rules! implOpenapiRouter {
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
+			}
+			
+			fn search<Handler, Query, Res>(&mut self)
+			where
+				Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
+				Res : ResourceResult,
+				Handler : ResourceSearch<Query, Res>
+			{
+				let schema = (self.0).1.add_schema::<Res>();
+				
+				let path = format!("/{}/search", &self.1);
+				let mut item = (self.0).1.remove_path(&self.1);
+				item.get = Some(new_operation(Res::default_status(), schema, vec![], None)); // TODO
+				(self.0).1.add_path(path, item);
+				
+				(&mut *(self.0).0, self.1.to_string()).search::<Handler, Query, Res>()
 			}
 			
 			fn create<Handler, Body, Res>(&mut self)

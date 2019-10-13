@@ -12,12 +12,14 @@ use futures::{
 	stream::Stream
 };
 use gotham::{
+	extractor::QueryStringExtractor,
 	handler::{HandlerFuture, IntoHandlerError},
 	helpers::http::response::create_response,
 	pipeline::chain::PipelineHandleChain,
 	router::builder::*,
 	state::{FromState, State}
 };
+use hyper::Body;
 use mime::APPLICATION_JSON;
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -64,6 +66,12 @@ pub trait DrawResourceRoutes
 		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
 		Res : ResourceResult,
 		Handler : ResourceRead<ID, Res>;
+	
+	fn search<Handler, Query, Res>(&mut self)
+	where
+		Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
+		Res : ResourceResult,
+		Handler : ResourceSearch<Query, Res>;
 	
 	fn create<Handler, Body, Res>(&mut self)
 	where
@@ -175,6 +183,16 @@ where
 	to_handler_future(state, |state| Handler::read(state, id))
 }
 
+fn search_handler<Handler, Query, Res>(mut state : State) -> Box<HandlerFuture>
+where
+	Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
+	Res : ResourceResult,
+	Handler : ResourceSearch<Query, Res>
+{
+	let query = Query::take_from(&mut state);
+	to_handler_future(state, |state| Handler::search(state, query))
+}
+
 fn create_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
 	Body : ResourceType,
@@ -284,7 +302,18 @@ macro_rules! implDrawResourceRoutes {
 					.with_path_extractor::<PathExtractor<ID>>()
 					.to(|state| read_handler::<Handler, ID, Res>(state));
 			}
-
+			
+			fn search<Handler, Query, Res>(&mut self)
+			where
+				Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
+				Res : ResourceResult,
+				Handler : ResourceSearch<Query, Res>
+			{
+				self.0.get(&format!("{}/search", self.1))
+					.with_query_string_extractor::<Query>()
+					.to(|state| search_handler::<Handler, Query, Res>(state));
+			}
+			
 			fn create<Handler, Body, Res>(&mut self)
 			where
 				Body : ResourceType,

@@ -37,6 +37,13 @@ pub fn rest_read(attr : TokenStream, item : TokenStream) -> TokenStream
 }
 
 #[proc_macro_attribute]
+pub fn rest_search(attr : TokenStream, item : TokenStream) -> TokenStream
+{
+	let output = expand_method(Method::Search, attr, item);
+	output
+}
+
+#[proc_macro_attribute]
 pub fn rest_create(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	let output = expand_method(Method::Create, attr, item);

@@ -16,7 +16,9 @@ gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 [dependencies]
 fake = "2.2"
 gotham = "0.4"
+gotham_derive = "0.4"
 gotham_restful = { path = "../gotham_restful", features = ["openapi"] }
+hyper = "0.12"
 log = "0.4"
 log4rs = { version = "0.8", features = ["console_appender"], default-features = false }
 serde = "1"

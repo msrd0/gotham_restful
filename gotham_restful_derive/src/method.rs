@@ -13,6 +13,7 @@ pub enum Method
 {
 	ReadAll,
 	Read,
+	Search,
 	Create,
 	UpdateAll,
 	Update,
@@ -28,6 +29,7 @@ impl FromStr for Method
 		match str {
 			"ReadAll" | "read_all" => Ok(Self::ReadAll),
 			"Read" | "read" => Ok(Self::Read),
+			"Search" | "search" => Ok(Self::Search),
 			"Create" | "create" => Ok(Self::Create),
 			"UpdateAll" | "update_all" => Ok(Self::UpdateAll),
 			"Update" | "update" => Ok(Self::Update),
@@ -47,6 +49,7 @@ impl Method
 		let name = match self {
 			ReadAll => "ReadAll",
 			Read => "Read",
+			Search => "Search",
 			Create => "Create",
 			UpdateAll => "UpdateAll",
 			Update => "Update",
@@ -63,6 +66,7 @@ impl Method
 		let name = match self {
 			ReadAll => "read_all",
 			Read => "read",
+			Search => "search",
 			Create => "create",
 			UpdateAll => "update_all",
 			Update => "update",

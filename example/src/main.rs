@@ -1,3 +1,4 @@
+#[macro_use] extern crate gotham_derive;
 #[macro_use] extern crate log;
 
 use fake::{faker::internet::en::Username, Fake};
@@ -17,20 +18,12 @@ use log4rs::{
 use serde::{Deserialize, Serialize};
 
 #[derive(Resource)]
-#[rest_resource(ReadAll, Read, Create, DeleteAll, Delete, Update, UpdateAll)]
+#[rest_resource(ReadAll, Read, Search, Create, DeleteAll, Delete, Update, UpdateAll)]
 struct Users
 {
 }
 
-// rest_resource!{Users, route => {
-// 	route.read_all::<Self, _>();
-// 	route.read::<Self, _, _>();
-// 	route.create::<Self, _, _>();
-// 	route.update_all::<Self, _, _>();
-// 	route.update::<Self, _, _, _>();
-// }}
-
-#[derive(Deserialize, OpenapiType, Serialize)]
+#[derive(Deserialize, OpenapiType, Serialize, StateData, StaticResponseExtender)]
 struct User
 {
 	username : String
@@ -51,6 +44,12 @@ fn read(_state : &mut State, id : u64) -> Success<User>
 {
 	let username : String = Username().fake();
 	User { username: format!("{}{}", username, id) }.into()
+}
+
+#[rest_search(Users)]
+fn search(_state : &mut State, query : User) -> Success<User>
+{
+	query.into()
 }
 
 #[rest_create(Users)]

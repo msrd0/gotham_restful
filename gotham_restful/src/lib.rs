@@ -30,6 +30,7 @@ pub use resource::{
 	Resource,
 	ResourceReadAll,
 	ResourceRead,
+	ResourceSearch,
 	ResourceCreate,
 	ResourceUpdateAll,
 	ResourceUpdate,
