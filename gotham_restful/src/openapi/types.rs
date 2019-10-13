@@ -10,18 +10,32 @@ use openapiv3::{
 #[cfg(feature = "chrono")]
 use openapiv3::{StringFormat, VariantOrUnknownOrEmpty};
 
+/**
+This struct needs to be available for every type that can be part of an OpenAPI Spec. It is
+already implemented for primitive types, String, Vec, Option and the like. To have it available
+for your type, simply derive from [`OpenapiType`].
+
+[`OpenapiType`]: trait.OpenapiType.html
+*/
 #[derive(Debug, Clone, PartialEq)]
 pub struct OpenapiSchema
 {
 	/// The name of this schema. If it is None, the schema will be inlined.
 	pub name : Option<String>,
+	/// Whether this particular schema is nullable. Note that there is no guarantee that this will
+	/// make it into the final specification, it might just be interpreted as a hint to make it
+	/// an optional parameter.
 	pub nullable : bool,
+	/// The actual OpenAPI schema.
 	pub schema : SchemaKind,
+	/// Other schemas that this schema depends on. They will be included in the final OpenAPI Spec
+	/// along with this schema.
 	pub dependencies : IndexMap<String, OpenapiSchema>
 }
 
 impl OpenapiSchema
 {
+	/// Create a new schema that has no name.
 	pub fn new(schema : SchemaKind) -> Self
 	{
 		Self {
@@ -31,7 +45,8 @@ impl OpenapiSchema
 			dependencies: IndexMap::new()
 		}
 	}
-
+	
+	/// Convert this schema to an `openapiv3::Schema` that can be serialized to the OpenAPI Spec.
 	pub fn into_schema(self) -> Schema
 	{
 		Schema {
@@ -52,6 +67,20 @@ impl OpenapiSchema
 	}
 }
 
+/**
+This trait needs to be implemented by every type that is being used in the OpenAPI Spec. It gives
+access to the [`OpenapiSchema`] of this type. It is provided for primitive types, String and the
+like. For use on your own types, there is a derive macro:
+
+```
+# #[macro_use] extern crate gotham_restful_derive;
+#
+#[derive(OpenapiType)]
+struct MyResponse {
+	message: String
+}
+```
+*/
 pub trait OpenapiType
 {
 	fn schema() -> OpenapiSchema;
@@ -115,7 +144,7 @@ macro_rules! str_types {
 	(format = $format:ident, $($str_ty:ty),*) => {$(
 		impl OpenapiType  for $str_ty
 		{
-			fn to_schema() -> OpenapiSchema
+			fn schema() -> OpenapiSchema
 			{
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Item(StringFormat::$format),

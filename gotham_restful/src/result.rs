@@ -68,7 +68,31 @@ impl<R : ResourceType, E : Error> ResourceResult for Result<R, E>
 	}
 }
 
-/// This can be returned from a resource when there is no cause of an error.
+/**
+This can be returned from a resource when there is no cause of an error. For example:
+
+```
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::state::State;
+# use gotham_restful::Success;
+# use serde::{Deserialize, Serialize};
+#
+# #[derive(Resource)]
+# struct MyResource;
+#
+#[derive(Deserialize, Serialize)]
+# #[derive(OpenapiType)]
+struct MyResponse {
+	message: String
+}
+
+#[rest_read_all(MyResource)]
+fn read_all(_state: &mut State) -> Success<MyResponse> {
+	let res = MyResponse { message: "I'm always happy".to_string() };
+	res.into()
+}
+```
+*/
 pub struct Success<T>(T);
 
 impl<T> From<T> for Success<T>
@@ -93,7 +117,24 @@ impl<T : ResourceType> ResourceResult for Success<T>
 	}
 }
 
-/// This can be returned from a resource when there is no content to send.
+/**
+This is the return type of a resource that doesn't actually return something. It will result
+in a _204 No Content_ answer by default. You don't need to use this type directly if using
+the function attributes:
+
+```
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::state::State;
+#
+# #[derive(Resource)]
+# struct MyResource;
+#
+#[rest_read_all(MyResource)]
+fn read_all(_state: &mut State) {
+	// do something
+}
+```
+*/
 #[derive(Default)]
 pub struct NoContent;
 
@@ -107,17 +148,20 @@ impl From<()> for NoContent
 
 impl ResourceResult for NoContent
 {
+	/// This will always be a _204 No Content_ together with an empty string.
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
 	{
-		Ok((StatusCode::NO_CONTENT, "".to_string()))
+		Ok((Self::default_status(), "".to_string()))
 	}
 	
+	/// Returns the schema of the `()` type.
 	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema
 	{
 		<()>::schema()
 	}
 	
+	/// This will always be a _204 No Content_
 	#[cfg(feature = "openapi")]
 	fn default_status() -> StatusCode
 	{

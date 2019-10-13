@@ -27,6 +27,12 @@ use openapiv3::{
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
+/**
+This type is required to build routes while adding them to the generated OpenAPI Spec at the
+same time. There is no need to use this type directly. See [`WithOpenapi`] on how to do this.
+
+[`WithOpenapi`]: trait.WithOpenapi.html
+*/
 pub struct OpenapiRouter(OpenAPI);
 
 impl OpenapiRouter
@@ -159,6 +165,7 @@ impl Handler for OpenapiHandler
 	}
 }
 
+/// This trait adds the `get_openapi` method to an OpenAPI-aware router.
 pub trait GetOpenapi
 {
 	fn get_openapi(&mut self, path : &str);

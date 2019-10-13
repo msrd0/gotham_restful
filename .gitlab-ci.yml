@@ -2,8 +2,21 @@
 stages:
   - check
 
-check:
+check-none:
   stage: check
   image: msrd0/rust-pq
   script:
-    - cargo check
+    - cargo check --all --no-default-features
+
+check-all:
+  stage: check
+  image: msrd0/rust-pq
+  script:
+    - cargo check --all --all-features
+
+readme:
+  stage: check
+  image: msrd0/rust:alpine-readme
+  script:
+    - cargo readme -r gotham_restful -t ../README.tpl >README.md.new
+    - diff README.md README.md.new
