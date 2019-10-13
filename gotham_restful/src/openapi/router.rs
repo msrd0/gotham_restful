@@ -203,7 +203,7 @@ impl<'a> OperationParams<'a>
 	
 	fn add_path_params(&self, params : &mut Vec<ReferenceOr<Parameter>>)
 	{
-		for param in self.path_params
+		for param in &self.path_params
 		{
 			params.push(Item(Parameter::Path {
 				parameter_data: ParameterData {
@@ -222,7 +222,7 @@ impl<'a> OperationParams<'a>
 	
 	fn add_query_params(&self, params : &mut Vec<ReferenceOr<Parameter>>)
 	{
-		let query_params = match self.query_params {
+		let query_params = match &self.query_params {
 			Some(qp) => qp,
 			None => return
 		};
@@ -315,7 +315,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), schema, vec![], None));
+				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::default(), None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
@@ -331,7 +331,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), schema, vec!["id"], None));
+				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::from_path_params(vec!["id"]), None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
@@ -347,7 +347,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}/search", &self.1);
 				let mut item = (self.0).1.remove_path(&self.1);
-				item.get = Some(new_operation(Res::default_status(), schema, vec![], None)); // TODO
+				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::default(), None)); // TODO
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).search::<Handler, Query, Res>()
@@ -364,7 +364,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.post = Some(new_operation(Res::default_status(), schema, vec![], Some(body_schema)));
+				item.post = Some(new_operation(Res::default_status(), schema, OperationParams::default(), Some(body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
@@ -381,7 +381,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), schema, vec![], Some(body_schema)));
+				item.put = Some(new_operation(Res::default_status(), schema, OperationParams::default(), Some(body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
@@ -399,7 +399,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), schema, vec!["id"], Some(body_schema)));
+				item.put = Some(new_operation(Res::default_status(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema)));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
@@ -414,7 +414,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), schema, vec![], None));
+				item.delete = Some(new_operation(Res::default_status(), schema, OperationParams::default(), None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
@@ -430,7 +430,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), schema, vec!["id"], None));
+				item.delete = Some(new_operation(Res::default_status(), schema, OperationParams::from_path_params(vec!["id"]), None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()
