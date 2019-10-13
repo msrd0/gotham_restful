@@ -48,7 +48,7 @@ fn expand_enum(input : ItemEnum) -> TokenStream2
 		{
 			fn to_schema() -> ::gotham_restful::OpenapiSchema
 			{
-				use ::gotham_restful::{helper::openapi::*, OpenapiSchema};
+				use ::gotham_restful::{export::openapi::*, OpenapiSchema};
 				
 				let mut enumeration : Vec<String> = Vec::new();
 				
@@ -130,7 +130,7 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 		{
 			fn to_schema() -> ::gotham_restful::OpenapiSchema
 			{
-				use ::gotham_restful::{helper::openapi::*, OpenapiSchema};
+				use ::gotham_restful::{export::{openapi::*, IndexMap}, OpenapiSchema};
 				
 				let mut properties : IndexMap<String, ReferenceOr<Box<Schema>>> = IndexMap::new();
 				let mut required : Vec<String> = Vec::new();

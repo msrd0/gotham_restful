@@ -5,6 +5,7 @@ pub use hyper::StatusCode;
 use serde::{de::DeserializeOwned, Serialize};
 
 pub use gotham_restful_derive::*;
+
 /// Not public API
 #[doc(hidden)]
 pub mod export
@@ -12,10 +13,8 @@ pub mod export
 	#[cfg(feature = "openapi")]
 	pub use indexmap::IndexMap;
 	#[cfg(feature = "openapi")]
-	pub use openapiv3;
+	pub use openapiv3 as openapi;
 }
-
-pub mod helper;
 
 #[cfg(feature = "openapi")]
 pub mod openapi;
