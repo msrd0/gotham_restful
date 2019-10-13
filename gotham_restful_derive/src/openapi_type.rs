@@ -73,7 +73,7 @@ fn expand_field(field : &Field) -> TokenStream2
 	let ty = &field.ty;
 	
 	quote! {{
-		let mut schema = <#ty>::to_schema();
+		let mut schema = <#ty>::schema();
 		
 		if schema.nullable
 		{
@@ -105,7 +105,7 @@ fn expand_field(field : &Field) -> TokenStream2
 			None => {
 				properties.insert(
 					stringify!(#ident).to_string(),
-					ReferenceOr::Item(Box::new(schema.to_schema()))
+					ReferenceOr::Item(Box::new(schema.into_schema()))
 				);
 			}
 		}
@@ -128,7 +128,7 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 	quote!{
 		impl #generics ::gotham_restful::OpenapiType for #ident #generics
 		{
-			fn to_schema() -> ::gotham_restful::OpenapiSchema
+			fn schema() -> ::gotham_restful::OpenapiSchema
 			{
 				use ::gotham_restful::{export::{openapi::*, IndexMap}, OpenapiSchema};
 				

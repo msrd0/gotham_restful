@@ -11,7 +11,7 @@ pub trait ResourceResult
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>;
 	
 	#[cfg(feature = "openapi")]
-	fn to_schema() -> OpenapiSchema;
+	fn schema() -> OpenapiSchema;
 	
 	#[cfg(feature = "openapi")]
 	fn default_status() -> StatusCode
@@ -23,9 +23,9 @@ pub trait ResourceResult
 #[cfg(feature = "openapi")]
 impl<Res : ResourceResult> crate::OpenapiType for Res
 {
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		Self::to_schema()
+		Self::schema()
 	}
 }
 
@@ -62,9 +62,9 @@ impl<R : ResourceType, E : Error> ResourceResult for Result<R, E>
 	}
 	
 	#[cfg(feature = "openapi")]
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		R::to_schema()
+		R::schema()
 	}
 }
 
@@ -87,13 +87,14 @@ impl<T : ResourceType> ResourceResult for Success<T>
 	}
 	
 	#[cfg(feature = "openapi")]
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		T::to_schema()
+		T::schema()
 	}
 }
 
 /// This can be returned from a resource when there is no content to send.
+#[derive(Default)]
 pub struct NoContent;
 
 impl From<()> for NoContent
@@ -112,9 +113,9 @@ impl ResourceResult for NoContent
 	}
 	
 	#[cfg(feature = "openapi")]
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		<()>::to_schema()
+		<()>::schema()
 	}
 	
 	#[cfg(feature = "openapi")]
@@ -138,9 +139,9 @@ impl<E : Error> ResourceResult for Result<NoContent, E>
 	}
 	
 	#[cfg(feature = "openapi")]
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		<()>::to_schema()
+		<()>::schema()
 	}
 	
 	#[cfg(feature = "openapi")]

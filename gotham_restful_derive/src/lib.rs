@@ -25,55 +25,47 @@ pub fn derive_resource(tokens : TokenStream) -> TokenStream
 #[proc_macro_attribute]
 pub fn rest_read_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::ReadAll, attr, item);
-	output
+	expand_method(Method::ReadAll, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_read(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::Read, attr, item);
-	output
+	expand_method(Method::Read, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_search(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::Search, attr, item);
-	output
+	expand_method(Method::Search, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_create(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::Create, attr, item);
-	output
+	expand_method(Method::Create, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_update_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::UpdateAll, attr, item);
-	output
+	expand_method(Method::UpdateAll, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_update(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::Update, attr, item);
-	output
+	expand_method(Method::Update, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_delete_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::DeleteAll, attr, item);
-	output
+	expand_method(Method::DeleteAll, attr, item)
 }
 
 #[proc_macro_attribute]
 pub fn rest_delete(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	let output = expand_method(Method::Delete, attr, item);
-	output
+	expand_method(Method::Delete, attr, item)
 }

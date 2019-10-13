@@ -32,7 +32,7 @@ impl OpenapiSchema
 		}
 	}
 
-	pub fn to_schema(self) -> Schema
+	pub fn into_schema(self) -> Schema
 	{
 		Schema {
 			schema_data: SchemaData {
@@ -54,12 +54,12 @@ impl OpenapiSchema
 
 pub trait OpenapiType
 {
-	fn to_schema() -> OpenapiSchema;
+	fn schema() -> OpenapiSchema;
 }
 
 impl OpenapiType for ()
 {
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
 		OpenapiSchema::new(SchemaKind::Type(Type::Object(ObjectType::default())))
 	}
@@ -67,7 +67,7 @@ impl OpenapiType for ()
 
 impl OpenapiType for bool
 {
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
 		OpenapiSchema::new(SchemaKind::Type(Type::Boolean{}))
 	}
@@ -77,7 +77,7 @@ macro_rules! int_types {
 	($($int_ty:ty),*) => {$(
 		impl OpenapiType for $int_ty
 		{
-			fn to_schema() -> OpenapiSchema
+			fn schema() -> OpenapiSchema
 			{
 				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType::default())))
 			}
@@ -91,7 +91,7 @@ macro_rules! num_types {
 	($($num_ty:ty),*) => {$(
 		impl OpenapiType for $num_ty
 		{
-			fn to_schema() -> OpenapiSchema
+			fn schema() -> OpenapiSchema
 			{
 				OpenapiSchema::new(SchemaKind::Type(Type::Number(NumberType::default())))
 			}
@@ -105,7 +105,7 @@ macro_rules! str_types {
 	($($str_ty:ty),*) => {$(
 		impl OpenapiType for $str_ty
 		{
-			fn to_schema() -> OpenapiSchema
+			fn schema() -> OpenapiSchema
 			{
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType::default())))
 			}
@@ -131,9 +131,9 @@ str_types!(String, &str);
 
 impl<T : OpenapiType> OpenapiType for Option<T>
 {
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		let schema = T::to_schema();
+		let schema = T::schema();
 		let mut dependencies = schema.dependencies.clone();
 		let schema = match schema.name.clone() {
 			Some(name) => {
@@ -155,20 +155,19 @@ impl<T : OpenapiType> OpenapiType for Option<T>
 
 impl<T : OpenapiType> OpenapiType for Vec<T>
 {
-	fn to_schema() -> OpenapiSchema
+	fn schema() -> OpenapiSchema
 	{
-		let schema = T::to_schema();
+		let schema = T::schema();
 		let mut dependencies = schema.dependencies.clone();
-
-		let items = if let Some(name) = schema.name.clone()
+		
+		let items = match schema.name.clone()
 		{
-			let reference = Reference { reference: format!("#/components/schemas/{}", name) };
-			dependencies.insert(name, schema);
-			reference
-		}
-		else
-		{
-			Item(Box::new(schema.to_schema()))
+			Some(name) => {
+				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				dependencies.insert(name, schema);
+				reference
+			},
+			None => Item(Box::new(schema.into_schema()))
 		};
 		
 		OpenapiSchema {

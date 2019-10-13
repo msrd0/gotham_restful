@@ -60,11 +60,10 @@ impl OpenapiRouter
 	/// modify the path and add it back after the modification
 	fn remove_path(&mut self, path : &str) -> PathItem
 	{
-		if let Some(Item(item)) = self.0.paths.swap_remove(path)
-		{
-			return item;
+		match self.0.paths.swap_remove(path) {
+			Some(Item(item)) => item,
+			_ => PathItem::default()
 		}
-		return PathItem::default()
 	}
 
 	fn add_path<Path : ToString>(&mut self, path : Path, item : PathItem)
@@ -78,11 +77,11 @@ impl OpenapiRouter
 		
 		match &mut self.0.components {
 			Some(comp) => {
-				comp.schemas.insert(name, Item(schema.to_schema()));
+				comp.schemas.insert(name, Item(schema.into_schema()));
 			},
 			None => {
 				let mut comp = Components::default();
-				comp.schemas.insert(name, Item(schema.to_schema()));
+				comp.schemas.insert(name, Item(schema.into_schema()));
 				self.0.components = Some(comp);
 			}
 		};
@@ -103,17 +102,17 @@ impl OpenapiRouter
 	
 	fn add_schema<T : OpenapiType>(&mut self) -> ReferenceOr<Schema>
 	{
-		let mut schema = T::to_schema();
-		if let Some(name) = schema.name.clone()
-		{
-			let reference = Reference { reference: format!("#/components/schemas/{}", name) };
-			self.add_schema_impl(name, schema);
-			reference
-		}
-		else
-		{
-			self.add_schema_dependencies(&mut schema.dependencies);
-			Item(schema.to_schema())
+		let mut schema = T::schema();
+		match schema.name.clone() {
+			Some(name) => {
+				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				self.add_schema_impl(name, schema);
+				reference
+			},
+			None => {
+				self.add_schema_dependencies(&mut schema.dependencies);
+				Item(schema.into_schema())
+			}
 		}
 	}
 }
@@ -211,7 +210,7 @@ impl<'a> OperationParams<'a>
 					description: None,
 					required: true,
 					deprecated: None,
-					format: ParameterSchemaOrContent::Schema(Item(String::to_schema().to_schema())),
+					format: ParameterSchemaOrContent::Schema(Item(String::schema().into_schema())),
 					example: None,
 					examples: IndexMap::new()
 				},

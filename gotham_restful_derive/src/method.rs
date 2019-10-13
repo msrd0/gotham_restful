@@ -99,19 +99,11 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 		},
 		FnArg::Receiver(_) => panic!("didn't expect self parameter")
 	}).collect();
-	let mut generics : Vec<TokenStream2> = Vec::new();
-	for i in 1..args.len()
-	{
-		let (_, ty) = &args[i];
-		generics.push(quote!(#ty));
-	}
+	let mut generics : Vec<TokenStream2> = args.iter().skip(1).map(|(_, ty)| quote!(#ty)).collect();
 	generics.push(quote!(#ret));
 	let args : Vec<TokenStream2> = args.into_iter().map(|(pat, ty)| quote!(#pat : #ty)).collect();
 	let block = fun.block.stmts;
-	let ret_stmt = match is_no_content {
-		true => Some(quote!(().into())),
-		false => None
-	};
+	let ret_stmt = if is_no_content { Some(quote!(#ret::default())) } else { None };
 	
 	let trait_ident = method.trait_ident();
 	let fn_ident = method.fn_ident();

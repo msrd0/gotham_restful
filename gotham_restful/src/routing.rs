@@ -278,6 +278,7 @@ macro_rules! implDrawResourceRoutes {
 			}
 		}
 		
+		#[allow(clippy::redundant_closure)] // doesn't work because of type parameters
 		impl<'a, C, P> DrawResourceRoutes for (&mut $implType<'a, C, P>, String)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
