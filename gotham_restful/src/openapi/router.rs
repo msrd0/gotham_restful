@@ -177,7 +177,67 @@ fn schema_to_content(schema : ReferenceOr<Schema>) -> IndexMap<String, MediaType
 	content
 }
 
-fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema>, path_params : Vec<&str>, body_schema : Option<ReferenceOr<Schema>>) -> Operation
+#[derive(Default)]
+struct OperationParams<'a>
+{
+	path_params : Vec<&'a str>,
+	query_params : Option<OpenapiSchema>
+}
+
+impl<'a> OperationParams<'a>
+{
+	fn new(path_params : Vec<&'a str>, query_params : Option<OpenapiSchema>) -> Self
+	{
+		Self { path_params, query_params }
+	}
+	
+	fn from_path_params(path_params : Vec<&'a str>) -> Self
+	{
+		Self::new(path_params, None)
+	}
+	
+	fn from_query_params(query_params : OpenapiSchema) -> Self
+	{
+		Self::new(Vec::new(), Some(query_params))
+	}
+	
+	fn add_path_params(&self, params : &mut Vec<ReferenceOr<Parameter>>)
+	{
+		for param in self.path_params
+		{
+			params.push(Item(Parameter::Path {
+				parameter_data: ParameterData {
+					name: param.to_string(),
+					description: None,
+					required: true,
+					deprecated: None,
+					format: ParameterSchemaOrContent::Schema(Item(String::to_schema().to_schema())),
+					example: None,
+					examples: IndexMap::new()
+				},
+				style: PathStyle::default(),
+			}));
+		}
+	}
+	
+	fn add_query_params(&self, params : &mut Vec<ReferenceOr<Parameter>>)
+	{
+		let query_params = match self.query_params {
+			Some(qp) => qp,
+			None => return
+		};
+		// TODO
+	}
+	
+	fn params(&self) -> Vec<ReferenceOr<Parameter>>
+	{
+		let mut params : Vec<ReferenceOr<Parameter>> = Vec::new();
+		self.add_path_params(&mut params);
+		params
+	}
+}
+
+fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema>, params : OperationParams, body_schema : Option<ReferenceOr<Schema>>) -> Operation
 {
 	let content = match default_status.as_u16() {
 		204 => IndexMap::new(),
@@ -192,23 +252,6 @@ fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema
 		links: IndexMap::new()
 	}));
 	
-	let mut params : Vec<ReferenceOr<Parameter>> = Vec::new();
-	for param in path_params
-	{
-		params.push(Item(Parameter::Path {
-			parameter_data: ParameterData {
-				name: param.to_string(),
-				description: None,
-				required: true,
-				deprecated: None,
-				format: ParameterSchemaOrContent::Schema(Item(String::to_schema().to_schema())),
-				example: None,
-				examples: IndexMap::new()
-			},
-			style: PathStyle::default(),
-		}));
-	}
-
 	let request_body = body_schema.map(|schema| Item(RequestBody {
 		description: None,
 		content: schema_to_content(schema),
@@ -221,7 +264,7 @@ fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema
 		description: None,
 		external_documentation: None,
 		operation_id: None, // TODO
-		parameters: params,
+		parameters: params.params(),
 		request_body,
 		responses: Responses {
 			default: None,
