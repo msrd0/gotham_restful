@@ -2,17 +2,32 @@
 stages:
   - check
 
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
+
 check-none:
   stage: check
-  image: msrd0/rust-pq
+  image: msrd0/rust:alpine
+  before_script:
+    - cargo -V
   script:
     - cargo check --all --no-default-features
+  cache:
+    paths:
+      - cargo/
+      - target/
 
 check-all:
   stage: check
-  image: msrd0/rust-pq
+  image: msrd0/rust:alpine
+  before_script:
+    - cargo -V
   script:
     - cargo check --all --all-features
+  cache:
+    paths:
+      - cargo/
+      - target/
 
 readme:
   stage: check
