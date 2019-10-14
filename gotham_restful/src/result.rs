@@ -174,7 +174,7 @@ impl<E : Error> ResourceResult for Result<NoContent, E>
 	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
 	{
 		Ok(match self {
-			Ok(_) => (StatusCode::NO_CONTENT, "".to_string()),
+			Ok(_) => (Self::default_status(), "".to_string()),
 			Err(e) => {
 				let err : ResourceError = e.into();
 				(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
@@ -185,12 +185,75 @@ impl<E : Error> ResourceResult for Result<NoContent, E>
 	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema
 	{
-		<()>::schema()
+		<NoContent as ResourceResult>::schema()
 	}
 	
 	#[cfg(feature = "openapi")]
 	fn default_status() -> StatusCode
 	{
-		StatusCode::NO_CONTENT
+		NoContent::default_status()
+	}
+}
+
+#[cfg(test)]
+mod test
+{
+	use super::*;
+	use thiserror::Error;
+	
+	#[derive(Debug, Default, Deserialize, Serialize)]
+	#[cfg_attr(feature = "openapi", derive(OpenapiType))]
+	struct Msg
+	{
+		msg : String
+	}
+	
+	#[derive(Debug, Default, Error)]
+	#[error("An Error")]
+	struct MsgError;
+	
+	#[test]
+	fn resource_result_ok()
+	{
+		let ok : Result<Msg, MsgError> = Ok(Msg::default());
+		let (status, json) = ok.to_json().expect("didn't expect error response");
+		assert_eq!(status, StatusCode::OK);
+		assert_eq!(json, r#"{"msg":""}"#);
+	}
+	
+	#[test]
+	fn resource_result_err()
+	{
+		let err : Result<Msg, MsgError> = Err(MsgError::default());
+		let (status, json) = err.to_json().expect("didn't expect error response");
+		assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+		assert_eq!(json, format!(r#"{{"error":true,"message":"{}"}}"#, err.unwrap_err()));
+	}
+	
+	#[test]
+	fn success_always_successfull()
+	{
+		let success : Success<Msg> = Msg::default().into();
+		let (status, json) = success.to_json().expect("didn't expect error response");
+		assert_eq!(status, StatusCode::OK);
+		assert_eq!(json, r#"{"msg":""}"#);
+	}
+	
+	#[test]
+	fn no_content_has_empty_json()
+	{
+		let no_content = NoContent::default();
+		let (status, json) = no_content.to_json().expect("didn't expect error response");
+		assert_eq!(status, StatusCode::NO_CONTENT);
+		assert_eq!(json, "");
+	}
+	
+	#[test]
+	fn no_content_result()
+	{
+		let no_content = NoContent::default();
+		let res_def = no_content.to_json().expect("didn't expect error response");
+		let res_err = Result::<NoContent, MsgError>::Ok(no_content).to_json().expect("didn't expect error response");
+		assert_eq!(res_def, res_err);
 	}
 }

@@ -1,36 +1,38 @@
 
 stages:
-  - check
+  - test
 
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
 
-check-none:
-  stage: check
+test-none:
+  stage: test
   image: msrd0/rust:alpine
   before_script:
     - cargo -V
   script:
-    - cargo check --all --no-default-features
+    - cargo test --all --no-default-features
   cache:
     paths:
       - cargo/
       - target/
 
-check-all:
-  stage: check
-  image: msrd0/rust:alpine
+test-all:
+  stage: test
+  image: msrd0/rust:alpine-tarpaulin
   before_script:
+    - apk add --no-cache bash curl
     - cargo -V
   script:
-    - cargo check --all --all-features
+    - cargo tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'example/*' --out Xml
+    - wget -qO- https://codecov.io/bash | bash -s -- -X gcov
   cache:
     paths:
       - cargo/
       - target/
 
 readme:
-  stage: check
+  stage: test
   image: msrd0/rust:alpine-readme
   script:
     - cargo readme -r gotham_restful -t ../README.tpl >README.md.new

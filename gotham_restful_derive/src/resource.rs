@@ -28,6 +28,7 @@ impl Parse for MethodList
 
 pub fn expand_resource(tokens : TokenStream) -> TokenStream
 {
+	let krate = super::krate();
 	let input = parse_macro_input!(tokens as ItemStruct);
 	let ident = input.ident;
 	
@@ -43,14 +44,14 @@ pub fn expand_resource(tokens : TokenStream) -> TokenStream
 	}).collect();
 	
 	let output = quote! {
-		impl ::gotham_restful::Resource for #ident
+		impl #krate::Resource for #ident
 		{
 			fn name() -> String
 			{
 				stringify!(#ident).to_string()
 			}
 			
-			fn setup<D : ::gotham_restful::DrawResourceRoutes>(mut route : D)
+			fn setup<D : #krate::DrawResourceRoutes>(mut route : D)
 			{
 				#(#methods)*
 			}

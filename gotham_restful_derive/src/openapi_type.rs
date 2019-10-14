@@ -114,6 +114,7 @@ fn expand_field(field : &Field) -> TokenStream2
 
 pub fn expand_struct(input : ItemStruct) -> TokenStream2
 {
+	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 	
@@ -126,11 +127,11 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 	};
 	
 	quote!{
-		impl #generics ::gotham_restful::OpenapiType for #ident #generics
+		impl #generics #krate::OpenapiType for #ident #generics
 		{
-			fn schema() -> ::gotham_restful::OpenapiSchema
+			fn schema() -> #krate::OpenapiSchema
 			{
-				use ::gotham_restful::{export::{openapi::*, IndexMap}, OpenapiSchema};
+				use #krate::{export::{openapi::*, IndexMap}, OpenapiSchema};
 				
 				let mut properties : IndexMap<String, ReferenceOr<Box<Schema>>> = IndexMap::new();
 				let mut required : Vec<String> = Vec::new();
