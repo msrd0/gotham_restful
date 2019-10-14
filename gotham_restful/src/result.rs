@@ -74,7 +74,7 @@ This can be returned from a resource when there is no cause of an error. For exa
 ```
 # #[macro_use] extern crate gotham_restful_derive;
 # use gotham::state::State;
-# use gotham_restful::Success;
+# use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #
 # #[derive(Resource)]
@@ -125,6 +125,7 @@ the function attributes:
 ```
 # #[macro_use] extern crate gotham_restful_derive;
 # use gotham::state::State;
+# use gotham_restful::*;
 #
 # #[derive(Resource)]
 # struct MyResource;

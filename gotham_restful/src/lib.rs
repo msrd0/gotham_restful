@@ -70,6 +70,9 @@ OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS LICENSE.
 [serde_json]: https://github.com/serde-rs/json#serde-json----
 */
 
+// weird proc macro issue
+extern crate self as gotham_restful;
+
 #[macro_use] extern crate gotham_derive;
 #[macro_use] extern crate serde;
 

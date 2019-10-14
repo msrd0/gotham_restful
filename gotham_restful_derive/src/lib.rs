@@ -3,7 +3,6 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use std::env;
 
 mod method;
 use method::{expand_method, Method};
@@ -14,14 +13,7 @@ mod openapi_type;
 
 fn krate() -> TokenStream2
 {
-	if env::var("CARGO_PKG_NAME").unwrap() == "gotham_restful"
-	{
-		quote!(crate)
-	}
-	else
-	{
-		quote!(::gotham_restful)
-	}
+	quote!(::gotham_restful)
 }
 
 #[cfg(feature = "openapi")]
