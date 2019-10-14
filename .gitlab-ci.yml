@@ -25,7 +25,7 @@ test-all:
     - cargo -V
   script:
     - cargo tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'example/*' --out Xml
-    - wget -qO- https://codecov.io/bash | bash -s -- -X gcov
+    - wget -qO- https://codecov.io/bash | bash -s -- -y .codecov.yml -X gcov
   cache:
     paths:
       - cargo/
