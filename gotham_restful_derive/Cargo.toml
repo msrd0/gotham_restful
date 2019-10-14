@@ -17,16 +17,12 @@ proc-macro = true
 
 [badges]
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
+codecov = { repository = "msrd0/gotham-restful", branch = "master", service = "gitlab" }
 
 [dependencies]
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "1", features = ["extra-traits", "full"] }
-
-[dev-dependencies]
-fake = "2.2"
-log = "0.4"
-log4rs = { version = "0.8", features = ["console_appender"], default-features = false }
 
 [features]
 default = ["openapi"]

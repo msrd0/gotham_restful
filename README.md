@@ -1,4 +1,7 @@
-# gotham_restful [![Build Status](https://gitlab.com/msrd0/gotham-restful/badges/master/build.svg)](https://gitlab.com/msrd0/gotham-restful/commits/master)
+# gotham_restful
+
+[![Build Status](https://gitlab.com/msrd0/gotham-restful/badges/master/build.svg)](https://gitlab.com/msrd0/gotham-restful/commits/master)
+[![Coverage Status](https://codecov.io/gl/msrd0/gotham-restful/branch/master/graph/badge.svg)](https://codecov.io/gl/msrd0/gotham-restful)
 
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. The idea is to
 have several RESTful resources that can be added to the gotham router. This crate will take care

@@ -1,3 +1,5 @@
-# {{crate}} {{badges}}
+# {{crate}}
+
+{{badges}}
 
 {{readme}}
