@@ -21,8 +21,8 @@ use log::error;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
 	Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
-	PathStyle, Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody, Response, Responses,
-	Schema, Server, StatusCode
+	Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody, Response, Responses, Schema,
+	SchemaKind, Server, StatusCode, Type
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -221,24 +221,46 @@ impl<'a> OperationParams<'a>
 					example: None,
 					examples: IndexMap::new()
 				},
-				style: PathStyle::default(),
+				style: Default::default(),
 			}));
 		}
 	}
 	
-	fn add_query_params(&self, params : &mut Vec<ReferenceOr<Parameter>>)
+	fn add_query_params(self, params : &mut Vec<ReferenceOr<Parameter>>)
 	{
-		let query_params = match &self.query_params {
-			Some(qp) => qp,
+		let query_params = match self.query_params {
+			Some(qp) => qp.schema,
 			None => return
 		};
-		// TODO
+		let query_params = match query_params {
+			SchemaKind::Type(Type::Object(ty)) => ty,
+			_ => panic!("Query Parameters needs to be a plain struct")
+		};
+		for (name, schema) in query_params.properties
+		{
+			let required = query_params.required.contains(&name);
+			params.push(Item(Parameter::Query {
+				parameter_data: ParameterData {
+					name,
+					description: None,
+					required,
+					deprecated: None,
+					format: ParameterSchemaOrContent::Schema(schema.unbox()),
+					example: None,
+					examples: IndexMap::new()
+				},
+				allow_reserved: false,
+				style: Default::default(),
+				allow_empty_value: None
+			}))
+		}
 	}
 	
-	fn params(&self) -> Vec<ReferenceOr<Parameter>>
+	fn into_params(self) -> Vec<ReferenceOr<Parameter>>
 	{
 		let mut params : Vec<ReferenceOr<Parameter>> = Vec::new();
 		self.add_path_params(&mut params);
+		self.add_query_params(&mut params);
 		params
 	}
 }
@@ -270,7 +292,7 @@ fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema
 		description: None,
 		external_documentation: None,
 		operation_id: None, // TODO
-		parameters: params.params(),
+		parameters: params.into_params(),
 		request_body,
 		responses: Responses {
 			default: None,
@@ -353,7 +375,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}/search", &self.1);
 				let mut item = (self.0).1.remove_path(&self.1);
-				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::default(), None)); // TODO
+				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::from_query_params(Query::schema()), None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).search::<Handler, Query, Res>()
