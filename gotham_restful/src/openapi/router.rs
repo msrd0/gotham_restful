@@ -470,3 +470,54 @@ macro_rules! implOpenapiRouter {
 
 implOpenapiRouter!(RouterBuilder);
 implOpenapiRouter!(ScopeBuilder);
+
+
+#[cfg(test)]
+mod test
+{
+	use super::*;
+	
+	#[derive(OpenapiType)]
+	#[allow(dead_code)]
+	struct QueryParams
+	{
+		id : i64
+	}
+	
+	#[test]
+	fn params_empty()
+	{
+		let op_params = OperationParams::default();
+		let params = op_params.into_params();
+		assert!(params.is_empty());
+	}
+	
+	#[test]
+	fn params_from_path_params()
+	{
+		let name = "id";
+		let op_params = OperationParams::from_path_params(vec![name]);
+		let params = op_params.into_params();
+		let json = serde_json::to_string(&params).unwrap();
+		assert_eq!(json, format!(r#"[{{"in":"path","name":"{}","required":true,"schema":{{"type":"string"}},"style":"simple"}}]"#, name));
+	}
+	
+	#[test]
+	fn params_from_query_params()
+	{
+		let op_params = OperationParams::from_query_params(QueryParams::schema());
+		let params = op_params.into_params();
+		let json = serde_json::to_string(&params).unwrap();
+		assert_eq!(json, r#"[{"in":"query","name":"id","required":true,"schema":{"type":"integer"},"style":"form"}]"#);
+	}
+	
+	#[test]
+	fn params_both()
+	{
+		let name = "id";
+		let op_params = OperationParams::new(vec![name], Some(QueryParams::schema()));
+		let params = op_params.into_params();
+		let json = serde_json::to_string(&params).unwrap();
+		assert_eq!(json, format!(r#"[{{"in":"path","name":"{}","required":true,"schema":{{"type":"string"}},"style":"simple"}},{{"in":"query","name":"id","required":true,"schema":{{"type":"integer"}},"style":"form"}}]"#, name));
+	}
+}
