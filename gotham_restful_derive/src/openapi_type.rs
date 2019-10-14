@@ -38,17 +38,18 @@ fn expand_variant(variant : &Variant) -> TokenStream2
 
 fn expand_enum(input : ItemEnum) -> TokenStream2
 {
+	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 	
 	let variants : Vec<TokenStream2> = input.variants.iter().map(expand_variant).collect();
 	
 	quote! {
-		impl #generics ::gotham_restful::OpenapiType for #ident #generics
+		impl #generics #krate::OpenapiType for #ident #generics
 		{
-			fn to_schema() -> ::gotham_restful::OpenapiSchema
+			fn schema() -> #krate::OpenapiSchema
 			{
-				use ::gotham_restful::{export::openapi::*, OpenapiSchema};
+				use #krate::{export::openapi::*, OpenapiSchema};
 				
 				let mut enumeration : Vec<String> = Vec::new();
 				
