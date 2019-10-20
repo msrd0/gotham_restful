@@ -72,6 +72,15 @@ fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
 
 Look at the [example] for more methods and usage with the `openapi` feature.
 
+## Known Issues
+
+These are currently known major issues. For a complete list please see
+[the issue tracker](https://gitlab.com/msrd0/gotham-restful/issues).
+If you encounter any issues that aren't yet reported, please report them
+[here](https://gitlab.com/msrd0/gotham-restful/issues/new).
+
+ - Enabling the `openapi` feature might break code ([#4](https://gitlab.com/msrd0/gotham-restful/issues/4))
+
 ## License
 
 Licensed under your option of:
