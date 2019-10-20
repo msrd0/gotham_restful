@@ -1,14 +1,76 @@
-use crate::{ResourceType, StatusCode};
+use crate::{ResponseBody, StatusCode};
 #[cfg(feature = "openapi")]
 use crate::{OpenapiSchema, OpenapiType};
+use hyper::Body;
+use mime::{Mime, APPLICATION_JSON, STAR_STAR};
+#[cfg(feature = "openapi")]
+use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde::Serialize;
 use serde_json::error::Error as SerdeJsonError;
 use std::error::Error;
 
+/// A response, used to create the final gotham response from.
+pub struct Response
+{
+	pub status : StatusCode,
+	pub body : Body,
+	pub mime : Option<Mime>
+}
+
+impl Response
+{
+	/// Create a new `Response` from raw data.
+	pub fn new<B : Into<Body>>(status : StatusCode, body : B, mime : Option<Mime>) -> Self
+	{
+		Self {
+			status,
+			body: body.into(),
+			mime
+		}
+	}
+	
+	/// Create a `Response` with mime type json from already serialized data.
+	pub fn json<B : Into<Body>>(status : StatusCode, body : B) -> Self
+	{
+		Self {
+			status,
+			body: body.into(),
+			mime: Some(APPLICATION_JSON)
+		}
+	}
+	
+	/// Create a _204 No Content_ `Response`.
+	pub fn no_content() -> Self
+	{
+		Self {
+			status: StatusCode::NO_CONTENT,
+			body: Body::empty(),
+			mime: None
+		}
+	}
+	
+	#[cfg(test)]
+	fn full_body(self) -> Vec<u8>
+	{
+		use futures::{future::Future, stream::Stream};
+		
+		let bytes : &[u8] = &self.body.concat2().wait().unwrap().into_bytes();
+		bytes.to_vec()
+	}
+}
+
 /// A trait provided to convert a resource's result to json.
 pub trait ResourceResult
 {
-	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>;
+	/// Turn this into a response that can be returned to the browser. This api will likely
+	/// change in the future.
+	fn into_response(self) -> Result<Response, SerdeJsonError>;
+	
+	/// Return a list of supported mime types.
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		None
+	}
 	
 	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema;
@@ -48,17 +110,22 @@ impl<T : ToString> From<T> for ResourceError
 	}
 }
 
-impl<R : ResourceType, E : Error> ResourceResult for Result<R, E>
+impl<R : ResponseBody, E : Error> ResourceResult for Result<R, E>
 {
-	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
+	fn into_response(self) -> Result<Response, SerdeJsonError>
 	{
 		Ok(match self {
-			Ok(r) => (StatusCode::OK, serde_json::to_string(r)?),
+			Ok(r) => Response::json(StatusCode::OK, serde_json::to_string(&r)?),
 			Err(e) => {
 				let err : ResourceError = e.into();
-				(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
+				Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
 			}
 		})
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		Some(vec![APPLICATION_JSON])
 	}
 	
 	#[cfg(feature = "openapi")]
@@ -103,11 +170,16 @@ impl<T> From<T> for Success<T>
 	}
 }
 
-impl<T : ResourceType> ResourceResult for Success<T>
+impl<T : ResponseBody> ResourceResult for Success<T>
 {
-	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
+	fn into_response(self) -> Result<Response, SerdeJsonError>
 	{
-		Ok((StatusCode::OK, serde_json::to_string(&self.0)?))
+		Ok(Response::json(StatusCode::OK, serde_json::to_string(&self.0)?))
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		Some(vec![APPLICATION_JSON])
 	}
 	
 	#[cfg(feature = "openapi")]
@@ -150,9 +222,9 @@ impl From<()> for NoContent
 impl ResourceResult for NoContent
 {
 	/// This will always be a _204 No Content_ together with an empty string.
-	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
+	fn into_response(self) -> Result<Response, SerdeJsonError>
 	{
-		Ok((Self::default_status(), "".to_string()))
+		Ok(Response::no_content())
 	}
 	
 	/// Returns the schema of the `()` type.
@@ -172,15 +244,15 @@ impl ResourceResult for NoContent
 
 impl<E : Error> ResourceResult for Result<NoContent, E>
 {
-	fn to_json(&self) -> Result<(StatusCode, String), SerdeJsonError>
+	fn into_response(self) -> Result<Response, SerdeJsonError>
 	{
-		Ok(match self {
-			Ok(_) => (Self::default_status(), "".to_string()),
+		match self {
+			Ok(nc) => nc.into_response(),
 			Err(e) => {
 				let err : ResourceError = e.into();
-				(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
+				Ok(Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?))
 			}
-		})
+		}
 	}
 	
 	#[cfg(feature = "openapi")]
@@ -196,10 +268,76 @@ impl<E : Error> ResourceResult for Result<NoContent, E>
 	}
 }
 
+pub struct Raw<T>
+{
+	pub raw : T,
+	pub mime : Mime
+}
+
+impl<T> Raw<T>
+{
+	pub fn new(raw : T, mime : Mime) -> Self
+	{
+		Self { raw, mime }
+	}
+}
+
+impl<T : Into<Body>> ResourceResult for Raw<T>
+{
+	fn into_response(self) -> Result<Response, SerdeJsonError>
+	{
+		Ok(Response::new(StatusCode::OK, self.raw, Some(self.mime.clone())))
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		Some(vec![STAR_STAR])
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn schema() -> OpenapiSchema
+	{
+		OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
+			format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),
+			pattern: None,
+			enumeration: Vec::new()
+		})))
+	}
+}
+
+impl<T, E : Error> ResourceResult for Result<Raw<T>, E>
+where
+	Raw<T> : ResourceResult
+{
+	fn into_response(self) -> Result<Response, SerdeJsonError>
+	{
+		match self {
+			Ok(raw) => raw.into_response(),
+			Err(e) => {
+				let err : ResourceError = e.into();
+				Ok(Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?))
+			}
+		}
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		<Raw<T> as ResourceResult>::accepted_types()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn schema() -> OpenapiSchema
+	{
+		<Raw<T> as ResourceResult>::schema()
+	}
+}
+
+
 #[cfg(test)]
 mod test
 {
 	use super::*;
+	use mime::TEXT_PLAIN;
 	use thiserror::Error;
 	
 	#[derive(Debug, Default, Deserialize, Serialize)]
@@ -217,44 +355,60 @@ mod test
 	fn resource_result_ok()
 	{
 		let ok : Result<Msg, MsgError> = Ok(Msg::default());
-		let (status, json) = ok.to_json().expect("didn't expect error response");
-		assert_eq!(status, StatusCode::OK);
-		assert_eq!(json, r#"{"msg":""}"#);
+		let res = ok.into_response().expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::OK);
+		assert_eq!(res.mime, Some(APPLICATION_JSON));
+		assert_eq!(res.full_body(), r#"{"msg":""}"#.as_bytes());
 	}
 	
 	#[test]
 	fn resource_result_err()
 	{
 		let err : Result<Msg, MsgError> = Err(MsgError::default());
-		let (status, json) = err.to_json().expect("didn't expect error response");
-		assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
-		assert_eq!(json, format!(r#"{{"error":true,"message":"{}"}}"#, err.unwrap_err()));
+		let res = err.into_response().expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::INTERNAL_SERVER_ERROR);
+		assert_eq!(res.mime, Some(APPLICATION_JSON));
+		assert_eq!(res.full_body(), format!(r#"{{"error":true,"message":"{}"}}"#, MsgError::default()).as_bytes());
 	}
 	
 	#[test]
 	fn success_always_successfull()
 	{
 		let success : Success<Msg> = Msg::default().into();
-		let (status, json) = success.to_json().expect("didn't expect error response");
-		assert_eq!(status, StatusCode::OK);
-		assert_eq!(json, r#"{"msg":""}"#);
+		let res = success.into_response().expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::OK);
+		assert_eq!(res.mime, Some(APPLICATION_JSON));
+		assert_eq!(res.full_body(), r#"{"msg":""}"#.as_bytes());
 	}
 	
 	#[test]
-	fn no_content_has_empty_json()
+	fn no_content_has_empty_response()
 	{
 		let no_content = NoContent::default();
-		let (status, json) = no_content.to_json().expect("didn't expect error response");
-		assert_eq!(status, StatusCode::NO_CONTENT);
-		assert_eq!(json, "");
+		let res = no_content.into_response().expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::NO_CONTENT);
+		assert_eq!(res.mime, None);
+		assert_eq!(res.full_body(), &[] as &[u8]);
 	}
 	
 	#[test]
 	fn no_content_result()
 	{
-		let no_content = NoContent::default();
-		let res_def = no_content.to_json().expect("didn't expect error response");
-		let res_err = Result::<NoContent, MsgError>::Ok(no_content).to_json().expect("didn't expect error response");
-		assert_eq!(res_def, res_err);
+		let no_content : Result<NoContent, MsgError> = Ok(NoContent::default());
+		let res = no_content.into_response().expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::NO_CONTENT);
+		assert_eq!(res.mime, None);
+		assert_eq!(res.full_body(), &[] as &[u8]);
+	}
+	
+	#[test]
+	fn raw_response()
+	{
+		let msg = "Test";
+		let raw = Raw::new(msg, TEXT_PLAIN);
+		let res = raw.into_response().expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::OK);
+		assert_eq!(res.mime, Some(TEXT_PLAIN));
+		assert_eq!(res.full_body(), msg.as_bytes());
 	}
 }

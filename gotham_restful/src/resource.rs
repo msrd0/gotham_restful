@@ -1,4 +1,4 @@
-use crate::{DrawResourceRoutes, ResourceResult, ResourceType};
+use crate::{DrawResourceRoutes, RequestBody, ResourceResult, ResourceType};
 use gotham::{
 	router::response::extender::StaticResponseExtender,
 	state::{State, StateData}
@@ -35,25 +35,25 @@ where
 /// Handle a GET request on the Resource with additional search parameters.
 pub trait ResourceSearch<Query : ResourceType, R : ResourceResult>
 where
-	Query : ResourceType + StateData + StaticResponseExtender
+	Query : ResourceType + DeserializeOwned + StateData + StaticResponseExtender
 {
 	fn search(state : &mut State, query : Query) -> R;
 }
 
 /// Handle a POST request on the Resource root.
-pub trait ResourceCreate<Body : ResourceType, R : ResourceResult>
+pub trait ResourceCreate<Body : RequestBody, R : ResourceResult>
 {
 	fn create(state : &mut State, body : Body) -> R;
 }
 
 /// Handle a PUT request on the Resource root.
-pub trait ResourceUpdateAll<Body : ResourceType, R : ResourceResult>
+pub trait ResourceUpdateAll<Body : RequestBody, R : ResourceResult>
 {
 	fn update_all(state : &mut State, body : Body) -> R;
 }
 
 /// Handle a PUT request on the Resource with an id.
-pub trait ResourceUpdate<ID, Body : ResourceType, R : ResourceResult>
+pub trait ResourceUpdate<ID, Body : RequestBody, R : ResourceResult>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static
 {

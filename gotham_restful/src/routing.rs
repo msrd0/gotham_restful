@@ -1,6 +1,7 @@
 use crate::{
 	resource::*,
-	result::{ResourceError, ResourceResult},
+	result::{ResourceError, ResourceResult, Response},
+	RequestBody,
 	ResourceType,
 	StatusCode
 };
@@ -14,13 +15,26 @@ use futures::{
 use gotham::{
 	extractor::QueryStringExtractor,
 	handler::{HandlerFuture, IntoHandlerError},
-	helpers::http::response::create_response,
+	helpers::http::response::{create_empty_response, create_response},
 	pipeline::chain::PipelineHandleChain,
-	router::builder::*,
+	router::{
+		builder::*,
+		non_match::RouteNonMatch,
+		route::matcher::{
+			content_type::ContentTypeHeaderRouteMatcher,
+			AcceptHeaderRouteMatcher,
+			RouteMatcher
+		}
+	},
 	state::{FromState, State}
 };
-use hyper::Body;
-use mime::APPLICATION_JSON;
+use hyper::{
+	header::CONTENT_TYPE,
+	Body,
+	HeaderMap,
+	Method
+};
+use mime::{Mime, APPLICATION_JSON};
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
@@ -69,26 +83,26 @@ pub trait DrawResourceRoutes
 	
 	fn search<Handler, Query, Res>(&mut self)
 	where
-		Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
+		Query : ResourceType + DeserializeOwned + QueryStringExtractor<Body> + Send + Sync + 'static,
 		Res : ResourceResult,
 		Handler : ResourceSearch<Query, Res>;
 	
 	fn create<Handler, Body, Res>(&mut self)
 	where
-		Body : ResourceType,
+		Body : RequestBody,
 		Res : ResourceResult,
 		Handler : ResourceCreate<Body, Res>;
 
 	fn update_all<Handler, Body, Res>(&mut self)
 	where
-		Body : ResourceType,
+		Body : RequestBody,
 		Res : ResourceResult,
 		Handler : ResourceUpdateAll<Body, Res>;
 
 	fn update<Handler, ID, Body, Res>(&mut self)
 	where
 		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		Body : ResourceType,
+		Body : RequestBody,
 		Res : ResourceResult,
 		Handler : ResourceUpdate<ID, Body, Res>;
 
@@ -104,16 +118,30 @@ pub trait DrawResourceRoutes
 		Handler : ResourceDelete<ID, Res>;
 }
 
+fn response_from(res : Response, state : &State) -> hyper::Response<Body>
+{
+	let mut r = create_empty_response(state, res.status);
+	if let Some(mime) = res.mime
+	{
+		r.headers_mut().insert(CONTENT_TYPE, mime.as_ref().parse().unwrap());
+	}
+	if Method::borrow_from(state) != Method::HEAD
+	{
+		*r.body_mut() = res.body;
+	}
+	r
+}
+
 fn to_handler_future<F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
 where
 	F : FnOnce(&mut State) -> R,
 	R : ResourceResult
 {
-	let res = get_result(&mut state).to_json();
+	let res = get_result(&mut state).into_response();
 	match res {
-		Ok((status, body)) => {
-			let res = create_response(&state, status, APPLICATION_JSON, body);
-			Box::new(ok((state, res)))
+		Ok(res) => {
+			let r = response_from(res, &state);
+			Box::new(ok((state, r)))
 		},
 		Err(e) => Box::new(err((state, e.into_handler_error())))
 	}
@@ -121,7 +149,7 @@ where
 
 fn handle_with_body<Body, F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
 where
-	Body : DeserializeOwned,
+	Body : RequestBody,
 	F : FnOnce(&mut State, Body) -> R + Send + 'static,
 	R : ResourceResult
 {
@@ -133,8 +161,16 @@ where
 				Ok(body) => body,
 				Err(e) => return err((state, e.into_handler_error()))
 			};
+			
+			let content_type : Mime = match HeaderMap::borrow_from(&state).get(CONTENT_TYPE) {
+				Some(content_type) => content_type.to_str().unwrap().parse().unwrap(),
+				None => {
+					let res = create_empty_response(&state, StatusCode::UNSUPPORTED_MEDIA_TYPE);
+					return ok((state, res))
+				}
+			};
 
-			let body = match serde_json::from_slice(&body) {
+			let body = match Body::from_body(body, content_type) {
 				Ok(body) => body,
 				Err(e) => return {
 					let error : ResourceError = e.into();
@@ -148,11 +184,11 @@ where
 				}
 			};
 
-			let res = get_result(&mut state, body).to_json();
+			let res = get_result(&mut state, body).into_response();
 			match res {
-				Ok((status, body)) => {
-					let res = create_response(&state, status, APPLICATION_JSON, body);
-					ok((state, res))
+				Ok(res) => {
+					let r = response_from(res, &state);
+					ok((state, r))
 				},
 				Err(e) => err((state, e.into_handler_error()))
 			}
@@ -195,7 +231,7 @@ where
 
 fn create_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
-	Body : ResourceType,
+	Body : RequestBody,
 	Res : ResourceResult,
 	Handler : ResourceCreate<Body, Res>
 {
@@ -204,7 +240,7 @@ where
 
 fn update_all_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
 where
-	Body : ResourceType,
+	Body : RequestBody,
 	Res : ResourceResult,
 	Handler : ResourceUpdateAll<Body, Res>
 {
@@ -214,7 +250,7 @@ where
 fn update_handler<Handler, ID, Body, Res>(state : State) -> Box<HandlerFuture>
 where
 	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-	Body : ResourceType,
+	Body : RequestBody,
 	Res : ResourceResult,
 	Handler : ResourceUpdate<ID, Body, Res>
 {
@@ -244,6 +280,60 @@ where
 		path.id.clone()
 	};
 	to_handler_future(state, |state| Handler::delete(state, id))
+}
+
+#[derive(Clone)]
+struct MaybeMatchAcceptHeader
+{
+	matcher : Option<AcceptHeaderRouteMatcher>
+}
+
+impl RouteMatcher for MaybeMatchAcceptHeader
+{
+	fn is_match(&self, state : &State) -> Result<(), RouteNonMatch>
+	{
+		match &self.matcher {
+			Some(matcher) => matcher.is_match(state),
+			None => Ok(())
+		}
+	}
+}
+
+impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader
+{
+	fn from(types : Option<Vec<Mime>>) -> Self
+	{
+		Self {
+			matcher: types.map(AcceptHeaderRouteMatcher::new)
+		}
+	}
+}
+
+#[derive(Clone)]
+struct MaybeMatchContentTypeHeader
+{
+	matcher : Option<ContentTypeHeaderRouteMatcher>
+}
+
+impl RouteMatcher for MaybeMatchContentTypeHeader
+{
+	fn is_match(&self, state : &State) -> Result<(), RouteNonMatch>
+	{
+		match &self.matcher {
+			Some(matcher) => matcher.is_match(state),
+			None => Ok(())
+		}
+	}
+}
+
+impl From<Option<Vec<Mime>>> for MaybeMatchContentTypeHeader
+{
+	fn from(types : Option<Vec<Mime>>) -> Self
+	{
+		Self {
+			matcher: types.map(ContentTypeHeaderRouteMatcher::new)
+		}
+	}
 }
 
 macro_rules! implDrawResourceRoutes {
@@ -289,7 +379,9 @@ macro_rules! implDrawResourceRoutes {
 				Res : ResourceResult,
 				Handler : ResourceReadAll<Res>
 			{
+				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
 				self.0.get(&self.1)
+					.extend_route_matcher(matcher)
 					.to(|state| read_all_handler::<Handler, Res>(state));
 			}
 
@@ -299,7 +391,9 @@ macro_rules! implDrawResourceRoutes {
 				Res : ResourceResult,
 				Handler : ResourceRead<ID, Res>
 			{
+				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
 				self.0.get(&format!("{}/:id", self.1))
+					.extend_route_matcher(matcher)
 					.with_path_extractor::<PathExtractor<ID>>()
 					.to(|state| read_handler::<Handler, ID, Res>(state));
 			}
@@ -310,39 +404,53 @@ macro_rules! implDrawResourceRoutes {
 				Res : ResourceResult,
 				Handler : ResourceSearch<Query, Res>
 			{
+				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
 				self.0.get(&format!("{}/search", self.1))
+					.extend_route_matcher(matcher)
 					.with_query_string_extractor::<Query>()
 					.to(|state| search_handler::<Handler, Query, Res>(state));
 			}
 			
 			fn create<Handler, Body, Res>(&mut self)
 			where
-				Body : ResourceType,
+				Body : RequestBody,
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
+				let accept_matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let content_matcher : MaybeMatchContentTypeHeader = Body::supported_types().into();
 				self.0.post(&self.1)
+					.extend_route_matcher(accept_matcher)
+					.extend_route_matcher(content_matcher)
 					.to(|state| create_handler::<Handler, Body, Res>(state));
 			}
 
 			fn update_all<Handler, Body, Res>(&mut self)
 			where
-				Body : ResourceType,
+				Body : RequestBody,
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
+				let accept_matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let content_matcher : MaybeMatchContentTypeHeader = Body::supported_types().into();
 				self.0.put(&self.1)
+					.extend_route_matcher(accept_matcher)
+					.extend_route_matcher(content_matcher)
 					.to(|state| update_all_handler::<Handler, Body, Res>(state));
 			}
 
 			fn update<Handler, ID, Body, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : ResourceType,
+				Body : RequestBody,
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{
+				let accept_matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let content_matcher : MaybeMatchContentTypeHeader = Body::supported_types().into();
 				self.0.put(&format!("{}/:id", self.1))
+					.extend_route_matcher(accept_matcher)
+					.extend_route_matcher(content_matcher)
 					.with_path_extractor::<PathExtractor<ID>>()
 					.to(|state| update_handler::<Handler, ID, Body, Res>(state));
 			}
@@ -352,7 +460,9 @@ macro_rules! implDrawResourceRoutes {
 				Res : ResourceResult,
 				Handler : ResourceDeleteAll<Res>
 			{
+				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
 				self.0.delete(&self.1)
+					.extend_route_matcher(matcher)
 					.to(|state| delete_all_handler::<Handler, Res>(state));
 			}
 
@@ -362,7 +472,9 @@ macro_rules! implDrawResourceRoutes {
 				Res : ResourceResult,
 				Handler : ResourceDelete<ID, Res>
 			{
+				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
 				self.0.delete(&format!("{}/:id", self.1))
+					.extend_route_matcher(matcher)
 					.with_path_extractor::<PathExtractor<ID>>()
 					.to(|state| delete_handler::<Handler, ID, Res>(state));
 			}

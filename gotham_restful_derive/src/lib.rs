@@ -4,8 +4,12 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
+mod from_body;
+use from_body::expand_from_body;
 mod method;
 use method::{expand_method, Method};
+mod request_body;
+use request_body::expand_request_body;
 mod resource;
 use resource::expand_resource;
 #[cfg(feature = "openapi")]
@@ -16,11 +20,23 @@ fn krate() -> TokenStream2
 	quote!(::gotham_restful)
 }
 
+#[proc_macro_derive(FromBody)]
+pub fn derive_from_body(tokens : TokenStream) -> TokenStream
+{
+	expand_from_body(tokens)
+}
+
 #[cfg(feature = "openapi")]
 #[proc_macro_derive(OpenapiType)]
 pub fn derive_openapi_type(tokens : TokenStream) -> TokenStream
 {
 	openapi_type::expand(tokens)
+}
+
+#[proc_macro_derive(RequestBody, attributes(supported_types))]
+pub fn derive_request_body(tokens : TokenStream) -> TokenStream
+{
+	expand_request_body(tokens)
 }
 
 #[proc_macro_derive(Resource, attributes(rest_resource))]
