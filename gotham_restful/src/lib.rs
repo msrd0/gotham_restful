@@ -90,6 +90,7 @@ If you encounter any issues that aren't yet reported, please report them
 [here](https://gitlab.com/msrd0/gotham-restful/issues/new).
 
  - Enabling the `openapi` feature might break code ([#4](https://gitlab.com/msrd0/gotham-restful/issues/4))
+ - For `chrono`'s `DateTime` types, the format is `date-time` instead of `datetime` ([openapiv3#14](https://github.com/glademiller/openapiv3/pull/14))
 
 # License
 

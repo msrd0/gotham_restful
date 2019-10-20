@@ -5,10 +5,10 @@ use chrono::{
 use indexmap::IndexMap;
 use openapiv3::{
 	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, ReferenceOr::Reference, Schema,
-	SchemaData, SchemaKind, StringType, Type
+	SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty
 };
-#[cfg(feature = "chrono")]
-use openapiv3::{StringFormat, VariantOrUnknownOrEmpty};
+#[cfg(feature = "uuid")]
+use uuid::Uuid;
 
 /**
 This struct needs to be available for every type that can be part of an OpenAPI Spec. It is
@@ -52,15 +52,8 @@ impl OpenapiSchema
 		Schema {
 			schema_data: SchemaData {
 				nullable: self.nullable,
-				read_only: false,
-				write_only: false,
-				deprecated: false,
-				external_docs: None,
-				example: None,
 				title: self.name,
-				description: None,
-				discriminator: None,
-				default: None
+				..Default::default()
 			},
 			schema_kind: self.schema
 		}
@@ -80,6 +73,8 @@ struct MyResponse {
 	message: String
 }
 ```
+
+[`OpenapiSchema`]: struct.OpenapiSchema.html
 */
 pub trait OpenapiType
 {
@@ -111,10 +106,61 @@ macro_rules! int_types {
 				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType::default())))
 			}
 		}
-	)*}
+	)*};
+	
+	(unsigned $($int_ty:ty),*) => {$(
+		impl OpenapiType for $int_ty
+		{
+			fn schema() -> OpenapiSchema
+			{
+				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType {
+					minimum: Some(0),
+					..Default::default()
+				})))
+			}
+		}
+	)*};
+	
+	(bits = $bits:expr, $($int_ty:ty),*) => {$(
+		impl OpenapiType for $int_ty
+		{
+			fn schema() -> OpenapiSchema
+			{
+				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType {
+					format: VariantOrUnknownOrEmpty::Unknown(format!("int{}", $bits)),
+					..Default::default()
+				})))
+			}
+		}
+	)*};
+	
+	(unsigned bits = $bits:expr, $($int_ty:ty),*) => {$(
+		impl OpenapiType for $int_ty
+		{
+			fn schema() -> OpenapiSchema
+			{
+				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType {
+					format: VariantOrUnknownOrEmpty::Unknown(format!("int{}", $bits)),
+					minimum: Some(0),
+					..Default::default()
+				})))
+			}
+		}
+	)*};
 }
 
-int_types!(u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128);
+int_types!(isize);
+int_types!(unsigned usize);
+int_types!(bits = 8, i8);
+int_types!(unsigned bits = 8, u8);
+int_types!(bits = 16, i16);
+int_types!(unsigned bits = 16, u16);
+int_types!(bits = 32, i32);
+int_types!(unsigned bits = 32, u32);
+int_types!(bits = 64, i64);
+int_types!(unsigned bits = 64, u64);
+int_types!(bits = 128, i128);
+int_types!(unsigned bits = 128, u128);
 
 macro_rules! num_types {
 	($($num_ty:ty),*) => {$(
@@ -146,10 +192,24 @@ macro_rules! str_types {
 		{
 			fn schema() -> OpenapiSchema
 			{
+				use openapiv3::StringFormat;
+				
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Item(StringFormat::$format),
-					pattern: None,
-					enumeration: Vec::new()
+					..Default::default()
+				})))
+			}
+		}
+	)*};
+	
+	(format_str = $format:expr, $($str_ty:ty),*) => {$(
+		impl OpenapiType  for $str_ty
+		{
+			fn schema() -> OpenapiSchema
+			{
+				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
+					format: VariantOrUnknownOrEmpty::Unknown($format.to_string()),
+					..Default::default()
 				})))
 			}
 		}
@@ -217,3 +277,6 @@ impl<T : OpenapiType> OpenapiType for Vec<T>
 str_types!(format = Date, Date<FixedOffset>, Date<Local>, Date<Utc>, NaiveDate);
 #[cfg(feature = "chrono")]
 str_types!(format = DateTime, DateTime<FixedOffset>, DateTime<Local>, DateTime<Utc>, NaiveDateTime);
+
+#[cfg(feature = "uuid")]
+str_types!(format_str = "uuid", Uuid);
