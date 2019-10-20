@@ -74,9 +74,9 @@ Look at the [example] for more methods and usage with the `openapi` feature.
 
 ## License
 
-THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THE ECLIPSE <br/>
-PUBLIC LICENSE VERSION 2.0. ANY USE, REPRODUCTION OR DISTRIBUTION <br/>
-OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS LICENSE.
+Licensed under your option of:
+ - [Apache License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-Apache)
+ - [Eclipse Public License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-EPL)
 
 
 [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
