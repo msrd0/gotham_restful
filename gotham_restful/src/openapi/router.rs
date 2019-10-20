@@ -4,6 +4,7 @@ use crate::{
 	routing::*,
 	OpenapiSchema,
 	OpenapiType,
+	RequestBody,
 	ResourceType
 };
 use futures::future::ok;
@@ -18,10 +19,10 @@ use gotham::{
 use hyper::Body;
 use indexmap::IndexMap;
 use log::error;
-use mime::{APPLICATION_JSON, TEXT_PLAIN};
+use mime::{Mime, APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
 	Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
-	Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody, Response, Responses, Schema,
+	Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
 	SchemaKind, Server, StatusCode, Type
 };
 use serde::de::DeserializeOwned;
@@ -171,15 +172,18 @@ pub trait GetOpenapi
 	fn get_openapi(&mut self, path : &str);
 }
 
-fn schema_to_content(schema : ReferenceOr<Schema>) -> IndexMap<String, MediaType>
+fn schema_to_content(types : Vec<Mime>, schema : ReferenceOr<Schema>) -> IndexMap<String, MediaType>
 {
 	let mut content : IndexMap<String, MediaType> = IndexMap::new();
-	content.insert(APPLICATION_JSON.to_string(), MediaType {
-		schema: Some(schema),
-		example: None,
-		examples: IndexMap::new(),
-		encoding: IndexMap::new()
-	});
+	for ty in types
+	{
+		content.insert(ty.to_string(), MediaType {
+			schema: Some(schema.clone()),
+			example: None,
+			examples: IndexMap::new(),
+			encoding: IndexMap::new()
+		});
+	}
 	content
 }
 
@@ -265,12 +269,9 @@ impl<'a> OperationParams<'a>
 	}
 }
 
-fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema>, params : OperationParams, body_schema : Option<ReferenceOr<Schema>>) -> Operation
+fn new_operation(default_status : hyper::StatusCode, accepted_types : Option<Vec<Mime>>, schema : ReferenceOr<Schema>, params : OperationParams, body_schema : Option<ReferenceOr<Schema>>, supported_types : Option<Vec<Mime>>) -> Operation
 {
-	let content = match default_status.as_u16() {
-		204 => IndexMap::new(),
-		_ => schema_to_content(schema)
-	};
+	let content = schema_to_content(accepted_types.unwrap_or_default(), schema);
 	
 	let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
 	responses.insert(StatusCode::Code(default_status.as_u16()), Item(Response {
@@ -280,9 +281,9 @@ fn new_operation(default_status : hyper::StatusCode, schema : ReferenceOr<Schema
 		links: IndexMap::new()
 	}));
 	
-	let request_body = body_schema.map(|schema| Item(RequestBody {
+	let request_body = body_schema.map(|schema| Item(OARequestBody {
 		description: None,
-		content: schema_to_content(schema),
+		content: schema_to_content(supported_types.unwrap_or_default(), schema),
 		required: true
 	}));
 	
@@ -343,7 +344,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::default(), None));
+				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
@@ -359,7 +360,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::from_path_params(vec!["id"]), None));
+				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
@@ -367,7 +368,7 @@ macro_rules! implOpenapiRouter {
 			
 			fn search<Handler, Query, Res>(&mut self)
 			where
-				Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
+				Query : ResourceType + DeserializeOwned + QueryStringExtractor<Body> + Send + Sync + 'static,
 				Res : ResourceResult,
 				Handler : ResourceSearch<Query, Res>
 			{
@@ -375,7 +376,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}/search", &self.1);
 				let mut item = (self.0).1.remove_path(&self.1);
-				item.get = Some(new_operation(Res::default_status(), schema, OperationParams::from_query_params(Query::schema()), None));
+				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_query_params(Query::schema()), None, None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).search::<Handler, Query, Res>()
@@ -383,7 +384,7 @@ macro_rules! implOpenapiRouter {
 			
 			fn create<Handler, Body, Res>(&mut self)
 			where
-				Body : ResourceType,
+				Body : RequestBody,
 				Res : ResourceResult,
 				Handler : ResourceCreate<Body, Res>
 			{
@@ -392,7 +393,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.post = Some(new_operation(Res::default_status(), schema, OperationParams::default(), Some(body_schema)));
+				item.post = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
@@ -400,7 +401,7 @@ macro_rules! implOpenapiRouter {
 			
 			fn update_all<Handler, Body, Res>(&mut self)
 			where
-				Body : ResourceType,
+				Body : RequestBody,
 				Res : ResourceResult,
 				Handler : ResourceUpdateAll<Body, Res>
 			{
@@ -409,7 +410,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), schema, OperationParams::default(), Some(body_schema)));
+				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
@@ -418,7 +419,7 @@ macro_rules! implOpenapiRouter {
 			fn update<Handler, ID, Body, Res>(&mut self)
 			where
 				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : ResourceType,
+				Body : RequestBody,
 				Res : ResourceResult,
 				Handler : ResourceUpdate<ID, Body, Res>
 			{
@@ -427,7 +428,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema)));
+				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema), Body::supported_types()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
@@ -442,7 +443,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), schema, OperationParams::default(), None));
+				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
@@ -458,7 +459,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), schema, OperationParams::from_path_params(vec!["id"]), None));
+				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()
@@ -475,6 +476,7 @@ implOpenapiRouter!(ScopeBuilder);
 #[cfg(test)]
 mod test
 {
+	use crate::ResourceResult;
 	use super::*;
 	
 	#[derive(OpenapiType)]
@@ -519,5 +521,25 @@ mod test
 		let params = op_params.into_params();
 		let json = serde_json::to_string(&params).unwrap();
 		assert_eq!(json, format!(r#"[{{"in":"path","name":"{}","required":true,"schema":{{"type":"string"}},"style":"simple"}},{{"in":"query","name":"id","required":true,"schema":{{"type":"integer"}},"style":"form"}}]"#, name));
+	}
+	
+	#[test]
+	fn no_content_schema_to_content()
+	{
+		let types = NoContent::accepted_types();
+		let schema = <NoContent as OpenapiType>::schema();
+		let content = schema_to_content(types.unwrap_or_default(), Item(schema.into_schema()));
+		assert!(content.is_empty());
+	}
+	
+	#[test]
+	fn raw_schema_to_content()
+	{
+		let types = Raw::<&str>::accepted_types();
+		let schema = <Raw<&str> as OpenapiType>::schema();
+		let content = schema_to_content(types.unwrap_or_default(), Item(schema.into_schema()));
+		assert_eq!(content.len(), 1);
+		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
+		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);
 	}
 }

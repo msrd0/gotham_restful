@@ -22,7 +22,6 @@ A basic server with only one resource, handling a simple `GET` request, could lo
 # use gotham::{router::builder::*, state::State};
 # use gotham_restful::{DrawResources, Resource, Success};
 # use serde::{Deserialize, Serialize};
-#
 /// Our RESTful Resource.
 #[derive(Resource)]
 #[rest_resource(read_all)]
@@ -55,6 +54,32 @@ fn main() {
 }
 ```
 
+Uploads and Downloads can also be handled, but you need to specify the mime type manually:
+
+```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::{router::builder::*, state::State};
+# use gotham_restful::{DrawResources, Raw, Resource, Success};
+# use serde::{Deserialize, Serialize};
+#[derive(Resource)]
+#[rest_resource(create)]
+struct ImageResource;
+
+#[derive(FromBody, RequestBody)]
+#[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
+struct RawImage(Vec<u8>);
+
+#[rest_create(ImageResource)]
+fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
+	Raw::new(body.0, mime::APPLICATION_OCTET_STREAM)
+}
+# fn main() {
+# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+# 		route.resource::<ImageResource, _>("image");
+# 	}));
+# }
+```
+
 Look at the [example] for more methods and usage with the `openapi` feature.
 
 # License
@@ -76,7 +101,10 @@ extern crate self as gotham_restful;
 #[macro_use] extern crate gotham_derive;
 #[macro_use] extern crate serde;
 
-pub use hyper::StatusCode;
+#[doc(no_inline)]
+pub use hyper::{Chunk, StatusCode};
+#[doc(no_inline)]
+pub use mime::Mime;
 
 pub use gotham_restful_derive::*;
 
@@ -114,7 +142,9 @@ pub use resource::{
 mod result;
 pub use result::{
 	NoContent,
+	Raw,
 	ResourceResult,
+	Response,
 	Success
 };
 
@@ -124,4 +154,4 @@ pub use routing::{DrawResources, DrawResourceRoutes};
 pub use routing::WithOpenapi;
 
 mod types;
-pub use types::ResourceType;
+pub use types::*;

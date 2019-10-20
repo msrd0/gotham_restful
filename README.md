@@ -22,7 +22,6 @@ gotham_restful = "0.0.1"
 A basic server with only one resource, handling a simple `GET` request, could look like this:
 
 ```rust
-#
 /// Our RESTful Resource.
 #[derive(Resource)]
 #[rest_resource(read_all)]
@@ -51,6 +50,23 @@ fn main() {
 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
 		route.resource::<UsersResource, _>("users");
 	}));
+}
+```
+
+Uploads and Downloads can also be handled, but you need to specify the mime type manually:
+
+```rust
+#[derive(Resource)]
+#[rest_resource(create)]
+struct ImageResource;
+
+#[derive(FromBody, RequestBody)]
+#[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
+struct RawImage(Vec<u8>);
+
+#[rest_create(ImageResource)]
+fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
+	Raw::new(body.0, mime::APPLICATION_OCTET_STREAM)
 }
 ```
 
