@@ -6,3 +6,7 @@ members = [
 	"gotham_restful_derive",
 	"example"
 ]
+
+[patch.crates-io]
+gotham_restful = { path = "./gotham_restful" }
+gotham_restful_derive = { path = "./gotham_restful_derive" }

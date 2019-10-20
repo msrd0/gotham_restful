@@ -9,7 +9,6 @@ description = "RESTful additions for Gotham - Derive"
 keywords = ["gotham", "rest", "restful", "derive"]
 license = "EPL-2.0 OR Apache-2.0"
 readme = "../README.md"
-include = ["src/**/*", "Cargo.toml", "../LICENSE"]
 repository = "https://gitlab.com/msrd0/gotham-restful"
 
 [lib]

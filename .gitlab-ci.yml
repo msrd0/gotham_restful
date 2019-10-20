@@ -37,3 +37,18 @@ readme:
   script:
     - cargo readme -r gotham_restful -t ../README.tpl >README.md.new
     - diff README.md README.md.new
+
+publish:
+  stage: publish
+  image: msrd0/rust:alpine
+  before_script:
+    - cargo -V
+    - cargo login $CRATES_IO_TOKEN
+  script:
+    - cd gotham_restful_derive
+    - cargo publish
+    - cd ../gotham_restful
+    - cargo publish
+    - cd ..
+  only:
+    - tags

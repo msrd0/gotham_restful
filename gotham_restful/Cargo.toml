@@ -9,7 +9,6 @@ description = "RESTful additions for Gotham"
 keywords = ["gotham", "rest", "restful"]
 license = "EPL-2.0 OR Apache-2.0"
 readme = "../README.md"
-include = ["src/**/*", "Cargo.toml", "../LICENSE"]
 repository = "https://gitlab.com/msrd0/gotham-restful"
 
 [badges]
@@ -22,7 +21,7 @@ failure = "0.1"
 futures = "0.1"
 gotham = "0.4"
 gotham_derive = "0.4"
-gotham_restful_derive = { path = "../gotham_restful_derive" }
+gotham_restful_derive = { version = "0.0.1" }
 hyper = "0.12"
 indexmap = { version = "1.0", optional = true }
 log = { version = "0.4", optional = true }

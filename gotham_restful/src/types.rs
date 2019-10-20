@@ -1,5 +1,6 @@
 #[cfg(feature = "openapi")]
-use crate::{OpenapiType, result::ResourceError};
+use crate::OpenapiType;
+use crate::result::ResourceError;
 
 use hyper::Chunk;
 use mime::{Mime, APPLICATION_JSON};
