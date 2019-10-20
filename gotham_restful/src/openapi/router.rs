@@ -483,7 +483,7 @@ mod test
 	#[allow(dead_code)]
 	struct QueryParams
 	{
-		id : i64
+		id : isize
 	}
 	
 	#[test]
