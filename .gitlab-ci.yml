@@ -1,6 +1,7 @@
 
 stages:
   - test
+  - publish
 
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
