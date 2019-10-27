@@ -39,7 +39,7 @@ pub fn expand_resource(tokens : TokenStream) -> TokenStream
 		m.0.into_iter()
 	}).map(|method| {
 		let method = Method::from_str(&method.to_string()).expect("unknown method");
-		let ident = method.setup_ident();
+		let ident = method.setup_ident(ident.to_string());
 		quote!(#ident(&mut route);)
 	}).collect();
 	
