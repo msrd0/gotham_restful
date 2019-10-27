@@ -1,3 +1,4 @@
+use heck::SnakeCase;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
@@ -76,19 +77,25 @@ impl Method
 		format_ident!("{}", name)
 	}
 	
-	pub fn setup_ident(&self) -> Ident
+	pub fn setup_ident(&self, resource : String) -> Ident
 	{
-		format_ident!("{}_setup_impl", self.fn_ident())
+		format_ident!("{}_{}_setup_impl", resource.to_snake_case(), self.fn_ident())
 	}
 }
 
 pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -> TokenStream
 {
 	let krate = super::krate();
-	let ident = parse_macro_input!(attrs as Ident);
+	let resource_ident = parse_macro_input!(attrs as Ident);
 	let fun = parse_macro_input!(item as ItemFn);
+	let fun_ident = &fun.sig.ident;
+	let fun_vis = &fun.vis;
 	
-	let (ret, is_no_content) = match fun.sig.output {
+	let trait_ident = method.trait_ident();
+	let method_ident = method.fn_ident();
+	let setup_ident = method.setup_ident(resource_ident.to_string());
+	
+	let (ret, is_no_content) = match &fun.sig.output {
 		ReturnType::Default => (quote!(#krate::NoContent), true),
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
@@ -102,29 +109,26 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	}).collect();
 	let mut generics : Vec<TokenStream2> = args.iter().skip(1).map(|(_, ty)| quote!(#ty)).collect();
 	generics.push(quote!(#ret));
-	let args : Vec<TokenStream2> = args.into_iter().map(|(pat, ty)| quote!(#pat : #ty)).collect();
-	let block = fun.block.stmts;
-	let ret_stmt = if is_no_content { Some(quote!(Default::default())) } else { None };
-	
-	let trait_ident = method.trait_ident();
-	let fn_ident = method.fn_ident();
-	let setup_ident = method.setup_ident();
+	let args_def : Vec<TokenStream2> = args.iter().map(|(pat, ty)| quote!(#pat : #ty)).collect();
+	let args_pass : Vec<TokenStream2> = args.iter().map(|(pat, _)| quote!(#pat)).collect();
+	let block = if is_no_content { quote!(#fun_ident(#(#args_pass),*); Default::default()) } else { quote!(#fun_ident(#(#args_pass),*)) };
 	
 	let output = quote! {
-		impl #krate::#trait_ident<#(#generics),*> for #ident
-		where #ident : #krate::Resource
+		#fun
+		
+		impl #krate::#trait_ident<#(#generics),*> for #resource_ident
+		where #resource_ident : #krate::Resource
 		{
-			fn #fn_ident(#(#args),*) -> #ret
+			fn #method_ident(#(#args_def),*) -> #ret
 			{
-				#(#block)*
-				#ret_stmt
+				#block
 			}
 		}
 		
 		#[deny(dead_code)]
-		fn #setup_ident<D : #krate::DrawResourceRoutes>(route : &mut D)
+		#fun_vis fn #setup_ident<D : #krate::DrawResourceRoutes>(route : &mut D)
 		{
-			route.#fn_ident::<#ident, #(#generics),*>();
+			route.#method_ident::<#resource_ident, #(#generics),*>();
 		}
 	};
 	output.into()
