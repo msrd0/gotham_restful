@@ -280,3 +280,16 @@ str_types!(format = DateTime, DateTime<FixedOffset>, DateTime<Local>, DateTime<U
 
 #[cfg(feature = "uuid")]
 str_types!(format_str = "uuid", Uuid);
+
+impl OpenapiType for serde_json::Value
+{
+	fn schema() -> OpenapiSchema
+	{
+		OpenapiSchema {
+			nullable: true,
+			name: None,
+			schema: SchemaKind::Any(Default::default()),
+			dependencies: Default::default()
+		}
+	}
+}
