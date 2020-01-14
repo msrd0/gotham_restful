@@ -177,6 +177,5 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 			route.#method_ident::<#resource_ident, #(#generics),*>();
 		}
 	};
-	println!("{}", output);
 	output.into()
 }
