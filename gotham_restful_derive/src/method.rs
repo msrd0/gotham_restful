@@ -7,7 +7,6 @@ use syn::{
 	ItemFn,
 	ReturnType,
 	Type,
-	TypePath,
 	parse_macro_input
 };
 use std::str::FromStr;
@@ -154,7 +153,7 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 			use #krate::export::{Future, FromState};
 			let #repo_ident = <#krate::export::Repo<#conn_ty_real>>::borrow_from(&#state_ident).clone();
 			#repo_ident.run::<_, #ret, ()>(move |#conn_ident| {
-				Ok(#block)
+				Ok({#block})
 			}).wait().unwrap()
 		};
 	}
