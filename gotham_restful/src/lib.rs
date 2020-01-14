@@ -122,6 +122,8 @@ pub use gotham_restful_derive::*;
 #[doc(hidden)]
 pub mod export
 {
+	#[cfg(feature = "database")]
+	pub use gotham_middleware_diesel::Repo;
 	#[cfg(feature = "openapi")]
 	pub use indexmap::IndexMap;
 	#[cfg(feature = "openapi")]

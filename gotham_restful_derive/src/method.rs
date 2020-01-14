@@ -107,11 +107,29 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 		},
 		FnArg::Receiver(_) => panic!("didn't expect self parameter")
 	}).collect();
-	let mut generics : Vec<TokenStream2> = args.iter().skip(1).map(|(_, ty)| quote!(#ty)).collect();
+	let args_state = args.iter().map(|(pat, _)| pat).nth(0).expect("state parameter is required");
+	let args_conn = if cfg!(feature = "database") {
+		args.iter().filter(|(pat, _)| pat.to_string() == "conn").nth(0)
+	} else { None };
+	let mut generics : Vec<TokenStream2> = args.iter().skip(1)
+		.filter(|(pat, _)| Some(pat.to_string()) != args_conn.map(|(pat, _)| pat.to_string()))
+		.map(|(_, ty)| quote!(#ty)).collect();
 	generics.push(quote!(#ret));
-	let args_def : Vec<TokenStream2> = args.iter().map(|(pat, ty)| quote!(#pat : #ty)).collect();
+	let args_def : Vec<TokenStream2> = args.iter()
+		.filter(|(pat, _)| Some(pat.to_string()) != args_conn.map(|(pat, _)| pat.to_string()))
+		.map(|(pat, ty)| quote!(#pat : #ty)).collect();
 	let args_pass : Vec<TokenStream2> = args.iter().map(|(pat, _)| quote!(#pat)).collect();
-	let block = if is_no_content { quote!(#fun_ident(#(#args_pass),*); Default::default()) } else { quote!(#fun_ident(#(#args_pass),*)) };
+	let mut block = if is_no_content { quote!(#fun_ident(#(#args_pass),*); Default::default()) } else { quote!(#fun_ident(#(#args_pass),*)) };
+	if /*cfg!(feature = "database") &&*/ let Some((conn_pat, conn_ty)) = args_conn // https://github.com/rust-lang/rust/issues/53667
+	{
+		let repo_ident = format_ident!("{}_database_repo", conn_pat.to_string());
+		block = quote! {
+			let #repo_ident = <#krate::export::Repo<#conn_ty>>::borrow_from(&#args_state).clone();
+			#repo_ident.run(move |#conn_pat| {
+				#block
+			}).wait()
+		};
+	}
 	
 	let output = quote! {
 		#fun
