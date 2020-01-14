@@ -4,6 +4,8 @@ use quote::quote;
 use syn::{
 	Field,
 	Fields,
+	Generics,
+	GenericParam,
 	Item,
 	ItemEnum,
 	ItemStruct,
@@ -20,6 +22,29 @@ pub fn expand(tokens : TokenStream) -> TokenStream
 		Item::Struct(item) => expand_struct(item),
 		_ => panic!("derive(OpenapiType) not supported for this context")
 	}.into()
+}
+
+fn expand_where(generics : &Generics) -> TokenStream2
+{
+	if generics.params.is_empty()
+	{
+		quote!()
+	}
+	else
+	{
+		let krate = super::krate();
+		let idents = generics.params.iter()
+			.map(|param| match param {
+				GenericParam::Type(ty) => Some(ty.ident.clone()),
+				_ => None
+			})
+			.filter(|param| param.is_some())
+			.map(|param| param.unwrap());
+		
+		quote! {
+			where #(#idents : #krate::OpenapiType),*
+		}
+	}
 }
 
 fn expand_variant(variant : &Variant) -> TokenStream2
@@ -41,11 +66,13 @@ fn expand_enum(input : ItemEnum) -> TokenStream2
 	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
+	let where_clause = expand_where(&generics);
 	
 	let variants : Vec<TokenStream2> = input.variants.iter().map(expand_variant).collect();
 	
 	quote! {
 		impl #generics #krate::OpenapiType for #ident #generics
+		#where_clause
 		{
 			fn schema() -> #krate::OpenapiSchema
 			{
@@ -118,6 +145,7 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
+	let where_clause = expand_where(&generics);
 	
 	let fields : Vec<TokenStream2> = match input.fields {
 		Fields::Named(fields) => {
@@ -129,6 +157,7 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 	
 	quote!{
 		impl #generics #krate::OpenapiType for #ident #generics
+		#where_clause
 		{
 			fn schema() -> #krate::OpenapiSchema
 			{
