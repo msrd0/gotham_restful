@@ -123,7 +123,7 @@ pub use gotham_restful_derive::*;
 pub mod export
 {
 	pub use futures::future::Future;
-	pub use gotham::state::FromState;
+	pub use gotham::state::{FromState, State};
 	
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;

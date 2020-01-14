@@ -104,11 +104,11 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	
 	// extract arguments into pattern, ident and type
 	let state_ident = format_ident!("state");
-	let args : Vec<(TokenStream2, Ident, Type)> = fun.sig.inputs.iter().enumerate().map(|(i, arg)| match arg {
+	let args : Vec<(usize, TokenStream2, Ident, Type)> = fun.sig.inputs.iter().enumerate().map(|(i, arg)| match arg {
 		FnArg::Typed(arg) => {
 			let pat = &arg.pat;
-			let ident = if i == 0 { state_ident.clone() } else { format_ident!("arg{}", i-1) };
-			(quote!(#pat), ident, *arg.ty.clone())
+			let ident = format_ident!("arg{}", i);
+			(i, quote!(#pat), ident, *arg.ty.clone())
 		},
 		FnArg::Receiver(_) => panic!("didn't expect self parameter")
 	}).collect();
@@ -116,31 +116,35 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	// find the database connection if enabled and present
 	let repo_ident = format_ident!("database_repo");
 	let args_conn = if cfg!(feature = "database") {
-		args.iter().filter(|(pat, _, _)| pat.to_string() == "conn").nth(0)
+		args.iter().filter(|(_, pat, _, _)| pat.to_string() == "conn").nth(0)
 	} else { None };
-	let args_conn_name = args_conn.map(|(pat, _, _)| pat.to_string());
+	let args_conn_name = args_conn.map(|(_, pat, _, _)| pat.to_string());
 	
 	// extract the generic parameters to use
 	let mut generics : Vec<TokenStream2> = args.iter().skip(1)
-		.filter(|(pat, _, _)| Some(pat.to_string()) != args_conn_name)
-		.map(|(_, _, ty)| quote!(#ty)).collect();
+		.filter(|(_, pat, _, _)| Some(pat.to_string()) != args_conn_name)
+		.map(|(_, _, _, ty)| quote!(#ty)).collect();
 	generics.push(quote!(#ret));
 	
 	// extract the definition of our method
-	let args_def : Vec<TokenStream2> = args.iter()
-		.filter(|(pat, _, _)| Some(pat.to_string()) != args_conn_name)
-		.map(|(_, ident, ty)| quote!(#ident : #ty)).collect();
+	let mut args_def : Vec<TokenStream2> = args.iter()
+		.filter(|(_, pat, _, _)| Some(pat.to_string()) != args_conn_name)
+		.map(|(i, _, ident, ty)| if *i == 0 { quote!(#state_ident : #ty) } else { quote!(#ident : #ty) }).collect();
+	if let Some(_) = args_conn
+	{
+		args_def.insert(0, quote!(#state_ident : &mut #krate::export::State));
+	}
 	
 	// extract the arguments to pass over to the supplied method
-	let args_pass : Vec<TokenStream2> = args.iter().map(|(pat, ident, _)| if Some(pat.to_string()) != args_conn_name {
-		quote!(#ident)
+	let args_pass : Vec<TokenStream2> = args.iter().map(|(i, pat, ident, _)| if Some(pat.to_string()) != args_conn_name {
+		if *i == 0 { quote!(#state_ident) } else { quote!(#ident) }
 	} else {
 		quote!(&#ident)
 	}).collect();
 	
 	// prepare the method block
 	let mut block = if is_no_content { quote!(#fun_ident(#(#args_pass),*); Default::default()) } else { quote!(#fun_ident(#(#args_pass),*)) };
-	if /*cfg!(feature = "database") &&*/ let Some((_, conn_ident, conn_ty)) = args_conn // https://github.com/rust-lang/rust/issues/53667
+	if /*cfg!(feature = "database") &&*/ let Some((_, _, conn_ident, conn_ty)) = args_conn // https://github.com/rust-lang/rust/issues/53667
 	{
 		let conn_ty_real = match conn_ty {
 			Type::Reference(ty) => &*ty.elem,
@@ -149,9 +153,9 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 		block = quote! {
 			use #krate::export::{Future, FromState};
 			let #repo_ident = <#krate::export::Repo<#conn_ty_real>>::borrow_from(&#state_ident).clone();
-			#repo_ident.run(move |#conn_ident| {
-				#block
-			}).wait()
+			#repo_ident.run::<_, #ret, ()>(move |#conn_ident| {
+				Ok(#block)
+			}).wait().unwrap()
 		};
 	}
 	
