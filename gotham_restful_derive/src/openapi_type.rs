@@ -84,8 +84,8 @@ fn expand_enum(input : ItemEnum) -> TokenStream2
 				
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Empty,
-					pattern: None,
-					enumeration
+					enumeration,
+					..Default::default()
 				})))
 			}
 		}

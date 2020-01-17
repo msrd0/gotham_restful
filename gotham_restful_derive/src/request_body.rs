@@ -46,8 +46,7 @@ fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream2
 				
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),
-					pattern: None,
-					enumeration: Vec::new()
+					..Default::default()
 				})))
 			}
 		}

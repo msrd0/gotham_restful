@@ -299,8 +299,7 @@ impl<T : Into<Body>> ResourceResult for Raw<T>
 	{
 		OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 			format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),
-			pattern: None,
-			enumeration: Vec::new()
+			..Default::default()
 		})))
 	}
 }
