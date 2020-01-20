@@ -6,13 +6,13 @@ stages:
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
 
-test-none:
+test-default:
   stage: test
   image: msrd0/rust:alpine
   before_script:
     - cargo -V
   script:
-    - cargo test --all --no-default-features
+    - cargo test --all
   cache:
     paths:
       - cargo/
@@ -48,6 +48,7 @@ publish:
   script:
     - cd gotham_restful_derive
     - cargo publish
+    - sleep 10s
     - cd ../gotham_restful
     - cargo publish
     - cd ..
