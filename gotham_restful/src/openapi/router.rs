@@ -21,9 +21,9 @@ use indexmap::IndexMap;
 use log::error;
 use mime::{Mime, APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
-	Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
+	APIKeyLocation, Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
 	Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
-	SchemaKind, Server, StatusCode, Type
+	SchemaKind, SecurityRequirement, SecurityScheme, Server, StatusCode, Type
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -125,16 +125,13 @@ impl OpenapiRouter
 }
 
 #[derive(Clone)]
-struct OpenapiHandler(Result<String, String>);
-
-// dunno what/why/whatever
-impl RefUnwindSafe for OpenapiHandler {}
+struct OpenapiHandler(OpenAPI);
 
 impl OpenapiHandler
 {
 	fn new(openapi : &OpenapiRouter) -> Self
 	{
-		Self(serde_json::to_string(&openapi.0).map_err(|e| format!("{}", e)))
+		Self(openapi.0.clone())
 	}
 }
 
@@ -148,11 +145,63 @@ impl NewHandler for OpenapiHandler
 	}
 }
 
+#[cfg(feature = "auth")]
+const SECURITY_NAME : &'static str = "authToken";
+
+#[cfg(feature = "auth")]
+fn get_security(state : &mut State) -> (Vec<SecurityRequirement>, IndexMap<String, ReferenceOr<SecurityScheme>>)
+{
+	use crate::AuthSource;
+	use gotham::state::FromState;
+	
+	let source = match AuthSource::try_borrow_from(state) {
+		Some(source) => source,
+		None => return Default::default()
+	};
+	
+	let mut security : IndexMap<String, Vec<String>> = Default::default();
+	security.insert(SECURITY_NAME.to_owned(), Vec::new());
+	let security = vec![security];
+	
+	let security_scheme = match source {
+		AuthSource::Cookie(name) => SecurityScheme::APIKey {
+			location: APIKeyLocation::Cookie,
+			name: name.to_string()
+		},
+		AuthSource::Header(name) => SecurityScheme::APIKey {
+			location: APIKeyLocation::Header,
+			name: name.to_string()
+		},
+		AuthSource::AuthorizationHeader => SecurityScheme::HTTP {
+			scheme: "bearer".to_owned(),
+			bearer_format: Some("JWT".to_owned())
+		}
+	};
+	
+	let mut security_schemes : IndexMap<String, ReferenceOr<SecurityScheme>> = Default::default();
+	security_schemes.insert(SECURITY_NAME.to_owned(), ReferenceOr::Item(security_scheme));
+	
+	(security, security_schemes)
+}
+
+#[cfg(not(feature = "auth"))]
+fn get_security(state : &mut State) -> (Vec<SecurityRequirement>, IndexMap<String, ReferenceOr<SecurityScheme>>)
+{
+	Default::default()
+}
+
 impl Handler for OpenapiHandler
 {
-	fn handle(self, state : State) -> Box<HandlerFuture>
+	fn handle(self, mut state : State) -> Box<HandlerFuture>
 	{
-		match self.0 {
+		let mut openapi = self.0;
+		let (security, security_schemes) = get_security(&mut state);
+		openapi.security = security;
+		let mut components = openapi.components.unwrap_or_default();
+		components.security_schemes = security_schemes;
+		openapi.components = Some(components);
+		
+		match serde_json::to_string(&openapi) {
 			Ok(body) => {
 				let res = create_response(&state, hyper::StatusCode::OK, APPLICATION_JSON, body);
 				Box::new(ok((state, res)))

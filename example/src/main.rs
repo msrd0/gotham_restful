@@ -23,6 +23,12 @@ struct Users
 {
 }
 
+#[derive(Resource)]
+#[rest_resource(ReadAll)]
+struct Auth
+{
+}
+
 #[derive(Deserialize, OpenapiType, Serialize, StateData, StaticResponseExtender)]
 struct User
 {
@@ -82,7 +88,23 @@ fn delete(_state : &mut State, id : u64)
 	info!("Delete User {}", id);
 }
 
+#[rest_read_all(Auth)]
+fn auth_read_all(auth : AuthStatus<()>) -> Success<String>
+{
+	format!("{:?}", auth).into()
+}
+
 const ADDR : &str = "127.0.0.1:18080";
+
+#[derive(Clone, Default)]
+struct Handler;
+impl<T> AuthHandler<T> for Handler
+{
+	fn jwt_secret<F : FnOnce() -> Option<T>>(&self, _state : &mut State, _decode_data : F) -> Option<Vec<u8>>
+	{
+		None
+	}
+}
 
 fn main()
 {
@@ -99,9 +121,11 @@ fn main()
 		.unwrap();
 	log4rs::init_config(config).unwrap();
 	
+	let auth = <AuthMiddleware<(), Handler>>::from_source(AuthSource::AuthorizationHeader);
 	let logging = RequestLogger::new(log::Level::Info);
 	let (chain, pipelines) = single_pipeline(
 		new_pipeline()
+			.add(auth)
 			.add(logging)
 			.build()
 	);
@@ -109,6 +133,7 @@ fn main()
 	gotham::start(ADDR, build_router(chain, pipelines, |route| {
 		route.with_openapi("Users Example", "0.0.1", format!("http://{}", ADDR), |mut route| {
 			route.resource::<Users, _>("users");
+			route.resource::<Auth, _>("auth");
 			route.get_openapi("openapi");
 		});
 	}));

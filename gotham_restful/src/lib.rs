@@ -8,7 +8,8 @@ resources.
 
 # Usage
 
-To use this crate, add the following to your `Cargo.toml`:
+This crate targets stable rust, currently requiring rustc 1.40+. To use this crate, add the
+following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
@@ -112,7 +113,7 @@ extern crate self as gotham_restful;
 #[macro_use] extern crate serde;
 
 #[doc(no_inline)]
-pub use hyper::{Chunk, StatusCode};
+pub use hyper::{header::HeaderName, Chunk, StatusCode};
 #[doc(no_inline)]
 pub use mime::Mime;
 
@@ -133,6 +134,18 @@ pub mod export
 	#[cfg(feature = "openapi")]
 	pub use openapiv3 as openapi;
 }
+
+#[cfg(feature = "auth")]
+mod auth;
+#[cfg(feature = "auth")]
+pub use auth::{
+	AuthHandler,
+	AuthMiddleware,
+	AuthSource,
+	AuthStatus,
+	AuthValidation,
+	StaticAuthHandler
+};
 
 #[cfg(feature = "openapi")]
 mod openapi;
