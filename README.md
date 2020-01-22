@@ -12,7 +12,8 @@ resources.
 
 ## Usage
 
-To use this crate, add the following to your `Cargo.toml`:
+This crate targets stable rust, currently requiring rustc 1.40+. To use this crate, add the
+following to your `Cargo.toml`:
 
 ```toml
 [dependencies]

@@ -3,8 +3,10 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
+	Attribute,
 	FnArg,
 	ItemFn,
+	PatType,
 	ReturnType,
 	Type,
 	parse_macro_input
@@ -84,6 +86,112 @@ impl Method
 	}
 }
 
+enum MethodArgumentType
+{
+	StateRef,
+	StateMutRef,
+	MethodArg(Type),
+	DatabaseConnection(Type),
+	AuthStatus(Type),
+	AuthStatusRef(Type)
+}
+
+impl MethodArgumentType
+{
+	fn is_method_arg(&self) -> bool
+	{
+		match self {
+			Self::MethodArg(_) => true,
+			_ => false,
+		}
+	}
+	
+	fn is_database_conn(&self) -> bool
+	{
+		match self {
+			Self::DatabaseConnection(_) => true,
+			_ => false
+		}
+	}
+	
+	fn is_auth_status(&self) -> bool
+	{
+		match self {
+			Self::AuthStatus(_) | Self::AuthStatusRef(_) => true,
+			_ => false
+		}
+	}
+	
+	fn is_auth_status_ref(&self) -> bool
+	{
+		match self {
+			Self::AuthStatusRef(_) => true,
+			_ => false
+		}
+	}
+	
+	fn quote_ty(&self) -> Option<TokenStream2>
+	{
+		match self {
+			Self::MethodArg(ty) => Some(quote!(#ty)),
+			Self::DatabaseConnection(ty) => Some(quote!(#ty)),
+			Self::AuthStatus(ty) => Some(quote!(#ty)),
+			Self::AuthStatusRef(ty) => Some(quote!(#ty)),
+			_ => None
+		}
+	}
+}
+
+struct MethodArgument
+{
+	ident : Ident,
+	ty : MethodArgumentType
+}
+
+fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type) -> MethodArgumentType
+{
+	let attr = attrs.into_iter()
+		.filter(|arg| arg.path.segments.iter().filter(|path| &path.ident.to_string() == "rest_arg").nth(0).is_some())
+		.nth(0)
+		.map(|arg| arg.tokens.to_string());
+	
+	if cfg!(feature = "auth") && (attr.as_deref() == Some("auth") || (attr.is_none() && name == "auth"))
+	{
+		return match ty {
+			Type::Reference(ty) => MethodArgumentType::AuthStatusRef(*ty.elem),
+			ty => MethodArgumentType::AuthStatus(ty)
+		};
+	}
+	
+	if cfg!(feature = "database") && (attr.as_deref() == Some("connection") || attr.as_deref() == Some("conn") || (attr.is_none() && name == "conn"))
+	{
+		return MethodArgumentType::DatabaseConnection(match ty {
+			Type::Reference(ty) => *ty.elem,
+			ty => ty
+		});
+	}
+	
+	if index == 0
+	{
+		return match ty {
+			Type::Reference(ty) => if ty.mutability.is_none() { MethodArgumentType::StateRef } else { MethodArgumentType::StateMutRef },
+			_ => panic!("The first argument, unless some feature is used, has to be a (mutable) reference to gotham::state::State")
+		};
+	}
+	
+	MethodArgumentType::MethodArg(ty)
+}
+
+fn interpret_arg(index : usize, arg : &PatType) -> MethodArgument
+{
+	let pat = &arg.pat;
+	let ident = format_ident!("arg{}", index);
+	let orig_name = quote!(#pat);
+	let ty = interpret_arg_ty(index, &arg.attrs, &orig_name.to_string(), *arg.ty.clone());
+	
+	MethodArgument { ident, ty }
+}
+
 pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -> TokenStream
 {
 	let krate = super::krate();
@@ -101,71 +209,90 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
 	
-	// extract arguments into pattern, ident and type
+	// some default idents we'll need
 	let state_ident = format_ident!("state");
-	let args : Vec<(usize, TokenStream2, Ident, Type)> = fun.sig.inputs.iter().enumerate().map(|(i, arg)| match arg {
-		FnArg::Typed(arg) => {
-			let pat = &arg.pat;
-			let ident = format_ident!("arg{}", i);
-			(i, quote!(#pat), ident, *arg.ty.clone())
-		},
+	let repo_ident = format_ident!("repo");
+	let conn_ident = format_ident!("conn");
+	let auth_ident = format_ident!("auth");
+	
+	// extract arguments into pattern, ident and type
+	let args : Vec<MethodArgument> = fun.sig.inputs.iter().enumerate().map(|(i, arg)| match arg {
+		FnArg::Typed(arg) => interpret_arg(i, arg),
 		FnArg::Receiver(_) => panic!("didn't expect self parameter")
 	}).collect();
 	
-	// find the database connection if enabled and present
-	let repo_ident = format_ident!("database_repo");
-	let args_conn = if cfg!(feature = "database") {
-		args.iter().filter(|(_, pat, _, _)| pat.to_string() == "conn").nth(0)
-	} else { None };
-	let args_conn_name = args_conn.map(|(_, pat, _, _)| pat.to_string());
-	
 	// extract the generic parameters to use
-	let mut generics : Vec<TokenStream2> = args.iter().skip(1)
-		.filter(|(_, pat, _, _)| Some(pat.to_string()) != args_conn_name)
-		.map(|(_, _, _, ty)| quote!(#ty)).collect();
+	let mut generics : Vec<TokenStream2> = args.iter()
+		.filter(|arg| (*arg).ty.is_method_arg())
+		.map(|arg| arg.ty.quote_ty().unwrap())
+		.collect();
 	generics.push(quote!(#ret));
 	
 	// extract the definition of our method
 	let mut args_def : Vec<TokenStream2> = args.iter()
-		.filter(|(_, pat, _, _)| Some(pat.to_string()) != args_conn_name)
-		.map(|(i, _, ident, ty)| if *i == 0 { quote!(#state_ident : #ty) } else { quote!(#ident : #ty) }).collect();
-	if let Some(_) = args_conn
-	{
-		args_def.insert(0, quote!(#state_ident : &mut #krate::export::State));
-	}
+		.filter(|arg| (*arg).ty.is_method_arg())
+		.map(|arg| {
+			let ident = &arg.ident;
+			let ty = arg.ty.quote_ty();
+			quote!(#ident : #ty)
+		}).collect();
+	args_def.insert(0, quote!(#state_ident : &mut #krate::export::State));
 	
 	// extract the arguments to pass over to the supplied method
-	let args_pass : Vec<TokenStream2> = args.iter().map(|(i, pat, ident, _)| if Some(pat.to_string()) != args_conn_name {
-		if *i == 0 { quote!(#state_ident) } else { quote!(#ident) }
-	} else {
-		quote!(&#ident)
+	let args_pass : Vec<TokenStream2> = args.iter().map(|arg| match (&arg.ty, &arg.ident) {
+		(MethodArgumentType::StateRef, _) => quote!(#state_ident),
+		(MethodArgumentType::StateMutRef, _) => quote!(#state_ident),
+		(MethodArgumentType::MethodArg(_), ident) => quote!(#ident),
+		(MethodArgumentType::DatabaseConnection(_), _) => quote!(&#conn_ident),
+		(MethodArgumentType::AuthStatus(_), _) => quote!(#auth_ident.clone()),
+		(MethodArgumentType::AuthStatusRef(_), _) => quote!(#auth_ident)
 	}).collect();
 	
 	// prepare the method block
-	let mut block = if is_no_content { quote!(#fun_ident(#(#args_pass),*); Default::default()) } else { quote!(#fun_ident(#(#args_pass),*)) };
-	if /*cfg!(feature = "database") &&*/ let Some((_, _, conn_ident, conn_ty)) = args_conn // https://github.com/rust-lang/rust/issues/53667
+	let mut block = quote!(#fun_ident(#(#args_pass),*));
+	if is_no_content
 	{
-		let conn_ty_real = match conn_ty {
-			Type::Reference(ty) => &*ty.elem,
-			ty => ty
-		};
+		block = quote!(#block; Default::default())
+	}
+	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_database_conn()).nth(0)
+	{
+		let conn_ty = arg.ty.quote_ty();
 		block = quote! {
-			use #krate::export::{Future, FromState};
-			let #repo_ident = <#krate::export::Repo<#conn_ty_real>>::borrow_from(&#state_ident).clone();
+			let #repo_ident = <#krate::export::Repo<#conn_ty>>::borrow_from(&#state_ident).clone();
 			#repo_ident.run::<_, #ret, ()>(move |#conn_ident| {
 				Ok({#block})
 			}).wait().unwrap()
 		};
 	}
+	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_auth_status()).nth(0)
+	{
+		let auth_ty = arg.ty.quote_ty();
+		block = quote! {
+			let #auth_ident : &#auth_ty = <#auth_ty>::borrow_from(#state_ident);
+			#block
+		};
+	}
 	
+	// prepare the where clause
+	let mut where_clause = quote!(#resource_ident : #krate::Resource,);
+	for arg in args.iter().filter(|arg| (*arg).ty.is_auth_status() && !(*arg).ty.is_auth_status_ref())
+	{
+		let auth_ty = arg.ty.quote_ty();
+		where_clause = quote!(#where_clause #auth_ty : Clone,);
+	}
+	
+	// put everything together
 	let output = quote! {
 		#fun
 		
 		impl #krate::#trait_ident<#(#generics),*> for #resource_ident
-		where #resource_ident : #krate::Resource
+		where #where_clause
 		{
 			fn #method_ident(#(#args_def),*) -> #ret
 			{
+				#[allow(unused_imports)]
+				use #krate::export::{Future, FromState};
+				
 				#block
 			}
 		}
