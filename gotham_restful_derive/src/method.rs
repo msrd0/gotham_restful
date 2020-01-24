@@ -244,8 +244,8 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 		(MethodArgumentType::StateMutRef, _) => quote!(#state_ident),
 		(MethodArgumentType::MethodArg(_), ident) => quote!(#ident),
 		(MethodArgumentType::DatabaseConnection(_), _) => quote!(&#conn_ident),
-		(MethodArgumentType::AuthStatus(_), _) => quote!(#auth_ident.clone()),
-		(MethodArgumentType::AuthStatusRef(_), _) => quote!(#auth_ident)
+		(MethodArgumentType::AuthStatus(_), _) => quote!(#auth_ident),
+		(MethodArgumentType::AuthStatusRef(_), _) => quote!(&#auth_ident)
 	}).collect();
 	
 	// prepare the method block
@@ -268,7 +268,7 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	{
 		let auth_ty = arg.ty.quote_ty();
 		block = quote! {
-			let #auth_ident : &#auth_ty = <#auth_ty>::borrow_from(#state_ident);
+			let #auth_ident : #auth_ty = <#auth_ty>::borrow_from(#state_ident).clone();
 			#block
 		};
 	}
@@ -303,5 +303,6 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 			route.#method_ident::<#resource_ident, #(#generics),*>();
 		}
 	};
+	eprintln!("{}", output);
 	output.into()
 }
