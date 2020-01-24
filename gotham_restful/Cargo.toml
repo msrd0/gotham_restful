@@ -19,7 +19,6 @@ codecov = { repository = "msrd0/gotham-restful", branch = "master", service = "g
 base64 = { version = "0.11.0", optional = true }
 chrono = { version = "0.4.10", optional = true }
 cookie = { version = "0.12", optional = true }
-failure = "0.1.6"
 futures = "0.1.29"
 gotham = "0.4"
 gotham_derive = "0.4"
