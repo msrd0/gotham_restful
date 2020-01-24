@@ -19,9 +19,9 @@ codecov = { repository = "msrd0/gotham-restful", branch = "master", service = "g
 
 [dependencies]
 heck = "0.3.1"
-proc-macro2 = "1.0.6"
+proc-macro2 = "1.0.8"
 quote = "1.0.2"
-syn = { version = "1.0.13", features = ["extra-traits", "full"] }
+syn = { version = "1.0.14", features = ["extra-traits", "full"] }
 
 [features]
 default = []
