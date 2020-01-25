@@ -7,7 +7,10 @@ use mime::{Mime, APPLICATION_JSON, STAR_STAR};
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde::Serialize;
 use serde_json::error::Error as SerdeJsonError;
-use std::error::Error;
+use std::{
+	error::Error,
+	fmt::Debug
+};
 
 /// A response, used to create the final gotham response from.
 pub struct Response
@@ -44,6 +47,16 @@ impl Response
 	{
 		Self {
 			status: StatusCode::NO_CONTENT,
+			body: Body::empty(),
+			mime: None
+		}
+	}
+	
+	/// Create an empty _403 Forbidden_ `Response`.
+	pub fn forbidden() -> Self
+	{
+		Self {
+			status: StatusCode::FORBIDDEN,
 			body: Body::empty(),
 			mime: None
 		}
@@ -170,6 +183,21 @@ impl<T> From<T> for Success<T>
 	}
 }
 
+impl<T : Clone> Clone for Success<T>
+{
+	fn clone(&self) -> Self
+	{
+		Self(self.0.clone())
+	}
+}
+
+impl<T : Debug> Debug for Success<T>
+{
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "Success({:?})", self.0)
+	}
+}
+
 impl<T : ResponseBody> ResourceResult for Success<T>
 {
 	fn into_response(self) -> Result<Response, SerdeJsonError>
@@ -186,6 +214,98 @@ impl<T : ResponseBody> ResourceResult for Success<T>
 	fn schema() -> OpenapiSchema
 	{
 		T::schema()
+	}
+}
+
+/**
+This return type can be used to map another `ResourceResult` that can only be returned if the
+client is authenticated. Otherwise, an empty _403 Forbidden_ response will be issued. Use can
+look something like this (assuming the `auth` feature is enabled):
+
+```
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::state::State;
+# use gotham_restful::*;
+# use serde::Deserialize;
+#
+# #[derive(Resource)]
+# struct MyResource;
+#
+# #[derive(Clone, Deserialize)]
+# struct MyAuthData { exp : u64 }
+#
+#[rest_read_all(MyResource)]
+fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent> {
+	let auth_data = match auth {
+		AuthStatus::Authenticated(data) => data,
+		_ => return AuthErr
+	};
+	// do something
+	NoContent::default().into()
+}
+```
+*/
+pub enum AuthResult<T>
+{
+	Ok(T),
+	AuthErr
+}
+
+impl<T> From<T> for AuthResult<T>
+{
+	fn from(t : T) -> Self
+	{
+		Self::Ok(t)
+	}
+}
+
+impl<T : Clone> Clone for AuthResult<T>
+{
+	fn clone(&self) -> Self
+	{
+		match self {
+			Self::Ok(t) => Self::Ok(t.clone()),
+			Self::AuthErr => Self::AuthErr
+		}
+	}
+}
+
+impl<T : Debug> Debug for AuthResult<T>
+{
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match self {
+			Self::Ok(t) => write!(f, "Ok({:?})", t),
+			Self::AuthErr => write!(f, "AuthErr")
+		}
+	}
+}
+
+impl<T : ResourceResult> ResourceResult for AuthResult<T>
+{
+	fn into_response(self) -> Result<Response, SerdeJsonError>
+	{
+		match self
+		{
+			Self::Ok(res) => res.into_response(),
+			Self::AuthErr => Ok(Response::forbidden())
+		}
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		T::accepted_types()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn schema() -> OpenapiSchema
+	{
+		T::schema()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn default_status() -> StatusCode
+	{
+		T::default_status()
 	}
 }
 
@@ -279,6 +399,24 @@ impl<T> Raw<T>
 	pub fn new(raw : T, mime : Mime) -> Self
 	{
 		Self { raw, mime }
+	}
+}
+
+impl<T : Clone> Clone for Raw<T>
+{
+	fn clone(&self) -> Self
+	{
+		Self {
+			raw: self.raw.clone(),
+			mime: self.mime.clone()
+		}
+	}
+}
+
+impl<T : Debug> Debug for Raw<T>
+{
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "Raw({:?}, {:?})", self.raw, self.mime)
 	}
 }
 

@@ -170,6 +170,8 @@ pub use resource::{
 
 mod result;
 pub use result::{
+	AuthResult,
+	AuthResult::AuthErr,
 	NoContent,
 	Raw,
 	ResourceResult,

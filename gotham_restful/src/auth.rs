@@ -308,6 +308,7 @@ mod test
 	// some known tokens
 	const VALID_TOKEN : &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk";
 	const EXPIRED_TOKEN : &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0";
+	const INVALID_TOKEN : &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9";
 	
 	#[derive(Debug, Deserialize, PartialEq)]
 	struct TestData
@@ -332,13 +333,25 @@ mod test
 	}
 	
 	#[derive(Default)]
-	struct TestHandler;
-	impl<T> AuthHandler<T> for TestHandler
+	struct NoneAuthHandler;
+	impl<T> AuthHandler<T> for NoneAuthHandler
 	{
 		fn jwt_secret<F : FnOnce() -> Option<T>>(&self, _state : &mut State, _decode_data : F) -> Option<Vec<u8>>
 		{
-			Some(JWT_SECRET.to_vec())
+			None
 		}
+	}
+	
+	#[test]
+	fn test_auth_middleware_none_secret()
+	{
+		let middleware = <AuthMiddleware<TestData, NoneAuthHandler>>::from_source(AuthSource::AuthorizationHeader);
+		State::with_new(|mut state| {
+			let mut headers = HeaderMap::new();
+			headers.insert(AUTHORIZATION, format!("Bearer {}", VALID_TOKEN).parse().unwrap());
+			state.put(headers);
+			middleware.auth_status(&mut state);
+		});
 	}
 	
 	#[derive(Default)]
@@ -365,10 +378,10 @@ mod test
 		});
 	}
 	
-	fn new_middleware<T>(source : AuthSource) -> AuthMiddleware<T, TestHandler>
+	fn new_middleware<T>(source : AuthSource) -> AuthMiddleware<T, StaticAuthHandler>
 	where T : DeserializeOwned + Send
 	{
-		AuthMiddleware::from_source(source)
+		AuthMiddleware::new(source, Default::default(), StaticAuthHandler::from_array(JWT_SECRET))
 	}
 	
 	#[test]
@@ -396,6 +409,22 @@ mod test
 			match status {
 				AuthStatus::Expired => {},
 				_ => panic!("Expected AuthStatus::Expired, got {:?}", status)
+			};
+		});
+	}
+	
+	#[test]
+	fn test_auth_middleware_invalid_token()
+	{
+		let middleware = new_middleware::<TestData>(AuthSource::AuthorizationHeader);
+		State::with_new(|mut state| {
+			let mut headers = HeaderMap::new();
+			headers.insert(AUTHORIZATION, format!("Bearer {}", INVALID_TOKEN).parse().unwrap());
+			state.put(headers);
+			let status = middleware.auth_status(&mut state);
+			match status {
+				AuthStatus::Invalid => {},
+				_ => panic!("Expected AuthStatus::Invalid, got {:?}", status)
 			};
 		});
 	}
