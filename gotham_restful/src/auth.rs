@@ -127,7 +127,7 @@ simply add it to your pipeline and request it inside your handler:
 #[rest_resource(read_all)]
 struct AuthResource;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 struct AuthData {
 	sub: String,
 	exp: u64

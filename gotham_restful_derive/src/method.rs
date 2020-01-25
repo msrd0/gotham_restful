@@ -122,14 +122,6 @@ impl MethodArgumentType
 		}
 	}
 	
-	fn is_auth_status_ref(&self) -> bool
-	{
-		match self {
-			Self::AuthStatusRef(_) => true,
-			_ => false
-		}
-	}
-	
 	fn quote_ty(&self) -> Option<TokenStream2>
 	{
 		match self {
@@ -275,7 +267,7 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	
 	// prepare the where clause
 	let mut where_clause = quote!(#resource_ident : #krate::Resource,);
-	for arg in args.iter().filter(|arg| (*arg).ty.is_auth_status() && !(*arg).ty.is_auth_status_ref())
+	for arg in args.iter().filter(|arg| (*arg).ty.is_auth_status())
 	{
 		let auth_ty = arg.ty.quote_ty();
 		where_clause = quote!(#where_clause #auth_ty : Clone,);
