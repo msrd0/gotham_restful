@@ -42,3 +42,6 @@ default = []
 auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
 database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
 openapi = ["gotham_restful_derive/openapi", "indexmap", "log", "openapiv3"]
+
+[package.metadata.docs.rs]
+all-features = true
