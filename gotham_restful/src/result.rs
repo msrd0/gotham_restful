@@ -251,6 +251,25 @@ pub enum AuthResult<T>
 	AuthErr
 }
 
+impl<T> AuthResult<T>
+{
+	pub fn is_ok(&self) -> bool
+	{
+		match self {
+			Self::Ok(_) => true,
+			_ => false
+		}
+	}
+	
+	pub fn unwrap(self) -> T
+	{
+		match self {
+			Self::Ok(data) => data,
+			_ => panic!()
+		}
+	}
+}
+
 impl<T> From<T> for AuthResult<T>
 {
 	fn from(t : T) -> Self
