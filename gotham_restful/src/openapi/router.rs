@@ -23,7 +23,7 @@ use mime::{Mime, APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
 	APIKeyLocation, Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
 	Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
-	SchemaKind, SecurityRequirement, SecurityScheme, Server, StatusCode, Type
+	SchemaKind, SecurityScheme, Server, StatusCode, Type
 };
 use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
@@ -149,7 +149,7 @@ impl NewHandler for OpenapiHandler
 const SECURITY_NAME : &'static str = "authToken";
 
 #[cfg(feature = "auth")]
-fn get_security(state : &mut State) -> (Vec<SecurityRequirement>, IndexMap<String, ReferenceOr<SecurityScheme>>)
+fn get_security(state : &mut State) -> IndexMap<String, ReferenceOr<SecurityScheme>>
 {
 	use crate::AuthSource;
 	use gotham::state::FromState;
@@ -158,10 +158,6 @@ fn get_security(state : &mut State) -> (Vec<SecurityRequirement>, IndexMap<Strin
 		Some(source) => source,
 		None => return Default::default()
 	};
-	
-	let mut security : IndexMap<String, Vec<String>> = Default::default();
-	security.insert(SECURITY_NAME.to_owned(), Vec::new());
-	let security = vec![security];
 	
 	let security_scheme = match source {
 		AuthSource::Cookie(name) => SecurityScheme::APIKey {
@@ -181,7 +177,7 @@ fn get_security(state : &mut State) -> (Vec<SecurityRequirement>, IndexMap<Strin
 	let mut security_schemes : IndexMap<String, ReferenceOr<SecurityScheme>> = Default::default();
 	security_schemes.insert(SECURITY_NAME.to_owned(), ReferenceOr::Item(security_scheme));
 	
-	(security, security_schemes)
+	security_schemes
 }
 
 #[cfg(not(feature = "auth"))]
@@ -195,8 +191,7 @@ impl Handler for OpenapiHandler
 	fn handle(self, mut state : State) -> Box<HandlerFuture>
 	{
 		let mut openapi = self.0;
-		let (security, security_schemes) = get_security(&mut state);
-		openapi.security = security;
+		let security_schemes = get_security(&mut state);
 		let mut components = openapi.components.unwrap_or_default();
 		components.security_schemes = security_schemes;
 		openapi.components = Some(components);
@@ -318,7 +313,15 @@ impl<'a> OperationParams<'a>
 	}
 }
 
-fn new_operation(default_status : hyper::StatusCode, accepted_types : Option<Vec<Mime>>, schema : ReferenceOr<Schema>, params : OperationParams, body_schema : Option<ReferenceOr<Schema>>, supported_types : Option<Vec<Mime>>) -> Operation
+fn new_operation(
+		default_status : hyper::StatusCode,
+		accepted_types : Option<Vec<Mime>>,
+		schema : ReferenceOr<Schema>,
+		params : OperationParams,
+		body_schema : Option<ReferenceOr<Schema>>,
+		supported_types : Option<Vec<Mime>>,
+		requires_auth : bool
+) -> Operation
 {
 	let content = schema_to_content(accepted_types.unwrap_or_default(), schema);
 	
@@ -336,6 +339,14 @@ fn new_operation(default_status : hyper::StatusCode, accepted_types : Option<Vec
 		required: true
 	}));
 	
+	let mut security = Vec::new();
+	if requires_auth
+	{
+		let mut sec = IndexMap::new();
+		sec.insert(SECURITY_NAME.to_owned(), Vec::new());
+		security.push(sec);
+	}
+	
 	Operation {
 		tags: Vec::new(),
 		summary: None,
@@ -349,7 +360,7 @@ fn new_operation(default_status : hyper::StatusCode, accepted_types : Option<Vec
 			responses
 		},
 		deprecated: false,
-		security: Vec::new(),
+		security,
 		servers: Vec::new()
 	}
 }
@@ -393,7 +404,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None));
+				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
@@ -409,7 +420,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None));
+				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
@@ -425,7 +436,7 @@ macro_rules! implOpenapiRouter {
 				
 				let path = format!("/{}/search", &self.1);
 				let mut item = (self.0).1.remove_path(&self.1);
-				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_query_params(Query::schema()), None, None));
+				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_query_params(Query::schema()), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).search::<Handler, Query, Res>()
@@ -442,7 +453,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.post = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types()));
+				item.post = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types(), Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
@@ -459,7 +470,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types()));
+				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types(), Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
@@ -477,7 +488,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema), Body::supported_types()));
+				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema), Body::supported_types(), Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
@@ -492,7 +503,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None));
+				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
@@ -508,7 +519,7 @@ macro_rules! implOpenapiRouter {
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None));
+				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()

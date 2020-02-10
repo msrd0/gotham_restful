@@ -89,9 +89,13 @@ fn delete(_state : &mut State, id : u64)
 }
 
 #[rest_read_all(Auth)]
-fn auth_read_all(auth : AuthStatus<()>) -> Success<String>
+fn auth_read_all(auth : AuthStatus<()>) -> AuthResult<Success<String>>
 {
-	format!("{:?}", auth).into()
+	let str : Success<String> = match auth {
+		AuthStatus::Authenticated(data) => format!("{:?}", data).into(),
+		_ => return AuthErr
+	};
+	str.into()
 }
 
 const ADDR : &str = "127.0.0.1:18080";
