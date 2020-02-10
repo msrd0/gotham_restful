@@ -2,6 +2,7 @@ use crate::{ResponseBody, StatusCode};
 #[cfg(feature = "openapi")]
 use crate::{OpenapiSchema, OpenapiType};
 use hyper::Body;
+use log::error;
 use mime::{Mime, APPLICATION_JSON, STAR_STAR};
 #[cfg(feature = "openapi")]
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
@@ -136,6 +137,10 @@ impl<R : ResponseBody, E : Error> ResourceResult for Result<R, E>
 		Ok(match self {
 			Ok(r) => Response::json(StatusCode::OK, serde_json::to_string(&r)?),
 			Err(e) => {
+				if cfg!(feature = "errorlog")
+				{
+					error!("The handler encountered an error: {}", e);
+				}
 				let err : ResourceError = e.into();
 				Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
 			}

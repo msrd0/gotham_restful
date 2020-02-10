@@ -40,6 +40,7 @@ thiserror = "1"
 [features]
 default = []
 auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
+errorlog = []
 database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
 openapi = ["gotham_restful_derive/openapi", "indexmap", "log", "openapiv3"]
 
