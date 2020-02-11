@@ -36,7 +36,7 @@ test-all:
 
 readme:
   stage: test
-  image: msrd0/rust:alpine-readme
+  image: msrd0/cargo-readme
   script:
     - cargo readme -r gotham_restful -t ../README.tpl >README.md.new
     - diff README.md README.md.new
