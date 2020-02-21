@@ -8,6 +8,8 @@ variables:
 
 test-default:
   stage: test
+  tags:
+    - fast
   image: msrd0/rust:alpine
   before_script:
     - cargo -V
@@ -22,6 +24,8 @@ test-default:
 test-all:
   stage: test
   image: msrd0/rust:alpine-tarpaulin
+  tags:
+    - fast
   before_script:
     - apk add --no-cache bash curl
     - cargo -V
