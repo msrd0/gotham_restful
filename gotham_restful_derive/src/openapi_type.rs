@@ -82,11 +82,18 @@ fn expand_enum(input : ItemEnum) -> TokenStream2
 				
 				#(#variants)*
 				
-				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
+				let schema = SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Empty,
 					enumeration,
 					..Default::default()
-				})))
+				}));
+
+				OpenapiSchema {
+					name: Some(stringify!(#ident).to_string()),
+					nullable: false,
+					schema,
+					dependencies: Default::default()
+				}
 			}
 		}
 	}
