@@ -2,6 +2,7 @@ use crate::{ResponseBody, StatusCode};
 #[cfg(feature = "openapi")]
 use crate::{OpenapiSchema, OpenapiType};
 use hyper::Body;
+#[cfg(feature = "errorlog")]
 use log::error;
 use mime::{Mime, APPLICATION_JSON, STAR_STAR};
 #[cfg(feature = "openapi")]
@@ -130,6 +131,15 @@ impl<T : ToString> From<T> for ResourceError
 	}
 }
 
+#[cfg(feature = "errorlog")]
+fn errorlog<E : Display>(e : E)
+{
+	error!("The handler encountered an error: {}", e);
+}
+
+#[cfg(not(feature = "errorlog"))]
+fn errorlog<E>(_e : E) {}
+
 impl<R : ResponseBody, E : Error> ResourceResult for Result<R, E>
 {
 	fn into_response(self) -> Result<Response, SerdeJsonError>
@@ -137,10 +147,7 @@ impl<R : ResponseBody, E : Error> ResourceResult for Result<R, E>
 		Ok(match self {
 			Ok(r) => Response::json(StatusCode::OK, serde_json::to_string(&r)?),
 			Err(e) => {
-				if cfg!(feature = "errorlog")
-				{
-					error!("The handler encountered an error: {}", e);
-				}
+				errorlog(&e);
 				let err : ResourceError = e.into();
 				Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?)
 			}
