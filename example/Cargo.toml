@@ -2,7 +2,7 @@
 
 [package]
 name = "example"
-version = "0.0.2"
+version = "0.0.1"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 license = "Unlicense"
@@ -17,7 +17,7 @@ gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 fake = "2.2"
 gotham = "0.4"
 gotham_derive = "0.4"
-gotham_restful = { version = "0.0.2", features = ["auth", "openapi"] }
+gotham_restful = { version = "0.0.3", features = ["auth", "openapi"] }
 hyper = "0.12"
 log = "0.4"
 log4rs = { version = "0.8", features = ["console_appender"], default-features = false }

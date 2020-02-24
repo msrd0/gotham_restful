@@ -2,7 +2,7 @@
 
 [package]
 name = "gotham_restful"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 description = "RESTful additions for Gotham"
