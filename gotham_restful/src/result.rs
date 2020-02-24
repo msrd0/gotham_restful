@@ -132,7 +132,7 @@ impl<T : ToString> From<T> for ResourceError
 }
 
 #[cfg(feature = "errorlog")]
-fn errorlog<E : Display>(e : E)
+fn errorlog<E : std::fmt::Display>(e : E)
 {
 	error!("The handler encountered an error: {}", e);
 }
