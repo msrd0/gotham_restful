@@ -22,7 +22,7 @@ use log::error;
 use mime::{Mime, APPLICATION_JSON, TEXT_PLAIN};
 use openapiv3::{
 	APIKeyLocation, Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
-	Paths, ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
+	ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
 	SchemaKind, SecurityScheme, Server, StatusCode, Type
 };
 use serde::de::DeserializeOwned;
@@ -38,28 +38,19 @@ pub struct OpenapiRouter(OpenAPI);
 
 impl OpenapiRouter
 {
-	pub fn new<Title : ToString, Version : ToString, Url : ToString>(title : Title, version : Version, server_url : Url) -> Self
+	pub fn new(title : String, version : String, url : String) -> Self
 	{
 		Self(OpenAPI {
 			openapi: "3.0.2".to_string(),
 			info: openapiv3::Info {
-				title: title.to_string(),
-				description: None,
-				terms_of_service: None,
-				contact: None,
-				license: None,
-				version: version.to_string()
+				title, version,
+				..Default::default()
 			},
 			servers: vec![Server {
-				url: server_url.to_string(),
-				description: None,
-				variables: None
+				url,
+				..Default::default()
 			}],
-			paths: Paths::new(),
-			components: None,
-			security: Vec::new(),
-			tags: Vec::new(),
-			external_docs: None
+			..Default::default()
 		})
 	}
 
@@ -223,9 +214,7 @@ fn schema_to_content(types : Vec<Mime>, schema : ReferenceOr<Schema>) -> IndexMa
 	{
 		content.insert(ty.to_string(), MediaType {
 			schema: Some(schema.clone()),
-			example: None,
-			examples: IndexMap::new(),
-			encoding: IndexMap::new()
+			..Default::default()
 		});
 	}
 	content
@@ -349,9 +338,6 @@ fn new_operation(
 	
 	Operation {
 		tags: Vec::new(),
-		summary: None,
-		description: None,
-		external_documentation: None,
 		operation_id: None, // TODO
 		parameters: params.into_params(),
 		request_body,
@@ -361,7 +347,7 @@ fn new_operation(
 		},
 		deprecated: false,
 		security,
-		servers: Vec::new()
+		..Default::default()
 	}
 }
 
