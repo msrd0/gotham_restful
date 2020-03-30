@@ -60,7 +60,7 @@ pub trait WithOpenapi<D>
 /// any RESTful `Resource` with a path.
 pub trait DrawResources
 {
-	fn resource<R : Resource, T : ToString>(&mut self, path : T);
+	fn resource<R : Resource>(&mut self, path : &str);
 }
 
 /// This trait allows to draw routes within an resource. Use this only inside the
@@ -356,14 +356,14 @@ macro_rules! implDrawResourceRoutes {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn resource<R : Resource, T : ToString>(&mut self, path : T)
+			fn resource<R : Resource>(&mut self, path : &str)
 			{
-				R::setup((self, path.to_string()));
+				R::setup((self, path));
 			}
 		}
 		
 		#[allow(clippy::redundant_closure)] // doesn't work because of type parameters
-		impl<'a, C, P> DrawResourceRoutes for (&mut $implType<'a, C, P>, String)
+		impl<'a, C, P> DrawResourceRoutes for (&mut $implType<'a, C, P>, &str)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static

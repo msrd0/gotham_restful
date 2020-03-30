@@ -136,8 +136,8 @@ fn main()
 
 	gotham::start(ADDR, build_router(chain, pipelines, |route| {
 		route.with_openapi("Users Example".to_owned(), "0.0.1".to_owned(), format!("http://{}", ADDR), |mut route| {
-			route.resource::<Users, _>("users");
-			route.resource::<Auth, _>("auth");
+			route.resource::<Users>("users");
+			route.resource::<Auth>("auth");
 			route.get_openapi("openapi");
 		});
 	}));

@@ -370,13 +370,13 @@ macro_rules! implOpenapiRouter {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn resource<R : Resource, T : ToString>(&mut self, path : T)
+			fn resource<R : Resource>(&mut self, path : &str)
 			{
-				R::setup((self, path.to_string()));
+				R::setup((self, path));
 			}
 		}
 
-		impl<'a, C, P> DrawResourceRoutes for (&mut (&mut $implType<'a, C, P>, &mut OpenapiRouter), String)
+		impl<'a, C, P> DrawResourceRoutes for (&mut (&mut $implType<'a, C, P>, &mut OpenapiRouter), &str)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
@@ -393,7 +393,7 @@ macro_rules! implOpenapiRouter {
 				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).read_all::<Handler, Res>()
+				(&mut *(self.0).0, self.1).read_all::<Handler, Res>()
 			}
 			
 			fn read<Handler, ID, Res>(&mut self)
@@ -409,7 +409,7 @@ macro_rules! implOpenapiRouter {
 				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).read::<Handler, ID, Res>()
+				(&mut *(self.0).0, self.1).read::<Handler, ID, Res>()
 			}
 			
 			fn search<Handler, Query, Res>(&mut self)
@@ -425,7 +425,7 @@ macro_rules! implOpenapiRouter {
 				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_query_params(Query::schema()), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).search::<Handler, Query, Res>()
+				(&mut *(self.0).0, self.1).search::<Handler, Query, Res>()
 			}
 			
 			fn create<Handler, Body, Res>(&mut self)
@@ -442,7 +442,7 @@ macro_rules! implOpenapiRouter {
 				item.post = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types(), Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).create::<Handler, Body, Res>()
+				(&mut *(self.0).0, self.1).create::<Handler, Body, Res>()
 			}
 			
 			fn update_all<Handler, Body, Res>(&mut self)
@@ -459,7 +459,7 @@ macro_rules! implOpenapiRouter {
 				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types(), Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).update_all::<Handler, Body, Res>()
+				(&mut *(self.0).0, self.1).update_all::<Handler, Body, Res>()
 			}
 			
 			fn update<Handler, ID, Body, Res>(&mut self)
@@ -477,7 +477,7 @@ macro_rules! implOpenapiRouter {
 				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema), Body::supported_types(), Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).update::<Handler, ID, Body, Res>()
+				(&mut *(self.0).0, self.1).update::<Handler, ID, Body, Res>()
 			}
 			
 			fn delete_all<Handler, Res>(&mut self)
@@ -492,7 +492,7 @@ macro_rules! implOpenapiRouter {
 				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).delete_all::<Handler, Res>()
+				(&mut *(self.0).0, self.1).delete_all::<Handler, Res>()
 			}
 			
 			fn delete<Handler, ID, Res>(&mut self)
@@ -508,7 +508,7 @@ macro_rules! implOpenapiRouter {
 				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1.to_string()).delete::<Handler, ID, Res>()
+				(&mut *(self.0).0, self.1).delete::<Handler, ID, Res>()
 			}
 		}
 
