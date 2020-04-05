@@ -146,7 +146,7 @@ fn main() {
 	);
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
 	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<AuthResource, _>("auth");
+		route.resource::<AuthResource>("auth");
 	}));
 }
 ```

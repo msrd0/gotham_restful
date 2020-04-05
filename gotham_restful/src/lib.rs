@@ -50,7 +50,7 @@ fn read_all(_state: &mut State) -> Success<Vec<User>> {
 /// Our main method.
 fn main() {
 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-		route.resource::<UsersResource, _>("users");
+		route.resource::<UsersResource>("users");
 	}));
 }
 ```
@@ -76,7 +76,7 @@ fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
 }
 # fn main() {
 # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-# 		route.resource::<ImageResource, _>("image");
+# 		route.resource::<ImageResource>("image");
 # 	}));
 # }
 ```
