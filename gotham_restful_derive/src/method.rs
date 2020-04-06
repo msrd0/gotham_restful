@@ -1,4 +1,4 @@
-use heck::SnakeCase;
+use heck::{CamelCase, SnakeCase};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
@@ -46,6 +46,22 @@ impl FromStr for Method
 
 impl Method
 {
+	pub fn type_names(&self) -> Vec<&'static str>
+	{
+		use Method::*;
+		
+		match self {
+			ReadAll => vec![],
+			Read => vec!["ID"],
+			Search => vec!["Query"],
+			Create => vec!["Body"],
+			UpdateAll => vec!["Body"],
+			Update => vec!["ID", "Body"],
+			DeleteAll => vec![],
+			Delete => vec!["ID"]
+		}
+	}
+	
 	pub fn trait_ident(&self) -> Ident
 	{
 		use Method::*;
@@ -78,6 +94,16 @@ impl Method
 			Delete => "delete"
 		};
 		format_ident!("{}", name)
+	}
+	
+	pub fn mod_ident(&self, resource : String) -> Ident
+	{
+		format_ident!("_gotham_restful_resource_{}_method_{}", resource.to_snake_case(), self.fn_ident())
+	}
+	
+	pub fn handler_struct_ident(&self, resource : String) -> Ident
+	{
+		format_ident!("{}{}Handler", resource.to_camel_case(), self.trait_ident())
 	}
 	
 	pub fn setup_ident(&self, resource : String) -> Ident
@@ -194,6 +220,8 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	
 	let trait_ident = method.trait_ident();
 	let method_ident = method.fn_ident();
+	let mod_ident = method.mod_ident(resource_ident.to_string());
+	let handler_ident = method.handler_struct_ident(resource_ident.to_string());
 	let setup_ident = method.setup_ident(resource_ident.to_string());
 	
 	let (ret, is_no_content) = match &fun.sig.output {
@@ -214,11 +242,15 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	}).collect();
 	
 	// extract the generic parameters to use
-	let mut generics : Vec<TokenStream2> = args.iter()
+	let generics : Vec<TokenStream2> = args.iter()
 		.filter(|arg| (*arg).ty.is_method_arg())
 		.map(|arg| arg.ty.quote_ty().unwrap())
+		.zip(method.type_names())
+		.map(|(arg, name)| {
+			let ident = format_ident!("{}", name);
+			quote!(type #ident = #arg;)
+		})
 		.collect();
-	generics.push(quote!(#ret));
 	
 	// extract the definition of our method
 	let mut args_def : Vec<TokenStream2> = args.iter()
@@ -277,22 +309,37 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	let output = quote! {
 		#fun
 		
-		impl #krate::#trait_ident<#(#generics),*> for #resource_ident
-		where #where_clause
+		#fun_vis mod #mod_ident
 		{
-			fn #method_ident(#(#args_def),*) -> #ret
+			use super::*;
+			
+			struct #handler_ident;
+			
+			impl #krate::ResourceMethod for #handler_ident
 			{
-				#[allow(unused_imports)]
-				use #krate::export::{Future, FromState};
-				
-				#block
+				type Res = #ret;
 			}
-		}
-		
-		#[deny(dead_code)]
-		#fun_vis fn #setup_ident<D : #krate::DrawResourceRoutes>(route : &mut D)
-		{
-			route.#method_ident::<#resource_ident, #(#generics),*>();
+			
+			impl #krate::#trait_ident for #handler_ident
+			where #where_clause
+			{
+				#(#generics)*
+				
+				fn #method_ident(#(#args_def),*) -> #ret
+				{
+					#[allow(unused_imports)]
+					use #krate::export::{Future, FromState};
+					
+					#block
+				}
+			}
+			
+			#[deny(dead_code)]
+			pub fn #setup_ident<D : #krate::DrawResourceRoutes>(route : &mut D)
+			{
+				route.#method_ident::<#handler_ident>();
+			}
+			
 		}
 	};
 	output.into()
