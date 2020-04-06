@@ -171,6 +171,7 @@ This can be returned from a resource when there is no cause of an error. For exa
 
 ```
 # #[macro_use] extern crate gotham_restful_derive;
+# mod doc_tests_are_broken {
 # use gotham::state::State;
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
@@ -189,6 +190,7 @@ fn read_all(_state: &mut State) -> Success<MyResponse> {
 	let res = MyResponse { message: "I'm always happy".to_string() };
 	res.into()
 }
+# }
 ```
 */
 pub struct Success<T>(T);
@@ -242,6 +244,7 @@ look something like this (assuming the `auth` feature is enabled):
 
 ```
 # #[macro_use] extern crate gotham_restful_derive;
+# mod doc_tests_are_broken {
 # use gotham::state::State;
 # use gotham_restful::*;
 # use serde::Deserialize;
@@ -261,6 +264,7 @@ fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent> {
 	// do something
 	NoContent::default().into()
 }
+# }
 ```
 */
 pub enum AuthResult<T>
@@ -359,6 +363,7 @@ the function attributes:
 
 ```
 # #[macro_use] extern crate gotham_restful_derive;
+# mod doc_tests_are_broken {
 # use gotham::state::State;
 # use gotham_restful::*;
 #
@@ -369,6 +374,7 @@ the function attributes:
 fn read_all(_state: &mut State) {
 	// do something
 }
+# }
 ```
 */
 #[derive(Default)]

@@ -2,7 +2,6 @@ use crate::{
 	resource::*,
 	result::{ResourceError, ResourceResult, Response},
 	RequestBody,
-	ResourceType,
 	StatusCode
 };
 #[cfg(feature = "openapi")]
@@ -13,7 +12,6 @@ use futures::{
 	stream::Stream
 };
 use gotham::{
-	extractor::QueryStringExtractor,
 	handler::{HandlerFuture, IntoHandlerError},
 	helpers::http::response::{create_empty_response, create_response},
 	pipeline::chain::PipelineHandleChain,
@@ -35,7 +33,6 @@ use hyper::{
 	Method
 };
 use mime::{Mime, APPLICATION_JSON};
-use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
 /// Allow us to extract an id from a path.
@@ -67,52 +64,14 @@ pub trait DrawResources
 /// `Resource::setup` method.
 pub trait DrawResourceRoutes
 {
-	fn read_all<Handler, Res>(&mut self)
-	where
-		Res : ResourceResult,
-		Handler : ResourceReadAll<Res>;
-	
-	fn read<Handler, ID, Res>(&mut self)
-	where
-		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		Res : ResourceResult,
-		Handler : ResourceRead<ID, Res>;
-	
-	fn search<Handler, Query, Res>(&mut self)
-	where
-		Query : ResourceType + DeserializeOwned + QueryStringExtractor<Body> + Send + Sync + 'static,
-		Res : ResourceResult,
-		Handler : ResourceSearch<Query, Res>;
-	
-	fn create<Handler, Body, Res>(&mut self)
-	where
-		Body : RequestBody,
-		Res : ResourceResult,
-		Handler : ResourceCreate<Body, Res>;
-
-	fn update_all<Handler, Body, Res>(&mut self)
-	where
-		Body : RequestBody,
-		Res : ResourceResult,
-		Handler : ResourceUpdateAll<Body, Res>;
-
-	fn update<Handler, ID, Body, Res>(&mut self)
-	where
-		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		Body : RequestBody,
-		Res : ResourceResult,
-		Handler : ResourceUpdate<ID, Body, Res>;
-
-	fn delete_all<Handler, Res>(&mut self)
-	where
-		Res : ResourceResult,
-		Handler : ResourceDeleteAll<Res>;
-	
-	fn delete<Handler, ID, Res>(&mut self)
-	where
-		ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-		Res : ResourceResult,
-		Handler : ResourceDelete<ID, Res>;
+	fn read_all<Handler : ResourceReadAll>(&mut self);
+	fn read<Handler : ResourceRead>(&mut self);
+	fn search<Handler : ResourceSearch>(&mut self);
+	fn create<Handler : ResourceCreate>(&mut self);
+	fn update_all<Handler : ResourceUpdateAll>(&mut self);
+	fn update<Handler : ResourceUpdate>(&mut self);
+	fn delete_all<Handler : ResourceDeleteAll>(&mut self);
+	fn delete<Handler : ResourceDelete>(&mut self);
 }
 
 fn response_from(res : Response, state : &State) -> hyper::Response<Body>
@@ -195,85 +154,54 @@ where
 	Box::new(f)
 }
 
-fn read_all_handler<Handler, Res>(state : State) -> Box<HandlerFuture>
-where
-	Res : ResourceResult,
-	Handler : ResourceReadAll<Res>
+fn read_all_handler<Handler : ResourceReadAll>(state : State) -> Box<HandlerFuture>
 {
 	to_handler_future(state, |state| Handler::read_all(state))
 }
 
-fn read_handler<Handler, ID, Res>(state : State) -> Box<HandlerFuture>
-where
-	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-	Res : ResourceResult,
-	Handler : ResourceRead<ID, Res>
+fn read_handler<Handler : ResourceRead>(state : State) -> Box<HandlerFuture>
 {
 	let id = {
-		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
+		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
 	to_handler_future(state, |state| Handler::read(state, id))
 }
 
-fn search_handler<Handler, Query, Res>(mut state : State) -> Box<HandlerFuture>
-where
-	Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
-	Res : ResourceResult,
-	Handler : ResourceSearch<Query, Res>
+fn search_handler<Handler : ResourceSearch>(mut state : State) -> Box<HandlerFuture>
 {
-	let query = Query::take_from(&mut state);
+	let query = Handler::Query::take_from(&mut state);
 	to_handler_future(state, |state| Handler::search(state, query))
 }
 
-fn create_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
-where
-	Body : RequestBody,
-	Res : ResourceResult,
-	Handler : ResourceCreate<Body, Res>
+fn create_handler<Handler : ResourceCreate>(state : State) -> Box<HandlerFuture>
 {
-	handle_with_body::<Body, _, _>(state, |state, body| Handler::create(state, body))
+	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::create(state, body))
 }
 
-fn update_all_handler<Handler, Body, Res>(state : State) -> Box<HandlerFuture>
-where
-	Body : RequestBody,
-	Res : ResourceResult,
-	Handler : ResourceUpdateAll<Body, Res>
+fn update_all_handler<Handler : ResourceUpdateAll>(state : State) -> Box<HandlerFuture>
 {
-	handle_with_body::<Body, _, _>(state, |state, body| Handler::update_all(state, body))
+	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update_all(state, body))
 }
 
-fn update_handler<Handler, ID, Body, Res>(state : State) -> Box<HandlerFuture>
-where
-	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-	Body : RequestBody,
-	Res : ResourceResult,
-	Handler : ResourceUpdate<ID, Body, Res>
+fn update_handler<Handler : ResourceUpdate>(state : State) -> Box<HandlerFuture>
 {
 	let id = {
-		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
+		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	handle_with_body::<Body, _, _>(state, |state, body| Handler::update(state, id, body))
+	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update(state, id, body))
 }
 
-fn delete_all_handler<Handler, Res>(state : State) -> Box<HandlerFuture>
-where
-	Res : ResourceResult,
-	Handler : ResourceDeleteAll<Res>
+fn delete_all_handler<Handler : ResourceDeleteAll>(state : State) -> Box<HandlerFuture>
 {
 	to_handler_future(state, |state| Handler::delete_all(state))
 }
 
-fn delete_handler<Handler, ID, Res>(state : State) -> Box<HandlerFuture>
-where
-	ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-	Res : ResourceResult,
-	Handler : ResourceDelete<ID, Res>
+fn delete_handler<Handler : ResourceDelete>(state : State) -> Box<HandlerFuture>
 {
 	let id = {
-		let path : &PathExtractor<ID> = PathExtractor::borrow_from(&state);
+		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
 	to_handler_future(state, |state| Handler::delete(state, id))
@@ -368,109 +296,78 @@ macro_rules! implDrawResourceRoutes {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn read_all<Handler, Res>(&mut self)
-			where
-				Res : ResourceResult,
-				Handler : ResourceReadAll<Res>
+			fn read_all<Handler : ResourceReadAll>(&mut self)
 			{
-				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.get(&self.1)
 					.extend_route_matcher(matcher)
-					.to(|state| read_all_handler::<Handler, Res>(state));
+					.to(|state| read_all_handler::<Handler>(state));
 			}
 
-			fn read<Handler, ID, Res>(&mut self)
-			where
-				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Res : ResourceResult,
-				Handler : ResourceRead<ID, Res>
+			fn read<Handler : ResourceRead>(&mut self)
 			{
-				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.get(&format!("{}/:id", self.1))
 					.extend_route_matcher(matcher)
-					.with_path_extractor::<PathExtractor<ID>>()
-					.to(|state| read_handler::<Handler, ID, Res>(state));
+					.with_path_extractor::<PathExtractor<Handler::ID>>()
+					.to(|state| read_handler::<Handler>(state));
 			}
 			
-			fn search<Handler, Query, Res>(&mut self)
-			where
-				Query : ResourceType + QueryStringExtractor<Body> + Send + Sync + 'static,
-				Res : ResourceResult,
-				Handler : ResourceSearch<Query, Res>
+			fn search<Handler : ResourceSearch>(&mut self)
 			{
-				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.get(&format!("{}/search", self.1))
 					.extend_route_matcher(matcher)
-					.with_query_string_extractor::<Query>()
-					.to(|state| search_handler::<Handler, Query, Res>(state));
+					.with_query_string_extractor::<Handler::Query>()
+					.to(|state| search_handler::<Handler>(state));
 			}
 			
-			fn create<Handler, Body, Res>(&mut self)
-			where
-				Body : RequestBody,
-				Res : ResourceResult,
-				Handler : ResourceCreate<Body, Res>
+			fn create<Handler : ResourceCreate>(&mut self)
 			{
-				let accept_matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
-				let content_matcher : MaybeMatchContentTypeHeader = Body::supported_types().into();
+				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
+				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
 				self.0.post(&self.1)
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
-					.to(|state| create_handler::<Handler, Body, Res>(state));
+					.to(|state| create_handler::<Handler>(state));
 			}
 
-			fn update_all<Handler, Body, Res>(&mut self)
-			where
-				Body : RequestBody,
-				Res : ResourceResult,
-				Handler : ResourceUpdateAll<Body, Res>
+			fn update_all<Handler : ResourceUpdateAll>(&mut self)
 			{
-				let accept_matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
-				let content_matcher : MaybeMatchContentTypeHeader = Body::supported_types().into();
+				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
+				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
 				self.0.put(&self.1)
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
-					.to(|state| update_all_handler::<Handler, Body, Res>(state));
+					.to(|state| update_all_handler::<Handler>(state));
 			}
 
-			fn update<Handler, ID, Body, Res>(&mut self)
-			where
-				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : RequestBody,
-				Res : ResourceResult,
-				Handler : ResourceUpdate<ID, Body, Res>
+			fn update<Handler : ResourceUpdate>(&mut self)
 			{
-				let accept_matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
-				let content_matcher : MaybeMatchContentTypeHeader = Body::supported_types().into();
+				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
+				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
 				self.0.put(&format!("{}/:id", self.1))
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
-					.with_path_extractor::<PathExtractor<ID>>()
-					.to(|state| update_handler::<Handler, ID, Body, Res>(state));
+					.with_path_extractor::<PathExtractor<Handler::ID>>()
+					.to(|state| update_handler::<Handler>(state));
 			}
 
-			fn delete_all<Handler, Res>(&mut self)
-			where
-				Res : ResourceResult,
-				Handler : ResourceDeleteAll<Res>
+			fn delete_all<Handler : ResourceDeleteAll>(&mut self)
 			{
-				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.delete(&self.1)
 					.extend_route_matcher(matcher)
-					.to(|state| delete_all_handler::<Handler, Res>(state));
+					.to(|state| delete_all_handler::<Handler>(state));
 			}
 
-			fn delete<Handler, ID, Res>(&mut self)
-			where
-				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Res : ResourceResult,
-				Handler : ResourceDelete<ID, Res>
+			fn delete<Handler : ResourceDelete>(&mut self)
 			{
-				let matcher : MaybeMatchAcceptHeader = Res::accepted_types().into();
+				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.delete(&format!("{}/:id", self.1))
 					.extend_route_matcher(matcher)
-					.with_path_extractor::<PathExtractor<ID>>()
-					.to(|state| delete_handler::<Handler, ID, Res>(state));
+					.with_path_extractor::<PathExtractor<Handler::ID>>()
+					.to(|state| delete_handler::<Handler>(state));
 			}
 		}
 	}

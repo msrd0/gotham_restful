@@ -4,19 +4,16 @@ use crate::{
 	routing::*,
 	OpenapiSchema,
 	OpenapiType,
-	RequestBody,
-	ResourceType
+	RequestBody
 };
 use futures::future::ok;
 use gotham::{
-	extractor::QueryStringExtractor,
 	handler::{Handler, HandlerFuture, NewHandler},
 	helpers::http::response::create_response,
 	pipeline::chain::PipelineHandleChain,
 	router::builder::*,
 	state::State
 };
-use hyper::Body;
 use indexmap::IndexMap;
 use log::error;
 use mime::{Mime, APPLICATION_JSON, TEXT_PLAIN};
@@ -25,7 +22,6 @@ use openapiv3::{
 	ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
 	SchemaKind, SecurityScheme, Server, StatusCode, Type
 };
-use serde::de::DeserializeOwned;
 use std::panic::RefUnwindSafe;
 
 /**
@@ -381,134 +377,103 @@ macro_rules! implOpenapiRouter {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn read_all<Handler, Res>(&mut self)
-			where
-				Res : ResourceResult,
-				Handler : ResourceReadAll<Res>
+			fn read_all<Handler : ResourceReadAll>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
 				
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None, Res::requires_auth()));
+				item.get = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::default(), None, None, Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).read_all::<Handler, Res>()
+				(&mut *(self.0).0, self.1).read_all::<Handler>()
 			}
 			
-			fn read<Handler, ID, Res>(&mut self)
-			where
-				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Res : ResourceResult,
-				Handler : ResourceRead<ID, Res>
+			fn read<Handler : ResourceRead>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Res::requires_auth()));
+				item.get = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).read::<Handler, ID, Res>()
+				(&mut *(self.0).0, self.1).read::<Handler>()
 			}
 			
-			fn search<Handler, Query, Res>(&mut self)
-			where
-				Query : ResourceType + DeserializeOwned + QueryStringExtractor<Body> + Send + Sync + 'static,
-				Res : ResourceResult,
-				Handler : ResourceSearch<Query, Res>
+			fn search<Handler : ResourceSearch>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
 				
 				let path = format!("/{}/search", &self.1);
 				let mut item = (self.0).1.remove_path(&self.1);
-				item.get = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_query_params(Query::schema()), None, None, Res::requires_auth()));
+				item.get = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::from_query_params(Handler::Query::schema()), None, None, Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).search::<Handler, Query, Res>()
+				(&mut *(self.0).0, self.1).search::<Handler>()
 			}
 			
-			fn create<Handler, Body, Res>(&mut self)
-			where
-				Body : RequestBody,
-				Res : ResourceResult,
-				Handler : ResourceCreate<Body, Res>
+			fn create<Handler : ResourceCreate>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
-				let body_schema = (self.0).1.add_schema::<Body>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
+				let body_schema = (self.0).1.add_schema::<Handler::Body>();
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.post = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types(), Res::requires_auth()));
+				item.post = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Handler::Body::supported_types(), Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).create::<Handler, Body, Res>()
+				(&mut *(self.0).0, self.1).create::<Handler>()
 			}
 			
-			fn update_all<Handler, Body, Res>(&mut self)
-			where
-				Body : RequestBody,
-				Res : ResourceResult,
-				Handler : ResourceUpdateAll<Body, Res>
+			fn update_all<Handler : ResourceUpdateAll>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
-				let body_schema = (self.0).1.add_schema::<Body>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
+				let body_schema = (self.0).1.add_schema::<Handler::Body>();
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Body::supported_types(), Res::requires_auth()));
+				item.put = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::default(), Some(body_schema), Handler::Body::supported_types(), Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).update_all::<Handler, Body, Res>()
+				(&mut *(self.0).0, self.1).update_all::<Handler>()
 			}
 			
-			fn update<Handler, ID, Body, Res>(&mut self)
-			where
-				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Body : RequestBody,
-				Res : ResourceResult,
-				Handler : ResourceUpdate<ID, Body, Res>
+			fn update<Handler : ResourceUpdate>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
-				let body_schema = (self.0).1.add_schema::<Body>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
+				let body_schema = (self.0).1.add_schema::<Handler::Body>();
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema), Body::supported_types(), Res::requires_auth()));
+				item.put = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), Some(body_schema), Handler::Body::supported_types(), Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).update::<Handler, ID, Body, Res>()
+				(&mut *(self.0).0, self.1).update::<Handler>()
 			}
 			
-			fn delete_all<Handler, Res>(&mut self)
-			where
-				Res : ResourceResult,
-				Handler : ResourceDeleteAll<Res>
+			fn delete_all<Handler : ResourceDeleteAll>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
 
 				let path = format!("/{}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::default(), None, None, Res::requires_auth()));
+				item.delete = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::default(), None, None, Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).delete_all::<Handler, Res>()
+				(&mut *(self.0).0, self.1).delete_all::<Handler>()
 			}
 			
-			fn delete<Handler, ID, Res>(&mut self)
-			where
-				ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static,
-				Res : ResourceResult,
-				Handler : ResourceDelete<ID, Res>
+			fn delete<Handler : ResourceDelete>(&mut self)
 			{
-				let schema = (self.0).1.add_schema::<Res>();
+				let schema = (self.0).1.add_schema::<Handler::Res>();
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(new_operation(Res::default_status(), Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Res::requires_auth()));
+				item.delete = Some(new_operation(Handler::Res::default_status(), Handler::Res::accepted_types(), schema, OperationParams::from_path_params(vec!["id"]), None, None, Handler::Res::requires_auth()));
 				(self.0).1.add_path(path, item);
 				
-				(&mut *(self.0).0, self.1).delete::<Handler, ID, Res>()
+				(&mut *(self.0).0, self.1).delete::<Handler>()
 			}
 		}
 

@@ -158,6 +158,7 @@ pub use openapi::{
 mod resource;
 pub use resource::{
 	Resource,
+	ResourceMethod,
 	ResourceReadAll,
 	ResourceRead,
 	ResourceSearch,
