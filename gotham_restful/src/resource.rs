@@ -22,6 +22,12 @@ pub trait Resource
 pub trait ResourceMethod
 {
 	type Res : ResourceResult;
+	
+	#[cfg(feature = "openapi")]
+	fn operation_id() -> Option<String>
+	{
+		None
+	}
 }
 
 /// Handle a GET request on the Resource root.

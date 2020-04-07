@@ -4,8 +4,12 @@ use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
 	Attribute,
+	AttributeArgs,
 	FnArg,
 	ItemFn,
+	Lit,
+	Meta,
+	NestedMeta,
 	PatType,
 	ReturnType,
 	Type,
@@ -96,17 +100,17 @@ impl Method
 		format_ident!("{}", name)
 	}
 	
-	pub fn mod_ident(&self, resource : String) -> Ident
+	pub fn mod_ident(&self, resource : &str) -> Ident
 	{
 		format_ident!("_gotham_restful_resource_{}_method_{}", resource.to_snake_case(), self.fn_ident())
 	}
 	
-	pub fn handler_struct_ident(&self, resource : String) -> Ident
+	pub fn handler_struct_ident(&self, resource : &str) -> Ident
 	{
 		format_ident!("{}{}Handler", resource.to_camel_case(), self.trait_ident())
 	}
 	
-	pub fn setup_ident(&self, resource : String) -> Ident
+	pub fn setup_ident(&self, resource : &str) -> Ident
 	{
 		format_ident!("{}_{}_setup_impl", resource.to_snake_case(), self.fn_ident())
 	}
@@ -210,19 +214,61 @@ fn interpret_arg(index : usize, arg : &PatType) -> MethodArgument
 	MethodArgument { ident, ty }
 }
 
+#[cfg(feature = "openapi")]
+fn expand_operation_id(attrs : &AttributeArgs) -> TokenStream2
+{
+	let mut operation_id : Option<&Lit> = None;
+	for meta in attrs
+	{
+		match meta {
+			NestedMeta::Meta(Meta::NameValue(kv)) => {
+				if kv.path.segments.last().map(|p| p.ident.to_string()) == Some("operation_id".to_owned())
+				{
+					operation_id = Some(&kv.lit)
+				}
+			},
+			_ => {}
+		}
+	}
+	
+	match operation_id {
+		Some(operation_id) => quote! {
+			fn operation_id() -> Option<String>
+			{
+				Some(#operation_id.to_string())
+			}
+		},
+		None => quote!()
+	}
+}
+
+#[cfg(not(feature = "openapi"))]
+fn expand_operation_id(_ : &AttributeArgs) -> TokenStream2
+{
+	quote!()
+}
+
 pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -> TokenStream
 {
 	let krate = super::krate();
-	let resource_ident = parse_macro_input!(attrs as Ident);
+	
+	// parse attributes
+	let mut method_attrs = parse_macro_input!(attrs as AttributeArgs);
+	let resource_path = match method_attrs.remove(0) {
+		NestedMeta::Meta(Meta::Path(path)) => path,
+		_ => panic!("Expected resource name for rest macro")
+	};
+	let resource_name = resource_path.segments.last().expect("Resource name must not be empty").ident.to_string();
+	
 	let fun = parse_macro_input!(item as ItemFn);
 	let fun_ident = &fun.sig.ident;
 	let fun_vis = &fun.vis;
 	
 	let trait_ident = method.trait_ident();
 	let method_ident = method.fn_ident();
-	let mod_ident = method.mod_ident(resource_ident.to_string());
-	let handler_ident = method.handler_struct_ident(resource_ident.to_string());
-	let setup_ident = method.setup_ident(resource_ident.to_string());
+	let mod_ident = method.mod_ident(&resource_name);
+	let handler_ident = method.handler_struct_ident(&resource_name);
+	let setup_ident = method.setup_ident(&resource_name);
 	
 	let (ret, is_no_content) = match &fun.sig.output {
 		ReturnType::Default => (quote!(#krate::NoContent), true),
@@ -298,12 +344,15 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	}
 	
 	// prepare the where clause
-	let mut where_clause = quote!(#resource_ident : #krate::Resource,);
+	let mut where_clause = quote!(#resource_path : #krate::Resource,);
 	for arg in args.iter().filter(|arg| (*arg).ty.is_auth_status())
 	{
 		let auth_ty = arg.ty.quote_ty();
 		where_clause = quote!(#where_clause #auth_ty : Clone,);
 	}
+	
+	// operation id code
+	let operation_id = expand_operation_id(&method_attrs);
 	
 	// put everything together
 	let output = quote! {
@@ -318,6 +367,8 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 			impl #krate::ResourceMethod for #handler_ident
 			{
 				type Res = #ret;
+				
+				#operation_id
 			}
 			
 			impl #krate::#trait_ident for #handler_ident
