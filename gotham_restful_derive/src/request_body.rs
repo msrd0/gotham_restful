@@ -5,6 +5,7 @@ use syn::{
 	parse::{Parse, ParseStream, Result as SynResult},
 	punctuated::Punctuated,
 	token::Comma,
+	Error,
 	Generics,
 	Ident,
 	ItemStruct,
@@ -53,19 +54,29 @@ fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream2
 	}
 }
 
-pub fn expand_request_body(tokens : TokenStream) -> TokenStream
+fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input!(tokens as ItemStruct);
+	let input = parse_macro_input::parse::<ItemStruct>(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	
-	let types : Vec<Path> = input.attrs.into_iter().filter(|attr|
+	let mut types : Vec<Path> = Vec::new();
+	let mut errors : Vec<Error> = Vec::new();
+	for attr in input.attrs.into_iter().filter(|attr|
 		attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string()) // TODO wtf
-	).flat_map(|attr| {
-		let m : MimeList = syn::parse2(attr.tokens).expect("unable to parse attributes");
-		m.0.into_iter()
-	}).collect();
+	) {
+		match syn::parse2::<MimeList>(attr.tokens) {
+			Ok(m) => types.extend(m.0),
+			Err(e) => errors.push(e)
+		}
+	}
+	if !errors.is_empty()
+	{
+		let mut iter = errors.into_iter();
+		let first = iter.nth(0).unwrap();
+		return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
+	}
 	
 	let types = match types {
 		ref types if types.is_empty() => quote!(None),
@@ -74,7 +85,7 @@ pub fn expand_request_body(tokens : TokenStream) -> TokenStream
 	
 	let impl_openapi_type = impl_openapi_type(&ident, &generics);
 	
-	let output = quote! {
+	Ok(quote! {
 		impl #generics #krate::RequestBody for #ident #generics
 		where #ident #generics : #krate::FromBody
 		{
@@ -85,6 +96,12 @@ pub fn expand_request_body(tokens : TokenStream) -> TokenStream
 		}
 		
 		#impl_openapi_type
-	};
-	output.into()
+	})
+}
+
+pub fn expand_request_body(tokens : TokenStream) -> TokenStream
+{
+	expand(tokens)
+		.unwrap_or_else(|err| err.to_compile_error())
+		.into()
 }
