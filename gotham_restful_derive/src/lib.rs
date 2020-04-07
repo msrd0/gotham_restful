@@ -27,7 +27,7 @@ pub fn derive_from_body(tokens : TokenStream) -> TokenStream
 }
 
 #[cfg(feature = "openapi")]
-#[proc_macro_derive(OpenapiType)]
+#[proc_macro_derive(OpenapiType, attributes(openapi))]
 pub fn derive_openapi_type(tokens : TokenStream) -> TokenStream
 {
 	openapi_type::expand(tokens)
