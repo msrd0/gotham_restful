@@ -1,6 +1,9 @@
 use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
+	spanned::Spanned,
+	Error,
 	Fields,
 	ItemStruct,
 	parse_macro_input
@@ -8,8 +11,15 @@ use syn::{
 
 pub fn expand_from_body(tokens : TokenStream) -> TokenStream
 {
+	expand(tokens)
+		.unwrap_or_else(|err| err.to_compile_error())
+		.into()
+}
+
+fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
+{
 	let krate = super::krate();
-	let input = parse_macro_input!(tokens as ItemStruct);
+	let input = parse_macro_input::parse::<ItemStruct>(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	
@@ -24,7 +34,7 @@ pub fn expand_from_body(tokens : TokenStream) -> TokenStream
 					let field_ty = &field.ty;
 					(quote!(where #field_ty : for<'a> From<&'a [u8]>), quote!(Self { #field_ident: body.into() }))
 				},
-				_ => panic!("FromBody can only be derived for structs with at most one field")
+				_ => return Err(Error::new(fields.into_iter().nth(1).unwrap().span(), "FromBody can only be derived for structs with at most one field"))
 			}
 		},
 		Fields::Unnamed(unnamed) => {
@@ -36,13 +46,13 @@ pub fn expand_from_body(tokens : TokenStream) -> TokenStream
 					let field_ty = &field.ty;
 					(quote!(where #field_ty : for<'a> From<&'a [u8]>), quote!(Self(body.into())))
 				},
-				_ => panic!("FromBody can only be derived for structs with at most one field")
+				_ => return Err(Error::new(fields.into_iter().nth(1).unwrap().span(), "FromBody can only be derived for structs with at most one field"))
 			}
 		},
 		Fields::Unit => (quote!(), quote!(Self{}))
 	};
 	
-	let output = quote! {
+	Ok(quote! {
 		impl #generics #krate::FromBody for #ident #generics
 		#were
 		{
@@ -54,6 +64,5 @@ pub fn expand_from_body(tokens : TokenStream) -> TokenStream
 				Ok(#body)
 			}
 		}
-	};
-	output.into()
+	})
 }
