@@ -28,6 +28,11 @@ pub trait ResourceMethod
 	{
 		None
 	}
+	
+	fn wants_auth() -> bool
+	{
+		false
+	}
 }
 
 /// Handle a GET request on the Resource root.

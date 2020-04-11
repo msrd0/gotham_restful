@@ -95,12 +95,6 @@ pub trait ResourceResult
 	{
 		StatusCode::OK
 	}
-	
-	#[cfg(feature = "openapi")]
-	fn requires_auth() -> bool
-	{
-		false
-	}
 }
 
 #[cfg(feature = "openapi")]
@@ -347,12 +341,6 @@ impl<T : ResourceResult> ResourceResult for AuthResult<T>
 	fn default_status() -> StatusCode
 	{
 		T::default_status()
-	}
-	
-	#[cfg(feature = "openapi")]
-	fn requires_auth() -> bool
-	{
-		true
 	}
 }
 
