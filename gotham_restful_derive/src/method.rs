@@ -1,6 +1,6 @@
 use heck::{CamelCase, SnakeCase};
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
 	spanned::Spanned,
@@ -169,7 +169,16 @@ impl MethodArgumentType
 struct MethodArgument
 {
 	ident : Ident,
+	ident_span : Span,
 	ty : MethodArgumentType
+}
+
+impl Spanned for MethodArgument
+{
+	fn span(&self) -> Span
+	{
+		self.ident_span
+	}
 }
 
 fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType, Error>
@@ -213,7 +222,7 @@ fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument, Error>
 	let orig_name = quote!(#pat);
 	let ty = interpret_arg_ty(index, &arg.attrs, &orig_name.to_string(), *arg.ty.clone())?;
 	
-	Ok(MethodArgument { ident, ty })
+	Ok(MethodArgument { ident, ident_span: arg.pat.span(), ty })
 }
 
 #[cfg(feature = "openapi")]
@@ -306,10 +315,22 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	}
 	
 	// extract the generic parameters to use
-	let generics : Vec<TokenStream2> = args.iter()
+	let ty_names = method.type_names();
+	let ty_len = ty_names.len();
+	let generics_args : Vec<&MethodArgument> = args.iter()
 		.filter(|arg| (*arg).ty.is_method_arg())
+		.collect();
+	if generics_args.len() > ty_len
+	{
+		return Err(Error::new(generics_args[ty_len].span(), "Too many arguments"));
+	}
+	else if generics_args.len() < ty_len
+	{
+		return Err(Error::new(fun_ident.span(), "Too few arguments"));
+	}
+	let generics : Vec<TokenStream2> = generics_args.iter()
 		.map(|arg| arg.ty.quote_ty().unwrap())
-		.zip(method.type_names())
+		.zip(ty_names)
 		.map(|(arg, name)| {
 			let ident = format_ident!("{}", name);
 			quote!(type #ident = #arg;)
