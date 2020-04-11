@@ -16,7 +16,7 @@ use gotham::{
 };
 use indexmap::IndexMap;
 use log::error;
-use mime::{Mime, APPLICATION_JSON, TEXT_PLAIN};
+use mime::{Mime, APPLICATION_JSON, STAR_STAR, TEXT_PLAIN};
 use openapiv3::{
 	APIKeyLocation, Components, MediaType, OpenAPI, Operation, Parameter, ParameterData, ParameterSchemaOrContent, PathItem,
 	ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
@@ -309,7 +309,7 @@ fn new_operation(
 		requires_auth : bool
 ) -> Operation
 {
-	let content = schema_to_content(accepted_types.unwrap_or_default(), schema);
+	let content = schema_to_content(accepted_types.unwrap_or_else(|| vec![STAR_STAR]), schema);
 	
 	let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
 	responses.insert(StatusCode::Code(default_status.as_u16()), Item(Response {
@@ -321,7 +321,7 @@ fn new_operation(
 	
 	let request_body = body_schema.map(|schema| Item(OARequestBody {
 		description: None,
-		content: schema_to_content(supported_types.unwrap_or_default(), schema),
+		content: schema_to_content(supported_types.unwrap_or_else(|| vec![STAR_STAR]), schema),
 		required: true
 	}));
 	
