@@ -7,8 +7,10 @@ use proc_macro2::{
 use quote::quote;
 use std::{iter, iter::FromIterator};
 use syn::{
+	spanned::Spanned,
 	Attribute,
 	AttributeArgs,
+	Error,
 	Field,
 	Fields,
 	Generics,
@@ -30,9 +32,11 @@ pub fn expand(tokens : TokenStream) -> TokenStream
 	let output = match input {
 		Item::Enum(item) => expand_enum(item),
 		Item::Struct(item) => expand_struct(item),
-		_ => panic!("derive(OpenapiType) not supported for this context")
+		_ => Err(Error::new(input.span(), "derive(OpenapiType) not supported for this context"))
 	};
-	output.into()
+	output
+		.unwrap_or_else(|err| err.to_compile_error())
+		.into()
 }
 
 fn expand_where(generics : &Generics) -> TokenStream2
@@ -65,19 +69,19 @@ struct Attrs
 	rename : Option<String>
 }
 
-fn to_string(lit : &Lit) -> String
+fn to_string(lit : &Lit) -> Result<String, Error>
 {
 	match lit {
-		Lit::Str(str) => str.value(),
-		_ => panic!("Expected str, found {}", quote!(#lit))
+		Lit::Str(str) => Ok(str.value()),
+		_ => Err(Error::new(lit.span(), "Expected string literal"))
 	}
 }
 
-fn to_bool(lit : &Lit) -> bool
+fn to_bool(lit : &Lit) -> Result<bool, Error>
 {
 	match lit {
-		Lit::Bool(bool) => bool.value,
-		_ => panic!("Expected bool,  found {}", quote!(#lit))
+		Lit::Bool(bool) => Ok(bool.value),
+		_ => Err(Error::new(lit.span(), "Expected bool"))
 	}
 }
 
@@ -97,7 +101,7 @@ fn remove_parens(input : TokenStream2) -> TokenStream2
 	output
 }
 
-fn parse_attributes(input : &[Attribute]) -> Result<Attrs, syn::Error>
+fn parse_attributes(input : &[Attribute]) -> Result<Attrs, Error>
 {
 	let mut parsed = Attrs::default();
 	for attr in input
@@ -111,13 +115,13 @@ fn parse_attributes(input : &[Attribute]) -> Result<Attrs, syn::Error>
 				match &meta {
 					NestedMeta::Meta(Meta::NameValue(kv)) => match kv.path.segments.last().map(|s| s.ident.to_string()) {
 						Some(key) => match key.as_ref() {
-							"nullable" => parsed.nullable = to_bool(&kv.lit),
-						 	"rename" => parsed.rename = Some(to_string(&kv.lit)),
-							_ => panic!("Unexpected key: {}", key),
+							"nullable" => parsed.nullable = to_bool(&kv.lit)?,
+						 	"rename" => parsed.rename = Some(to_string(&kv.lit)?),
+							_ => return Err(Error::new(kv.path.span(), "Unknown key")),
 						},
-						_ => panic!("Unexpected token: {}", quote!(#meta))
+						_ => return Err(Error::new(meta.span(), "Unexpected token"))
 					},
-					_ => panic!("Unexpected token: {}", quote!(#meta))
+					_ => return Err(Error::new(meta.span(), "Unexpected token"))
 				}
 			}
 		}
@@ -125,43 +129,57 @@ fn parse_attributes(input : &[Attribute]) -> Result<Attrs, syn::Error>
 	Ok(parsed)
 }
 
-fn expand_variant(variant : &Variant) -> TokenStream2
+fn expand_variant(variant : &Variant) -> Result<TokenStream2, Error>
 {
 	if variant.fields != Fields::Unit
 	{
-		panic!("Enum Variants with Fields not supported");
+		return Err(Error::new(variant.span(), "Enum Variants with Fields not supported"));
 	}
 	
 	let ident = &variant.ident;
 	
-	let attrs = parse_attributes(&variant.attrs).expect("Unable to parse attributes");
+	let attrs = parse_attributes(&variant.attrs)?;
 	let name = match attrs.rename {
 		Some(rename) => rename,
 		None => ident.to_string()
 	};
 	
-	quote! {
+	Ok(quote! {
 		enumeration.push(#name.to_string());
-	}
+	})
 }
 
-fn expand_enum(input : ItemEnum) -> TokenStream2
+fn expand_enum(input : ItemEnum) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 	let where_clause = expand_where(&generics);
 	
-	let attrs = parse_attributes(&input.attrs).expect("Unable to parse attributes");
+	let attrs = parse_attributes(&input.attrs)?;
 	let nullable = attrs.nullable;
 	let name = match attrs.rename {
 		Some(rename) => rename,
 		None => ident.to_string()
 	};
 	
-	let variants : Vec<TokenStream2> = input.variants.iter().map(expand_variant).collect();
+	let mut variants : Vec<TokenStream2> = Vec::new();
+	let mut errors : Vec<Error> = Vec::new();
+	for variant in input.variants.iter().map(expand_variant)
+	{
+		match variant {
+			Ok(variant) => variants.push(variant),
+			Err(e) => errors.push(e)
+		}
+	}
+	if !errors.is_empty()
+	{
+		let mut iter = errors.into_iter();
+		let first = iter.nth(0).unwrap();
+		return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
+	}
 	
-	quote! {
+	Ok(quote! {
 		impl #generics #krate::OpenapiType for #ident #generics
 		#where_clause
 		{
@@ -187,25 +205,25 @@ fn expand_enum(input : ItemEnum) -> TokenStream2
 				}
 			}
 		}
-	}
+	})
 }
 
-fn expand_field(field : &Field) -> TokenStream2
+fn expand_field(field : &Field) -> Result<TokenStream2, Error>
 {
 	let ident = match &field.ident {
 		Some(ident) => ident,
-		None => panic!("Fields without ident are not supported")
+		None => return Err(Error::new(field.span(), "Fields without ident are not supported"))
 	};
 	let ty = &field.ty;
 	
-	let attrs = parse_attributes(&field.attrs).expect("Unable to parse attributes");
+	let attrs = parse_attributes(&field.attrs)?;
 	let nullable = attrs.nullable;
 	let name = match attrs.rename {
 		Some(rename) => rename,
 		None => ident.to_string()
 	};
 	
-	quote! {{
+	Ok(quote! {{
 		let mut schema = <#ty>::schema();
 		
 		if schema.nullable
@@ -242,17 +260,17 @@ fn expand_field(field : &Field) -> TokenStream2
 				);
 			}
 		}
-	}}
+	}})
 }
 
-pub fn expand_struct(input : ItemStruct) -> TokenStream2
+pub fn expand_struct(input : ItemStruct) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 	let where_clause = expand_where(&generics);
 	
-	let attrs = parse_attributes(&input.attrs).expect("Unable to parse attributes");
+	let attrs = parse_attributes(&input.attrs)?;
 	let nullable = attrs.nullable;
 	let name = match attrs.rename {
 		Some(rename) => rename,
@@ -260,14 +278,29 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 	};
 	
 	let fields : Vec<TokenStream2> = match input.fields {
-		Fields::Named(fields) => {
-			fields.named.iter().map(|field| expand_field(field)).collect()
+		Fields::Named(named_fields) => {
+			let mut fields : Vec<TokenStream2> = Vec::new();
+			let mut errors : Vec<Error> = Vec::new();
+			for field in named_fields.named.iter().map(expand_field)
+			{
+				match field {
+					Ok(field) => fields.push(field),
+					Err(e) => errors.push(e)
+				}
+			}
+			if !errors.is_empty()
+			{
+				let mut iter = errors.into_iter();
+				let first = iter.nth(0).unwrap();
+				return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
+			}
+			fields
 		},
-		Fields::Unnamed(_) => panic!("Unnamed fields are not supported"),
+		Fields::Unnamed(fields) => return Err(Error::new(fields.span(), "Unnamed fields are not supported")),
 		Fields::Unit => Vec::new()
 	};
 	
-	quote!{
+	Ok(quote!{
 		impl #generics #krate::OpenapiType for #ident #generics
 		#where_clause
 		{
@@ -297,5 +330,5 @@ pub fn expand_struct(input : ItemStruct) -> TokenStream2
 				}
 			}
 		}
-	}
+	})
 }

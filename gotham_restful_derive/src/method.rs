@@ -1,10 +1,12 @@
 use heck::{CamelCase, SnakeCase};
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
+	spanned::Spanned,
 	Attribute,
 	AttributeArgs,
+	Error,
 	FnArg,
 	ItemFn,
 	Lit,
@@ -167,10 +169,19 @@ impl MethodArgumentType
 struct MethodArgument
 {
 	ident : Ident,
+	ident_span : Span,
 	ty : MethodArgumentType
 }
 
-fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type) -> MethodArgumentType
+impl Spanned for MethodArgument
+{
+	fn span(&self) -> Span
+	{
+		self.ident_span
+	}
+}
+
+fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType, Error>
 {
 	let attr = attrs.into_iter()
 		.filter(|arg| arg.path.segments.iter().filter(|path| &path.ident.to_string() == "rest_arg").nth(0).is_some())
@@ -179,39 +190,39 @@ fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type)
 	
 	if cfg!(feature = "auth") && (attr.as_deref() == Some("auth") || (attr.is_none() && name == "auth"))
 	{
-		return match ty {
+		return Ok(match ty {
 			Type::Reference(ty) => MethodArgumentType::AuthStatusRef(*ty.elem),
 			ty => MethodArgumentType::AuthStatus(ty)
-		};
+		});
 	}
 	
 	if cfg!(feature = "database") && (attr.as_deref() == Some("connection") || attr.as_deref() == Some("conn") || (attr.is_none() && name == "conn"))
 	{
-		return MethodArgumentType::DatabaseConnection(match ty {
+		return Ok(MethodArgumentType::DatabaseConnection(match ty {
 			Type::Reference(ty) => *ty.elem,
 			ty => ty
-		});
+		}));
 	}
 	
 	if index == 0
 	{
 		return match ty {
-			Type::Reference(ty) => if ty.mutability.is_none() { MethodArgumentType::StateRef } else { MethodArgumentType::StateMutRef },
-			_ => panic!("The first argument, unless some feature is used, has to be a (mutable) reference to gotham::state::State")
+			Type::Reference(ty) => Ok(if ty.mutability.is_none() { MethodArgumentType::StateRef } else { MethodArgumentType::StateMutRef }),
+			_ => Err(Error::new(ty.span(), "The first argument, unless some feature is used, has to be a (mutable) reference to gotham::state::State"))
 		};
 	}
 	
-	MethodArgumentType::MethodArg(ty)
+	Ok(MethodArgumentType::MethodArg(ty))
 }
 
-fn interpret_arg(index : usize, arg : &PatType) -> MethodArgument
+fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument, Error>
 {
 	let pat = &arg.pat;
 	let ident = format_ident!("arg{}", index);
 	let orig_name = quote!(#pat);
-	let ty = interpret_arg_ty(index, &arg.attrs, &orig_name.to_string(), *arg.ty.clone());
+	let ty = interpret_arg_ty(index, &arg.attrs, &orig_name.to_string(), *arg.ty.clone())?;
 	
-	MethodArgument { ident, ty }
+	Ok(MethodArgument { ident, ident_span: arg.pat.span(), ty })
 }
 
 #[cfg(feature = "openapi")]
@@ -248,19 +259,20 @@ fn expand_operation_id(_ : &AttributeArgs) -> TokenStream2
 	quote!()
 }
 
-pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -> TokenStream
+fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
 	
 	// parse attributes
-	let mut method_attrs = parse_macro_input!(attrs as AttributeArgs);
+	let mut method_attrs = parse_macro_input::parse::<AttributeArgs>(attrs)?;
 	let resource_path = match method_attrs.remove(0) {
 		NestedMeta::Meta(Meta::Path(path)) => path,
-		_ => panic!("Expected resource name for rest macro")
+		p => return Err(Error::new(p.span(), "Expected name of the Resource struct this method belongs to"))
 	};
-	let resource_name = resource_path.segments.last().expect("Resource name must not be empty").ident.to_string();
+	let resource_name = resource_path.segments.last().map(|s| s.ident.to_string())
+			.ok_or_else(|| Error::new(resource_path.span(), "Resource name must not be empty"))?;
 	
-	let fun = parse_macro_input!(item as ItemFn);
+	let fun = parse_macro_input::parse::<ItemFn>(item)?;
 	let fun_ident = &fun.sig.ident;
 	let fun_vis = &fun.vis;
 	
@@ -282,16 +294,43 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	let auth_ident = format_ident!("auth");
 	
 	// extract arguments into pattern, ident and type
-	let args : Vec<MethodArgument> = fun.sig.inputs.iter().enumerate().map(|(i, arg)| match arg {
-		FnArg::Typed(arg) => interpret_arg(i, arg),
-		FnArg::Receiver(_) => panic!("didn't expect self parameter")
-	}).collect();
+	let mut args : Vec<MethodArgument> = Vec::new();
+	let mut errors : Vec<Error> = Vec::new();
+	for (i, arg) in fun.sig.inputs.iter().enumerate()
+	{
+		let a = match arg {
+			FnArg::Typed(arg) => interpret_arg(i, arg),
+			FnArg::Receiver(_) => Err(Error::new(arg.span(), "Didn't expect self parameter"))
+		};
+		match a {
+			Ok(a) => args.push(a),
+			Err(e) => errors.push(e)
+		}
+	}
+	if !errors.is_empty()
+	{
+		let mut iter = errors.into_iter();
+		let first = iter.nth(0).unwrap();
+		return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
+	}
 	
 	// extract the generic parameters to use
-	let generics : Vec<TokenStream2> = args.iter()
+	let ty_names = method.type_names();
+	let ty_len = ty_names.len();
+	let generics_args : Vec<&MethodArgument> = args.iter()
 		.filter(|arg| (*arg).ty.is_method_arg())
+		.collect();
+	if generics_args.len() > ty_len
+	{
+		return Err(Error::new(generics_args[ty_len].span(), "Too many arguments"));
+	}
+	else if generics_args.len() < ty_len
+	{
+		return Err(Error::new(fun_ident.span(), "Too few arguments"));
+	}
+	let generics : Vec<TokenStream2> = generics_args.iter()
 		.map(|arg| arg.ty.quote_ty().unwrap())
-		.zip(method.type_names())
+		.zip(ty_names)
 		.map(|(arg, name)| {
 			let ident = format_ident!("{}", name);
 			quote!(type #ident = #arg;)
@@ -355,7 +394,7 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 	let operation_id = expand_operation_id(&method_attrs);
 	
 	// put everything together
-	let output = quote! {
+	Ok(quote! {
 		#fun
 		
 		#fun_vis mod #mod_ident
@@ -392,6 +431,12 @@ pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -
 			}
 			
 		}
-	};
-	output.into()
+	})
+}
+
+pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -> TokenStream
+{
+	expand(method, attrs, item)
+		.unwrap_or_else(|err| err.to_compile_error())
+		.into()
 }
