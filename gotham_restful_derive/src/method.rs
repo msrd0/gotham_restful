@@ -10,6 +10,7 @@ use syn::{
 	FnArg,
 	ItemFn,
 	Lit,
+	LitBool,
 	Meta,
 	NestedMeta,
 	PatType,
@@ -259,6 +260,31 @@ fn expand_operation_id(_ : &AttributeArgs) -> TokenStream2
 	quote!()
 }
 
+fn expand_wants_auth(attrs : &AttributeArgs, default : bool) -> TokenStream2
+{
+	let default_lit = Lit::Bool(LitBool { value: default, span: Span::call_site() });
+	let mut wants_auth = &default_lit;
+	for meta in attrs
+	{
+		match meta {
+			NestedMeta::Meta(Meta::NameValue(kv)) => {
+				if kv.path.segments.last().map(|p| p.ident.to_string()) == Some("wants_auth".to_owned())
+				{
+					wants_auth = &kv.lit
+				}
+			},
+			_ => {}
+		}
+	}
+	
+	quote! {
+		fn wants_auth() -> bool
+		{
+			#wants_auth
+		}
+	}
+}
+
 fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
@@ -390,8 +416,9 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 		where_clause = quote!(#where_clause #auth_ty : Clone,);
 	}
 	
-	// operation id code
+	// attribute generated code
 	let operation_id = expand_operation_id(&method_attrs);
+	let wants_auth = expand_wants_auth(&method_attrs, args.iter().any(|arg| (*arg).ty.is_auth_status()));
 	
 	// put everything together
 	Ok(quote! {
@@ -408,6 +435,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 				type Res = #ret;
 				
 				#operation_id
+				#wants_auth
 			}
 			
 			impl #krate::#trait_ident for #handler_ident
