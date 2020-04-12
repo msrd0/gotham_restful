@@ -1,6 +1,8 @@
+use crate::util::CollectToResult;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
+use std::iter;
 use syn::{
 	parse::{Parse, ParseStream, Result as SynResult},
 	punctuated::Punctuated,
@@ -61,22 +63,13 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 	let ident = input.ident;
 	let generics = input.generics;
 	
-	let mut types : Vec<Path> = Vec::new();
-	let mut errors : Vec<Error> = Vec::new();
-	for attr in input.attrs.into_iter().filter(|attr|
-		attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string()) // TODO wtf
-	) {
-		match syn::parse2::<MimeList>(attr.tokens) {
-			Ok(m) => types.extend(m.0),
-			Err(e) => errors.push(e)
-		}
-	}
-	if !errors.is_empty()
-	{
-		let mut iter = errors.into_iter();
-		let first = iter.nth(0).unwrap();
-		return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
-	}
+	let types = input.attrs.into_iter()
+		.filter(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string()))
+		.flat_map(|attr|
+			syn::parse2::<MimeList>(attr.tokens)
+				.map(|list| Box::new(list.0.into_iter().map(|mime| Ok(mime))) as Box<dyn Iterator<Item = Result<Path, Error>>>)
+				.unwrap_or_else(|err| Box::new(iter::once(Err(err)))))
+		.collect_to_result()?;
 	
 	let types = match types {
 		ref types if types.is_empty() => quote!(None),

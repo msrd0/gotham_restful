@@ -1,3 +1,4 @@
+use crate::util::CollectToResult;
 use proc_macro::TokenStream;
 use proc_macro2::{
 	Delimiter,
@@ -163,21 +164,9 @@ fn expand_enum(input : ItemEnum) -> Result<TokenStream2, Error>
 		None => ident.to_string()
 	};
 	
-	let mut variants : Vec<TokenStream2> = Vec::new();
-	let mut errors : Vec<Error> = Vec::new();
-	for variant in input.variants.iter().map(expand_variant)
-	{
-		match variant {
-			Ok(variant) => variants.push(variant),
-			Err(e) => errors.push(e)
-		}
-	}
-	if !errors.is_empty()
-	{
-		let mut iter = errors.into_iter();
-		let first = iter.nth(0).unwrap();
-		return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
-	}
+	let variants = input.variants.iter()
+		.map(expand_variant)
+		.collect_to_result()?;
 	
 	Ok(quote! {
 		impl #generics #krate::OpenapiType for #ident #generics
@@ -279,22 +268,9 @@ pub fn expand_struct(input : ItemStruct) -> Result<TokenStream2, Error>
 	
 	let fields : Vec<TokenStream2> = match input.fields {
 		Fields::Named(named_fields) => {
-			let mut fields : Vec<TokenStream2> = Vec::new();
-			let mut errors : Vec<Error> = Vec::new();
-			for field in named_fields.named.iter().map(expand_field)
-			{
-				match field {
-					Ok(field) => fields.push(field),
-					Err(e) => errors.push(e)
-				}
-			}
-			if !errors.is_empty()
-			{
-				let mut iter = errors.into_iter();
-				let first = iter.nth(0).unwrap();
-				return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
-			}
-			fields
+			named_fields.named.iter()
+				.map(expand_field)
+				.collect_to_result()?
 		},
 		Fields::Unnamed(fields) => return Err(Error::new(fields.span(), "Unnamed fields are not supported")),
 		Fields::Unit => Vec::new()

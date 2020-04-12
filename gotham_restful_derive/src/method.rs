@@ -1,3 +1,4 @@
+use crate::util::CollectToResult;
 use heck::{CamelCase, SnakeCase};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
@@ -320,25 +321,13 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	let auth_ident = format_ident!("auth");
 	
 	// extract arguments into pattern, ident and type
-	let mut args : Vec<MethodArgument> = Vec::new();
-	let mut errors : Vec<Error> = Vec::new();
-	for (i, arg) in fun.sig.inputs.iter().enumerate()
-	{
-		let a = match arg {
+	let args = fun.sig.inputs.iter()
+		.enumerate()
+		.map(|(i, arg)| match arg {
 			FnArg::Typed(arg) => interpret_arg(i, arg),
 			FnArg::Receiver(_) => Err(Error::new(arg.span(), "Didn't expect self parameter"))
-		};
-		match a {
-			Ok(a) => args.push(a),
-			Err(e) => errors.push(e)
-		}
-	}
-	if !errors.is_empty()
-	{
-		let mut iter = errors.into_iter();
-		let first = iter.nth(0).unwrap();
-		return Err(iter.fold(first, |mut e0, e1| { e0.combine(e1); e0 }));
-	}
+		})
+		.collect_to_result()?;
 	
 	// extract the generic parameters to use
 	let ty_names = method.type_names();
