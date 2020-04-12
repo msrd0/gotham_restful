@@ -4,6 +4,8 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
+mod util;
+
 mod from_body;
 use from_body::expand_from_body;
 mod method;
