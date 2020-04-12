@@ -23,12 +23,13 @@ test-all:
   stage: test
   image: msrd0/rust:alpine-tarpaulin
   before_script:
-    - apk add --no-cache bash curl
     - cargo -V
   script:
     - cargo test --workspace --all-features --doc
-    - cargo tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Xml -v
-    - wget -qO- https://codecov.io/bash | bash -s -- -y .codecov.yml -X gcov
+    - cargo tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'gotham_restful_derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
+  artifacts:
+    paths:
+      - tarpaulin-report.html
   cache:
     paths:
       - cargo/

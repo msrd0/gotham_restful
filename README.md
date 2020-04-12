@@ -1,7 +1,27 @@
-# gotham_restful
-
-[![Build Status](https://gitlab.com/msrd0/gotham-restful/badges/master/pipeline.svg)](https://gitlab.com/msrd0/gotham-restful/commits/master)
-[![Coverage Status](https://codecov.io/gl/msrd0/gotham-restful/branch/master/graph/badge.svg)](https://codecov.io/gl/msrd0/gotham-restful)
+<div align="center">
+	<h1>gotham-restful</h1>
+</div>
+<div align="center">
+	<a href="https://gitlab.com/msrd0/gotham-restful/-/commits/master">
+		<img alt="pipeline status" src="https://gitlab.com/msrd0/gotham-restful/badges/master/pipeline.svg"/>
+	</a>
+	<a href="https://gitlab.com/msrd0/gotham-restful/-/commits/master">
+		<img alt="coverage report" src="https://gitlab.com/msrd0/gotham-restful/badges/master/coverage.svg"/>
+	</a>
+	<a href="https://crates.io/crates/gotham_restful">
+        <img alt="crates.io" src="https://img.shields.io/crates/v/gotham_restful.svg"/>
+    </a>
+	<a href="https://docs.rs/crate/gotham_restful">
+        <img alt="docs.rs" src="https://docs.rs/gotham_restful/badge.svg"/>
+    </a>
+	<a href="https://www.rust-lang.org/en-US/">
+        <img alt="Build with Rust" src="https://img.shields.io/badge/Made%20with-Rust-orange.svg"/>
+    </a>
+    <a href="https://blog.rust-lang.org/2019/12/19/Rust-1.40.0.html">
+        <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.40+-yellow.svg"/>
+    </a>
+</div>
+<br/>
 
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. The idea is to
 have several RESTful resources that can be added to the gotham router. This crate will take care
@@ -11,14 +31,6 @@ enable the `openapi` feature, you can also generate an OpenAPI Specification fro
 resources.
 
 ## Usage
-
-This crate targets stable rust, currently requiring rustc 1.40+. To use this crate, add the
-following to your `Cargo.toml`:
-
-```toml
-[dependencies]
-gotham_restful = "0.0.1"
-```
 
 A basic server with only one resource, handling a simple `GET` request, could look like this:
 

@@ -15,7 +15,6 @@ proc-macro = true
 
 [badges]
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
-codecov = { repository = "msrd0/gotham-restful", branch = "master", service = "gitlab" }
 
 [dependencies]
 heck = "0.3.1"

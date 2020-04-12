@@ -13,7 +13,6 @@ repository = "https://gitlab.com/msrd0/gotham-restful"
 
 [badges]
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
-codecov = { repository = "msrd0/gotham-restful", branch = "master", service = "gitlab" }
 
 [dependencies]
 base64 = { version = ">=0.10.1, <0.12", optional = true }

@@ -8,14 +8,6 @@ resources.
 
 # Usage
 
-This crate targets stable rust, currently requiring rustc 1.40+. To use this crate, add the
-following to your `Cargo.toml`:
-
-```toml
-[dependencies]
-gotham_restful = "0.0.1"
-```
-
 A basic server with only one resource, handling a simple `GET` request, could look like this:
 
 ```rust,no_run
