@@ -4,8 +4,8 @@ use chrono::{
 };
 use indexmap::IndexMap;
 use openapiv3::{
-	ArrayType, IntegerType, NumberType, ObjectType, ReferenceOr::Item, ReferenceOr::Reference, Schema,
-	SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty
+	AdditionalProperties, ArrayType, IntegerType, NumberFormat, NumberType, ObjectType, ReferenceOr::Item,
+	ReferenceOr::Reference, Schema, SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty
 };
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
@@ -86,7 +86,10 @@ impl OpenapiType for ()
 {
 	fn schema() -> OpenapiSchema
 	{
-		OpenapiSchema::new(SchemaKind::Type(Type::Object(ObjectType::default())))
+		OpenapiSchema::new(SchemaKind::Type(Type::Object(ObjectType {
+			additional_properties: Some(AdditionalProperties::Any(false)),
+			..Default::default()
+		})))
 	}
 }
 
@@ -164,18 +167,21 @@ int_types!(bits = 128, i128);
 int_types!(unsigned bits = 128, u128);
 
 macro_rules! num_types {
-	($($num_ty:ty),*) => {$(
+	($($num_ty:ty = $num_fmt:ident),*) => {$(
 		impl OpenapiType for $num_ty
 		{
 			fn schema() -> OpenapiSchema
 			{
-				OpenapiSchema::new(SchemaKind::Type(Type::Number(NumberType::default())))
+				OpenapiSchema::new(SchemaKind::Type(Type::Number(NumberType {
+					format: VariantOrUnknownOrEmpty::Item(NumberFormat::$num_fmt),
+					..Default::default()
+				})))
 			}
 		}
 	)*}
 }
 
-num_types!(f32, f64);
+num_types!(f32 = Float, f64 = Double);
 
 macro_rules! str_types {
 	($($str_ty:ty),*) => {$(
@@ -218,6 +224,14 @@ macro_rules! str_types {
 }
 
 str_types!(String, &str);
+
+#[cfg(feature = "chrono")]
+str_types!(format = Date, Date<FixedOffset>, Date<Local>, Date<Utc>, NaiveDate);
+#[cfg(feature = "chrono")]
+str_types!(format = DateTime, DateTime<FixedOffset>, DateTime<Local>, DateTime<Utc>, NaiveDateTime);
+
+#[cfg(feature = "uuid")]
+str_types!(format_str = "uuid", Uuid);
 
 impl<T : OpenapiType> OpenapiType for Option<T>
 {
@@ -290,14 +304,6 @@ impl<T : OpenapiType> OpenapiType for HashSet<T>
 	}
 }
 
-#[cfg(feature = "chrono")]
-str_types!(format = Date, Date<FixedOffset>, Date<Local>, Date<Utc>, NaiveDate);
-#[cfg(feature = "chrono")]
-str_types!(format = DateTime, DateTime<FixedOffset>, DateTime<Local>, DateTime<Utc>, NaiveDateTime);
-
-#[cfg(feature = "uuid")]
-str_types!(format_str = "uuid", Uuid);
-
 impl OpenapiType for serde_json::Value
 {
 	fn schema() -> OpenapiSchema
@@ -309,4 +315,70 @@ impl OpenapiType for serde_json::Value
 			dependencies: Default::default()
 		}
 	}
+}
+
+
+#[cfg(test)]
+mod test
+{
+	use super::*;
+	use serde_json::Value;
+	
+	type Unit = ();
+	
+	macro_rules! assert_schema {
+		($ty:ident $(<$generic:ident>)* => $json:expr) => {
+			paste::item! {
+				#[test]
+				fn [<test_schema_ $ty:snake $(_ $generic:snake)*>]()
+				{
+					let schema = <$ty $(<$generic>)* as OpenapiType>::schema().into_schema();
+					let schema_json = serde_json::to_string(&schema).expect(&format!("Unable to serialize schema for {}", stringify!($ty)));
+					assert_eq!(schema_json, $json);
+				}
+			}
+		};
+	}
+	
+	assert_schema!(Unit => r#"{"type":"object","additionalProperties":false}"#);
+	assert_schema!(bool => r#"{"type":"boolean"}"#);
+	assert_schema!(isize => r#"{"type":"integer"}"#);
+	assert_schema!(usize => r#"{"type":"integer","minimum":0}"#);
+	assert_schema!(i8 => r#"{"type":"integer","format":"int8"}"#);
+	assert_schema!(u8 => r#"{"type":"integer","format":"int8","minimum":0}"#);
+	assert_schema!(i16 => r#"{"type":"integer","format":"int16"}"#);
+	assert_schema!(u16 => r#"{"type":"integer","format":"int16","minimum":0}"#);
+	assert_schema!(i32 => r#"{"type":"integer","format":"int32"}"#);
+	assert_schema!(u32 => r#"{"type":"integer","format":"int32","minimum":0}"#);
+	assert_schema!(i64 => r#"{"type":"integer","format":"int64"}"#);
+	assert_schema!(u64 => r#"{"type":"integer","format":"int64","minimum":0}"#);
+	assert_schema!(i128 => r#"{"type":"integer","format":"int128"}"#);
+	assert_schema!(u128 => r#"{"type":"integer","format":"int128","minimum":0}"#);
+	assert_schema!(f32 => r#"{"type":"number","format":"float"}"#);
+	assert_schema!(f64 => r#"{"type":"number","format":"double"}"#);
+	
+	assert_schema!(String => r#"{"type":"string"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(Date<FixedOffset> => r#"{"type":"string","format":"date"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(Date<Local> => r#"{"type":"string","format":"date"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(Date<Utc> => r#"{"type":"string","format":"date"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(NaiveDate => r#"{"type":"string","format":"date"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(DateTime<FixedOffset> => r#"{"type":"string","format":"date-time"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(DateTime<Local> => r#"{"type":"string","format":"date-time"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(DateTime<Utc> => r#"{"type":"string","format":"date-time"}"#);
+	#[cfg(feature = "chrono")]
+	assert_schema!(NaiveDateTime => r#"{"type":"string","format":"date-time"}"#);
+	#[cfg(feature = "uuid")]
+	assert_schema!(Uuid => r#"{"type":"string","format":"uuid"}"#);
+	
+	assert_schema!(Option<String> => r#"{"nullable":true,"type":"string"}"#);
+	assert_schema!(Vec<String> => r#"{"type":"array","items":{"type":"string"}}"#);
+	
+	assert_schema!(Value => r#"{"nullable":true}"#);
 }

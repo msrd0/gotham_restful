@@ -10,3 +10,4 @@ members = [
 [patch.crates-io]
 gotham_restful = { path = "./gotham_restful" }
 gotham_restful_derive = { path = "./gotham_restful_derive" }
+openapiv3 = { git = "https://github.com/glademiller/openapiv3", rev = "4c3bd95c966a3f9d59bb494c3d8e30c5c3068bdb" }
