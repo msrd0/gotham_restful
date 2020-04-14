@@ -1,7 +1,7 @@
 use crate::{ResponseBody, StatusCode};
 #[cfg(feature = "openapi")]
 use crate::{OpenapiSchema, OpenapiType};
-use hyper::Body;
+use gotham::hyper::Body;
 #[cfg(feature = "errorlog")]
 use log::error;
 use mime::{Mime, APPLICATION_JSON, STAR_STAR};
@@ -65,12 +65,13 @@ impl Response
 	}
 	
 	#[cfg(test)]
-	fn full_body(self) -> Vec<u8>
+	fn full_body(mut self) -> Result<Vec<u8>, <Body as gotham::hyper::body::HttpBody>::Error>
 	{
-		use futures::{future::Future, stream::Stream};
+		use futures_executor::block_on;
+		use gotham::hyper::body::to_bytes;
 		
-		let bytes : &[u8] = &self.body.concat2().wait().unwrap().into_bytes();
-		bytes.to_vec()
+		let bytes : &[u8] = &block_on(to_bytes(&mut self.body))?;
+		Ok(bytes.to_vec())
 	}
 }
 
@@ -532,7 +533,7 @@ mod test
 		let res = ok.into_response().expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::OK);
 		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body(), r#"{"msg":""}"#.as_bytes());
+		assert_eq!(res.full_body().unwrap(), r#"{"msg":""}"#.as_bytes());
 	}
 	
 	#[test]
@@ -542,7 +543,7 @@ mod test
 		let res = err.into_response().expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::INTERNAL_SERVER_ERROR);
 		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body(), format!(r#"{{"error":true,"message":"{}"}}"#, MsgError::default()).as_bytes());
+		assert_eq!(res.full_body().unwrap(), format!(r#"{{"error":true,"message":"{}"}}"#, MsgError::default()).as_bytes());
 	}
 	
 	#[test]
@@ -552,7 +553,7 @@ mod test
 		let res = success.into_response().expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::OK);
 		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body(), r#"{"msg":""}"#.as_bytes());
+		assert_eq!(res.full_body().unwrap(), r#"{"msg":""}"#.as_bytes());
 	}
 	
 	#[test]
@@ -562,7 +563,7 @@ mod test
 		let res = no_content.into_response().expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::NO_CONTENT);
 		assert_eq!(res.mime, None);
-		assert_eq!(res.full_body(), &[] as &[u8]);
+		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
 	}
 	
 	#[test]
@@ -572,7 +573,7 @@ mod test
 		let res = no_content.into_response().expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::NO_CONTENT);
 		assert_eq!(res.mime, None);
-		assert_eq!(res.full_body(), &[] as &[u8]);
+		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
 	}
 	
 	#[test]
@@ -583,6 +584,6 @@ mod test
 		let res = raw.into_response().expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::OK);
 		assert_eq!(res.mime, Some(TEXT_PLAIN));
-		assert_eq!(res.full_body(), msg.as_bytes());
+		assert_eq!(res.full_body().unwrap(), msg.as_bytes());
 	}
 }

@@ -435,7 +435,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 				fn #method_ident(#(#args_def),*) -> #ret
 				{
 					#[allow(unused_imports)]
-					use #krate::export::{Future, FromState};
+					use #krate::export::FromState;
 					
 					#block
 				}

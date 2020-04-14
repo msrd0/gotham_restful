@@ -58,7 +58,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		{
 			type Err = String;
 			
-			fn from_body(body : #krate::Chunk, _content_type : #krate::Mime) -> Result<Self, Self::Err>
+			fn from_body(body : #krate::export::Bytes, _content_type : #krate::Mime) -> Result<Self, Self::Err>
 			{
 				let body : &[u8] = &body;
 				Ok(#body)

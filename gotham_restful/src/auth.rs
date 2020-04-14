@@ -1,17 +1,21 @@
 use crate::HeaderName;
 use cookie::CookieJar;
-use futures::{future, future::Future};
+use futures_util::{future, future::{FutureExt, TryFutureExt}};
 use gotham::{
 	handler::HandlerFuture,
 	middleware::{Middleware, NewMiddleware},
 	state::{FromState, State}
 };
 use hyper::header::{AUTHORIZATION, HeaderMap};
-use jsonwebtoken::errors::ErrorKind;
+use jsonwebtoken::{
+	errors::ErrorKind,
+	DecodingKey
+};
 use serde::de::DeserializeOwned;
 use std::{
 	marker::PhantomData,
-	panic::RefUnwindSafe
+	panic::RefUnwindSafe,
+	pin::Pin
 };
 
 pub use jsonwebtoken::Validation as AuthValidation;
@@ -248,7 +252,7 @@ where
 		};
 		
 		// validate the token
-		let data : Data = match jsonwebtoken::decode(&token, &secret, &self.validation) {
+		let data : Data = match jsonwebtoken::decode(&token, &DecodingKey::from_secret(&secret), &self.validation) {
 			Ok(data) => data.claims,
 			Err(e) => match dbg!(e.into_kind()) {
 				ErrorKind::ExpiredSignature => return AuthStatus::Expired,
@@ -266,9 +270,9 @@ where
 	Data : DeserializeOwned + Send + 'static,
 	Handler : AuthHandler<Data>
 {
-	fn call<Chain>(self, mut state : State, chain : Chain) -> Box<HandlerFuture>
+	fn call<Chain>(self, mut state : State, chain : Chain) -> Pin<Box<HandlerFuture>>
 	where
-		Chain : FnOnce(State) -> Box<HandlerFuture>
+		Chain : FnOnce(State) -> Pin<Box<HandlerFuture>>
 	{
 		// put the source in our state, required for e.g. openapi
 		state.put(self.source.clone());
@@ -278,7 +282,7 @@ where
 		state.put(status);
 		
 		// call the rest of the chain
-		Box::new(chain(state).and_then(|(state, res)| future::ok((state, res))))
+		chain(state).and_then(|(state, res)| future::ok((state, res))).boxed()
 	}
 }
 

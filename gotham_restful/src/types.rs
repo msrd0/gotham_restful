@@ -2,7 +2,7 @@
 use crate::OpenapiType;
 use crate::result::ResourceError;
 
-use hyper::Chunk;
+use gotham::hyper::body::Bytes;
 use mime::{Mime, APPLICATION_JSON};
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -46,14 +46,14 @@ pub trait FromBody : Sized
 	type Err : Into<ResourceError>;
 	
 	/// Create the request body from a raw body and the content type.
-	fn from_body(body : Chunk, content_type : Mime) -> Result<Self, Self::Err>;
+	fn from_body(body : Bytes, content_type : Mime) -> Result<Self, Self::Err>;
 }
 
 impl<T : DeserializeOwned> FromBody for T
 {
 	type Err = serde_json::Error;
 	
-	fn from_body(body : Chunk, _content_type : Mime) -> Result<Self, Self::Err>
+	fn from_body(body : Bytes, _content_type : Mime) -> Result<Self, Self::Err>
 	{
 		serde_json::from_slice(&body)
 	}

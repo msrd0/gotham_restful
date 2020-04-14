@@ -6,7 +6,7 @@ use crate::{
 	OpenapiType,
 	RequestBody
 };
-use futures::future::ok;
+use futures_util::{future, future::FutureExt};
 use gotham::{
 	handler::{Handler, HandlerFuture, NewHandler},
 	helpers::http::response::create_response,
@@ -22,7 +22,10 @@ use openapiv3::{
 	ReferenceOr, ReferenceOr::Item, ReferenceOr::Reference, RequestBody as OARequestBody, Response, Responses, Schema,
 	SchemaKind, SecurityScheme, Server, StatusCode, Type
 };
-use std::panic::RefUnwindSafe;
+use std::{
+	panic::RefUnwindSafe,
+	pin::Pin
+};
 
 /**
 This type is required to build routes while adding them to the generated OpenAPI Spec at the
@@ -175,7 +178,7 @@ fn get_security(state : &mut State) -> (Vec<SecurityRequirement>, IndexMap<Strin
 
 impl Handler for OpenapiHandler
 {
-	fn handle(self, mut state : State) -> Box<HandlerFuture>
+	fn handle(self, mut state : State) -> Pin<Box<HandlerFuture>>
 	{
 		let mut openapi = self.0;
 		let security_schemes = get_security(&mut state);
@@ -186,12 +189,12 @@ impl Handler for OpenapiHandler
 		match serde_json::to_string(&openapi) {
 			Ok(body) => {
 				let res = create_response(&state, hyper::StatusCode::OK, APPLICATION_JSON, body);
-				Box::new(ok((state, res)))
+				future::ok((state, res)).boxed()
 			},
 			Err(e) => {
 				error!("Unable to handle OpenAPI request due to error: {}", e);
 				let res = create_response(&state, hyper::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
-				Box::new(ok((state, res)))
+				future::ok((state, res)).boxed()
 			}
 		}
 	}

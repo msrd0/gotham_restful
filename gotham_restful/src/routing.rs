@@ -7,12 +7,9 @@ use crate::{
 #[cfg(feature = "openapi")]
 use crate::OpenapiRouter;
 
-use futures::{
-	future::{Future, err, ok},
-	stream::Stream
-};
+use futures_util::{future, future::FutureExt};
 use gotham::{
-	handler::{HandlerFuture, IntoHandlerError},
+	handler::{HandlerFuture, IntoHandlerError, IntoHandlerFuture},
 	helpers::http::response::{create_empty_response, create_response},
 	pipeline::chain::PipelineHandleChain,
 	router::{
@@ -26,14 +23,18 @@ use gotham::{
 	},
 	state::{FromState, State}
 };
-use hyper::{
+use gotham::hyper::{
+	body::to_bytes,
 	header::CONTENT_TYPE,
 	Body,
 	HeaderMap,
 	Method
 };
 use mime::{Mime, APPLICATION_JSON};
-use std::panic::RefUnwindSafe;
+use std::{
+	panic::RefUnwindSafe,
+	pin::Pin
+};
 
 /// Allow us to extract an id from a path.
 #[derive(Deserialize, StateData, StaticResponseExtender)]
@@ -88,7 +89,7 @@ fn response_from(res : Response, state : &State) -> hyper::Response<Body>
 	r
 }
 
-fn to_handler_future<F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
+fn to_handler_future<F, R>(mut state : State, get_result : F) -> Pin<Box<HandlerFuture>>
 where
 	F : FnOnce(&mut State) -> R,
 	R : ResourceResult
@@ -97,32 +98,31 @@ where
 	match res {
 		Ok(res) => {
 			let r = response_from(res, &state);
-			Box::new(ok((state, r)))
+			(state, r).into_handler_future()
 		},
-		Err(e) => Box::new(err((state, e.into_handler_error())))
+		Err(e) => future::err((state, e.into_handler_error())).boxed()
 	}
 }
 
-fn handle_with_body<Body, F, R>(mut state : State, get_result : F) -> Box<HandlerFuture>
+fn handle_with_body<Body, F, R>(mut state : State, get_result : F) -> Pin<Box<HandlerFuture>>
 where
 	Body : RequestBody,
 	F : FnOnce(&mut State, Body) -> R + Send + 'static,
 	R : ResourceResult
 {
-	let f = hyper::Body::take_from(&mut state)
-		.concat2()
+	let f = to_bytes(gotham::hyper::Body::take_from(&mut state))
 		.then(|body| {
 
 			let body = match body {
 				Ok(body) => body,
-				Err(e) => return err((state, e.into_handler_error()))
+				Err(e) => return future::err((state, e.into_handler_error()))
 			};
 			
 			let content_type : Mime = match HeaderMap::borrow_from(&state).get(CONTENT_TYPE) {
 				Some(content_type) => content_type.to_str().unwrap().parse().unwrap(),
 				None => {
 					let res = create_empty_response(&state, StatusCode::UNSUPPORTED_MEDIA_TYPE);
-					return ok((state, res))
+					return future::ok((state, res))
 				}
 			};
 
@@ -133,9 +133,9 @@ where
 					match serde_json::to_string(&error) {
 						Ok(json) => {
 							let res = create_response(&state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
-							ok((state, res))
+							future::ok((state, res))
 						},
-						Err(e) => err((state, e.into_handler_error()))
+						Err(e) => future::err((state, e.into_handler_error()))
 					}
 				}
 			};
@@ -144,22 +144,22 @@ where
 			match res {
 				Ok(res) => {
 					let r = response_from(res, &state);
-					ok((state, r))
+					future::ok((state, r))
 				},
-				Err(e) => err((state, e.into_handler_error()))
+				Err(e) => future::err((state, e.into_handler_error()))
 			}
 			
 		});
 
-	Box::new(f)
+	f.boxed()
 }
 
-fn read_all_handler<Handler : ResourceReadAll>(state : State) -> Box<HandlerFuture>
+fn read_all_handler<Handler : ResourceReadAll>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	to_handler_future(state, |state| Handler::read_all(state))
 }
 
-fn read_handler<Handler : ResourceRead>(state : State) -> Box<HandlerFuture>
+fn read_handler<Handler : ResourceRead>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
@@ -168,23 +168,23 @@ fn read_handler<Handler : ResourceRead>(state : State) -> Box<HandlerFuture>
 	to_handler_future(state, |state| Handler::read(state, id))
 }
 
-fn search_handler<Handler : ResourceSearch>(mut state : State) -> Box<HandlerFuture>
+fn search_handler<Handler : ResourceSearch>(mut state : State) -> Pin<Box<HandlerFuture>>
 {
 	let query = Handler::Query::take_from(&mut state);
 	to_handler_future(state, |state| Handler::search(state, query))
 }
 
-fn create_handler<Handler : ResourceCreate>(state : State) -> Box<HandlerFuture>
+fn create_handler<Handler : ResourceCreate>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::create(state, body))
 }
 
-fn update_all_handler<Handler : ResourceUpdateAll>(state : State) -> Box<HandlerFuture>
+fn update_all_handler<Handler : ResourceUpdateAll>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update_all(state, body))
 }
 
-fn update_handler<Handler : ResourceUpdate>(state : State) -> Box<HandlerFuture>
+fn update_handler<Handler : ResourceUpdate>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
@@ -193,12 +193,12 @@ fn update_handler<Handler : ResourceUpdate>(state : State) -> Box<HandlerFuture>
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update(state, id, body))
 }
 
-fn delete_all_handler<Handler : ResourceDeleteAll>(state : State) -> Box<HandlerFuture>
+fn delete_all_handler<Handler : ResourceDeleteAll>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	to_handler_future(state, |state| Handler::delete_all(state))
 }
 
-fn delete_handler<Handler : ResourceDelete>(state : State) -> Box<HandlerFuture>
+fn delete_handler<Handler : ResourceDelete>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
