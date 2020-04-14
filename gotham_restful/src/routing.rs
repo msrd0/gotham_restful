@@ -7,9 +7,10 @@ use crate::{
 #[cfg(feature = "openapi")]
 use crate::OpenapiRouter;
 
+use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
 use gotham::{
-	handler::{HandlerFuture, IntoHandlerError, IntoHandlerFuture},
+	handler::{HandlerError, HandlerFuture, IntoHandlerError, IntoHandlerFuture},
 	helpers::http::response::{create_empty_response, create_response},
 	pipeline::chain::PipelineHandleChain,
 	router::{
@@ -65,14 +66,40 @@ pub trait DrawResources
 /// `Resource::setup` method.
 pub trait DrawResourceRoutes
 {
-	fn read_all<Handler : ResourceReadAll>(&mut self);
-	fn read<Handler : ResourceRead>(&mut self);
-	fn search<Handler : ResourceSearch>(&mut self);
-	fn create<Handler : ResourceCreate>(&mut self);
-	fn update_all<Handler : ResourceUpdateAll>(&mut self);
-	fn update<Handler : ResourceUpdate>(&mut self);
-	fn delete_all<Handler : ResourceDeleteAll>(&mut self);
-	fn delete<Handler : ResourceDelete>(&mut self);
+	fn read_all<Handler : ResourceReadAll>(&mut self)
+	where
+		dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send;
+	
+	fn read<Handler : ResourceRead>(&mut self)
+	where
+		dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send;
+	
+	fn search<Handler : ResourceSearch>(&mut self)
+	where
+		dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send;
+	
+	fn create<Handler : ResourceCreate>(&mut self)
+	where
+		Handler::Res : Send + 'static,
+		Handler::Body : 'static;
+	
+	fn update_all<Handler : ResourceUpdateAll>(&mut self)
+	where
+		Handler::Res : Send + 'static,
+		Handler::Body : 'static;
+	
+	fn update<Handler : ResourceUpdate>(&mut self)
+	where
+		Handler::Res : Send + 'static,
+		Handler::Body : 'static;
+	
+	fn delete_all<Handler : ResourceDeleteAll>(&mut self)
+	where
+		dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send;
+	
+	fn delete<Handler : ResourceDelete>(&mut self)
+	where
+		dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send;
 }
 
 fn response_from(res : Response, state : &State) -> hyper::Response<Body>
@@ -92,74 +119,93 @@ fn response_from(res : Response, state : &State) -> hyper::Response<Body>
 fn to_handler_future<F, R>(mut state : State, get_result : F) -> Pin<Box<HandlerFuture>>
 where
 	F : FnOnce(&mut State) -> R,
-	R : ResourceResult
+	R : ResourceResult,
+	dyn Future<Output = Result<Response, R::Err>> : Send
 {
-	let res = get_result(&mut state).into_response();
-	match res {
-		Ok(res) => {
-			let r = response_from(res, &state);
-			(state, r).into_handler_future()
-		},
-		Err(e) => future::err((state, e.into_handler_error())).boxed()
-	}
-}
-
-fn handle_with_body<Body, F, R>(mut state : State, get_result : F) -> Pin<Box<HandlerFuture>>
-where
-	Body : RequestBody,
-	F : FnOnce(&mut State, Body) -> R + Send + 'static,
-	R : ResourceResult
-{
-	let f = to_bytes(gotham::hyper::Body::take_from(&mut state))
-		.then(|body| {
-
-			let body = match body {
-				Ok(body) => body,
-				Err(e) => return future::err((state, e.into_handler_error()))
-			};
-			
-			let content_type : Mime = match HeaderMap::borrow_from(&state).get(CONTENT_TYPE) {
-				Some(content_type) => content_type.to_str().unwrap().parse().unwrap(),
-				None => {
-					let res = create_empty_response(&state, StatusCode::UNSUPPORTED_MEDIA_TYPE);
-					return future::ok((state, res))
-				}
-			};
-
-			let body = match Body::from_body(body, content_type) {
-				Ok(body) => body,
-				Err(e) => return {
-					let error : ResourceError = e.into();
-					match serde_json::to_string(&error) {
-						Ok(json) => {
-							let res = create_response(&state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
-							future::ok((state, res))
-						},
-						Err(e) => future::err((state, e.into_handler_error()))
-					}
-				}
-			};
-
-			let res = get_result(&mut state, body).into_response();
+	get_result(&mut state).into_response()
+		.then(|res|
 			match res {
 				Ok(res) => {
 					let r = response_from(res, &state);
-					future::ok((state, r))
+					(state, r).into_handler_future()
 				},
-				Err(e) => future::err((state, e.into_handler_error()))
+				Err(e) => future::err((state, e.into_handler_error())).boxed()
 			}
-			
-		});
+		).boxed()
+}
 
-	f.boxed()
+async fn body_to_res<B, F, R>(state : &mut State, get_result : F) -> Result<gotham::hyper::Response<Body>, HandlerError>
+where
+	B : RequestBody,
+	F : FnOnce(&mut State, B) -> R,
+	R : ResourceResult
+{
+	let body = to_bytes(Body::take_from(&mut state)).await;
+	
+	let body = match body {
+		Ok(body) => body,
+		Err(e) => return Err(e.into_handler_error())
+	};
+	
+	let content_type : Mime = match HeaderMap::borrow_from(&state).get(CONTENT_TYPE) {
+		Some(content_type) => content_type.to_str().unwrap().parse().unwrap(),
+		None => {
+			let res = create_empty_response(&state, StatusCode::UNSUPPORTED_MEDIA_TYPE);
+			return Ok(res)
+		}
+	};
+	
+	let res = {
+		let body = match B::from_body(body, content_type) {
+			Ok(body) => body,
+			Err(e) => return {
+				let error : ResourceError = e.into();
+				match serde_json::to_string(&error) {
+					Ok(json) => {
+						let res = create_response(&state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
+						Ok(res)
+					},
+					Err(e) => Err(e.into_handler_error())
+				}
+			}
+		};
+		get_result(&mut state, body)
+	};
+
+	let res = res.into_response().await;
+	match res {
+		Ok(res) => {
+			let r = response_from(res, &state);
+			Ok(r)
+		},
+		Err(e) => Err(e.into_handler_error())
+	}
+}
+
+fn handle_with_body<B, F, R>(mut state : State, get_result : F) -> Pin<Box<HandlerFuture>>
+where
+	B : RequestBody + 'static,
+	F : FnOnce(&mut State, B) -> R + Send + 'static,
+	R : ResourceResult + Send + 'static
+{
+	body_to_res(&mut state, get_result)
+		.then(|res| match res {
+			Ok(ok) => future::ok((state, ok)),
+			Err(err) => future::err((state, err))
+		})
+		.boxed()
 }
 
 fn read_all_handler<Handler : ResourceReadAll>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 {
 	to_handler_future(state, |state| Handler::read_all(state))
 }
 
 fn read_handler<Handler : ResourceRead>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
@@ -169,22 +215,33 @@ fn read_handler<Handler : ResourceRead>(state : State) -> Pin<Box<HandlerFuture>
 }
 
 fn search_handler<Handler : ResourceSearch>(mut state : State) -> Pin<Box<HandlerFuture>>
+where
+	dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 {
 	let query = Handler::Query::take_from(&mut state);
 	to_handler_future(state, |state| Handler::search(state, query))
 }
 
 fn create_handler<Handler : ResourceCreate>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	Handler::Res : Send + 'static,
+	Handler::Body : 'static
 {
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::create(state, body))
 }
 
 fn update_all_handler<Handler : ResourceUpdateAll>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	Handler::Res : Send + 'static,
+	Handler::Body : 'static
 {
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update_all(state, body))
 }
 
 fn update_handler<Handler : ResourceUpdate>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	Handler::Res : Send + 'static,
+	Handler::Body : 'static
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
@@ -194,11 +251,15 @@ fn update_handler<Handler : ResourceUpdate>(state : State) -> Pin<Box<HandlerFut
 }
 
 fn delete_all_handler<Handler : ResourceDeleteAll>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 {
 	to_handler_future(state, |state| Handler::delete_all(state))
 }
 
 fn delete_handler<Handler : ResourceDelete>(state : State) -> Pin<Box<HandlerFuture>>
+where
+	dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
@@ -297,6 +358,8 @@ macro_rules! implDrawResourceRoutes {
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
 			fn read_all<Handler : ResourceReadAll>(&mut self)
+			where
+				dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.get(&self.1)
@@ -305,6 +368,8 @@ macro_rules! implDrawResourceRoutes {
 			}
 
 			fn read<Handler : ResourceRead>(&mut self)
+			where
+				dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.get(&format!("{}/:id", self.1))
@@ -314,6 +379,8 @@ macro_rules! implDrawResourceRoutes {
 			}
 			
 			fn search<Handler : ResourceSearch>(&mut self)
+			where
+				dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.get(&format!("{}/search", self.1))
@@ -323,6 +390,9 @@ macro_rules! implDrawResourceRoutes {
 			}
 			
 			fn create<Handler : ResourceCreate>(&mut self)
+			where
+				Handler::Res : Send + 'static,
+				Handler::Body : 'static
 			{
 				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
@@ -333,6 +403,9 @@ macro_rules! implDrawResourceRoutes {
 			}
 
 			fn update_all<Handler : ResourceUpdateAll>(&mut self)
+			where
+				Handler::Res : Send + 'static,
+				Handler::Body : 'static
 			{
 				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
@@ -343,6 +416,9 @@ macro_rules! implDrawResourceRoutes {
 			}
 
 			fn update<Handler : ResourceUpdate>(&mut self)
+			where
+				Handler::Res : Send + 'static,
+				Handler::Body : 'static
 			{
 				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
@@ -354,6 +430,8 @@ macro_rules! implDrawResourceRoutes {
 			}
 
 			fn delete_all<Handler : ResourceDeleteAll>(&mut self)
+			where
+				dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.delete(&self.1)
@@ -362,6 +440,8 @@ macro_rules! implDrawResourceRoutes {
 			}
 
 			fn delete<Handler : ResourceDelete>(&mut self)
+			where
+				dyn Future<Output = Result<Response, <Handler::Res as ResourceResult>::Err>> : Send
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.delete(&format!("{}/:id", self.1))
