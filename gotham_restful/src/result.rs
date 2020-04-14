@@ -80,7 +80,7 @@ impl Response
 
 
 /// A trait provided to convert a resource's result to json.
-pub trait ResourceResult
+pub trait ResourceResult : Send
 {
 	type Err : Error + Send + 'static;
 	
@@ -151,6 +151,8 @@ fn errorlog<E : std::fmt::Display>(e : E)
 fn errorlog<E>(_e : E) {}
 
 impl<R : ResponseBody, E : Error> ResourceResult for Result<R, E>
+where
+	Self : Send
 {
 	type Err = SerdeJsonError;
 	
@@ -267,6 +269,8 @@ impl<T : Debug> Debug for Success<T>
 }
 
 impl<T : ResponseBody> ResourceResult for Success<T>
+where
+	Self : Send
 {
 	type Err = SerdeJsonError;
 	
@@ -460,6 +464,8 @@ impl ResourceResult for NoContent
 }
 
 impl<E : Error> ResourceResult for Result<NoContent, E>
+where
+	Self : Send
 {
 	type Err = SerdeJsonError;
 	
@@ -520,6 +526,8 @@ impl<T : Debug> Debug for Raw<T>
 }
 
 impl<T : Into<Body>> ResourceResult for Raw<T>
+where
+	Self : Send
 {
 	type Err = SerdeJsonError; // just for easier handling of `Result<Raw<T>, E>`
 	
@@ -545,6 +553,7 @@ impl<T : Into<Body>> ResourceResult for Raw<T>
 
 impl<T, E : Error> ResourceResult for Result<Raw<T>, E>
 where
+	Self : Send,
 	Raw<T> : ResourceResult<Err = SerdeJsonError>
 {
 	type Err = SerdeJsonError;

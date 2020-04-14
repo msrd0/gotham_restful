@@ -73,17 +73,17 @@ pub trait DrawResourceRoutes
 	
 	fn create<Handler : ResourceCreate>(&mut self)
 	where
-		Handler::Res : Send + 'static,
+		Handler::Res : 'static,
 		Handler::Body : 'static;
 	
 	fn update_all<Handler : ResourceUpdateAll>(&mut self)
 	where
-		Handler::Res : Send + 'static,
+		Handler::Res : 'static,
 		Handler::Body : 'static;
 	
 	fn update<Handler : ResourceUpdate>(&mut self)
 	where
-		Handler::Res : Send + 'static,
+		Handler::Res : 'static,
 		Handler::Body : 'static;
 	
 	fn delete_all<Handler : ResourceDeleteAll>(&mut self);
@@ -175,7 +175,7 @@ fn handle_with_body<B, F, R>(state : State, get_result : F) -> Pin<Box<HandlerFu
 where
 	B : RequestBody + 'static,
 	F : FnOnce(&mut State, B) -> R + Send + 'static,
-	R : ResourceResult + Send + 'static
+	R : ResourceResult + 'static
 {
 	body_to_res(state, get_result)
 		.then(|(state, res)| match res {
@@ -207,7 +207,7 @@ fn search_handler<Handler : ResourceSearch>(mut state : State) -> Pin<Box<Handle
 
 fn create_handler<Handler : ResourceCreate>(state : State) -> Pin<Box<HandlerFuture>>
 where
-	Handler::Res : Send + 'static,
+	Handler::Res : 'static,
 	Handler::Body : 'static
 {
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::create(state, body))
@@ -215,7 +215,7 @@ where
 
 fn update_all_handler<Handler : ResourceUpdateAll>(state : State) -> Pin<Box<HandlerFuture>>
 where
-	Handler::Res : Send + 'static,
+	Handler::Res : 'static,
 	Handler::Body : 'static
 {
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update_all(state, body))
@@ -223,7 +223,7 @@ where
 
 fn update_handler<Handler : ResourceUpdate>(state : State) -> Pin<Box<HandlerFuture>>
 where
-	Handler::Res : Send + 'static,
+	Handler::Res : 'static,
 	Handler::Body : 'static
 {
 	let id = {

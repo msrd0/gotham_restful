@@ -419,7 +419,7 @@ macro_rules! implOpenapiRouter {
 			
 			fn create<Handler : ResourceCreate>(&mut self)
 			where
-				Handler::Res : Send + 'static,
+				Handler::Res : 'static,
 				Handler::Body : 'static
 			{
 				let schema = (self.0).1.add_schema::<Handler::Res>();
@@ -435,7 +435,7 @@ macro_rules! implOpenapiRouter {
 			
 			fn update_all<Handler : ResourceUpdateAll>(&mut self)
 			where
-				Handler::Res : Send + 'static,
+				Handler::Res : 'static,
 				Handler::Body : 'static
 			{
 				let schema = (self.0).1.add_schema::<Handler::Res>();
@@ -451,7 +451,7 @@ macro_rules! implOpenapiRouter {
 			
 			fn update<Handler : ResourceUpdate>(&mut self)
 			where
-				Handler::Res : Send + 'static,
+				Handler::Res : 'static,
 				Handler::Body : 'static
 			{
 				let schema = (self.0).1.add_schema::<Handler::Res>();
