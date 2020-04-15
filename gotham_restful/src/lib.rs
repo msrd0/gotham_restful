@@ -115,6 +115,7 @@ pub use gotham_restful_derive::*;
 #[doc(hidden)]
 pub mod export
 {
+	pub use futures_util::future::FutureExt;
 	pub use gotham::{
 		hyper::body::Bytes,
 		state::{FromState, State}

@@ -9,7 +9,7 @@ use crate::OpenapiRouter;
 
 use futures_util::{future, future::FutureExt};
 use gotham::{
-	handler::{HandlerError, HandlerFuture, IntoHandlerError, IntoHandlerFuture},
+	handler::{HandlerError, HandlerFuture, IntoHandlerError},
 	helpers::http::response::{create_empty_response, create_response},
 	pipeline::chain::PipelineHandleChain,
 	router::{
@@ -32,6 +32,7 @@ use gotham::hyper::{
 };
 use mime::{Mime, APPLICATION_JSON};
 use std::{
+	future::Future,
 	panic::RefUnwindSafe,
 	pin::Pin
 };
@@ -105,27 +106,26 @@ fn response_from(res : Response, state : &State) -> hyper::Response<Body>
 	r
 }
 
-fn to_handler_future<F, R>(mut state : State, get_result : F) -> Pin<Box<HandlerFuture>>
+async fn to_handler_future<F, R>(mut state : State, get_result : F) -> Result<(State, gotham::hyper::Response<Body>), (State, HandlerError)>
 where
-	F : FnOnce(&mut State) -> R,
+	F : FnOnce(&mut State) -> Pin<Box<dyn Future<Output = R> + Send>>,
 	R : ResourceResult
 {
-	get_result(&mut state).into_response()
-		.then(|res|
-			match res {
-				Ok(res) => {
-					let r = response_from(res, &state);
-					(state, r).into_handler_future()
-				},
-				Err(e) => future::err((state, e.into_handler_error())).boxed()
-			}
-		).boxed()
+	let res = get_result(&mut state).await;
+	let res = res.into_response().await;
+	match res {
+		Ok(res) => {
+			let r = response_from(res, &state);
+			Ok((state, r))
+		},
+		Err(e) => Err((state, e.into_handler_error()))
+	}
 }
 
 async fn body_to_res<B, F, R>(mut state : State, get_result : F) -> (State, Result<gotham::hyper::Response<Body>, HandlerError>)
 where
 	B : RequestBody,
-	F : FnOnce(&mut State, B) -> R,
+	F : FnOnce(&mut State, B) -> Pin<Box<dyn Future<Output = R> + Send>>,
 	R : ResourceResult
 {
 	let body = to_bytes(Body::take_from(&mut state)).await;
@@ -160,8 +160,11 @@ where
 		};
 		get_result(&mut state, body)
 	};
-
-	let res = match res.into_response().await {
+	
+	let res = res.await;
+	let res = res.into_response().await;
+	
+	let res = match res {
 		Ok(res) => {
 			let r = response_from(res, &state);
 			Ok(r)
@@ -174,8 +177,8 @@ where
 fn handle_with_body<B, F, R>(state : State, get_result : F) -> Pin<Box<HandlerFuture>>
 where
 	B : RequestBody + 'static,
-	F : FnOnce(&mut State, B) -> R + Send + 'static,
-	R : ResourceResult + 'static
+	F : FnOnce(&mut State, B) -> Pin<Box<dyn Future<Output = R> + Send>> + Send + 'static,
+	R : ResourceResult + Send + 'static
 {
 	body_to_res(state, get_result)
 		.then(|(state, res)| match res {
@@ -187,7 +190,7 @@ where
 
 fn read_all_handler<Handler : ResourceReadAll>(state : State) -> Pin<Box<HandlerFuture>>
 {
-	to_handler_future(state, |state| Handler::read_all(state))
+	to_handler_future(state, |state| Handler::read_all(state)).boxed()
 }
 
 fn read_handler<Handler : ResourceRead>(state : State) -> Pin<Box<HandlerFuture>>
@@ -196,13 +199,13 @@ fn read_handler<Handler : ResourceRead>(state : State) -> Pin<Box<HandlerFuture>
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	to_handler_future(state, |state| Handler::read(state, id))
+	to_handler_future(state, |state| Handler::read(state, id)).boxed()
 }
 
 fn search_handler<Handler : ResourceSearch>(mut state : State) -> Pin<Box<HandlerFuture>>
 {
 	let query = Handler::Query::take_from(&mut state);
-	to_handler_future(state, |state| Handler::search(state, query))
+	to_handler_future(state, |state| Handler::search(state, query)).boxed()
 }
 
 fn create_handler<Handler : ResourceCreate>(state : State) -> Pin<Box<HandlerFuture>>
@@ -235,7 +238,7 @@ where
 
 fn delete_all_handler<Handler : ResourceDeleteAll>(state : State) -> Pin<Box<HandlerFuture>>
 {
-	to_handler_future(state, |state| Handler::delete_all(state))
+	to_handler_future(state, |state| Handler::delete_all(state)).boxed()
 }
 
 fn delete_handler<Handler : ResourceDelete>(state : State) -> Pin<Box<HandlerFuture>>
@@ -244,7 +247,7 @@ fn delete_handler<Handler : ResourceDelete>(state : State) -> Pin<Box<HandlerFut
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	to_handler_future(state, |state| Handler::delete(state, id))
+	to_handler_future(state, |state| Handler::delete(state, id)).boxed()
 }
 
 #[derive(Clone)]

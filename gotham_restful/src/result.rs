@@ -80,7 +80,7 @@ impl Response
 
 
 /// A trait provided to convert a resource's result to json.
-pub trait ResourceResult : Send
+pub trait ResourceResult
 {
 	type Err : Error + Send + 'static;
 	

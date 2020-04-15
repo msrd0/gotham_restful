@@ -302,6 +302,12 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	let fun = parse_macro_input::parse::<ItemFn>(item)?;
 	let fun_ident = &fun.sig.ident;
 	let fun_vis = &fun.vis;
+	let fun_is_async = fun.sig.asyncness.is_some();
+	
+	if let Some(unsafety) = fun.sig.unsafety
+	{
+		return Err(Error::new(unsafety.span(), "Resource methods must not be unsafe"));
+	}
 	
 	let trait_ident = method.trait_ident();
 	let method_ident = method.fn_ident();
@@ -374,6 +380,11 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	
 	// prepare the method block
 	let mut block = quote!(#fun_ident(#(#args_pass),*));
+	let mut state_block = quote!();
+	if fun_is_async
+	{
+		block = quote!(#block.await);
+	}
 	if is_no_content
 	{
 		block = quote!(#block; Default::default())
@@ -381,19 +392,22 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_database_conn()).nth(0)
 	{
 		let conn_ty = arg.ty.quote_ty();
-		block = quote! {
+		state_block = quote! {
+			#state_block
 			let #repo_ident = <#krate::export::Repo<#conn_ty>>::borrow_from(&#state_ident).clone();
+		};
+		block = quote! {
 			#repo_ident.run::<_, #ret, ()>(move |#conn_ident| {
 				Ok({#block})
-			}).wait().unwrap()
+			}).await.unwrap()
 		};
 	}
 	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_auth_status()).nth(0)
 	{
 		let auth_ty = arg.ty.quote_ty();
-		block = quote! {
+		state_block = quote! {
+			#state_block
 			let #auth_ident : #auth_ty = <#auth_ty>::borrow_from(#state_ident).clone();
-			#block
 		};
 	}
 	
@@ -416,6 +430,10 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 		#fun_vis mod #mod_ident
 		{
 			use super::*;
+			use std::{
+				future::Future,
+				pin::Pin
+			};
 			
 			struct #handler_ident;
 			
@@ -432,12 +450,16 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			{
 				#(#generics)*
 				
-				fn #method_ident(#(#args_def),*) -> #ret
+				fn #method_ident(#(#args_def),*) -> Pin<Box<dyn Future<Output = #ret> + Send>>
 				{
 					#[allow(unused_imports)]
-					use #krate::export::FromState;
+					use #krate::export::{FromState, FutureExt};
 					
-					#block
+					#state_block
+					
+					async move {
+						#block
+					}.boxed()
 				}
 			}
 			

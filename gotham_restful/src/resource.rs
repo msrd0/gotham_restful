@@ -5,7 +5,11 @@ use gotham::{
 };
 use hyper::Body;
 use serde::de::DeserializeOwned;
-use std::panic::RefUnwindSafe;
+use std::{
+	future::Future,
+	panic::RefUnwindSafe,
+	pin::Pin
+};
 
 /// This trait must be implemented by every RESTful Resource. It will
 /// allow you to register the different methods for this Resource.
@@ -21,7 +25,7 @@ pub trait Resource
 
 pub trait ResourceMethod
 {
-	type Res : ResourceResult;
+	type Res : ResourceResult + Send + 'static;
 	
 	#[cfg(feature = "openapi")]
 	fn operation_id() -> Option<String>
@@ -38,7 +42,7 @@ pub trait ResourceMethod
 /// Handle a GET request on the Resource root.
 pub trait ResourceReadAll : ResourceMethod
 {
-	fn read_all(state : &mut State) -> Self::Res;
+	fn read_all(state : &mut State) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a GET request on the Resource with an id.
@@ -46,7 +50,7 @@ pub trait ResourceRead : ResourceMethod
 {
 	type ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static;
 	
-	fn read(state : &mut State, id : Self::ID) -> Self::Res;
+	fn read(state : &mut State, id : Self::ID) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a GET request on the Resource with additional search parameters.
@@ -54,7 +58,7 @@ pub trait ResourceSearch : ResourceMethod
 {
 	type Query : ResourceType + QueryStringExtractor<Body> + Sync;
 	
-	fn search(state : &mut State, query : Self::Query) -> Self::Res;
+	fn search(state : &mut State, query : Self::Query) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a POST request on the Resource root.
@@ -62,7 +66,7 @@ pub trait ResourceCreate : ResourceMethod
 {
 	type Body : RequestBody;
 	
-	fn create(state : &mut State, body : Self::Body) -> Self::Res;
+	fn create(state : &mut State, body : Self::Body) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a PUT request on the Resource root.
@@ -70,7 +74,7 @@ pub trait ResourceUpdateAll : ResourceMethod
 {
 	type Body : RequestBody;
 	
-	fn update_all(state : &mut State, body : Self::Body) -> Self::Res;
+	fn update_all(state : &mut State, body : Self::Body) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a PUT request on the Resource with an id.
@@ -79,13 +83,13 @@ pub trait ResourceUpdate : ResourceMethod
 	type Body : RequestBody;
 	type ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static;
 	
-	fn update(state : &mut State, id : Self::ID, body : Self::Body) -> Self::Res;
+	fn update(state : &mut State, id : Self::ID, body : Self::Body) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a DELETE request on the Resource root.
 pub trait ResourceDeleteAll : ResourceMethod
 {
-	fn delete_all(state : &mut State) -> Self::Res;
+	fn delete_all(state : &mut State) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
 
 /// Handle a DELETE request on the Resource with an id.
@@ -93,5 +97,5 @@ pub trait ResourceDelete : ResourceMethod
 {
 	type ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static;
 	
-	fn delete(state : &mut State, id : Self::ID) -> Self::Res;
+	fn delete(state : &mut State, id : Self::ID) -> Pin<Box<dyn Future<Output = Self::Res> + Send>>;
 }
