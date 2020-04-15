@@ -47,7 +47,7 @@ impl FromStr for Method
 			"Update" | "update" => Ok(Self::Update),
 			"DeleteAll" | "delete_all" => Ok(Self::DeleteAll),
 			"Delete" | "delete" => Ok(Self::Delete),
-			_ => Err("unknown method".to_string())
+			_ => Err(format!("Unknown method: `{}'", str))
 		}
 	}
 }

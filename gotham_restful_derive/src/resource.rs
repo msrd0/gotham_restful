@@ -1,23 +1,27 @@
-use crate::method::Method;
+use crate::{
+	method::Method,
+	util::CollectToResult
+};
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
-	parse::{Parse, ParseStream, Result as SynResult},
+	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
 	token::Comma,
+	Error,
 	Ident,
 	ItemStruct,
 	parenthesized,
 	parse_macro_input
 };
-use std::str::FromStr;
+use std::{iter, str::FromStr};
 
 struct MethodList(Punctuated<Ident, Comma>);
 
 impl Parse for MethodList
 {
-	fn parse(input: ParseStream) -> SynResult<Self>
+	fn parse(input: ParseStream) -> Result<Self, Error>
 	{
 		let content;
 		let _paren = parenthesized!(content in input);
@@ -26,26 +30,28 @@ impl Parse for MethodList
 	}
 }
 
-pub fn expand_resource(tokens : TokenStream) -> TokenStream
+fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input!(tokens as ItemStruct);
+	let input = parse_macro_input::parse::<ItemStruct>(tokens)?;
 	let ident = input.ident;
 	let name = ident.to_string();
 	
-	let methods : Vec<TokenStream2> = input.attrs.into_iter().filter(|attr|
+	let methods = input.attrs.into_iter().filter(|attr|
 		attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("rest_resource".to_string()) // TODO wtf
-	).flat_map(|attr| {
-		let m : MethodList = syn::parse2(attr.tokens).expect("unable to parse attributes");
-		m.0.into_iter()
-	}).map(|method| {
-		let method = Method::from_str(&method.to_string()).expect("unknown method");
-		let mod_ident = method.mod_ident(&name);
-		let ident = method.setup_ident(&name);
-		quote!(#mod_ident::#ident(&mut route);)
-	}).collect();
+	).map(|attr| {
+		syn::parse2(attr.tokens).map(|m : MethodList| m.0.into_iter())
+	}).flat_map(|list| match list {
+		Ok(iter) => Box::new(iter.map(|method| {
+			let method = Method::from_str(&method.to_string()).map_err(|err| Error::new(method.span(), err))?;
+			let mod_ident = method.mod_ident(&name);
+			let ident = method.setup_ident(&name);
+			Ok(quote!(#mod_ident::#ident(&mut route);))
+		})) as Box<dyn Iterator<Item = Result<TokenStream2, Error>>>,
+		Err(err) => Box::new(iter::once(Err(err)))
+	}).collect_to_result()?;
 	
-	let output = quote! {
+	Ok(quote! {
 		impl #krate::Resource for #ident
 		{
 			fn name() -> String
@@ -58,6 +64,12 @@ pub fn expand_resource(tokens : TokenStream) -> TokenStream
 				#(#methods)*
 			}
 		}
-	};
-	output.into()
+	})
+}
+
+pub fn expand_resource(tokens : TokenStream) -> TokenStream
+{
+	expand(tokens)
+		.unwrap_or_else(|err| err.to_compile_error())
+		.into()
 }
