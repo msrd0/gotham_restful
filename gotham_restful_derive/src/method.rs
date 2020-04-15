@@ -325,6 +325,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	let repo_ident = format_ident!("repo");
 	let conn_ident = format_ident!("conn");
 	let auth_ident = format_ident!("auth");
+	let res_ident = format_ident!("res");
 	
 	// extract arguments into pattern, ident and type
 	let args = fun.sig.inputs.iter()
@@ -366,12 +367,12 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			let ty = arg.ty.quote_ty();
 			quote!(#ident : #ty)
 		}).collect();
-	args_def.insert(0, quote!(#state_ident : &mut #krate::export::State));
+	args_def.insert(0, quote!(mut #state_ident : #krate::export::State));
 	
 	// extract the arguments to pass over to the supplied method
 	let args_pass : Vec<TokenStream2> = args.iter().map(|arg| match (&arg.ty, &arg.ident) {
-		(MethodArgumentType::StateRef, _) => quote!(#state_ident),
-		(MethodArgumentType::StateMutRef, _) => quote!(#state_ident),
+		(MethodArgumentType::StateRef, _) => quote!(&#state_ident),
+		(MethodArgumentType::StateMutRef, _) => quote!(&mut #state_ident),
 		(MethodArgumentType::MethodArg(_), ident) => quote!(#ident),
 		(MethodArgumentType::DatabaseConnection(_), _) => quote!(&#conn_ident),
 		(MethodArgumentType::AuthStatus(_), _) => quote!(#auth_ident),
@@ -407,7 +408,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 		let auth_ty = arg.ty.quote_ty();
 		state_block = quote! {
 			#state_block
-			let #auth_ident : #auth_ty = <#auth_ty>::borrow_from(#state_ident).clone();
+			let #auth_ident : #auth_ty = <#auth_ty>::borrow_from(&#state_ident).clone();
 		};
 	}
 	
@@ -430,10 +431,6 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 		#fun_vis mod #mod_ident
 		{
 			use super::*;
-			use std::{
-				future::Future,
-				pin::Pin
-			};
 			
 			struct #handler_ident;
 			
@@ -450,7 +447,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			{
 				#(#generics)*
 				
-				fn #method_ident(#(#args_def),*) -> Pin<Box<dyn Future<Output = #ret> + Send>>
+				fn #method_ident(#(#args_def),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = (#krate::export::State, #ret)> + Send>>
 				{
 					#[allow(unused_imports)]
 					use #krate::export::{FromState, FutureExt};
@@ -458,7 +455,8 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 					#state_block
 					
 					async move {
-						#block
+						let #res_ident = { #block };
+						(#state_ident, #res_ident)
 					}.boxed()
 				}
 			}

@@ -106,12 +106,12 @@ fn response_from(res : Response, state : &State) -> hyper::Response<Body>
 	r
 }
 
-async fn to_handler_future<F, R>(mut state : State, get_result : F) -> Result<(State, gotham::hyper::Response<Body>), (State, HandlerError)>
+async fn to_handler_future<F, R>(state : State, get_result : F) -> Result<(State, gotham::hyper::Response<Body>), (State, HandlerError)>
 where
-	F : FnOnce(&mut State) -> Pin<Box<dyn Future<Output = R> + Send>>,
+	F : FnOnce(State) -> Pin<Box<dyn Future<Output = (State, R)> + Send>>,
 	R : ResourceResult
 {
-	let res = get_result(&mut state).await;
+	let (state, res) = get_result(state).await;
 	let res = res.into_response().await;
 	match res {
 		Ok(res) => {
@@ -125,7 +125,7 @@ where
 async fn body_to_res<B, F, R>(mut state : State, get_result : F) -> (State, Result<gotham::hyper::Response<Body>, HandlerError>)
 where
 	B : RequestBody,
-	F : FnOnce(&mut State, B) -> Pin<Box<dyn Future<Output = R> + Send>>,
+	F : FnOnce(State, B) -> Pin<Box<dyn Future<Output = (State, R)> + Send>>,
 	R : ResourceResult
 {
 	let body = to_bytes(Body::take_from(&mut state)).await;
@@ -158,10 +158,10 @@ where
 				return (state, res)
 			}
 		};
-		get_result(&mut state, body)
+		get_result(state, body)
 	};
 	
-	let res = res.await;
+	let (state, res) = res.await;
 	let res = res.into_response().await;
 	
 	let res = match res {
@@ -177,7 +177,7 @@ where
 fn handle_with_body<B, F, R>(state : State, get_result : F) -> Pin<Box<HandlerFuture>>
 where
 	B : RequestBody + 'static,
-	F : FnOnce(&mut State, B) -> Pin<Box<dyn Future<Output = R> + Send>> + Send + 'static,
+	F : FnOnce(State, B) -> Pin<Box<dyn Future<Output = (State, R)> + Send>> + Send + 'static,
 	R : ResourceResult + Send + 'static
 {
 	body_to_res(state, get_result)
