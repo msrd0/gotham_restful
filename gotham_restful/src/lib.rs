@@ -108,7 +108,12 @@ extern crate self as gotham_restful;
 #[macro_use] extern crate serde;
 
 #[doc(no_inline)]
-pub use gotham::hyper::{header::HeaderName, StatusCode};
+pub use gotham;
+#[doc(no_inline)]
+pub use gotham::{
+	hyper::{header::HeaderName, StatusCode},
+	state::{FromState, State}
+};
 #[doc(no_inline)]
 pub use mime::Mime;
 
@@ -119,10 +124,6 @@ pub use gotham_restful_derive::*;
 pub mod export
 {
 	pub use futures_util::future::FutureExt;
-	pub use gotham::{
-		hyper::body::Bytes,
-		state::{FromState, State}
-	};
 	
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;

@@ -367,7 +367,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			let ty = arg.ty.quote_ty();
 			quote!(#ident : #ty)
 		}).collect();
-	args_def.insert(0, quote!(mut #state_ident : #krate::export::State));
+	args_def.insert(0, quote!(mut #state_ident : #krate::State));
 	
 	// extract the arguments to pass over to the supplied method
 	let args_pass : Vec<TokenStream2> = args.iter().map(|arg| match (&arg.ty, &arg.ident) {
@@ -447,10 +447,10 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			{
 				#(#generics)*
 				
-				fn #method_ident(#(#args_def),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = (#krate::export::State, #ret)> + Send>>
+				fn #method_ident(#(#args_def),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = (#krate::State, #ret)> + Send>>
 				{
 					#[allow(unused_imports)]
-					use #krate::export::{FromState, FutureExt};
+					use #krate::{export::FutureExt, FromState};
 					
 					#state_block
 					
