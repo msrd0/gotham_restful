@@ -92,7 +92,7 @@ pub trait DrawResourceRoutes
 	fn delete<Handler : ResourceDelete>(&mut self);
 }
 
-fn response_from(res : Response, state : &State) -> hyper::Response<Body>
+fn response_from(res : Response, state : &State) -> gotham::hyper::Response<Body>
 {
 	let mut r = create_empty_response(state, res.status);
 	if let Some(mime) = res.mime

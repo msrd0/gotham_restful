@@ -18,9 +18,9 @@ gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 
 [dependencies]
 heck = "0.3.1"
-proc-macro2 = "1.0.8"
-quote = "1.0.2"
-syn = { version = "1.0.14", features = ["extra-traits", "full"] }
+proc-macro2 = "1.0.10"
+quote = "1.0.3"
+syn = { version = "1.0.17", features = ["extra-traits", "full"] }
 
 [features]
 default = []

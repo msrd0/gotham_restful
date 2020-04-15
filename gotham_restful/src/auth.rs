@@ -3,10 +3,10 @@ use cookie::CookieJar;
 use futures_util::{future, future::{FutureExt, TryFutureExt}};
 use gotham::{
 	handler::HandlerFuture,
+	hyper::header::{AUTHORIZATION, HeaderMap},
 	middleware::{Middleware, NewMiddleware},
 	state::{FromState, State}
 };
-use hyper::header::{AUTHORIZATION, HeaderMap};
 use jsonwebtoken::{
 	errors::ErrorKind,
 	DecodingKey

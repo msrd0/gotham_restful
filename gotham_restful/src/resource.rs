@@ -1,9 +1,9 @@
 use crate::{DrawResourceRoutes, RequestBody, ResourceResult, ResourceType};
 use gotham::{
 	extractor::QueryStringExtractor,
+	hyper::Body,
 	state::State
 };
-use hyper::Body;
 use serde::de::DeserializeOwned;
 use std::{
 	future::Future,

@@ -188,12 +188,12 @@ impl Handler for OpenapiHandler
 		
 		match serde_json::to_string(&openapi) {
 			Ok(body) => {
-				let res = create_response(&state, hyper::StatusCode::OK, APPLICATION_JSON, body);
+				let res = create_response(&state, crate::StatusCode::OK, APPLICATION_JSON, body);
 				future::ok((state, res)).boxed()
 			},
 			Err(e) => {
 				error!("Unable to handle OpenAPI request due to error: {}", e);
-				let res = create_response(&state, hyper::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
+				let res = create_response(&state, crate::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
 				future::ok((state, res)).boxed()
 			}
 		}
@@ -303,7 +303,7 @@ impl<'a> OperationParams<'a>
 
 fn new_operation(
 		operation_id : Option<String>,
-		default_status : hyper::StatusCode,
+		default_status : crate::StatusCode,
 		accepted_types : Option<Vec<Mime>>,
 		schema : ReferenceOr<Schema>,
 		params : OperationParams,
