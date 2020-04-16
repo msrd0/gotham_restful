@@ -398,9 +398,14 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			let #repo_ident = <#krate::export::Repo<#conn_ty>>::borrow_from(&#state_ident).clone();
 		};
 		block = quote! {
-			#repo_ident.run::<_, #ret, ()>(move |#conn_ident| {
-				Ok({#block})
-			}).await.unwrap()
+			{
+				let #res_ident = #repo_ident.run::<_, (#krate::State, #ret), ()>(move |#conn_ident| {
+					let #res_ident = { #block };
+					Ok((#state_ident, #res_ident))
+				}).await.unwrap();
+				#state_ident = #res_ident.0;
+				#res_ident.1
+			}
 		};
 	}
 	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_auth_status()).nth(0)
