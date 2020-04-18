@@ -406,6 +406,42 @@ impl<T : ResourceResult> ResourceResult for AuthResult<T>
 	}
 }
 
+impl<T : ResourceResult<Err = SerdeJsonError>, E : Error> ResourceResult for Result<AuthResult<T>, E>
+{
+	type Err = T::Err;
+	
+	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, T::Err>> + Send>>
+	{
+		match self {
+			Ok(r) => r.into_response(),
+			Err(e) => {
+				into_response_helper(|| {
+					errorlog(&e);
+					let err : ResourceError = e.into();
+					Ok(Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?))
+				})
+			}
+		}
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		T::accepted_types()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn schema() -> OpenapiSchema
+	{
+		T::schema()
+	}
+	
+	#[cfg(feature = "openapi")]
+	fn default_status() -> StatusCode
+	{
+		T::default_status()
+	}
+}
+
 /**
 This is the return type of a resource that doesn't actually return something. It will result
 in a _204 No Content_ answer by default. You don't need to use this type directly if using
