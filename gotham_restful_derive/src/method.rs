@@ -392,6 +392,10 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	}
 	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_database_conn()).nth(0)
 	{
+		if fun_is_async
+		{
+			return Err(Error::new(arg.span(), "async fn is not supported when database support is required, consider boxing"));
+		}
 		let conn_ty = arg.ty.quote_ty();
 		state_block = quote! {
 			#state_block
