@@ -55,7 +55,7 @@ Uploads and Downloads can also be handled, but you need to specify the mime type
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
 # use gotham::{router::builder::*, state::State};
-# use gotham_restful::{DrawResources, Raw, Resource, Success};
+# use gotham_restful::{DrawResources, Mime, Raw, Resource, Success};
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
 #[rest_resource(create)]
@@ -63,11 +63,14 @@ struct ImageResource;
 
 #[derive(FromBody, RequestBody)]
 #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
-struct RawImage(Vec<u8>);
+struct RawImage {
+	content: Vec<u8>,
+	content_type: Mime
+}
 
 #[rest_create(ImageResource)]
 fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
-	Raw::new(body.0, mime::APPLICATION_OCTET_STREAM)
+	Raw::new(body.content, body.content_type)
 }
 # fn main() {
 # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
