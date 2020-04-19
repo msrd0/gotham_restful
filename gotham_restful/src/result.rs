@@ -185,8 +185,7 @@ where
 
 impl<Res> ResourceResult for Pin<Box<dyn Future<Output = Res> + Send>>
 where
-	Res : ResourceResult + 'static,
-	dyn Future<Output = Result<Response, Res::Err>> : Send
+	Res : ResourceResult + 'static
 {
 	type Err = Res::Err;
 	
