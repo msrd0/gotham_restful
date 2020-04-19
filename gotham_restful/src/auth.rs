@@ -71,7 +71,7 @@ This trait will help the auth middleware to determine the validity of an authent
 
 A very basic implementation could look like this:
 ```
-# use gotham_restful::{export::State, AuthHandler};
+# use gotham_restful::{AuthHandler, State};
 #
 const SECRET : &'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
 
