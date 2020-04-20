@@ -78,11 +78,14 @@ struct ImageResource;
 
 #[derive(FromBody, RequestBody)]
 #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
-struct RawImage(Vec<u8>);
+struct RawImage {
+	content: Vec<u8>,
+	content_type: Mime
+}
 
 #[rest_create(ImageResource)]
 fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
-	Raw::new(body.0, mime::APPLICATION_OCTET_STREAM)
+	Raw::new(body.content, body.content_type)
 }
 ```
 
