@@ -317,9 +317,8 @@ fn new_operation(
 	let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
 	responses.insert(StatusCode::Code(default_status.as_u16()), Item(Response {
 		description: default_status.canonical_reason().map(|d| d.to_string()).unwrap_or_default(),
-		headers: IndexMap::new(),
 		content,
-		links: IndexMap::new()
+		..Default::default()
 	}));
 	
 	let request_body = body_schema.map(|schema| Item(OARequestBody {
@@ -552,7 +551,7 @@ mod test
 	{
 		let types = NoContent::accepted_types();
 		let schema = <NoContent as OpenapiType>::schema();
-		let content = schema_to_content(types.unwrap_or_default(), Item(schema.into_schema()));
+		let content = schema_to_content(types.unwrap_or_else(|| vec![STAR_STAR]), Item(schema.into_schema()));
 		assert!(content.is_empty());
 	}
 	
@@ -561,7 +560,7 @@ mod test
 	{
 		let types = Raw::<&str>::accepted_types();
 		let schema = <Raw<&str> as OpenapiType>::schema();
-		let content = schema_to_content(types.unwrap_or_default(), Item(schema.into_schema()));
+		let content = schema_to_content(types.unwrap_or_else(|| vec![STAR_STAR]), Item(schema.into_schema()));
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);

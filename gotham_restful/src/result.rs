@@ -483,6 +483,11 @@ impl ResourceResult for NoContent
 		future::ok(Response::no_content()).boxed()
 	}
 	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		Some(Vec::new())
+	}
+	
 	/// Returns the schema of the `()` type.
 	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema
@@ -513,6 +518,11 @@ where
 				Ok(Response::json(StatusCode::INTERNAL_SERVER_ERROR, serde_json::to_string(&err)?))
 			})
 		}
+	}
+	
+	fn accepted_types() -> Option<Vec<Mime>>
+	{
+		NoContent::accepted_types()
 	}
 	
 	#[cfg(feature = "openapi")]
