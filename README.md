@@ -30,8 +30,9 @@ bodies, relying on [`serde`][serde] and [`serde_json`][serde_json] for (de)seria
 enable the `openapi` feature, you can also generate an OpenAPI Specification from your RESTful
 resources.
 
-**Note:** The master branch currently tracks gotham's master branch and the next release will use
-gotham 0.5.0 and be compatible with the new future / async stuff.
+**Note:** The `stable` branch contains some bugfixes against the last release. The `master`
+branch currently tracks gotham's master branch and the next release will use gotham 0.5.0 and be
+compatible with the new future / async stuff.
 
 ## Usage
 
