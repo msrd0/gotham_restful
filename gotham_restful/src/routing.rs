@@ -271,6 +271,10 @@ impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader
 {
 	fn from(types : Option<Vec<Mime>>) -> Self
 	{
+		let types = match types {
+			Some(types) if types.is_empty() => None,
+			types => types
+		};
 		Self {
 			matcher: types.map(AcceptHeaderRouteMatcher::new)
 		}
