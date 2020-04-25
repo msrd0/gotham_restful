@@ -6,7 +6,7 @@ use futures_util::{future, future::FutureExt};
 use gotham::hyper::Body;
 #[cfg(feature = "errorlog")]
 use log::error;
-use mime::{Mime, APPLICATION_JSON, STAR_STAR};
+use mime::{Mime, APPLICATION_JSON};
 #[cfg(feature = "openapi")]
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde::Serialize;
@@ -579,11 +579,6 @@ where
 	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, SerdeJsonError>> + Send>>
 	{
 		future::ok(Response::new(StatusCode::OK, self.raw, Some(self.mime.clone()))).boxed()
-	}
-	
-	fn accepted_types() -> Option<Vec<Mime>>
-	{
-		Some(vec![STAR_STAR])
 	}
 	
 	#[cfg(feature = "openapi")]

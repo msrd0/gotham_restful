@@ -151,6 +151,8 @@ pub use auth::{
 	StaticAuthHandler
 };
 
+pub mod matcher;
+
 #[cfg(feature = "openapi")]
 mod openapi;
 #[cfg(feature = "openapi")]
