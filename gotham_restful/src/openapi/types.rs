@@ -9,7 +9,10 @@ use openapiv3::{
 };
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
-use std::collections::{BTreeSet, HashSet};
+use std::{
+	collections::{BTreeSet, HashSet},
+	hash::BuildHasher
+};
 
 /**
 This struct needs to be available for every type that can be part of an OpenAPI Spec. It is
@@ -296,7 +299,7 @@ impl<T : OpenapiType> OpenapiType for BTreeSet<T>
 	}
 }
 
-impl<T : OpenapiType> OpenapiType for HashSet<T>
+impl<T : OpenapiType, S : BuildHasher> OpenapiType for HashSet<T, S>
 {
 	fn schema() -> OpenapiSchema
 	{

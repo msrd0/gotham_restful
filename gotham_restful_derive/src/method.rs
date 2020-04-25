@@ -120,6 +120,7 @@ impl Method
 	}
 }
 
+#[allow(clippy::large_enum_variant)]
 enum MethodArgumentType
 {
 	StateRef,
@@ -176,9 +177,8 @@ impl Spanned for MethodArgument
 
 fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType, Error>
 {
-	let attr = attrs.into_iter()
-		.filter(|arg| arg.path.segments.iter().filter(|path| &path.ident.to_string() == "rest_arg").nth(0).is_some())
-		.nth(0)
+	let attr = attrs.iter()
+		.find(|arg| arg.path.segments.iter().any(|path| &path.ident.to_string() == "rest_arg"))
 		.map(|arg| arg.tokens.to_string());
 	
 	if cfg!(feature = "auth") && (attr.as_deref() == Some("auth") || (attr.is_none() && name == "auth"))
@@ -219,19 +219,17 @@ fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument, Error>
 }
 
 #[cfg(feature = "openapi")]
-fn expand_operation_id(attrs : &AttributeArgs) -> TokenStream2
+fn expand_operation_id(attrs : &[NestedMeta]) -> TokenStream2
 {
 	let mut operation_id : Option<&Lit> = None;
 	for meta in attrs
 	{
-		match meta {
-			NestedMeta::Meta(Meta::NameValue(kv)) => {
-				if kv.path.segments.last().map(|p| p.ident.to_string()) == Some("operation_id".to_owned())
-				{
-					operation_id = Some(&kv.lit)
-				}
-			},
-			_ => {}
+		if let NestedMeta::Meta(Meta::NameValue(kv)) = meta
+		{
+			if kv.path.segments.last().map(|p| p.ident.to_string()) == Some("operation_id".to_owned())
+			{
+				operation_id = Some(&kv.lit)
+			}
 		}
 	}
 	
@@ -247,25 +245,23 @@ fn expand_operation_id(attrs : &AttributeArgs) -> TokenStream2
 }
 
 #[cfg(not(feature = "openapi"))]
-fn expand_operation_id(_ : &AttributeArgs) -> TokenStream2
+fn expand_operation_id(_ : &[NestedMeta]) -> TokenStream2
 {
 	quote!()
 }
 
-fn expand_wants_auth(attrs : &AttributeArgs, default : bool) -> TokenStream2
+fn expand_wants_auth(attrs : &[NestedMeta], default : bool) -> TokenStream2
 {
 	let default_lit = Lit::Bool(LitBool { value: default, span: Span::call_site() });
 	let mut wants_auth = &default_lit;
 	for meta in attrs
 	{
-		match meta {
-			NestedMeta::Meta(Meta::NameValue(kv)) => {
-				if kv.path.segments.last().map(|p| p.ident.to_string()) == Some("wants_auth".to_owned())
-				{
-					wants_auth = &kv.lit
-				}
-			},
-			_ => {}
+		if let NestedMeta::Meta(Meta::NameValue(kv)) = meta
+		{
+			if kv.path.segments.last().map(|p| p.ident.to_string()) == Some("wants_auth".to_owned())
+			{
+				wants_auth = &kv.lit
+			}
 		}
 	}
 	
@@ -277,6 +273,7 @@ fn expand_wants_auth(attrs : &AttributeArgs, default : bool) -> TokenStream2
 	}
 }
 
+#[allow(clippy::comparison_chain)]
 fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
@@ -381,7 +378,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	{
 		block = quote!(#block; Default::default())
 	}
-	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_database_conn()).nth(0)
+	if let Some(arg) = args.iter().find(|arg| (*arg).ty.is_database_conn())
 	{
 		if fun_is_async
 		{
@@ -403,7 +400,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			}
 		};
 	}
-	if let Some(arg) = args.iter().filter(|arg| (*arg).ty.is_auth_status()).nth(0)
+	if let Some(arg) = args.iter().find(|arg| (*arg).ty.is_auth_status())
 	{
 		let auth_ty = arg.ty.quote_ty();
 		state_block = quote! {

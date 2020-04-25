@@ -44,22 +44,20 @@ fn expand_where(generics : &Generics) -> TokenStream2
 {
 	if generics.params.is_empty()
 	{
-		quote!()
+		return quote!();
 	}
-	else
-	{
-		let krate = super::krate();
-		let idents = generics.params.iter()
-			.map(|param| match param {
-				GenericParam::Type(ty) => Some(ty.ident.clone()),
-				_ => None
-			})
-			.filter(|param| param.is_some())
-			.map(|param| param.unwrap());
-		
-		quote! {
-			where #(#idents : #krate::OpenapiType),*
-		}
+	
+	let krate = super::krate();
+	let idents = generics.params.iter()
+		.map(|param| match param {
+			GenericParam::Type(ty) => Some(ty.ident.clone()),
+			_ => None
+		})
+		.filter(|param| param.is_some())
+		.map(|param| param.unwrap());
+	
+	quote! {
+		where #(#idents : #krate::OpenapiType),*
 	}
 }
 
@@ -98,8 +96,7 @@ fn remove_parens(input : TokenStream2) -> TokenStream2
 		}
 		Box::new(iter::once(tt))
 	});
-	let output = TokenStream2::from_iter(iter);
-	output
+	TokenStream2::from_iter(iter)
 }
 
 fn parse_attributes(input : &[Attribute]) -> Result<Attrs, Error>

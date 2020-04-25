@@ -240,7 +240,7 @@ where
 		
 		// get the secret from the handler, possibly decoding claims ourselves
 		let secret = self.handler.jwt_secret(state, || {
-			let b64 = token.split(".").nth(1)?;
+			let b64 = token.split('.').nth(1)?;
 			let raw = base64::decode_config(b64, base64::URL_SAFE_NO_PAD).ok()?;
 			serde_json::from_slice(&raw).ok()?
 		});
@@ -261,7 +261,7 @@ where
 		};
 		
 		// we found a valid token
-		return AuthStatus::Authenticated(data);
+		AuthStatus::Authenticated(data)
 	}
 }
 

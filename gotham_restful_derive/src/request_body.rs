@@ -67,7 +67,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		.filter(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string()))
 		.flat_map(|attr|
 			syn::parse2::<MimeList>(attr.tokens)
-				.map(|list| Box::new(list.0.into_iter().map(|mime| Ok(mime))) as Box<dyn Iterator<Item = Result<Path, Error>>>)
+				.map(|list| Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path, Error>>>)
 				.unwrap_or_else(|err| Box::new(iter::once(Err(err)))))
 		.collect_to_result()?;
 	

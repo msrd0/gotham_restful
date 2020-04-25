@@ -136,7 +136,7 @@ impl NewHandler for OpenapiHandler
 }
 
 #[cfg(feature = "auth")]
-const SECURITY_NAME : &'static str = "authToken";
+const SECURITY_NAME : &str = "authToken";
 
 #[cfg(feature = "auth")]
 fn get_security(state : &mut State) -> IndexMap<String, ReferenceOr<SecurityScheme>>
@@ -249,7 +249,7 @@ impl<'a> OperationParams<'a>
 		{
 			params.push(Item(Parameter::Path {
 				parameter_data: ParameterData {
-					name: param.to_string(),
+					name: (*param).to_string(),
 					description: None,
 					required: true,
 					deprecated: None,
