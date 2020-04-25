@@ -134,26 +134,17 @@ impl MethodArgumentType
 {
 	fn is_method_arg(&self) -> bool
 	{
-		match self {
-			Self::MethodArg(_) => true,
-			_ => false,
-		}
+		matches!(self, Self::MethodArg(_))
 	}
 	
 	fn is_database_conn(&self) -> bool
 	{
-		match self {
-			Self::DatabaseConnection(_) => true,
-			_ => false
-		}
+		matches!(self, Self::DatabaseConnection(_))
 	}
 	
 	fn is_auth_status(&self) -> bool
 	{
-		match self {
-			Self::AuthStatus(_) | Self::AuthStatusRef(_) => true,
-			_ => false
-		}
+		matches!(self, Self::AuthStatus(_) | Self::AuthStatusRef(_))
 	}
 	
 	fn quote_ty(&self) -> Option<TokenStream2>
