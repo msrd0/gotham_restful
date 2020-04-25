@@ -59,25 +59,28 @@ impl FromStr for QMime
 
 
 /**
-A route matcher that checks for the presence of a supported content type.
+A route matcher that checks whether the supported types match the accept header of the request.
 
 Usage:
 
 ```
 # use gotham::{helpers::http::response::create_response, hyper::StatusCode, router::builder::*};
-# use gotham_restful::matcher::ContentTypeMatcher;
+# use gotham_restful::matcher::AcceptHeaderMatcher;
 #
-let types = vec![mime::TEXT_HTML, mime::TEXT_PLAIN];
-let matcher = ContentTypeMatcher::new(types)
-	// optionally accept requests with no content type
-	.allow_no_type();
+# const img_content : &[u8] = b"This is the content of a webp image";
+#
+# let IMAGE_WEBP : mime::Mime = "image/webp".parse().unwrap();
+let types = vec![IMAGE_WEBP];
+let matcher = AcceptHeaderMatcher::new(types);
 
 # build_simple_router(|route| {
 // use the matcher for your request
 route.post("/foo")
      .extend_route_matcher(matcher)
 	 .to(|state| {
-	 	let res = create_response(&state, StatusCode::OK, mime::TEXT_PLAIN, "Correct Content Type!");
+	 	// we know that the client is a modern browser and can handle webp images
+# let IMAGE_WEBP : mime::Mime = "image/webp".parse().unwrap();
+	 	let res = create_response(&state, StatusCode::OK, IMAGE_WEBP, img_content);
 		(state, res)
 	});
 # });
