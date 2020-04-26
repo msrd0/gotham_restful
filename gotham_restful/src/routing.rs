@@ -6,7 +6,7 @@ use crate::{
 	StatusCode
 };
 #[cfg(feature = "openapi")]
-use crate::openapi::router::OpenapiBuilder;
+use crate::openapi::builder::OpenapiBuilder;
 
 use futures_util::{future, future::FutureExt};
 use gotham::{

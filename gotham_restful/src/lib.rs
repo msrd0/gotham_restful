@@ -110,6 +110,7 @@ Licensed under your option of:
 extern crate self as gotham_restful;
 
 #[macro_use] extern crate gotham_derive;
+#[macro_use] extern crate log;
 #[macro_use] extern crate serde;
 
 #[doc(no_inline)]
