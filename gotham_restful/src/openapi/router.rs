@@ -24,7 +24,8 @@ use openapiv3::{
 };
 use std::{
 	panic::RefUnwindSafe,
-	pin::Pin
+	pin::Pin,
+	sync::{Arc, RwLock}
 };
 
 /**
@@ -33,31 +34,37 @@ same time. There is no need to use this type directly. See [`WithOpenapi`] on ho
 
 [`WithOpenapi`]: trait.WithOpenapi.html
 */
-pub struct OpenapiRouter(OpenAPI);
+pub struct OpenapiBuilder
+{
+	openapi : Arc<RwLock<OpenAPI>>
+}
 
-impl OpenapiRouter
+impl OpenapiBuilder
 {
 	pub fn new(title : String, version : String, url : String) -> Self
 	{
-		Self(OpenAPI {
-			openapi: "3.0.2".to_string(),
-			info: openapiv3::Info {
-				title, version,
+		Self {
+			openapi: Arc::new(RwLock::new(OpenAPI {
+				openapi: "3.0.2".to_string(),
+				info: openapiv3::Info {
+					title, version,
+					..Default::default()
+				},
+				servers: vec![Server {
+					url,
+					..Default::default()
+				}],
 				..Default::default()
-			},
-			servers: vec![Server {
-				url,
-				..Default::default()
-			}],
-			..Default::default()
-		})
+			}))
+		}
 	}
-
+	
 	/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to
 	/// modify the path and add it back after the modification
 	fn remove_path(&mut self, path : &str) -> PathItem
 	{
-		match self.0.paths.swap_remove(path) {
+		let mut openapi = self.openapi.write().unwrap();
+		match openapi.paths.swap_remove(path) {
 			Some(Item(item)) => item,
 			_ => PathItem::default()
 		}
@@ -65,21 +72,23 @@ impl OpenapiRouter
 
 	fn add_path<Path : ToString>(&mut self, path : Path, item : PathItem)
 	{
-		self.0.paths.insert(path.to_string(), Item(item));
+		let mut openapi = self.openapi.write().unwrap();
+		openapi.paths.insert(path.to_string(), Item(item));
 	}
 
 	fn add_schema_impl(&mut self, name : String, mut schema : OpenapiSchema)
 	{
 		self.add_schema_dependencies(&mut schema.dependencies);
 		
-		match &mut self.0.components {
+		let mut openapi = self.openapi.write().unwrap();
+		match &mut openapi.components {
 			Some(comp) => {
 				comp.schemas.insert(name, Item(schema.into_schema()));
 			},
 			None => {
 				let mut comp = Components::default();
 				comp.schemas.insert(name, Item(schema.into_schema()));
-				self.0.components = Some(comp);
+				openapi.components = Some(comp);
 			}
 		};
 	}
@@ -115,13 +124,16 @@ impl OpenapiRouter
 }
 
 #[derive(Clone)]
-struct OpenapiHandler(OpenAPI);
+struct OpenapiHandler
+{
+	openapi : Arc<RwLock<OpenAPI>>
+}
 
 impl OpenapiHandler
 {
-	fn new(openapi : &OpenapiRouter) -> Self
+	fn new(openapi : Arc<RwLock<OpenAPI>>) -> Self
 	{
-		Self(openapi.0.clone())
+		Self { openapi }
 	}
 }
 
@@ -180,7 +192,16 @@ impl Handler for OpenapiHandler
 {
 	fn handle(self, mut state : State) -> Pin<Box<HandlerFuture>>
 	{
-		let mut openapi = self.0;
+		let openapi = match self.openapi.read() {
+			Ok(openapi) => openapi,
+			Err(e) => {
+				error!("Unable to acquire read lock for the OpenAPI specification: {}", e);
+				let res = create_response(&state, crate::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
+				return future::ok((state, res)).boxed()
+			}
+		};
+		
+		let mut openapi = openapi.clone();
 		let security_schemes = get_security(&mut state);
 		let mut components = openapi.components.unwrap_or_default();
 		components.security_schemes = security_schemes;
@@ -353,18 +374,18 @@ fn new_operation(
 macro_rules! implOpenapiRouter {
 	($implType:ident) => {
 
-		impl<'a, C, P> GetOpenapi for (&mut $implType<'a, C, P>, &mut OpenapiRouter)
+		impl<'a, C, P> GetOpenapi for (&mut $implType<'a, C, P>, &mut OpenapiBuilder)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
 			fn get_openapi(&mut self, path : &str)
 			{
-				self.0.get(path).to_new_handler(OpenapiHandler::new(&self.1));
+				self.0.get(path).to_new_handler(OpenapiHandler::new(self.1.openapi.clone()));
 			}
 		}
 		
-		impl<'a, C, P> DrawResources for (&mut $implType<'a, C, P>, &mut OpenapiRouter)
+		impl<'a, C, P> DrawResources for (&mut $implType<'a, C, P>, &mut OpenapiBuilder)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
@@ -375,7 +396,7 @@ macro_rules! implOpenapiRouter {
 			}
 		}
 
-		impl<'a, C, P> DrawResourceRoutes for (&mut (&mut $implType<'a, C, P>, &mut OpenapiRouter), &str)
+		impl<'a, C, P> DrawResourceRoutes for (&mut (&mut $implType<'a, C, P>, &mut OpenapiBuilder), &str)
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static

@@ -6,7 +6,7 @@ use crate::{
 	StatusCode
 };
 #[cfg(feature = "openapi")]
-use crate::OpenapiRouter;
+use crate::openapi::router::OpenapiBuilder;
 
 use futures_util::{future, future::FutureExt};
 use gotham::{
@@ -49,7 +49,7 @@ pub trait WithOpenapi<D>
 {
 	fn with_openapi<F>(&mut self, title : String, version : String, server_url : String, block : F)
 	where
-		F : FnOnce((&mut D, &mut OpenapiRouter));
+		F : FnOnce((&mut D, &mut OpenapiBuilder));
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -316,9 +316,9 @@ macro_rules! implDrawResourceRoutes {
 		{
 			fn with_openapi<F>(&mut self, title : String, version : String, server_url : String, block : F)
 			where
-				F : FnOnce((&mut Self, &mut OpenapiRouter))
+				F : FnOnce((&mut Self, &mut OpenapiBuilder))
 			{
-				let mut router = OpenapiRouter::new(title, version, server_url);
+				let mut router = OpenapiBuilder::new(title, version, server_url);
 				block((self, &mut router));
 			}
 		}
