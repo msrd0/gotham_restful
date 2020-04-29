@@ -61,10 +61,11 @@ macro_rules! implOpenapiRouter {
 			fn read<Handler : ResourceRead>(&mut self)
 			{
 				let schema = (self.0).1.add_schema::<Handler::Res>();
+				let id_schema = (self.0).1.add_schema::<Handler::ID>();
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.get = Some(OperationDescription::new::<Handler>(schema).with_path_params(vec!["id"]).into_operation());
+				item.get = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).into_operation());
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1).read::<Handler>()
@@ -120,11 +121,12 @@ macro_rules! implOpenapiRouter {
 				Handler::Body : 'static
 			{
 				let schema = (self.0).1.add_schema::<Handler::Res>();
+				let id_schema = (self.0).1.add_schema::<Handler::ID>();
 				let body_schema = (self.0).1.add_schema::<Handler::Body>();
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.put = Some(OperationDescription::new::<Handler>(schema).with_path_params(vec!["id"]).with_body::<Handler::Body>(body_schema).into_operation());
+				item.put = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).with_body::<Handler::Body>(body_schema).into_operation());
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1).update::<Handler>()
@@ -145,10 +147,11 @@ macro_rules! implOpenapiRouter {
 			fn delete<Handler : ResourceDelete>(&mut self)
 			{
 				let schema = (self.0).1.add_schema::<Handler::Res>();
+				let id_schema = (self.0).1.add_schema::<Handler::ID>();
 
 				let path = format!("/{}/{{id}}", &self.1);
 				let mut item = (self.0).1.remove_path(&path);
-				item.delete = Some(OperationDescription::new::<Handler>(schema).with_path_params(vec!["id"]).into_operation());
+				item.delete = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).into_operation());
 				(self.0).1.add_path(path, item);
 				
 				(&mut *(self.0).0, self.1).delete::<Handler>()

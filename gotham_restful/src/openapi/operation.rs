@@ -2,7 +2,6 @@ use crate::{
 	resource::*,
 	result::*,
 	OpenapiSchema,
-	OpenapiType,
 	RequestBody
 };
 use super::SECURITY_NAME;
@@ -18,7 +17,7 @@ use openapiv3::{
 #[derive(Default)]
 struct OperationParams<'a>
 {
-	path_params : Vec<&'a str>,
+	path_params : Vec<(&'a str, ReferenceOr<Schema>)>,
 	query_params : Option<OpenapiSchema>
 }
 
@@ -30,11 +29,11 @@ impl<'a> OperationParams<'a>
 		{
 			params.push(Item(Parameter::Path {
 				parameter_data: ParameterData {
-					name: (*param).to_string(),
+					name: (*param).0.to_string(),
 					description: None,
 					required: true,
 					deprecated: None,
-					format: ParameterSchemaOrContent::Schema(Item(String::schema().into_schema())),
+					format: ParameterSchemaOrContent::Schema((*param).1.clone()),
 					example: None,
 					examples: IndexMap::new()
 				},
@@ -110,9 +109,9 @@ impl<'a> OperationDescription<'a>
 		}
 	}
 	
-	pub fn with_path_params(mut self, params : Vec<&'a str>) -> Self
+	pub fn add_path_param(mut self, name : &'a str, schema : ReferenceOr<Schema>) -> Self
 	{
-		self.params.path_params = params;
+		self.params.path_params.push((name, schema));
 		self
 	}
 	
@@ -192,7 +191,7 @@ impl<'a> OperationDescription<'a>
 #[cfg(test)]
 mod test
 {
-	use crate::ResourceResult;
+	use crate::{OpenapiType, ResourceResult};
 	use super::*;
 	
 	#[test]

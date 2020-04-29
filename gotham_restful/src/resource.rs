@@ -1,13 +1,11 @@
-use crate::{DrawResourceRoutes, RequestBody, ResourceResult, ResourceType};
+use crate::{DrawResourceRoutes, RequestBody, ResourceID, ResourceResult, ResourceType};
 use gotham::{
 	extractor::QueryStringExtractor,
 	hyper::Body,
 	state::State
 };
-use serde::de::DeserializeOwned;
 use std::{
 	future::Future,
-	panic::RefUnwindSafe,
 	pin::Pin
 };
 
@@ -48,7 +46,7 @@ pub trait ResourceReadAll : ResourceMethod
 /// Handle a GET request on the Resource with an id.
 pub trait ResourceRead : ResourceMethod
 {
-	type ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static;
+	type ID : ResourceID + 'static;
 	
 	fn read(state : State, id : Self::ID) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
@@ -81,7 +79,7 @@ pub trait ResourceUpdateAll : ResourceMethod
 pub trait ResourceUpdate : ResourceMethod
 {
 	type Body : RequestBody;
-	type ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static;
+	type ID : ResourceID + 'static;
 	
 	fn update(state : State, id : Self::ID, body : Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
@@ -95,7 +93,7 @@ pub trait ResourceDeleteAll : ResourceMethod
 /// Handle a DELETE request on the Resource with an id.
 pub trait ResourceDelete : ResourceMethod
 {
-	type ID : DeserializeOwned + Clone + RefUnwindSafe + Send + Sync + 'static;
+	type ID : ResourceID + 'static;
 	
 	fn delete(state : State, id : Self::ID) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
