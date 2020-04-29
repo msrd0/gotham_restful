@@ -1,6 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
+use std::cmp::min;
 use syn::{
 	punctuated::Punctuated,
 	token::Comma,
@@ -93,7 +94,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		};
 	}
 	
-	for field in &fields.fields[2..]
+	for field in &fields.fields[min(2, fields.fields.len())..]
 	{
 		let field_ident = &field.0;
 		let field_ty = &field.1;
