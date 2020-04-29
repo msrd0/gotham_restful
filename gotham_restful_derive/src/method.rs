@@ -175,11 +175,19 @@ impl Spanned for MethodArgument
 	}
 }
 
-fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType, Error>
+fn interpret_arg_ty(attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType, Error>
 {
 	let attr = attrs.iter()
 		.find(|arg| arg.path.segments.iter().any(|path| &path.ident.to_string() == "rest_arg"))
 		.map(|arg| arg.tokens.to_string());
+	
+	if attr.as_deref() == Some("state") || (attr.is_none() && name == "state")
+	{
+		return match ty {
+			Type::Reference(ty) => Ok(if ty.mutability.is_none() { MethodArgumentType::StateRef } else { MethodArgumentType::StateMutRef }),
+			_ => Err(Error::new(ty.span(), "The state parameter has to be a (mutable) reference to gotham_restful::State"))
+		};
+	}
 	
 	if cfg!(feature = "auth") && (attr.as_deref() == Some("auth") || (attr.is_none() && name == "auth"))
 	{
@@ -197,14 +205,6 @@ fn interpret_arg_ty(index : usize, attrs : &[Attribute], name : &str, ty : Type)
 		}));
 	}
 	
-	if index == 0
-	{
-		return match ty {
-			Type::Reference(ty) => Ok(if ty.mutability.is_none() { MethodArgumentType::StateRef } else { MethodArgumentType::StateMutRef }),
-			_ => Err(Error::new(ty.span(), "The first argument, unless some feature is used, has to be a (mutable) reference to gotham::state::State"))
-		};
-	}
-	
 	Ok(MethodArgumentType::MethodArg(ty))
 }
 
@@ -213,7 +213,7 @@ fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument, Error>
 	let pat = &arg.pat;
 	let ident = format_ident!("arg{}", index);
 	let orig_name = quote!(#pat);
-	let ty = interpret_arg_ty(index, &arg.attrs, &orig_name.to_string(), *arg.ty.clone())?;
+	let ty = interpret_arg_ty(&arg.attrs, &orig_name.to_string(), *arg.ty.clone())?;
 	
 	Ok(MethodArgument { ident, ident_span: arg.pat.span(), ty })
 }
