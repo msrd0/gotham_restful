@@ -1,5 +1,6 @@
 use crate::{
 	matcher::{AcceptHeaderMatcher, ContentTypeMatcher},
+	openapi::router::OpenapiRouter,
 	resource::*,
 	result::{ResourceError, ResourceResult, Response},
 	RequestBody,
@@ -49,7 +50,7 @@ pub trait WithOpenapi<D>
 {
 	fn with_openapi<F>(&mut self, title : String, version : String, server_url : String, block : F)
 	where
-		F : FnOnce((&mut D, &mut OpenapiBuilder));
+		F : FnOnce(OpenapiRouter<D>);
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -316,10 +317,13 @@ macro_rules! implDrawResourceRoutes {
 		{
 			fn with_openapi<F>(&mut self, title : String, version : String, server_url : String, block : F)
 			where
-				F : FnOnce((&mut Self, &mut OpenapiBuilder))
+				F : FnOnce(OpenapiRouter<$implType<'a, C, P>>)
 			{
-				let mut router = OpenapiBuilder::new(title, version, server_url);
-				block((self, &mut router));
+				let router = OpenapiRouter {
+					router: self,
+					openapi_builder: &mut OpenapiBuilder::new(title, version, server_url)
+				};
+				block(router);
 			}
 		}
 		
