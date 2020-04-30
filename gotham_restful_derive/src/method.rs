@@ -181,7 +181,8 @@ fn interpret_arg_ty(attrs : &[Attribute], name : &str, ty : Type) -> Result<Meth
 		.find(|arg| arg.path.segments.iter().any(|path| &path.ident.to_string() == "rest_arg"))
 		.map(|arg| arg.tokens.to_string());
 	
-	if attr.as_deref() == Some("state") || (attr.is_none() && name == "state")
+	// TODO issue a warning for _state usage once diagnostics become stable
+	if attr.as_deref() == Some("state") || (attr.is_none() && (name == "state" || name == "_state"))
 	{
 		return match ty {
 			Type::Reference(ty) => Ok(if ty.mutability.is_none() { MethodArgumentType::StateRef } else { MethodArgumentType::StateMutRef }),
