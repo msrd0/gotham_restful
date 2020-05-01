@@ -1,3 +1,9 @@
+use proc_macro2::{
+	Delimiter,
+	TokenStream as TokenStream2,
+	TokenTree
+};
+use std::iter;
 use syn::Error;
 
 pub trait CollectToResult
@@ -24,4 +30,20 @@ where
 		    }
 		})
 	}
+}
+
+
+pub fn remove_parens(input : TokenStream2) -> TokenStream2
+{
+	let iter = input.into_iter().flat_map(|tt| {
+		if let TokenTree::Group(group) = &tt
+		{
+			if group.delimiter() == Delimiter::Parenthesis
+			{
+				return Box::new(group.stream().into_iter()) as Box<dyn Iterator<Item = TokenTree>>;
+			}
+		}
+		Box::new(iter::once(tt))
+	});
+	iter.collect()
 }

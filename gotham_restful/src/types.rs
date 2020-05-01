@@ -1,11 +1,14 @@
 #[cfg(feature = "openapi")]
 use crate::OpenapiType;
-use crate::result::ResourceError;
 
 use gotham::hyper::body::Bytes;
 use mime::{Mime, APPLICATION_JSON};
 use serde::{de::DeserializeOwned, Serialize};
-use std::panic::RefUnwindSafe;
+use std::{
+	error::Error,
+	panic::RefUnwindSafe
+};
+use thiserror::Error;
 
 #[cfg(not(feature = "openapi"))]
 pub trait ResourceType
@@ -44,7 +47,7 @@ impl<T : ResourceType + Serialize> ResponseBody for T
 /// to create the type from a hyper body chunk and it's content type.
 pub trait FromBody : Sized
 {
-	type Err : Into<ResourceError>;
+	type Err : Error;
 	
 	/// Create the request body from a raw body and the content type.
 	fn from_body(body : Bytes, content_type : Mime) -> Result<Self, Self::Err>;
@@ -59,6 +62,14 @@ impl<T : DeserializeOwned> FromBody for T
 		serde_json::from_slice(&body)
 	}
 }
+
+/// This error type can be used by `FromBody` implementations when there is no need to return any
+/// errors.
+
+#[derive(Clone, Copy, Debug, Error)]
+#[error("No Error")]
+pub struct FromBodyNoError;
+
 
 /// A type that can be used inside a request body. Implemented for every type that is
 /// deserializable with serde. If the `openapi` feature is used, it must also be of type

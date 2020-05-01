@@ -36,7 +36,7 @@ struct User
 }
 
 #[rest_read_all(Users)]
-fn read_all(_state : &mut State) -> Success<Vec<Option<User>>>
+fn read_all() -> Success<Vec<Option<User>>>
 {
 	vec![Username().fake(), Username().fake()]
 		.into_iter()
@@ -46,56 +46,55 @@ fn read_all(_state : &mut State) -> Success<Vec<Option<User>>>
 }
 
 #[rest_read(Users)]
-fn read(_state : &mut State, id : u64) -> Success<User>
+fn read(id : u64) -> Success<User>
 {
 	let username : String = Username().fake();
 	User { username: format!("{}{}", username, id) }.into()
 }
 
 #[rest_search(Users)]
-fn search(_state : &mut State, query : User) -> Success<User>
+fn search(query : User) -> Success<User>
 {
 	query.into()
 }
 
 #[rest_create(Users)]
-fn create(_state : &mut State, body : User)
+fn create(body : User)
 {
 	info!("Created User: {}", body.username);
 }
 
 #[rest_update_all(Users)]
-fn update_all(_state : &mut State, body : Vec<User>)
+fn update_all(body : Vec<User>)
 {
 	info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
 }
 
 #[rest_update(Users)]
-fn update(_state : &mut State, id : u64, body : User)
+fn update(id : u64, body : User)
 {
 	info!("Change User {} to {}", id, body.username);
 }
 
 #[rest_delete_all(Users)]
-fn delete_all(_state : &mut State)
+fn delete_all()
 {
 	info!("Delete all Users");
 }
 
 #[rest_delete(Users)]
-fn delete(_state : &mut State, id : u64)
+fn delete(id : u64)
 {
 	info!("Delete User {}", id);
 }
 
 #[rest_read_all(Auth)]
-fn auth_read_all(auth : AuthStatus<()>) -> AuthResult<Success<String>>
+fn auth_read_all(auth : AuthStatus<()>) -> AuthSuccess<String>
 {
-	let str : Success<String> = match auth {
-		AuthStatus::Authenticated(data) => format!("{:?}", data).into(),
-		_ => return AuthErr
-	};
-	str.into()
+	match auth {
+		AuthStatus::Authenticated(data) => Ok(format!("{:?}", data).into()),
+		_ => Err(Forbidden)
+	}
 }
 
 const ADDR : &str = "127.0.0.1:18080";

@@ -120,7 +120,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		impl #generics #krate::FromBody for #ident #generics
 		where #where_clause
 		{
-			type Err = String;
+			type Err = #krate::FromBodyNoError;
 			
 			fn from_body(#body_ident : #krate::gotham::hyper::body::Bytes, #type_ident : #krate::Mime) -> Result<Self, Self::Err>
 			{

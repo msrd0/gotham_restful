@@ -1,12 +1,7 @@
-use crate::util::CollectToResult;
+use crate::util::{CollectToResult, remove_parens};
 use proc_macro::TokenStream;
-use proc_macro2::{
-	Delimiter,
-	TokenStream as TokenStream2,
-	TokenTree
-};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use std::{iter, iter::FromIterator};
 use syn::{
 	spanned::Spanned,
 	Attribute,
@@ -82,21 +77,6 @@ fn to_bool(lit : &Lit) -> Result<bool, Error>
 		Lit::Bool(bool) => Ok(bool.value),
 		_ => Err(Error::new(lit.span(), "Expected bool"))
 	}
-}
-
-fn remove_parens(input : TokenStream2) -> TokenStream2
-{
-	let iter = input.into_iter().flat_map(|tt| {
-		if let TokenTree::Group(group) = &tt
-		{
-			if group.delimiter() == Delimiter::Parenthesis
-			{
-				return Box::new(group.stream().into_iter()) as Box<dyn Iterator<Item = TokenTree>>;
-			}
-		}
-		Box::new(iter::once(tt))
-	});
-	TokenStream2::from_iter(iter)
 }
 
 fn parse_attributes(input : &[Attribute]) -> Result<Attrs, Error>
