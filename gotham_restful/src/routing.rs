@@ -1,13 +1,16 @@
 use crate::{
 	matcher::{AcceptHeaderMatcher, ContentTypeMatcher},
-	openapi::router::OpenapiRouter,
 	resource::*,
-	result::{ResourceError, ResourceResult, Response},
+	result::{ResourceError, ResourceResult},
 	RequestBody,
+	Response,
 	StatusCode
 };
 #[cfg(feature = "openapi")]
-use crate::openapi::builder::OpenapiBuilder;
+use crate::openapi::{
+	builder::OpenapiBuilder,
+	router::OpenapiRouter
+};
 
 use futures_util::{future, future::FutureExt};
 use gotham::{

@@ -70,7 +70,7 @@ fn main() {
 }
 ```
 
-Uploads and Downloads can also be handled, but you need to specify the mime type manually:
+Uploads and Downloads can also be handled:
 
 ```rust
 #[derive(Resource)]

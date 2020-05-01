@@ -12,6 +12,8 @@ mod request_body;
 use request_body::expand_request_body;
 mod resource;
 use resource::expand_resource;
+mod resource_error;
+use resource_error::expand_resource_error;
 #[cfg(feature = "openapi")]
 mod openapi_type;
 
@@ -51,6 +53,13 @@ pub fn derive_resource(tokens : TokenStream) -> TokenStream
 {
 	print_tokens(expand_resource(tokens))
 }
+
+#[proc_macro_derive(ResourceError, attributes(display, from, status))]
+pub fn derive_resource_error(tokens : TokenStream) -> TokenStream
+{
+	print_tokens(expand_resource_error(tokens))
+}
+
 
 #[proc_macro_attribute]
 pub fn rest_read_all(attr : TokenStream, item : TokenStream) -> TokenStream

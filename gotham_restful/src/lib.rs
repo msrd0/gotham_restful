@@ -52,7 +52,7 @@ fn main() {
 }
 ```
 
-Uploads and Downloads can also be handled, but you need to specify the mime type manually:
+Uploads and Downloads can also be handled:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
@@ -131,6 +131,8 @@ pub mod export
 {
 	pub use futures_util::future::FutureExt;
 	
+	pub use serde_json;
+	
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;
 	
@@ -176,14 +178,20 @@ pub use resource::{
 	ResourceDelete
 };
 
+mod response;
+pub use response::Response;
+
 mod result;
 pub use result::{
+	AuthError,
+	AuthError::Forbidden,
+	AuthErrorOrOther,
 	AuthResult,
-	AuthResult::AuthErr,
+	AuthSuccess,
+	IntoResponseError,
 	NoContent,
 	Raw,
 	ResourceResult,
-	Response,
 	Success
 };
 
