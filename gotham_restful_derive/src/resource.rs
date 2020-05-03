@@ -9,9 +9,9 @@ use syn::{
 	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
 	token::Comma,
+	DeriveInput,
 	Error,
 	Ident,
-	ItemStruct,
 	parenthesized,
 	parse_macro_input
 };
@@ -33,7 +33,7 @@ impl Parse for MethodList
 fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<ItemStruct>(tokens)?;
+	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
 	let ident = input.ident;
 	let name = ident.to_string();
 	

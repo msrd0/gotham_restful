@@ -6,14 +6,16 @@ use syn::{
 	spanned::Spanned,
 	Attribute,
 	AttributeArgs,
+	Data,
+	DataEnum,
+	DataStruct,
+	DeriveInput,
 	Error,
 	Field,
 	Fields,
 	Generics,
 	GenericParam,
-	Item,
-	ItemEnum,
-	ItemStruct,
+	Ident,
 	Lit,
 	Meta,
 	NestedMeta,
@@ -23,13 +25,14 @@ use syn::{
 
 pub fn expand(tokens : TokenStream) -> TokenStream
 {
-	let input = parse_macro_input!(tokens as Item);
+	let input = parse_macro_input!(tokens as DeriveInput);
 	
-	let output = match input {
-		Item::Enum(item) => expand_enum(item),
-		Item::Struct(item) => expand_struct(item),
-		_ => Err(Error::new(input.span(), "derive(OpenapiType) not supported for this context"))
+	let output = match (input.ident, input.generics, input.attrs, input.data) {
+		(ident, generics, attrs, Data::Enum(inum)) => expand_enum(ident, generics, attrs, inum),
+		(ident, generics, attrs, Data::Struct(strukt)) => expand_struct(ident, generics, attrs, strukt),
+		(_, _, _, Data::Union(uni)) => Err(Error::new(uni.union_token.span(), "#[derive(OpenapiType)] only works for structs and enums"))
 	};
+	
 	output
 		.unwrap_or_else(|err| err.to_compile_error())
 		.into()
@@ -127,14 +130,12 @@ fn expand_variant(variant : &Variant) -> Result<TokenStream2, Error>
 	})
 }
 
-fn expand_enum(input : ItemEnum) -> Result<TokenStream2, Error>
+fn expand_enum(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input : DataEnum) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let ident = input.ident;
-	let generics = input.generics;
 	let where_clause = expand_where(&generics);
 	
-	let attrs = parse_attributes(&input.attrs)?;
+	let attrs = parse_attributes(&attrs)?;
 	let nullable = attrs.nullable;
 	let name = match attrs.rename {
 		Some(rename) => rename,
@@ -229,14 +230,12 @@ fn expand_field(field : &Field) -> Result<TokenStream2, Error>
 	}})
 }
 
-pub fn expand_struct(input : ItemStruct) -> Result<TokenStream2, Error>
+pub fn expand_struct(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input : DataStruct) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let ident = input.ident;
-	let generics = input.generics;
 	let where_clause = expand_where(&generics);
 	
-	let attrs = parse_attributes(&input.attrs)?;
+	let attrs = parse_attributes(&attrs)?;
 	let nullable = attrs.nullable;
 	let name = match attrs.rename {
 		Some(rename) => rename,

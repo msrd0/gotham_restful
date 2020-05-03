@@ -7,10 +7,10 @@ use syn::{
 	parse::{Parse, ParseStream, Result as SynResult},
 	punctuated::Punctuated,
 	token::Comma,
+	DeriveInput,
 	Error,
 	Generics,
 	Ident,
-	ItemStruct,
 	Path,
 	parenthesized,
 	parse_macro_input
@@ -59,7 +59,7 @@ fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream2
 fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<ItemStruct>(tokens)?;
+	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	

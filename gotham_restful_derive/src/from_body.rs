@@ -4,12 +4,14 @@ use quote::{format_ident, quote};
 use std::cmp::min;
 use syn::{
 	punctuated::Punctuated,
+	spanned::Spanned,
 	token::Comma,
+	Data,
+	DeriveInput,
 	Error,
 	Field,
 	Fields,
 	Ident,
-	ItemStruct,
 	Type,
 	parse_macro_input
 };
@@ -50,11 +52,17 @@ impl ParsedFields
 fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<ItemStruct>(tokens)?;
+	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	
-	let fields = match input.fields {
+	let strukt = match input.data {
+		Data::Enum(inum) => Err(inum.enum_token.span()),
+		Data::Struct(strukt) => Ok(strukt),
+		Data::Union(uni) => Err(uni.union_token.span())
+	}.map_err(|span| Error::new(span, "#[derive(FromBody)] only works for enums"))?;
+	
+	let fields = match strukt.fields {
 		Fields::Named(named) => ParsedFields::from_named(named.named)?,
 		Fields::Unnamed(unnamed) => ParsedFields::from_unnamed(unnamed.unnamed)?,
 		Fields::Unit => ParsedFields::from_unit()?
@@ -115,14 +123,13 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		quote!(Self ( #(#field_names),* ))
 	};
 	
-	// TODO: Replace the Err type with something more appropriate that implements Display
 	Ok(quote! {
 		impl #generics #krate::FromBody for #ident #generics
 		where #where_clause
 		{
 			type Err = #krate::FromBodyNoError;
 			
-			fn from_body(#body_ident : #krate::gotham::hyper::body::Bytes, #type_ident : #krate::Mime) -> Result<Self, Self::Err>
+			fn from_body(#body_ident : #krate::gotham::hyper::body::Bytes, #type_ident : #krate::Mime) -> Result<Self, #krate::FromBodyNoError>
 			{
 				#block
 				Ok(#ctor)
