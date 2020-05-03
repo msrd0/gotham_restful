@@ -8,7 +8,7 @@ combination with [`AuthSuccess`] or [`AuthResult`].
   [`AuthSuccess`]: type.AuthSuccess.html
   [`AuthResult`]: type.AuthResult.html
 */
-#[derive(ResourceError)]
+#[derive(Debug, Clone, Copy, ResourceError)]
 pub enum AuthError
 {
 	#[status(FORBIDDEN)]
@@ -54,7 +54,7 @@ error, or delegates to another error type. This type is best used with [`AuthRes
 
   [`AuthResult`]: type.AuthResult.html
 */
-#[derive(ResourceError)]
+#[derive(Debug, ResourceError)]
 pub enum AuthErrorOrOther<E>
 {
 	#[status(UNAUTHORIZED)]

@@ -92,7 +92,7 @@ fn delete(id : u64)
 fn auth_read_all(auth : AuthStatus<()>) -> AuthSuccess<String>
 {
 	match auth {
-		AuthStatus::Authenticated(data) => Ok(format!("{:?}", data).into()),
+		AuthStatus::Authenticated(data) => Ok(format!("{:?}", data)),
 		_ => Err(Forbidden)
 	}
 }

@@ -21,17 +21,15 @@ impl LookupTableFromTypes for LookupTable
 	{
 		if include_stars
 		{
-			types
+			return types
 				.enumerate()
 				.flat_map(|(i, mime)| vec![("*/*".to_owned(), i), (format!("{}/*", mime.type_()), i), (mime.essence_str().to_owned(), i)].into_iter())
-				.into_group_map()
+				.into_group_map();
 		}
-		else
-		{
-			types
-				.enumerate()
-				.map(|(i, mime)| (mime.essence_str().to_owned(), i))
-				.into_group_map()
-		}
+		
+		types
+			.enumerate()
+			.map(|(i, mime)| (mime.essence_str().to_owned(), i))
+			.into_group_map()
 	}
 }

@@ -52,8 +52,14 @@ where
 	}
 }
 
+impl<T> Copy for AuthStatus<T>
+where
+	T : Copy + Send + 'static
+{
+}
+
 /// The source of the authentication token in the request.
-#[derive(Clone, StateData)]
+#[derive(Clone, Debug, StateData)]
 pub enum AuthSource
 {
 	/// Take the token from a cookie with the given name.
@@ -155,6 +161,7 @@ fn main() {
 }
 ```
 */
+#[derive(Debug)]
 pub struct AuthMiddleware<Data, Handler>
 {
 	source : AuthSource,

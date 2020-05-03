@@ -31,7 +31,7 @@ fn read_all(_state: &mut State) {
 # }
 ```
 */
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct NoContent;
 
 impl From<()> for NoContent

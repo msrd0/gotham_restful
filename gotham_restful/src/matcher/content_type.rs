@@ -34,7 +34,7 @@ route.post("/foo")
 # });
 ```
 */
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ContentTypeMatcher
 {
 	types : Vec<Mime>,

@@ -1,4 +1,6 @@
 #![allow(clippy::tabs_in_doc_comments)]
+#![warn(missing_debug_implementations, rust_2018_idioms)]
+#![deny(intra_doc_link_resolution_failure)]
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. The idea is to
 have several RESTful resources that can be added to the gotham router. This crate will take care

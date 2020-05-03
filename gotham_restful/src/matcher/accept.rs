@@ -86,7 +86,7 @@ route.post("/foo")
 # });
 ```
 */
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AcceptHeaderMatcher
 {
 	types : Vec<Mime>,

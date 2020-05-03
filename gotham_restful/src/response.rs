@@ -2,6 +2,7 @@ use gotham::hyper::{Body, StatusCode};
 use mime::{Mime, APPLICATION_JSON};
 
 /// A response, used to create the final gotham response from.
+#[derive(Debug)]
 pub struct Response
 {
 	pub status : StatusCode,

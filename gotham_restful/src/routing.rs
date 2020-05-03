@@ -53,7 +53,7 @@ pub trait WithOpenapi<D>
 {
 	fn with_openapi<F>(&mut self, info : OpenapiInfo, block : F)
 	where
-		F : FnOnce(OpenapiRouter<D>);
+		F : FnOnce(OpenapiRouter<'_, D>);
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
@@ -320,7 +320,7 @@ macro_rules! implDrawResourceRoutes {
 		{
 			fn with_openapi<F>(&mut self, info : OpenapiInfo, block : F)
 			where
-				F : FnOnce(OpenapiRouter<$implType<'a, C, P>>)
+				F : FnOnce(OpenapiRouter<'_, $implType<'a, C, P>>)
 			{
 				let router = OpenapiRouter {
 					router: self,

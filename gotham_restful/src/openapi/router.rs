@@ -16,6 +16,7 @@ pub trait GetOpenapi
 	fn get_openapi(&mut self, path : &str);
 }
 
+#[derive(Debug)]
 pub struct OpenapiRouter<'a, D>
 {
 	pub router : &'a mut D,

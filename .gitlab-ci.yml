@@ -26,7 +26,7 @@ test-all:
     - cargo -V
   script:
     - cargo test --workspace --all-features --doc
-    - cargo tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'gotham_restful_derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
+    - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'gotham_restful_derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
   artifacts:
     paths:
       - tarpaulin-report.html
