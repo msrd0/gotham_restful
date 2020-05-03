@@ -4,19 +4,19 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use std::iter;
 use syn::{
+	parenthesized,
+	parse_macro_input,
 	parse::{Parse, ParseStream, Result as SynResult},
 	punctuated::Punctuated,
-	token::Comma,
 	DeriveInput,
 	Error,
 	Generics,
 	Ident,
 	Path,
-	parenthesized,
-	parse_macro_input
+	Token
 };
 
-struct MimeList(Punctuated<Path, Comma>);
+struct MimeList(Punctuated<Path, Token![,]>);
 
 impl Parse for MimeList
 {
@@ -24,7 +24,7 @@ impl Parse for MimeList
 	{
 		let content;
 		let _paren = parenthesized!(content in input);
-		let list : Punctuated<Path, Comma> = Punctuated::parse_separated_nonempty(&content)?;
+		let list = Punctuated::parse_separated_nonempty(&content)?;
 		Ok(Self(list))
 	}
 }

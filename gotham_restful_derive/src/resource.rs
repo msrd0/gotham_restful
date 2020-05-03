@@ -6,18 +6,18 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
+	parenthesized,
+	parse_macro_input,
 	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
-	token::Comma,
 	DeriveInput,
 	Error,
 	Ident,
-	parenthesized,
-	parse_macro_input
+	Token
 };
 use std::{iter, str::FromStr};
 
-struct MethodList(Punctuated<Ident, Comma>);
+struct MethodList(Punctuated<Ident, Token![,]>);
 
 impl Parse for MethodList
 {
@@ -25,7 +25,7 @@ impl Parse for MethodList
 	{
 		let content;
 		let _paren = parenthesized!(content in input);
-		let list : Punctuated<Ident, Comma> = Punctuated::parse_separated_nonempty(&content)?;
+		let list = Punctuated::parse_separated_nonempty(&content)?;
 		Ok(Self(list))
 	}
 }

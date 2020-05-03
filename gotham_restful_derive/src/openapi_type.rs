@@ -3,6 +3,7 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
+	parse_macro_input,
 	spanned::Spanned,
 	Attribute,
 	AttributeArgs,
@@ -19,8 +20,7 @@ use syn::{
 	Lit,
 	Meta,
 	NestedMeta,
-	Variant,
-	parse_macro_input
+	Variant
 };
 
 pub fn expand(tokens : TokenStream) -> TokenStream

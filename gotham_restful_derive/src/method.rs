@@ -4,6 +4,7 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
+	parse_macro_input,
 	spanned::Spanned,
 	Attribute,
 	AttributeArgs,
@@ -16,8 +17,7 @@ use syn::{
 	NestedMeta,
 	PatType,
 	ReturnType,
-	Type,
-	parse_macro_input
+	Type
 };
 use std::str::FromStr;
 

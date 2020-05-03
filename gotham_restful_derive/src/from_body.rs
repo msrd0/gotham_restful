@@ -3,17 +3,15 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use std::cmp::min;
 use syn::{
-	punctuated::Punctuated,
+	parse_macro_input,
 	spanned::Spanned,
-	token::Comma,
 	Data,
 	DeriveInput,
 	Error,
 	Field,
 	Fields,
 	Ident,
-	Type,
-	parse_macro_input
+	Type
 };
 
 pub fn expand_from_body(tokens : TokenStream) -> TokenStream
@@ -31,13 +29,17 @@ struct ParsedFields
 
 impl ParsedFields
 {
-	fn from_named(fields : Punctuated<Field, Comma>) -> Result<Self, Error>
+	fn from_named<I>(fields : I) -> Result<Self, Error>
+	where
+		I : Iterator<Item = Field>
 	{
-		let fields = fields.into_iter().map(|field| (field.ident.unwrap(), field.ty)).collect();
+		let fields = fields.map(|field| (field.ident.unwrap(), field.ty)).collect();
 		Ok(Self { fields, named: true })
 	}
 	
-	fn from_unnamed(fields : Punctuated<Field, Comma>) -> Result<Self, Error>
+	fn from_unnamed<I>(fields : I) -> Result<Self, Error>
+	where
+		I : Iterator<Item = Field>
 	{
 		let fields = fields.into_iter().enumerate().map(|(i, field)| (format_ident!("arg{}", i), field.ty)).collect();
 		Ok(Self { fields, named: false })
@@ -63,8 +65,8 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 	}.map_err(|span| Error::new(span, "#[derive(FromBody)] only works for enums"))?;
 	
 	let fields = match strukt.fields {
-		Fields::Named(named) => ParsedFields::from_named(named.named)?,
-		Fields::Unnamed(unnamed) => ParsedFields::from_unnamed(unnamed.unnamed)?,
+		Fields::Named(named) => ParsedFields::from_named(named.named.into_iter())?,
+		Fields::Unnamed(unnamed) => ParsedFields::from_unnamed(unnamed.unnamed.into_iter())?,
 		Fields::Unit => ParsedFields::from_unit()?
 	};
 	
