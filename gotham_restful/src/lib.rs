@@ -160,6 +160,7 @@ pub mod matcher;
 mod openapi;
 #[cfg(feature = "openapi")]
 pub use openapi::{
+	builder::OpenapiInfo,
 	router::GetOpenapi,
 	types::{OpenapiSchema, OpenapiType}
 };

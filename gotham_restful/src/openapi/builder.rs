@@ -6,6 +6,14 @@ use openapiv3::{
 };
 use std::sync::{Arc, RwLock};
 
+#[derive(Clone, Debug)]
+pub struct OpenapiInfo
+{
+	pub title : String,
+	pub version : String,
+	pub urls : Vec<String>
+}
+
 pub struct OpenapiBuilder
 {
 	pub openapi : Arc<RwLock<OpenAPI>>
@@ -13,19 +21,19 @@ pub struct OpenapiBuilder
 
 impl OpenapiBuilder
 {
-	pub fn new(title : String, version : String, url : String) -> Self
+	pub fn new(info : OpenapiInfo) -> Self
 	{
 		Self {
 			openapi: Arc::new(RwLock::new(OpenAPI {
 				openapi: "3.0.2".to_string(),
 				info: openapiv3::Info {
-					title, version,
+					title: info.title,
+					version: info.version,
 					..Default::default()
 				},
-				servers: vec![Server {
-					url,
-					..Default::default()
-				}],
+				servers: info.urls.into_iter()
+					.map(|url| Server { url, ..Default::default() })
+					.collect(),
 				..Default::default()
 			}))
 		}
@@ -92,5 +100,62 @@ impl OpenapiBuilder
 				Item(schema.into_schema())
 			}
 		}
+	}
+}
+
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod test
+{
+	use super::*;
+	
+	#[derive(OpenapiType)]
+	struct Message
+	{
+		msg : String
+	}
+	
+	#[derive(OpenapiType)]
+	struct Messages
+	{
+		msgs : Vec<Message>
+	}
+	
+	fn info() -> OpenapiInfo
+	{
+		OpenapiInfo {
+			title: "TEST CASE".to_owned(),
+			version: "1.2.3".to_owned(),
+			urls: vec!["http://localhost:1234".to_owned(), "https://example.org".to_owned()]
+		}
+	}
+	
+	fn openapi(builder : OpenapiBuilder) -> OpenAPI
+	{
+		Arc::try_unwrap(builder.openapi).unwrap().into_inner().unwrap()
+	}
+	
+	#[test]
+	fn new_builder()
+	{
+		let info = info();
+		let builder = OpenapiBuilder::new(info.clone());
+		let openapi = openapi(builder);
+		
+		assert_eq!(info.title, openapi.info.title);
+		assert_eq!(info.version, openapi.info.version);
+		assert_eq!(info.urls.len(), openapi.servers.len());
+	}
+	
+	#[test]
+	fn add_schema()
+	{
+		let mut builder = OpenapiBuilder::new(info());
+		builder.add_schema::<Option<Messages>>();
+		let openapi = openapi(builder);
+		
+		assert_eq!(openapi.components.clone().unwrap_or_default().schemas["Message"] , ReferenceOr::Item(Message ::schema().into_schema()));
+		assert_eq!(openapi.components.clone().unwrap_or_default().schemas["Messages"], ReferenceOr::Item(Messages::schema().into_schema()));
 	}
 }

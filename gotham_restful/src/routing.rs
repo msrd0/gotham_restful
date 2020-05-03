@@ -8,7 +8,7 @@ use crate::{
 };
 #[cfg(feature = "openapi")]
 use crate::openapi::{
-	builder::OpenapiBuilder,
+	builder::{OpenapiBuilder, OpenapiInfo},
 	router::OpenapiRouter
 };
 
@@ -51,7 +51,7 @@ struct PathExtractor<ID : RefUnwindSafe + Send + 'static>
 #[cfg(feature = "openapi")]
 pub trait WithOpenapi<D>
 {
-	fn with_openapi<F>(&mut self, title : String, version : String, server_url : String, block : F)
+	fn with_openapi<F>(&mut self, info : OpenapiInfo, block : F)
 	where
 		F : FnOnce(OpenapiRouter<D>);
 }
@@ -318,13 +318,13 @@ macro_rules! implDrawResourceRoutes {
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P : RefUnwindSafe + Send + Sync + 'static
 		{
-			fn with_openapi<F>(&mut self, title : String, version : String, server_url : String, block : F)
+			fn with_openapi<F>(&mut self, info : OpenapiInfo, block : F)
 			where
 				F : FnOnce(OpenapiRouter<$implType<'a, C, P>>)
 			{
 				let router = OpenapiRouter {
 					router: self,
-					openapi_builder: &mut OpenapiBuilder::new(title, version, server_url)
+					openapi_builder: &mut OpenapiBuilder::new(info)
 				};
 				block(router);
 			}
