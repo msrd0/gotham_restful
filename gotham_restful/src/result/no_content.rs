@@ -104,3 +104,37 @@ where
 		NoContent::default_status()
 	}
 }
+
+
+#[cfg(test)]
+mod test
+{
+	use super::*;
+	use futures_executor::block_on;
+	use gotham::hyper::StatusCode;
+	use thiserror::Error;
+	
+	#[derive(Debug, Default, Error)]
+	#[error("An Error")]
+	struct MsgError;
+	
+	#[test]
+	fn no_content_has_empty_response()
+	{
+		let no_content = NoContent::default();
+		let res = block_on(no_content.into_response()).expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::NO_CONTENT);
+		assert_eq!(res.mime, None);
+		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+	}
+	
+	#[test]
+	fn no_content_result()
+	{
+		let no_content : Result<NoContent, MsgError> = Ok(NoContent::default());
+		let res = block_on(no_content.into_response()).expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::NO_CONTENT);
+		assert_eq!(res.mime, None);
+		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+	}
+}

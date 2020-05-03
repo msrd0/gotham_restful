@@ -2,7 +2,7 @@ use crate::Response;
 #[cfg(feature = "openapi")]
 use crate::OpenapiSchema;
 use futures_util::future::FutureExt;
-use mime::Mime;
+use mime::{Mime, STAR_STAR};
 use serde::Serialize;
 use std::{
 	error::Error,
@@ -25,6 +25,21 @@ pub use result::IntoResponseError;
 
 mod success;
 pub use success::Success;
+
+
+pub(crate) trait OrAllTypes
+{
+	fn or_all_types(self) -> Vec<Mime>;
+}
+
+impl OrAllTypes for Option<Vec<Mime>>
+{
+	fn or_all_types(self) -> Vec<Mime>
+	{
+		self.unwrap_or_else(|| vec![STAR_STAR])
+	}
+}
+
 
 /// A trait provided to convert a resource's result to json.
 pub trait ResourceResult
@@ -145,13 +160,11 @@ where
 mod test
 {
 	use super::*;
-	use crate::{OpenapiType, StatusCode};
 	use futures_executor::block_on;
-	use mime::{APPLICATION_JSON, TEXT_PLAIN};
 	use thiserror::Error;
 	
 	#[derive(Debug, Default, Deserialize, Serialize)]
-	#[cfg_attr(feature = "openapi", derive(OpenapiType))]
+	#[cfg_attr(feature = "openapi", derive(crate::OpenapiType))]
 	struct Msg
 	{
 		msg : String
@@ -162,63 +175,16 @@ mod test
 	struct MsgError;
 	
 	#[test]
-	fn resource_result_ok()
+	fn result_from_future()
 	{
-		let ok : Result<Msg, MsgError> = Ok(Msg::default());
-		let res = block_on(ok.into_response()).expect("didn't expect error response");
-		assert_eq!(res.status, StatusCode::OK);
-		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body().unwrap(), r#"{"msg":""}"#.as_bytes());
-	}
-	
-	#[test]
-	fn resource_result_err()
-	{
-		let err : Result<Msg, MsgError> = Err(MsgError::default());
-		let res = block_on(err.into_response()).expect("didn't expect error response");
-		assert_eq!(res.status, StatusCode::INTERNAL_SERVER_ERROR);
-		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body().unwrap(), format!(r#"{{"error":true,"message":"{}"}}"#, MsgError::default()).as_bytes());
-	}
-	
-	#[test]
-	fn success_always_successfull()
-	{
-		let success : Success<Msg> = Msg::default().into();
-		let res = block_on(success.into_response()).expect("didn't expect error response");
-		assert_eq!(res.status, StatusCode::OK);
-		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body().unwrap(), r#"{"msg":""}"#.as_bytes());
-	}
-	
-	#[test]
-	fn no_content_has_empty_response()
-	{
-		let no_content = NoContent::default();
-		let res = block_on(no_content.into_response()).expect("didn't expect error response");
-		assert_eq!(res.status, StatusCode::NO_CONTENT);
-		assert_eq!(res.mime, None);
-		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
-	}
-	
-	#[test]
-	fn no_content_result()
-	{
-		let no_content : Result<NoContent, MsgError> = Ok(NoContent::default());
-		let res = block_on(no_content.into_response()).expect("didn't expect error response");
-		assert_eq!(res.status, StatusCode::NO_CONTENT);
-		assert_eq!(res.mime, None);
-		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
-	}
-	
-	#[test]
-	fn raw_response()
-	{
-		let msg = "Test";
-		let raw = Raw::new(msg, TEXT_PLAIN);
-		let res = block_on(raw.into_response()).expect("didn't expect error response");
-		assert_eq!(res.status, StatusCode::OK);
-		assert_eq!(res.mime, Some(TEXT_PLAIN));
-		assert_eq!(res.full_body().unwrap(), msg.as_bytes());
+		let nc = NoContent::default();
+		let res = block_on(nc.into_response()).unwrap();
+		
+		let fut_nc = async move { NoContent::default() }.boxed();
+		let fut_res = block_on(fut_nc.into_response()).unwrap();
+		
+		assert_eq!(res.status, fut_res.status);
+		assert_eq!(res.mime, fut_res.mime);
+		assert_eq!(res.full_body().unwrap(), fut_res.full_body().unwrap());
 	}
 }

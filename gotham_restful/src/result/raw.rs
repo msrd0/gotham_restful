@@ -10,10 +10,11 @@ use mime::Mime;
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde_json::error::Error as SerdeJsonError;
 use std::{
-	fmt::{Debug, Display},
+	fmt::Display,
 	pin::Pin
 };
 
+#[derive(Debug)]
 pub struct Raw<T>
 {
 	pub raw : T,
@@ -36,13 +37,6 @@ impl<T : Clone> Clone for Raw<T>
 			raw: self.raw.clone(),
 			mime: self.mime.clone()
 		}
-	}
-}
-
-impl<T : Debug> Debug for Raw<T>
-{
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "Raw({:?}, {:?})", self.raw, self.mime)
 	}
 }
 
@@ -86,5 +80,25 @@ where
 	fn schema() -> OpenapiSchema
 	{
 		<Raw<T> as ResourceResult>::schema()
+	}
+}
+
+
+#[cfg(test)]
+mod test
+{
+	use super::*;
+	use futures_executor::block_on;
+	use mime::TEXT_PLAIN;
+	
+	#[test]
+	fn raw_response()
+	{
+		let msg = "Test";
+		let raw = Raw::new(msg, TEXT_PLAIN);
+		let res = block_on(raw.into_response()).expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::OK);
+		assert_eq!(res.mime, Some(TEXT_PLAIN));
+		assert_eq!(res.full_body().unwrap(), msg.as_bytes());
 	}
 }

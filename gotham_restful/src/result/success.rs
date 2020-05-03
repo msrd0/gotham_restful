@@ -41,6 +41,7 @@ fn read_all(_state: &mut State) -> Success<MyResponse> {
 # }
 ```
 */
+#[derive(Debug)]
 pub struct Success<T>(T);
 
 impl<T> AsMut<T> for Success<T>
@@ -97,13 +98,6 @@ impl<T : Copy> Copy for Success<T>
 {
 }
 
-impl<T : Debug> Debug for Success<T>
-{
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "Success({:?})", self.0)
-	}
-}
-
 impl<T : Default> Default for Success<T>
 {
 	fn default() -> Self
@@ -132,5 +126,37 @@ where
 	fn schema() -> OpenapiSchema
 	{
 		T::schema()
+	}
+}
+
+
+#[cfg(test)]
+mod test
+{
+	use super::*;
+	use crate::result::OrAllTypes;
+	use futures_executor::block_on;
+	
+	#[derive(Debug, Default, Serialize)]
+	#[cfg_attr(feature = "openapi", derive(crate::OpenapiType))]
+	struct Msg
+	{
+		msg : String
+	}
+	
+	#[test]
+	fn success_always_successfull()
+	{
+		let success : Success<Msg> = Msg::default().into();
+		let res = block_on(success.into_response()).expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::OK);
+		assert_eq!(res.mime, Some(APPLICATION_JSON));
+		assert_eq!(res.full_body().unwrap(), r#"{"msg":""}"#.as_bytes());
+	}
+	
+	#[test]
+	fn success_accepts_json()
+	{
+		assert!(<Success<Msg>>::accepted_types().or_all_types().contains(&APPLICATION_JSON))
 	}
 }

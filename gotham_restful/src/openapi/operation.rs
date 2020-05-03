@@ -6,7 +6,7 @@ use crate::{
 };
 use super::SECURITY_NAME;
 use indexmap::IndexMap;
-use mime::{Mime, STAR_STAR};
+use mime::Mime;
 use openapiv3::{
 	MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr,
 	ReferenceOr::Item, RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind,
@@ -148,7 +148,7 @@ impl<'a> OperationDescription<'a>
 		let (operation_id, default_status, accepted_types, schema, params, body_schema, supported_types, requires_auth) = (
 			self.operation_id, self.default_status, self.accepted_types, self.schema, self.params, self.body_schema, self.supported_types, self.requires_auth);
 		
-		let content = Self::schema_to_content(accepted_types.unwrap_or_else(|| vec![STAR_STAR]), schema);
+		let content = Self::schema_to_content(accepted_types.or_all_types(), schema);
 		
 		let mut responses : IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
 		responses.insert(StatusCode::Code(default_status.as_u16()), Item(Response {
@@ -159,7 +159,7 @@ impl<'a> OperationDescription<'a>
 		
 		let request_body = body_schema.map(|schema| Item(OARequestBody {
 			description: None,
-			content: Self::schema_to_content(supported_types.unwrap_or_else(|| vec![STAR_STAR]), schema),
+			content: Self::schema_to_content(supported_types.or_all_types(), schema),
 			required: true
 		}));
 		
@@ -199,7 +199,7 @@ mod test
 	{
 		let types = NoContent::accepted_types();
 		let schema = <NoContent as OpenapiType>::schema();
-		let content = OperationDescription::schema_to_content(types.unwrap_or_else(|| vec![STAR_STAR]), Item(schema.into_schema()));
+		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
 		assert!(content.is_empty());
 	}
 	
@@ -208,7 +208,7 @@ mod test
 	{
 		let types = Raw::<&str>::accepted_types();
 		let schema = <Raw<&str> as OpenapiType>::schema();
-		let content = OperationDescription::schema_to_content(types.unwrap_or_else(|| vec![STAR_STAR]), Item(schema.into_schema()));
+		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);
