@@ -20,7 +20,7 @@ pub use no_content::NoContent;
 mod raw;
 pub use raw::Raw;
 
-//#[allow(clippy::module_inception)]
+#[allow(clippy::module_inception)]
 mod result;
 pub use result::IntoResponseError;
 

@@ -150,7 +150,7 @@ impl ErrorVariant
 			// the status might be relative to StatusCode, so let's fix that
 			if status.leading_colon.is_none() && status.segments.len() < 2
 			{
-				let status_ident = status.segments.first().map(|path| path.clone()).unwrap_or_else(|| path_segment("OK"));
+				let status_ident = status.segments.first().cloned().unwrap_or_else(|| path_segment("OK"));
 				Path {
 					leading_colon: Some(Default::default()),
 					segments: vec![path_segment("gotham_restful"), path_segment("gotham"), path_segment("hyper"), path_segment("StatusCode"), status_ident].into_iter().collect()
@@ -199,7 +199,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		Data::Union(uni) => Err(uni.union_token.span())
 	}.map_err(|span| Error::new(span, "#[derive(ResourceError)] only works for enums"))?;
 	let variants = inum.variants.into_iter()
-		.map(|variant| process_variant(variant))
+		.map(process_variant)
 		.collect_to_result()?;
 	
 	let display_impl = if variants.iter().any(|v| v.display.is_none()) { None } else {

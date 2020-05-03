@@ -40,7 +40,7 @@ impl ParsedFields
 	where
 		I : Iterator<Item = Field>
 	{
-		let fields = fields.into_iter().enumerate().map(|(i, field)| (format_ident!("arg{}", i), field.ty)).collect();
+		let fields = fields.enumerate().map(|(i, field)| (format_ident!("arg{}", i), field.ty)).collect();
 		Ok(Self { fields, named: false })
 	}
 	
