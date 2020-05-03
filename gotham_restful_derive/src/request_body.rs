@@ -5,7 +5,6 @@ use quote::quote;
 use std::iter;
 use syn::{
 	parenthesized,
-	parse_macro_input,
 	parse::{Parse, ParseStream, Result as SynResult},
 	punctuated::Punctuated,
 	DeriveInput,
@@ -59,7 +58,7 @@ fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream2
 fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
+	let input : DeriveInput = syn::parse(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	

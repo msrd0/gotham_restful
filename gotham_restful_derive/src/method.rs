@@ -151,10 +151,7 @@ impl MethodArgumentType
 	fn quote_ty(&self) -> Option<TokenStream2>
 	{
 		match self {
-			Self::MethodArg(ty) => Some(quote!(#ty)),
-			Self::DatabaseConnection(ty) => Some(quote!(#ty)),
-			Self::AuthStatus(ty) => Some(quote!(#ty)),
-			Self::AuthStatusRef(ty) => Some(quote!(#ty)),
+			Self::MethodArg(ty) | Self::DatabaseConnection(ty) | Self::AuthStatus(ty) | Self::AuthStatusRef(ty) => Some(quote!(#ty)),
 			_ => None
 		}
 	}
@@ -280,7 +277,8 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	let krate = super::krate();
 	
 	// parse attributes
-	let mut method_attrs = parse_macro_input::parse::<AttributeArgs>(attrs)?;
+	// TODO this is not public api but syn currently doesn't offer another convenient way to parse AttributeArgs
+	let mut method_attrs : AttributeArgs = parse_macro_input::parse(attrs)?;
 	let resource_path = match method_attrs.remove(0) {
 		NestedMeta::Meta(Meta::Path(path)) => path,
 		p => return Err(Error::new(p.span(), "Expected name of the Resource struct this method belongs to"))
@@ -288,7 +286,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	let resource_name = resource_path.segments.last().map(|s| s.ident.to_string())
 			.ok_or_else(|| Error::new(resource_path.span(), "Resource name must not be empty"))?;
 	
-	let fun = parse_macro_input::parse::<ItemFn>(item)?;
+	let fun : ItemFn = syn::parse(item)?;
 	let fun_ident = &fun.sig.ident;
 	let fun_vis = &fun.vis;
 	let fun_is_async = fun.sig.asyncness.is_some();

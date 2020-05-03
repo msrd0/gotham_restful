@@ -7,7 +7,6 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
 	parenthesized,
-	parse_macro_input,
 	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
 	DeriveInput,
@@ -33,7 +32,7 @@ impl Parse for MethodList
 fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
+	let input : DeriveInput = syn::parse(tokens)?;
 	let ident = input.ident;
 	let name = ident.to_string();
 	

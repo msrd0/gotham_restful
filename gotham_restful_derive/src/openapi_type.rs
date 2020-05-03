@@ -90,6 +90,7 @@ fn parse_attributes(input : &[Attribute]) -> Result<Attrs, Error>
 		if attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("openapi".to_owned())
 		{
 			let tokens = remove_parens(attr.tokens.clone());
+			// TODO this is not public api but syn currently doesn't offer another convenient way to parse AttributeArgs
 			let nested = parse_macro_input::parse::<AttributeArgs>(tokens.into())?;
 			for meta in nested
 			{

@@ -45,7 +45,7 @@ fn process_variant(variant : Variant) -> Result<ErrorVariant, Error>
 	let status = match variant.attrs.iter()
 		.find(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("status".to_string()))
 	{
-		Some(attr) => Some(parse_macro_input::parse::<Path>(remove_parens(attr.tokens.clone()).into())?),
+		Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
 		None => None
 	};
 	
@@ -85,7 +85,7 @@ fn process_variant(variant : Variant) -> Result<ErrorVariant, Error>
 	let display = match variant.attrs.iter()
 		.find(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("display".to_string()))
 	{
-		Some(attr) => Some(parse_macro_input::parse::<LitStr>(remove_parens(attr.tokens.clone()).into())?),
+		Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
 		None => None
 	};
 	

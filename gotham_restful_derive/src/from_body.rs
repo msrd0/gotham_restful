@@ -3,7 +3,6 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use std::cmp::min;
 use syn::{
-	parse_macro_input,
 	spanned::Spanned,
 	Data,
 	DeriveInput,
@@ -54,7 +53,7 @@ impl ParsedFields
 fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
+	let input : DeriveInput = syn::parse(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	
