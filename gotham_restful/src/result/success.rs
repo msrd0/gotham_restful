@@ -25,6 +25,7 @@ Usage example:
 # use serde::{Deserialize, Serialize};
 #
 # #[derive(Resource)]
+# #[resource(read_all)]
 # struct MyResource;
 #
 #[derive(Deserialize, Serialize)]
@@ -33,7 +34,7 @@ struct MyResponse {
 	message: &'static str
 }
 
-#[rest_read_all(MyResource)]
+#[read_all(MyResource)]
 fn read_all(_state: &mut State) -> Success<MyResponse> {
 	let res = MyResponse { message: "I'm always happy" };
 	res.into()

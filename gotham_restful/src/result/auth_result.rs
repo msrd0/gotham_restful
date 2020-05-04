@@ -29,12 +29,13 @@ look something like this (assuming the `auth` feature is enabled):
 # use serde::Deserialize;
 #
 # #[derive(Resource)]
+# #[resource(read_all)]
 # struct MyResource;
 #
 # #[derive(Clone, Deserialize)]
 # struct MyAuthData { exp : u64 }
 #
-#[rest_read_all(MyResource)]
+#[read_all(MyResource)]
 fn read_all(auth : AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
 	let auth_data = match auth {
 		AuthStatus::Authenticated(data) => data,
@@ -88,12 +89,13 @@ look something like this (assuming the `auth` feature is enabled):
 # use std::io;
 #
 # #[derive(Resource)]
+# #[resource(read_all)]
 # struct MyResource;
 #
 # #[derive(Clone, Deserialize)]
 # struct MyAuthData { exp : u64 }
 #
-#[rest_read_all(MyResource)]
+#[read_all(MyResource)]
 fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent, io::Error> {
 	let auth_data = match auth {
 		AuthStatus::Authenticated(data) => data,

@@ -36,11 +36,12 @@ thiserror = "1.0.15"
 uuid = { version = ">= 0.1, < 0.9", optional = true }
 
 [dev-dependencies]
+diesel = { version = "1.4.4", features = ["postgres"] }
 futures-executor = "0.3.4"
 paste = "0.1.10"
 
 [features]
-default = []
+default = ["errorlog"]
 auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
 errorlog = []
 database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
