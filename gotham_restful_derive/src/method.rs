@@ -133,6 +133,11 @@ enum MethodArgumentType
 
 impl MethodArgumentType
 {
+	fn is_state_ref(&self) -> bool
+	{
+		matches!(self, Self::StateRef | Self::StateMutRef)
+	}
+	
 	fn is_method_arg(&self) -> bool
 	{
 		matches!(self, Self::MethodArg(_))
@@ -368,6 +373,10 @@ pub fn expand_method(method : Method, mut attrs : AttributeArgs, fun : ItemFn) -
 	let mut state_block = quote!();
 	if fun_is_async
 	{
+		if let Some(arg) = args.iter().find(|arg| (*arg).ty.is_state_ref())
+		{
+			return Err(Error::new(arg.span(), "async fn must not take &State as an argument as State is not Sync"));
+		}
 		block = quote!(#block.await);
 	}
 	if is_no_content
