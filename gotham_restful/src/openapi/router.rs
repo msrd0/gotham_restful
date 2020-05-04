@@ -106,7 +106,7 @@ macro_rules! implOpenapiRouter {
 				(&mut *(self.0).router, self.1).create::<Handler>()
 			}
 			
-			fn update_all<Handler : ResourceUpdateAll>(&mut self)
+			fn change_all<Handler : ResourceChangeAll>(&mut self)
 			where
 				Handler::Res : 'static,
 				Handler::Body : 'static
@@ -119,10 +119,10 @@ macro_rules! implOpenapiRouter {
 				item.put = Some(OperationDescription::new::<Handler>(schema).with_body::<Handler::Body>(body_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
 				
-				(&mut *(self.0).router, self.1).update_all::<Handler>()
+				(&mut *(self.0).router, self.1).change_all::<Handler>()
 			}
 			
-			fn update<Handler : ResourceUpdate>(&mut self)
+			fn change<Handler : ResourceChange>(&mut self)
 			where
 				Handler::Res : 'static,
 				Handler::Body : 'static
@@ -136,10 +136,10 @@ macro_rules! implOpenapiRouter {
 				item.put = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).with_body::<Handler::Body>(body_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
 				
-				(&mut *(self.0).router, self.1).update::<Handler>()
+				(&mut *(self.0).router, self.1).change::<Handler>()
 			}
 			
-			fn delete_all<Handler : ResourceDeleteAll>(&mut self)
+			fn remove_all<Handler : ResourceRemoveAll>(&mut self)
 			{
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 
@@ -148,10 +148,10 @@ macro_rules! implOpenapiRouter {
 				item.delete = Some(OperationDescription::new::<Handler>(schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
 				
-				(&mut *(self.0).router, self.1).delete_all::<Handler>()
+				(&mut *(self.0).router, self.1).remove_all::<Handler>()
 			}
 			
-			fn delete<Handler : ResourceDelete>(&mut self)
+			fn remove<Handler : ResourceRemove>(&mut self)
 			{
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
@@ -161,7 +161,7 @@ macro_rules! implOpenapiRouter {
 				item.delete = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
 				
-				(&mut *(self.0).router, self.1).delete::<Handler>()
+				(&mut *(self.0).router, self.1).remove::<Handler>()
 			}
 		}
 

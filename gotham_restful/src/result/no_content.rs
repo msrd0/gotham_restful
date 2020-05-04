@@ -22,9 +22,10 @@ the function attributes:
 # use gotham_restful::*;
 #
 # #[derive(Resource)]
+# #[resource(read_all)]
 # struct MyResource;
 #
-#[rest_read_all(MyResource)]
+#[read_all(MyResource)]
 fn read_all(_state: &mut State) {
 	// do something
 }

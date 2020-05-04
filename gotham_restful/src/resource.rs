@@ -68,32 +68,32 @@ pub trait ResourceCreate : ResourceMethod
 }
 
 /// Handle a PUT request on the Resource root.
-pub trait ResourceUpdateAll : ResourceMethod
+pub trait ResourceChangeAll : ResourceMethod
 {
 	type Body : RequestBody;
 	
-	fn update_all(state : State, body : Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
+	fn change_all(state : State, body : Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
 /// Handle a PUT request on the Resource with an id.
-pub trait ResourceUpdate : ResourceMethod
+pub trait ResourceChange : ResourceMethod
 {
 	type Body : RequestBody;
 	type ID : ResourceID + 'static;
 	
-	fn update(state : State, id : Self::ID, body : Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
+	fn change(state : State, id : Self::ID, body : Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
 /// Handle a DELETE request on the Resource root.
-pub trait ResourceDeleteAll : ResourceMethod
+pub trait ResourceRemoveAll : ResourceMethod
 {
-	fn delete_all(state : State) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
+	fn remove_all(state : State) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
 /// Handle a DELETE request on the Resource with an id.
-pub trait ResourceDelete : ResourceMethod
+pub trait ResourceRemove : ResourceMethod
 {
 	type ID : ResourceID + 'static;
 	
-	fn delete(state : State, id : Self::ID) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
+	fn remove(state : State, id : Self::ID) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }

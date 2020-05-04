@@ -2,67 +2,85 @@
 #![warn(missing_debug_implementations, rust_2018_idioms)]
 #![deny(intra_doc_link_resolution_failure)]
 /*!
-This crate is an extension to the popular [gotham web framework][gotham] for Rust. The idea is to
-have several RESTful resources that can be added to the gotham router. This crate will take care
-of everything else, like parsing path/query parameters, request bodies, and writing response
-bodies, relying on [`serde`][serde] and [`serde_json`][serde_json] for (de)serializing. If you
-enable the `openapi` feature, you can also generate an OpenAPI Specification from your RESTful
-resources.
-
 **Note:** The `stable` branch contains some bugfixes against the last release. The `master`
 branch currently tracks gotham's master branch and the next release will use gotham 0.5.0 and be
 compatible with the new future / async stuff.
 
-# Usage
+This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
+create resources with assigned methods that aim to be a more convenient way of creating handlers
+for requests. Assuming you assign `/foobar` to your resource, you can implement the following
+methods:
 
-A basic server with only one resource, handling a simple `GET` request, could look like this:
+| Method Name | Required Arguments | HTTP Verb | HTTP Path      |
+| ----------- | ------------------ | --------- | -----------    |
+| read_all    |                    | GET       | /foobar        |
+| read        | id                 | GET       | /foobar/:id    |
+| search      | query              | GET       | /foobar/search |
+| create      | body               | POST      | /foobar        |
+| change_all  | body               | PUT       | /foobar        |
+| change      | id, body           | PUT       | /foobar/:id    |
+| remove_all  |                    | DELETE    | /foobar        |
+| remove      | id                 | DELETE    | /foobar/:id    |
+
+Each of those methods has a macro that creates the neccessary boilerplate for the Resource. A
+simple example could look like this:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::builder::*, state::State};
-# use gotham_restful::{DrawResources, Resource, Success};
+# use gotham::router::builder::*;
+# use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
-/// Our RESTful Resource.
+/// Our RESTful resource.
 #[derive(Resource)]
-#[rest_resource(read_all)]
-struct UsersResource;
+#[resource(read)]
+struct FooResource;
 
-/// Our return type.
-#[derive(Deserialize, Serialize)]
+/// The return type of the foo read method.
+#[derive(Serialize)]
 # #[derive(OpenapiType)]
-struct User {
-	id: i64,
-	username: String,
-	email: String
+struct Foo {
+	id: u64
 }
 
-/// Our handler method.
-#[rest_read_all(UsersResource)]
-fn read_all(_state: &mut State) -> Success<Vec<User>> {
-	vec![User {
-		id: 1,
-		username: "h4ck3r".to_string(),
-		email: "h4ck3r@example.org".to_string()
-	}].into()
+/// The foo read method handler.
+#[read(FooResource)]
+fn read(id: u64) -> Success<Foo> {
+	Foo { id }.into()
 }
-
-/// Our main method.
-fn main() {
-	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-		route.resource::<UsersResource>("users");
-	}));
-}
+# fn main() {
+# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+# 		route.resource::<FooResource>("foo");
+# 	}));
+# }
 ```
 
-Uploads and Downloads can also be handled:
+# Arguments
+
+Some methods require arguments. Those should be
+ * **id** Should be a deserializable json-primitive like `i64` or `String`.
+ * **body** Should be any deserializable object, or any type implementing [`RequestBody`].
+ * **query** Should be any deserializable object whose variables are json-primitives. It will
+   however not be parsed from json, but from HTTP GET parameters like in `search?id=1`. The
+   type needs to implement [`QueryStringExtractor`].
+
+Additionally, non-async handlers may take a reference to gotham's [`State`]. If you need to
+have an async handler (that is, the function that the method macro is invoked on is declared
+as `async fn`), consider returning the boxed future instead. Since [`State`] does not implement
+`Sync` there is unfortunately no more convenient way.
+
+# Uploads and Downloads
+
+By default, every request body is parsed from json, and every respone is converted to json using
+[serde_json]. However, you may also use raw bodies. This is an example where the request body
+is simply returned as the response again, no json parsing involved:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::builder::*, state::State};
-# use gotham_restful::{DrawResources, Mime, Raw, Resource, Success};
+# use gotham::router::builder::*;
+# use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
-#[rest_resource(create)]
+#[resource(create)]
 struct ImageResource;
 
 #[derive(FromBody, RequestBody)]
@@ -72,8 +90,8 @@ struct RawImage {
 	content_type: Mime
 }
 
-#[rest_create(ImageResource)]
-fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
+#[create(ImageResource)]
+fn create(body : RawImage) -> Raw<Vec<u8>> {
 	Raw::new(body.content, body.content_type)
 }
 # fn main() {
@@ -83,17 +101,119 @@ fn create(_state : &mut State, body : RawImage) -> Raw<Vec<u8>> {
 # }
 ```
 
-Look at the [example] for more methods and usage with the `openapi` feature.
+# Features
 
-# Known Issues
+To make life easier for common use-cases, this create offers a few features that might be helpful
+when you implement your web server.
 
-These are currently known major issues. For a complete list please see
-[the issue tracker](https://gitlab.com/msrd0/gotham-restful/issues).
-If you encounter any issues that aren't yet reported, please report them
-[here](https://gitlab.com/msrd0/gotham-restful/issues/new).
+## Authentication Feature
 
- - Enabling the `openapi` feature might break code ([#4](https://gitlab.com/msrd0/gotham-restful/issues/4))
- - For `chrono`'s `DateTime` types, the format is `date-time` instead of `datetime` ([openapiv3#14](https://github.com/glademiller/openapiv3/pull/14))
+In order to enable authentication support, enable the `auth` feature gate. This allows you to
+register a middleware that can automatically check for the existence of an JWT authentication
+token. Besides being supported by the method macros, it supports to lookup the required JWT secret
+with the JWT data, hence you can use several JWT secrets and decide on the fly which secret to use.
+None of this is currently supported by gotham's own JWT middleware.
+
+A simple example that uses only a single secret could look like this:
+
+```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham_restful::*;
+# use serde::{Deserialize, Serialize};
+#[derive(Resource)]
+#[resource(read)]
+struct SecretResource;
+
+#[derive(Serialize)]
+# #[derive(OpenapiType)]
+struct Secret {
+	id: u64,
+	intended_for: String
+}
+
+#[derive(Deserialize, Clone)]
+struct AuthData {
+	sub: String,
+	exp: u64
+}
+
+#[read(SecretResource)]
+fn read(auth: AuthStatus<AuthData>, id: u64) -> AuthSuccess<Secret> {
+	let intended_for = auth.ok()?.sub;
+	Ok(Secret { id, intended_for })
+}
+
+fn main() {
+	let auth: AuthMiddleware<AuthData, _> = AuthMiddleware::new(
+		AuthSource::AuthorizationHeader,
+		AuthValidation::default(),
+		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
+	);
+	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
+	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
+		route.resource::<SecretResource>("secret");
+	}));
+}
+```
+
+## Database Feature
+
+The database feature allows an easy integration of [diesel] into your handler functions. Please
+note however that due to the way gotham's diesel middleware implementation, it is not possible
+to run async code while holding a database connection. If you need to combine async and database,
+you'll need to borrow the connection from the [`State`] yourself and return a boxed future.
+
+A simple non-async example could look like this:
+
+```rust,no_run
+# #[macro_use] extern crate diesel;
+# #[macro_use] extern crate gotham_restful_derive;
+# use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
+# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham_middleware_diesel::DieselMiddleware;
+# use gotham_restful::*;
+# use serde::{Deserialize, Serialize};
+# use std::env;
+# table! {
+#   foo (id) {
+#     id -> Int8,
+#     value -> Text,
+#   }
+# }
+#[derive(Resource)]
+#[resource(read_all)]
+struct FooResource;
+
+#[derive(Queryable, Serialize)]
+# #[derive(OpenapiType)]
+struct Foo {
+	id: i64,
+	value: String
+}
+
+#[read_all(FooResource)]
+fn read_all(conn: &PgConnection) -> QueryResult<Vec<Foo>> {
+	foo::table.load(conn)
+}
+
+type Repo = gotham_middleware_diesel::Repo<PgConnection>;
+
+fn main() {
+	let repo = Repo::new(&env::var("DATABASE_URL").unwrap());
+	let diesel = DieselMiddleware::new(repo);
+	
+	let (chain, pipelines) = single_pipeline(new_pipeline().add(diesel).build());
+	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
+		route.resource::<FooResource>("foo");
+	}));
+}
+```
+
+# Examples
+
+There is a lack of good examples, but there is currently a collection of code in the [example] 
+directory, that might help you. Any help writing more examples is highly appreciated.
 
 # License
 
@@ -102,10 +222,13 @@ Licensed under your option of:
  - [Eclipse Public License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-EPL)
 
 
-[example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
-[gotham]: https://gotham.rs/
-[serde]: https://github.com/serde-rs/serde#serde-----
-[serde_json]: https://github.com/serde-rs/json#serde-json----
+ [diesel]: https://diesel.rs/
+ [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
+ [gotham]: https://gotham.rs/
+ [serde_json]: https://github.com/serde-rs/json#serde-json----
+ [`QueryStringExtractor`]: ../gotham/extractor/trait.QueryStringExtractor.html
+ [`RequestBody`]: trait.RequestBody.html
+ [`State`]: ../gotham/state/struct.State.html
 */
 
 // weird proc macro issue
@@ -175,10 +298,10 @@ pub use resource::{
 	ResourceRead,
 	ResourceSearch,
 	ResourceCreate,
-	ResourceUpdateAll,
-	ResourceUpdate,
-	ResourceDeleteAll,
-	ResourceDelete
+	ResourceChangeAll,
+	ResourceChange,
+	ResourceRemoveAll,
+	ResourceRemove
 };
 
 mod response;

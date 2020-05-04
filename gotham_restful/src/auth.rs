@@ -1,4 +1,4 @@
-use crate::HeaderName;
+use crate::{AuthError, Forbidden, HeaderName};
 use cookie::CookieJar;
 use futures_util::{future, future::{FutureExt, TryFutureExt}};
 use gotham::{
@@ -56,6 +56,17 @@ impl<T> Copy for AuthStatus<T>
 where
 	T : Copy + Send + 'static
 {
+}
+
+impl<T : Send + 'static> AuthStatus<T>
+{
+	pub fn ok(self) -> Result<T, AuthError>
+	{
+		match self {
+			Self::Authenticated(data) => Ok(data),
+			_ => Err(Forbidden)
+		}
+	}
 }
 
 /// The source of the authentication token in the request.
@@ -134,7 +145,7 @@ simply add it to your pipeline and request it inside your handler:
 # use serde::{Deserialize, Serialize};
 #
 #[derive(Resource)]
-#[rest_resource(read_all)]
+#[resource(read_all)]
 struct AuthResource;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -143,7 +154,7 @@ struct AuthData {
 	exp: u64
 }
 
-#[rest_read_all(AuthResource)]
+#[read_all(AuthResource)]
 fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
 	format!("{:?}", auth).into()
 }
