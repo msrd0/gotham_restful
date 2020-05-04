@@ -1,6 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
+use syn::{parse_macro_input, parse_macro_input::ParseMacroInput, DeriveInput, Result};
 
 mod util;
 
@@ -16,95 +17,118 @@ mod resource_error;
 use resource_error::expand_resource_error;
 #[cfg(feature = "openapi")]
 mod openapi_type;
+#[cfg(feature = "openapi")]
+use openapi_type::expand_openapi_type;
 
 #[inline]
-fn print_tokens(tokens : TokenStream) -> TokenStream
+fn print_tokens(tokens : TokenStream2) -> TokenStream
 {
 	//eprintln!("{}", tokens);
-	tokens
+	tokens.into()
 }
 
+#[inline]
+fn expand_derive<F>(input : TokenStream, expand : F) -> TokenStream
+where
+	F : FnOnce(DeriveInput) -> Result<TokenStream2>
+{
+	print_tokens(expand(parse_macro_input!(input))
+		.unwrap_or_else(|err| err.to_compile_error()))
+}
+
+#[inline]
+fn expand_macro<F, A, I>(attrs : TokenStream, item : TokenStream, expand : F) -> TokenStream
+where
+	F : FnOnce(A, I) -> Result<TokenStream2>,
+	A : ParseMacroInput,
+	I : ParseMacroInput
+{
+	print_tokens(expand(parse_macro_input!(attrs), parse_macro_input!(item))
+		.unwrap_or_else(|err| err.to_compile_error()))
+}
+
+#[inline]
 fn krate() -> TokenStream2
 {
 	quote!(::gotham_restful)
 }
 
 #[proc_macro_derive(FromBody)]
-pub fn derive_from_body(tokens : TokenStream) -> TokenStream
+pub fn derive_from_body(input : TokenStream) -> TokenStream
 {
-	print_tokens(expand_from_body(tokens))
+	expand_derive(input, expand_from_body)
 }
 
 #[cfg(feature = "openapi")]
 #[proc_macro_derive(OpenapiType, attributes(openapi))]
-pub fn derive_openapi_type(tokens : TokenStream) -> TokenStream
+pub fn derive_openapi_type(input : TokenStream) -> TokenStream
 {
-	print_tokens(openapi_type::expand(tokens))
+	expand_derive(input, expand_openapi_type)
 }
 
 #[proc_macro_derive(RequestBody, attributes(supported_types))]
-pub fn derive_request_body(tokens : TokenStream) -> TokenStream
+pub fn derive_request_body(input : TokenStream) -> TokenStream
 {
-	print_tokens(expand_request_body(tokens))
+	expand_derive(input, expand_request_body)
 }
 
 #[proc_macro_derive(Resource, attributes(rest_resource))]
-pub fn derive_resource(tokens : TokenStream) -> TokenStream
+pub fn derive_resource(input : TokenStream) -> TokenStream
 {
-	print_tokens(expand_resource(tokens))
+	expand_derive(input, expand_resource)
 }
 
 #[proc_macro_derive(ResourceError, attributes(display, from, status))]
-pub fn derive_resource_error(tokens : TokenStream) -> TokenStream
+pub fn derive_resource_error(input : TokenStream) -> TokenStream
 {
-	print_tokens(expand_resource_error(tokens))
+	expand_derive(input, expand_resource_error)
 }
 
 
 #[proc_macro_attribute]
 pub fn rest_read_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::ReadAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::ReadAll, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_read(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::Read, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Read, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_search(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::Search, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Search, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_create(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::Create, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Create, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_update_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::UpdateAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::UpdateAll, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_update(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::Update, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Update, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_delete_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::DeleteAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::DeleteAll, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn rest_delete(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	print_tokens(expand_method(Method::Delete, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Delete, attr, item))
 }

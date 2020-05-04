@@ -1,9 +1,5 @@
-use crate::{
-	method::Method,
-	util::CollectToResult
-};
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use crate::{method::Method, util::CollectToResult};
+use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{
 	parenthesized,
@@ -11,7 +7,7 @@ use syn::{
 	punctuated::Punctuated,
 	DeriveInput,
 	Error,
-	Ident,
+	Result,
 	Token
 };
 use std::{iter, str::FromStr};
@@ -20,7 +16,7 @@ struct MethodList(Punctuated<Ident, Token![,]>);
 
 impl Parse for MethodList
 {
-	fn parse(input: ParseStream) -> Result<Self, Error>
+	fn parse(input: ParseStream) -> Result<Self>
 	{
 		let content;
 		let _paren = parenthesized!(content in input);
@@ -29,10 +25,9 @@ impl Parse for MethodList
 	}
 }
 
-fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
+pub fn expand_resource(input : DeriveInput) -> Result<TokenStream>
 {
 	let krate = super::krate();
-	let input : DeriveInput = syn::parse(tokens)?;
 	let ident = input.ident;
 	let name = ident.to_string();
 	
@@ -46,7 +41,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 			let mod_ident = method.mod_ident(&name);
 			let ident = method.setup_ident(&name);
 			Ok(quote!(#mod_ident::#ident(&mut route);))
-		})) as Box<dyn Iterator<Item = Result<TokenStream2, Error>>>,
+		})) as Box<dyn Iterator<Item = Result<TokenStream>>>,
 		Err(err) => Box::new(iter::once(Err(err)))
 	}).collect_to_result()?;
 	
@@ -64,11 +59,4 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 			}
 		}
 	})
-}
-
-pub fn expand_resource(tokens : TokenStream) -> TokenStream
-{
-	expand(tokens)
-		.unwrap_or_else(|err| err.to_compile_error())
-		.into()
 }

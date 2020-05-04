@@ -1,5 +1,4 @@
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use std::cmp::min;
 use syn::{
@@ -10,15 +9,9 @@ use syn::{
 	Field,
 	Fields,
 	Ident,
+	Result,
 	Type
 };
-
-pub fn expand_from_body(tokens : TokenStream) -> TokenStream
-{
-	expand(tokens)
-		.unwrap_or_else(|err| err.to_compile_error())
-		.into()
-}
 
 struct ParsedFields
 {
@@ -28,7 +21,7 @@ struct ParsedFields
 
 impl ParsedFields
 {
-	fn from_named<I>(fields : I) -> Result<Self, Error>
+	fn from_named<I>(fields : I) -> Result<Self>
 	where
 		I : Iterator<Item = Field>
 	{
@@ -36,7 +29,7 @@ impl ParsedFields
 		Ok(Self { fields, named: true })
 	}
 	
-	fn from_unnamed<I>(fields : I) -> Result<Self, Error>
+	fn from_unnamed<I>(fields : I) -> Result<Self>
 	where
 		I : Iterator<Item = Field>
 	{
@@ -44,16 +37,15 @@ impl ParsedFields
 		Ok(Self { fields, named: false })
 	}
 	
-	fn from_unit() -> Result<Self, Error>
+	fn from_unit() -> Result<Self>
 	{
 		Ok(Self { fields: Vec::new(), named: false })
 	}
 }
 
-fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
+pub fn expand_from_body(input : DeriveInput) -> Result<TokenStream>
 {
 	let krate = super::krate();
-	let input : DeriveInput = syn::parse(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	

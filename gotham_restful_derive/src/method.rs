@@ -1,10 +1,8 @@
 use crate::util::CollectToResult;
 use heck::{CamelCase, SnakeCase};
-use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote};
 use syn::{
-	parse_macro_input,
 	spanned::Spanned,
 	Attribute,
 	AttributeArgs,
@@ -16,6 +14,7 @@ use syn::{
 	Meta,
 	NestedMeta,
 	PatType,
+	Result,
 	ReturnType,
 	Type
 };
@@ -35,8 +34,9 @@ pub enum Method
 
 impl FromStr for Method
 {
-	type Err = String;
-	fn from_str(str : &str) -> Result<Self, Self::Err>
+	type Err = Error;
+	
+	fn from_str(str : &str) -> Result<Self>
 	{
 		match str {
 			"ReadAll" | "read_all" => Ok(Self::ReadAll),
@@ -47,7 +47,7 @@ impl FromStr for Method
 			"Update" | "update" => Ok(Self::Update),
 			"DeleteAll" | "delete_all" => Ok(Self::DeleteAll),
 			"Delete" | "delete" => Ok(Self::Delete),
-			_ => Err(format!("Unknown method: `{}'", str))
+			_ => Err(Error::new(Span::call_site(), format!("Unknown method: `{}'", str)))
 		}
 	}
 }
@@ -148,7 +148,7 @@ impl MethodArgumentType
 		matches!(self, Self::AuthStatus(_) | Self::AuthStatusRef(_))
 	}
 	
-	fn quote_ty(&self) -> Option<TokenStream2>
+	fn quote_ty(&self) -> Option<TokenStream>
 	{
 		match self {
 			Self::MethodArg(ty) | Self::DatabaseConnection(ty) | Self::AuthStatus(ty) | Self::AuthStatusRef(ty) => Some(quote!(#ty)),
@@ -172,7 +172,7 @@ impl Spanned for MethodArgument
 	}
 }
 
-fn interpret_arg_ty(attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType, Error>
+fn interpret_arg_ty(attrs : &[Attribute], name : &str, ty : Type) -> Result<MethodArgumentType>
 {
 	let attr = attrs.iter()
 		.find(|arg| arg.path.segments.iter().any(|path| &path.ident.to_string() == "rest_arg"))
@@ -206,7 +206,7 @@ fn interpret_arg_ty(attrs : &[Attribute], name : &str, ty : Type) -> Result<Meth
 	Ok(MethodArgumentType::MethodArg(ty))
 }
 
-fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument, Error>
+fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument>
 {
 	let pat = &arg.pat;
 	let ident = format_ident!("arg{}", index);
@@ -217,7 +217,7 @@ fn interpret_arg(index : usize, arg : &PatType) -> Result<MethodArgument, Error>
 }
 
 #[cfg(feature = "openapi")]
-fn expand_operation_id(attrs : &[NestedMeta]) -> TokenStream2
+fn expand_operation_id(attrs : &[NestedMeta]) -> TokenStream
 {
 	let mut operation_id : Option<&Lit> = None;
 	for meta in attrs
@@ -243,12 +243,12 @@ fn expand_operation_id(attrs : &[NestedMeta]) -> TokenStream2
 }
 
 #[cfg(not(feature = "openapi"))]
-fn expand_operation_id(_ : &[NestedMeta]) -> TokenStream2
+fn expand_operation_id(_ : &[NestedMeta]) -> TokenStream
 {
 	quote!()
 }
 
-fn expand_wants_auth(attrs : &[NestedMeta], default : bool) -> TokenStream2
+fn expand_wants_auth(attrs : &[NestedMeta], default : bool) -> TokenStream
 {
 	let default_lit = Lit::Bool(LitBool { value: default, span: Span::call_site() });
 	let mut wants_auth = &default_lit;
@@ -272,21 +272,18 @@ fn expand_wants_auth(attrs : &[NestedMeta], default : bool) -> TokenStream2
 }
 
 #[allow(clippy::comparison_chain)]
-fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<TokenStream2, Error>
+pub fn expand_method(method : Method, mut attrs : AttributeArgs, fun : ItemFn) -> Result<TokenStream>
 {
 	let krate = super::krate();
 	
 	// parse attributes
-	// TODO this is not public api but syn currently doesn't offer another convenient way to parse AttributeArgs
-	let mut method_attrs : AttributeArgs = parse_macro_input::parse(attrs)?;
-	let resource_path = match method_attrs.remove(0) {
+	let resource_path = match attrs.remove(0) {
 		NestedMeta::Meta(Meta::Path(path)) => path,
 		p => return Err(Error::new(p.span(), "Expected name of the Resource struct this method belongs to"))
 	};
 	let resource_name = resource_path.segments.last().map(|s| s.ident.to_string())
 			.ok_or_else(|| Error::new(resource_path.span(), "Resource name must not be empty"))?;
 	
-	let fun : ItemFn = syn::parse(item)?;
 	let fun_ident = &fun.sig.ident;
 	let fun_vis = &fun.vis;
 	let fun_is_async = fun.sig.asyncness.is_some();
@@ -337,7 +334,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	{
 		return Err(Error::new(fun_ident.span(), "Too few arguments"));
 	}
-	let generics : Vec<TokenStream2> = generics_args.iter()
+	let generics : Vec<TokenStream> = generics_args.iter()
 		.map(|arg| arg.ty.quote_ty().unwrap())
 		.zip(ty_names)
 		.map(|(arg, name)| {
@@ -347,7 +344,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 		.collect();
 	
 	// extract the definition of our method
-	let mut args_def : Vec<TokenStream2> = args.iter()
+	let mut args_def : Vec<TokenStream> = args.iter()
 		.filter(|arg| (*arg).ty.is_method_arg())
 		.map(|arg| {
 			let ident = &arg.ident;
@@ -357,7 +354,7 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	args_def.insert(0, quote!(mut #state_ident : #krate::State));
 	
 	// extract the arguments to pass over to the supplied method
-	let args_pass : Vec<TokenStream2> = args.iter().map(|arg| match (&arg.ty, &arg.ident) {
+	let args_pass : Vec<TokenStream> = args.iter().map(|arg| match (&arg.ty, &arg.ident) {
 		(MethodArgumentType::StateRef, _) => quote!(&#state_ident),
 		(MethodArgumentType::StateMutRef, _) => quote!(&mut #state_ident),
 		(MethodArgumentType::MethodArg(_), ident) => quote!(#ident),
@@ -417,8 +414,8 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 	}
 	
 	// attribute generated code
-	let operation_id = expand_operation_id(&method_attrs);
-	let wants_auth = expand_wants_auth(&method_attrs, args.iter().any(|arg| (*arg).ty.is_auth_status()));
+	let operation_id = expand_operation_id(&attrs);
+	let wants_auth = expand_wants_auth(&attrs, args.iter().any(|arg| (*arg).ty.is_auth_status()));
 	
 	// put everything together
 	Ok(quote! {
@@ -465,11 +462,4 @@ fn expand(method : Method, attrs : TokenStream, item : TokenStream) -> Result<To
 			
 		}
 	})
-}
-
-pub fn expand_method(method : Method, attrs : TokenStream, item : TokenStream) -> TokenStream
-{
-	expand(method, attrs, item)
-		.unwrap_or_else(|err| err.to_compile_error())
-		.into()
 }

@@ -1,17 +1,15 @@
 use crate::util::CollectToResult;
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::iter;
 use syn::{
 	parenthesized,
-	parse::{Parse, ParseStream, Result as SynResult},
+	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
 	DeriveInput,
-	Error,
 	Generics,
-	Ident,
 	Path,
+	Result,
 	Token
 };
 
@@ -19,7 +17,7 @@ struct MimeList(Punctuated<Path, Token![,]>);
 
 impl Parse for MimeList
 {
-	fn parse(input: ParseStream) -> SynResult<Self>
+	fn parse(input: ParseStream) -> Result<Self>
 	{
 		let content;
 		let _paren = parenthesized!(content in input);
@@ -29,13 +27,13 @@ impl Parse for MimeList
 }
 
 #[cfg(not(feature = "openapi"))]
-fn impl_openapi_type(_ident : &Ident, _generics : &Generics) -> TokenStream2
+fn impl_openapi_type(_ident : &Ident, _generics : &Generics) -> TokenStream
 {
 	quote!()
 }
 
 #[cfg(feature = "openapi")]
-fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream2
+fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream
 {
 	let krate = super::krate();
 	
@@ -55,10 +53,9 @@ fn impl_openapi_type(ident : &Ident, generics : &Generics) -> TokenStream2
 	}
 }
 
-fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
+pub fn expand_request_body(input : DeriveInput) -> Result<TokenStream>
 {
 	let krate = super::krate();
-	let input : DeriveInput = syn::parse(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	
@@ -66,7 +63,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		.filter(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string()))
 		.flat_map(|attr|
 			syn::parse2::<MimeList>(attr.tokens)
-				.map(|list| Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path, Error>>>)
+				.map(|list| Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path>>>)
 				.unwrap_or_else(|err| Box::new(iter::once(Err(err)))))
 		.collect_to_result()?;
 	
@@ -89,11 +86,4 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		
 		#impl_openapi_type
 	})
-}
-
-pub fn expand_request_body(tokens : TokenStream) -> TokenStream
-{
-	expand(tokens)
-		.unwrap_or_else(|err| err.to_compile_error())
-		.into()
 }

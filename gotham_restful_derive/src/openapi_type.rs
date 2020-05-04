@@ -1,6 +1,5 @@
 use crate::util::{CollectToResult, remove_parens};
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{
 	parse_macro_input,
@@ -16,29 +15,23 @@ use syn::{
 	Fields,
 	Generics,
 	GenericParam,
-	Ident,
 	Lit,
 	Meta,
 	NestedMeta,
+	Result,
 	Variant
 };
 
-pub fn expand(tokens : TokenStream) -> TokenStream
+pub fn expand_openapi_type(input : DeriveInput) -> Result<TokenStream>
 {
-	let input = parse_macro_input!(tokens as DeriveInput);
-	
-	let output = match (input.ident, input.generics, input.attrs, input.data) {
+	match (input.ident, input.generics, input.attrs, input.data) {
 		(ident, generics, attrs, Data::Enum(inum)) => expand_enum(ident, generics, attrs, inum),
 		(ident, generics, attrs, Data::Struct(strukt)) => expand_struct(ident, generics, attrs, strukt),
 		(_, _, _, Data::Union(uni)) => Err(Error::new(uni.union_token.span(), "#[derive(OpenapiType)] only works for structs and enums"))
-	};
-	
-	output
-		.unwrap_or_else(|err| err.to_compile_error())
-		.into()
+	}
 }
 
-fn expand_where(generics : &Generics) -> TokenStream2
+fn expand_where(generics : &Generics) -> TokenStream
 {
 	if generics.params.is_empty()
 	{
@@ -66,7 +59,7 @@ struct Attrs
 	rename : Option<String>
 }
 
-fn to_string(lit : &Lit) -> Result<String, Error>
+fn to_string(lit : &Lit) -> Result<String>
 {
 	match lit {
 		Lit::Str(str) => Ok(str.value()),
@@ -74,7 +67,7 @@ fn to_string(lit : &Lit) -> Result<String, Error>
 	}
 }
 
-fn to_bool(lit : &Lit) -> Result<bool, Error>
+fn to_bool(lit : &Lit) -> Result<bool>
 {
 	match lit {
 		Lit::Bool(bool) => Ok(bool.value),
@@ -82,7 +75,7 @@ fn to_bool(lit : &Lit) -> Result<bool, Error>
 	}
 }
 
-fn parse_attributes(input : &[Attribute]) -> Result<Attrs, Error>
+fn parse_attributes(input : &[Attribute]) -> Result<Attrs>
 {
 	let mut parsed = Attrs::default();
 	for attr in input
@@ -111,7 +104,7 @@ fn parse_attributes(input : &[Attribute]) -> Result<Attrs, Error>
 	Ok(parsed)
 }
 
-fn expand_variant(variant : &Variant) -> Result<TokenStream2, Error>
+fn expand_variant(variant : &Variant) -> Result<TokenStream>
 {
 	if variant.fields != Fields::Unit
 	{
@@ -131,7 +124,7 @@ fn expand_variant(variant : &Variant) -> Result<TokenStream2, Error>
 	})
 }
 
-fn expand_enum(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input : DataEnum) -> Result<TokenStream2, Error>
+fn expand_enum(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input : DataEnum) -> Result<TokenStream>
 {
 	let krate = super::krate();
 	let where_clause = expand_where(&generics);
@@ -176,7 +169,7 @@ fn expand_enum(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input
 	})
 }
 
-fn expand_field(field : &Field) -> Result<TokenStream2, Error>
+fn expand_field(field : &Field) -> Result<TokenStream>
 {
 	let ident = match &field.ident {
 		Some(ident) => ident,
@@ -231,7 +224,7 @@ fn expand_field(field : &Field) -> Result<TokenStream2, Error>
 	}})
 }
 
-pub fn expand_struct(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input : DataStruct) -> Result<TokenStream2, Error>
+fn expand_struct(ident : Ident, generics : Generics, attrs : Vec<Attribute>, input : DataStruct) -> Result<TokenStream>
 {
 	let krate = super::krate();
 	let where_clause = expand_where(&generics);
@@ -243,7 +236,7 @@ pub fn expand_struct(ident : Ident, generics : Generics, attrs : Vec<Attribute>,
 		None => ident.to_string()
 	};
 	
-	let fields : Vec<TokenStream2> = match input.fields {
+	let fields : Vec<TokenStream> = match input.fields {
 		Fields::Named(named_fields) => {
 			named_fields.named.iter()
 				.map(expand_field)

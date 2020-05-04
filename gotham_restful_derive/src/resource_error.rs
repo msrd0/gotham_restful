@@ -1,12 +1,10 @@
 use crate::util::{CollectToResult, remove_parens};
 use lazy_static::lazy_static;
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
 use std::iter;
 use syn::{
-	parse_macro_input,
 	spanned::Spanned,
 	Attribute,
 	Data,
@@ -14,10 +12,10 @@ use syn::{
 	Error,
 	Fields,
 	GenericParam,
-	Ident,
 	LitStr,
 	Path,
 	PathSegment,
+	Result,
 	Type,
 	Variant
 };
@@ -40,7 +38,7 @@ struct ErrorVariant
 	display : Option<LitStr>
 }
 
-fn process_variant(variant : Variant) -> Result<ErrorVariant, Error>
+fn process_variant(variant : Variant) -> Result<ErrorVariant>
 {
 	let status = match variant.attrs.iter()
 		.find(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("status".to_string()))
@@ -114,7 +112,7 @@ lazy_static! {
 
 impl ErrorVariant
 {
-	fn fields_pat(&self) -> TokenStream2
+	fn fields_pat(&self) -> TokenStream
 	{
 		let mut fields = self.fields.iter().map(|field| &field.ident).peekable();
 		if fields.peek().is_none() {
@@ -126,7 +124,7 @@ impl ErrorVariant
 		}
 	}
 	
-	fn to_display_match_arm(&self, formatter_ident : &Ident, enum_ident : &Ident) -> Result<TokenStream2, Error>
+	fn to_display_match_arm(&self, formatter_ident : &Ident, enum_ident : &Ident) -> Result<TokenStream>
 	{
 		let ident = &self.ident;
 		let display = self.display.as_ref().ok_or_else(|| Error::new(self.ident.span(), "Missing display string for this variant"))?;
@@ -142,7 +140,7 @@ impl ErrorVariant
 		})
 	}
 	
-	fn into_match_arm(self, krate : &TokenStream2, enum_ident : &Ident) -> TokenStream2
+	fn into_match_arm(self, krate : &TokenStream, enum_ident : &Ident) -> TokenStream
 	{
 		let ident = &self.ident;
 		let fields_pat = self.fields_pat();
@@ -177,7 +175,7 @@ impl ErrorVariant
 		}
 	}
 	
-	fn were(&self) -> Option<TokenStream2>
+	fn were(&self) -> Option<TokenStream>
 	{
 		match self.from_ty.as_ref() {
 			Some((_, ty)) => Some(quote!( #ty : ::std::error::Error )),
@@ -186,10 +184,9 @@ impl ErrorVariant
 	}
 }
 
-fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
+pub fn expand_resource_error(input : DeriveInput) -> Result<TokenStream>
 {
 	let krate = super::krate();
-	let input = parse_macro_input::parse::<DeriveInput>(tokens)?;
 	let ident = input.ident;
 	let generics = input.generics;
 	
@@ -228,7 +225,7 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		})
 	};
 	
-	let mut from_impls : Vec<TokenStream2> = Vec::new();
+	let mut from_impls : Vec<TokenStream> = Vec::new();
 	
 	for var in &variants
 	{
@@ -289,11 +286,4 @@ fn expand(tokens : TokenStream) -> Result<TokenStream2, Error>
 		
 		#( #from_impls )*
 	})
-}
-
-pub fn expand_resource_error(tokens : TokenStream) -> TokenStream
-{
-	expand(tokens)
-		.unwrap_or_else(|err| err.to_compile_error())
-		.into()
 }
