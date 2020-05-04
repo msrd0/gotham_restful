@@ -19,13 +19,36 @@ pub trait GetOpenapi
 #[derive(Debug)]
 pub struct OpenapiRouter<'a, D>
 {
-	pub router : &'a mut D,
-	pub openapi_builder : &'a mut OpenapiBuilder
+	pub(crate) router : &'a mut D,
+	pub(crate) scope : Option<&'a str>,
+	pub(crate) openapi_builder : &'a mut OpenapiBuilder
 }
 
 macro_rules! implOpenapiRouter {
 	($implType:ident) => {
-
+		
+		impl<'a, 'b, C, P> OpenapiRouter<'a, $implType<'b, C, P>>
+		where
+			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
+			P : RefUnwindSafe + Send + Sync + 'static
+		{
+			pub fn scope<F>(&mut self, path : &str, callback : F)
+			where
+				F : FnOnce(&mut OpenapiRouter<'_, ScopeBuilder<'_, C, P>>)
+			{
+				let mut openapi_builder = self.openapi_builder.clone();
+				let new_scope = self.scope.map(|scope| format!("{}/{}", scope, path).replace("//", "/"));
+				self.router.scope(path, |router| {
+					let mut router = OpenapiRouter {
+						router,
+						scope: Some(new_scope.as_ref().map(String::as_ref).unwrap_or(path)),
+						openapi_builder: &mut openapi_builder
+					};
+					callback(&mut router);
+				});
+			}
+		}
+		
 		impl<'a, 'b, C, P> GetOpenapi for OpenapiRouter<'a, $implType<'b, C, P>>
 		where
 			C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
@@ -57,7 +80,7 @@ macro_rules! implOpenapiRouter {
 			{
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				
-				let path = format!("/{}", &self.1);
+				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.get = Some(OperationDescription::new::<Handler>(schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
@@ -70,7 +93,7 @@ macro_rules! implOpenapiRouter {
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
 
-				let path = format!("/{}/{{id}}", &self.1);
+				let path = format!("{}/{}/{{id}}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.get = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
@@ -82,8 +105,8 @@ macro_rules! implOpenapiRouter {
 			{
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				
-				let path = format!("/{}/search", &self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&self.1);
+				let path = format!("{}/{}/search", self.0.scope.unwrap_or_default(), self.1);
+				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.get = Some(OperationDescription::new::<Handler>(schema).with_query_params(Handler::Query::schema()).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
 				
@@ -98,7 +121,7 @@ macro_rules! implOpenapiRouter {
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				let body_schema = (self.0).openapi_builder.add_schema::<Handler::Body>();
 
-				let path = format!("/{}", &self.1);
+				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.post = Some(OperationDescription::new::<Handler>(schema).with_body::<Handler::Body>(body_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
@@ -114,7 +137,7 @@ macro_rules! implOpenapiRouter {
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				let body_schema = (self.0).openapi_builder.add_schema::<Handler::Body>();
 
-				let path = format!("/{}", &self.1);
+				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.put = Some(OperationDescription::new::<Handler>(schema).with_body::<Handler::Body>(body_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
@@ -131,7 +154,7 @@ macro_rules! implOpenapiRouter {
 				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
 				let body_schema = (self.0).openapi_builder.add_schema::<Handler::Body>();
 
-				let path = format!("/{}/{{id}}", &self.1);
+				let path = format!("{}/{}/{{id}}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.put = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).with_body::<Handler::Body>(body_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
@@ -143,7 +166,7 @@ macro_rules! implOpenapiRouter {
 			{
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 
-				let path = format!("/{}", &self.1);
+				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.delete = Some(OperationDescription::new::<Handler>(schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);
@@ -156,7 +179,7 @@ macro_rules! implOpenapiRouter {
 				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
 				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
 
-				let path = format!("/{}/{{id}}", &self.1);
+				let path = format!("{}/{}/{{id}}", self.0.scope.unwrap_or_default(), self.1);
 				let mut item = (self.0).openapi_builder.remove_path(&path);
 				item.delete = Some(OperationDescription::new::<Handler>(schema).add_path_param("id", id_schema).into_operation());
 				(self.0).openapi_builder.add_path(path, item);

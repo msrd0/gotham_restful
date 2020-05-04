@@ -324,6 +324,7 @@ macro_rules! implDrawResourceRoutes {
 			{
 				let router = OpenapiRouter {
 					router: self,
+					scope: None,
 					openapi_builder: &mut OpenapiBuilder::new(info)
 				};
 				block(router);

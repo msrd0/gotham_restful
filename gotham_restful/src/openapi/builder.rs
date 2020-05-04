@@ -14,7 +14,7 @@ pub struct OpenapiInfo
 	pub urls : Vec<String>
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct OpenapiBuilder
 {
 	pub openapi : Arc<RwLock<OpenAPI>>
