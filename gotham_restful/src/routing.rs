@@ -78,19 +78,19 @@ pub trait DrawResourceRoutes
 		Handler::Res : 'static,
 		Handler::Body : 'static;
 	
-	fn update_all<Handler : ResourceUpdateAll>(&mut self)
+	fn change_all<Handler : ResourceChangeAll>(&mut self)
 	where
 		Handler::Res : 'static,
 		Handler::Body : 'static;
 	
-	fn update<Handler : ResourceUpdate>(&mut self)
+	fn change<Handler : ResourceChange>(&mut self)
 	where
 		Handler::Res : 'static,
 		Handler::Body : 'static;
 	
-	fn delete_all<Handler : ResourceDeleteAll>(&mut self);
+	fn remove_all<Handler : ResourceRemoveAll>(&mut self);
 	
-	fn delete<Handler : ResourceDelete>(&mut self);
+	fn remove<Handler : ResourceRemove>(&mut self);
 }
 
 fn response_from(res : Response, state : &State) -> gotham::hyper::Response<Body>
@@ -217,15 +217,15 @@ where
 	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::create(state, body))
 }
 
-fn update_all_handler<Handler : ResourceUpdateAll>(state : State) -> Pin<Box<HandlerFuture>>
+fn change_all_handler<Handler : ResourceChangeAll>(state : State) -> Pin<Box<HandlerFuture>>
 where
 	Handler::Res : 'static,
 	Handler::Body : 'static
 {
-	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update_all(state, body))
+	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::change_all(state, body))
 }
 
-fn update_handler<Handler : ResourceUpdate>(state : State) -> Pin<Box<HandlerFuture>>
+fn change_handler<Handler : ResourceChange>(state : State) -> Pin<Box<HandlerFuture>>
 where
 	Handler::Res : 'static,
 	Handler::Body : 'static
@@ -234,21 +234,21 @@ where
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::update(state, id, body))
+	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::change(state, id, body))
 }
 
-fn delete_all_handler<Handler : ResourceDeleteAll>(state : State) -> Pin<Box<HandlerFuture>>
+fn remove_all_handler<Handler : ResourceRemoveAll>(state : State) -> Pin<Box<HandlerFuture>>
 {
-	to_handler_future(state, |state| Handler::delete_all(state)).boxed()
+	to_handler_future(state, |state| Handler::remove_all(state)).boxed()
 }
 
-fn delete_handler<Handler : ResourceDelete>(state : State) -> Pin<Box<HandlerFuture>>
+fn remove_handler<Handler : ResourceRemove>(state : State) -> Pin<Box<HandlerFuture>>
 {
 	let id = {
 		let path : &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
 		path.id.clone()
 	};
-	to_handler_future(state, |state| Handler::delete(state, id)).boxed()
+	to_handler_future(state, |state| Handler::remove(state, id)).boxed()
 }
 
 #[derive(Clone)]
@@ -386,7 +386,7 @@ macro_rules! implDrawResourceRoutes {
 					.to(|state| create_handler::<Handler>(state));
 			}
 
-			fn update_all<Handler : ResourceUpdateAll>(&mut self)
+			fn change_all<Handler : ResourceChangeAll>(&mut self)
 			where
 				Handler::Res : Send + 'static,
 				Handler::Body : 'static
@@ -396,10 +396,10 @@ macro_rules! implDrawResourceRoutes {
 				self.0.put(&self.1)
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
-					.to(|state| update_all_handler::<Handler>(state));
+					.to(|state| change_all_handler::<Handler>(state));
 			}
 
-			fn update<Handler : ResourceUpdate>(&mut self)
+			fn change<Handler : ResourceChange>(&mut self)
 			where
 				Handler::Res : Send + 'static,
 				Handler::Body : 'static
@@ -410,24 +410,24 @@ macro_rules! implDrawResourceRoutes {
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
 					.with_path_extractor::<PathExtractor<Handler::ID>>()
-					.to(|state| update_handler::<Handler>(state));
+					.to(|state| change_handler::<Handler>(state));
 			}
 
-			fn delete_all<Handler : ResourceDeleteAll>(&mut self)
+			fn remove_all<Handler : ResourceRemoveAll>(&mut self)
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.delete(&self.1)
 					.extend_route_matcher(matcher)
-					.to(|state| delete_all_handler::<Handler>(state));
+					.to(|state| remove_all_handler::<Handler>(state));
 			}
 
-			fn delete<Handler : ResourceDelete>(&mut self)
+			fn remove<Handler : ResourceRemove>(&mut self)
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				self.0.delete(&format!("{}/:id", self.1))
 					.extend_route_matcher(matcher)
 					.with_path_extractor::<PathExtractor<Handler::ID>>()
-					.to(|state| delete_handler::<Handler>(state));
+					.to(|state| remove_handler::<Handler>(state));
 			}
 		}
 	}

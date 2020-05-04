@@ -32,7 +32,7 @@ pub fn expand_resource(input : DeriveInput) -> Result<TokenStream>
 	let name = ident.to_string();
 	
 	let methods = input.attrs.into_iter().filter(|attr|
-		attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("rest_resource".to_string()) // TODO wtf
+		attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("resource".to_string()) // TODO wtf
 	).map(|attr| {
 		syn::parse2(attr.tokens).map(|m : MethodList| m.0.into_iter())
 	}).flat_map(|list| match list {

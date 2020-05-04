@@ -26,10 +26,10 @@ pub enum Method
 	Read,
 	Search,
 	Create,
-	UpdateAll,
-	Update,
-	DeleteAll,
-	Delete
+	ChangeAll,
+	Change,
+	RemoveAll,
+	Remove
 }
 
 impl FromStr for Method
@@ -43,10 +43,10 @@ impl FromStr for Method
 			"Read" | "read" => Ok(Self::Read),
 			"Search" | "search" => Ok(Self::Search),
 			"Create" | "create" => Ok(Self::Create),
-			"UpdateAll" | "update_all" => Ok(Self::UpdateAll),
-			"Update" | "update" => Ok(Self::Update),
-			"DeleteAll" | "delete_all" => Ok(Self::DeleteAll),
-			"Delete" | "delete" => Ok(Self::Delete),
+			"ChangeAll" | "change_all" => Ok(Self::ChangeAll),
+			"Change" | "change" => Ok(Self::Change),
+			"RemoveAll" | "remove_all" => Ok(Self::RemoveAll),
+			"Remove" | "remove" => Ok(Self::Remove),
 			_ => Err(Error::new(Span::call_site(), format!("Unknown method: `{}'", str)))
 		}
 	}
@@ -59,14 +59,11 @@ impl Method
 		use Method::*;
 		
 		match self {
-			ReadAll => vec![],
-			Read => vec!["ID"],
+			ReadAll | RemoveAll => vec![],
+			Read | Remove => vec!["ID"],
 			Search => vec!["Query"],
-			Create => vec!["Body"],
-			UpdateAll => vec!["Body"],
-			Update => vec!["ID", "Body"],
-			DeleteAll => vec![],
-			Delete => vec!["ID"]
+			Create | ChangeAll => vec!["Body"],
+			Change => vec!["ID", "Body"]
 		}
 	}
 	
@@ -79,10 +76,10 @@ impl Method
 			Read => "Read",
 			Search => "Search",
 			Create => "Create",
-			UpdateAll => "UpdateAll",
-			Update => "Update",
-			DeleteAll => "DeleteAll",
-			Delete => "Delete"
+			ChangeAll => "ChangeAll",
+			Change => "Change",
+			RemoveAll => "RemoveAll",
+			Remove => "Remove"
 		};
 		format_ident!("Resource{}", name)
 	}
@@ -96,10 +93,10 @@ impl Method
 			Read => "read",
 			Search => "search",
 			Create => "create",
-			UpdateAll => "update_all",
-			Update => "update",
-			DeleteAll => "delete_all",
-			Delete => "delete"
+			ChangeAll => "change_all",
+			Change => "change",
+			RemoveAll => "remove_all",
+			Remove => "remove"
 		};
 		format_ident!("{}", name)
 	}

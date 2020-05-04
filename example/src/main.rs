@@ -18,13 +18,13 @@ use log4rs::{
 use serde::{Deserialize, Serialize};
 
 #[derive(Resource)]
-#[rest_resource(ReadAll, Read, Search, Create, DeleteAll, Delete, Update, UpdateAll)]
+#[resource(read_all, read, search, create, change_all, change, remove, remove_all)]
 struct Users
 {
 }
 
 #[derive(Resource)]
-#[rest_resource(ReadAll)]
+#[resource(ReadAll)]
 struct Auth
 {
 }
@@ -35,7 +35,7 @@ struct User
 	username : String
 }
 
-#[rest_read_all(Users)]
+#[read_all(Users)]
 fn read_all() -> Success<Vec<Option<User>>>
 {
 	vec![Username().fake(), Username().fake()]
@@ -45,50 +45,50 @@ fn read_all() -> Success<Vec<Option<User>>>
 		.into()
 }
 
-#[rest_read(Users)]
+#[read(Users)]
 fn read(id : u64) -> Success<User>
 {
 	let username : String = Username().fake();
 	User { username: format!("{}{}", username, id) }.into()
 }
 
-#[rest_search(Users)]
+#[search(Users)]
 fn search(query : User) -> Success<User>
 {
 	query.into()
 }
 
-#[rest_create(Users)]
+#[create(Users)]
 fn create(body : User)
 {
 	info!("Created User: {}", body.username);
 }
 
-#[rest_update_all(Users)]
+#[change_all(Users)]
 fn update_all(body : Vec<User>)
 {
 	info!("Changing all Users to {:?}", body.into_iter().map(|u| u.username).collect::<Vec<String>>());
 }
 
-#[rest_update(Users)]
+#[change(Users)]
 fn update(id : u64, body : User)
 {
 	info!("Change User {} to {}", id, body.username);
 }
 
-#[rest_delete_all(Users)]
+#[delete_all(Users)]
 fn delete_all()
 {
 	info!("Delete all Users");
 }
 
-#[rest_delete(Users)]
+#[delete(Users)]
 fn delete(id : u64)
 {
 	info!("Delete User {}", id);
 }
 
-#[rest_read_all(Auth)]
+#[read_all(Auth)]
 fn auth_read_all(auth : AuthStatus<()>) -> AuthSuccess<String>
 {
 	match auth {

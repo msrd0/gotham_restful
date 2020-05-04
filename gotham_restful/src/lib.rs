@@ -175,10 +175,10 @@ pub use resource::{
 	ResourceRead,
 	ResourceSearch,
 	ResourceCreate,
-	ResourceUpdateAll,
-	ResourceUpdate,
-	ResourceDeleteAll,
-	ResourceDelete
+	ResourceChangeAll,
+	ResourceChange,
+	ResourceRemoveAll,
+	ResourceRemove
 };
 
 mod response;

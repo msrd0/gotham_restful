@@ -72,7 +72,7 @@ pub fn derive_request_body(input : TokenStream) -> TokenStream
 	expand_derive(input, expand_request_body)
 }
 
-#[proc_macro_derive(Resource, attributes(rest_resource))]
+#[proc_macro_derive(Resource, attributes(resource))]
 pub fn derive_resource(input : TokenStream) -> TokenStream
 {
 	expand_derive(input, expand_resource)
@@ -86,49 +86,49 @@ pub fn derive_resource_error(input : TokenStream) -> TokenStream
 
 
 #[proc_macro_attribute]
-pub fn rest_read_all(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn read_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	expand_macro(attr, item, |attr, item| expand_method(Method::ReadAll, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_read(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn read(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	expand_macro(attr, item, |attr, item| expand_method(Method::Read, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_search(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn search(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	expand_macro(attr, item, |attr, item| expand_method(Method::Search, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_create(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn create(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	expand_macro(attr, item, |attr, item| expand_method(Method::Create, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_update_all(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn change_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	expand_macro(attr, item, |attr, item| expand_method(Method::UpdateAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::ChangeAll, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_update(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn change(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Update, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Change, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_delete_all(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn delete_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	expand_macro(attr, item, |attr, item| expand_method(Method::DeleteAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::RemoveAll, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn rest_delete(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn delete(attr : TokenStream, item : TokenStream) -> TokenStream
 {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Delete, attr, item))
+	expand_macro(attr, item, |attr, item| expand_method(Method::Remove, attr, item))
 }
