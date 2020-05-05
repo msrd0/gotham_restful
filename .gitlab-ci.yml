@@ -27,7 +27,7 @@ test-all:
   script:
     - cargo test --workspace --all-features --doc
     - cargo test trybuild_ui -- --ignored
-    - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'gotham_restful_derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
+    - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
   artifacts:
     paths:
       - tarpaulin-report.html
@@ -40,7 +40,7 @@ readme:
   stage: test
   image: msrd0/cargo-readme
   script:
-    - cargo readme -r gotham_restful -t ../README.tpl >README.md.new
+    - cargo readme -t README.tpl >README.md.new
     - diff README.md README.md.new
 
 publish:
