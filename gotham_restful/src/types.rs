@@ -8,7 +8,6 @@ use std::{
 	error::Error,
 	panic::RefUnwindSafe
 };
-use thiserror::Error;
 
 #[cfg(not(feature = "openapi"))]
 pub trait ResourceType
@@ -68,8 +67,8 @@ struct RawImage {
 pub trait FromBody : Sized
 {
 	/// The error type returned by the conversion if it was unsuccessfull. When using the derive
-	/// macro, there is no way to trigger an error, so
-	/// [`FromBodyNoError`](struct.FromBodyNoError.html) is used here.
+	/// macro, there is no way to trigger an error, so `Infallible` is used here. However, this
+	/// might change in the future.
 	type Err : Error;
 	
 	/// Perform the conversion.
@@ -85,12 +84,6 @@ impl<T : DeserializeOwned> FromBody for T
 		serde_json::from_slice(&body)
 	}
 }
-
-/// This error type can be used by [`FromBody`](trait.FromBody.html) implementations when there
-/// is no need to return any errors.
-#[derive(Clone, Copy, Debug, Error)]
-#[error("No Error")]
-pub struct FromBodyNoError;
 
 
 /**

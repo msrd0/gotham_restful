@@ -120,9 +120,9 @@ pub fn expand_from_body(input : DeriveInput) -> Result<TokenStream>
 		impl #generics #krate::FromBody for #ident #generics
 		where #where_clause
 		{
-			type Err = #krate::FromBodyNoError;
+			type Err = ::std::convert::Infallible;
 			
-			fn from_body(#body_ident : #krate::gotham::hyper::body::Bytes, #type_ident : #krate::Mime) -> Result<Self, #krate::FromBodyNoError>
+			fn from_body(#body_ident : #krate::gotham::hyper::body::Bytes, #type_ident : #krate::Mime) -> Result<Self, ::std::convert::Infallible>
 			{
 				#block
 				Ok(#ctor)

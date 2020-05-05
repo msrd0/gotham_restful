@@ -1,5 +1,5 @@
 use super::{IntoResponseError, ResourceResult, handle_error};
-use crate::{FromBody, FromBodyNoError, RequestBody, ResourceType, Response, StatusCode};
+use crate::{FromBody, RequestBody, ResourceType, Response, StatusCode};
 #[cfg(feature = "openapi")]
 use crate::OpenapiSchema;
 use futures_core::future::Future;
@@ -10,6 +10,7 @@ use mime::Mime;
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde_json::error::Error as SerdeJsonError;
 use std::{
+	convert::Infallible,
 	fmt::Display,
 	pin::Pin
 };
@@ -89,7 +90,7 @@ impl<T : Clone> Clone for Raw<T>
 
 impl<T : for<'a> From<&'a [u8]>> FromBody for Raw<T>
 {
-	type Err = FromBodyNoError;
+	type Err = Infallible;
 	
 	fn from_body(body : Bytes, mime : Mime) -> Result<Self, Self::Err>
 	{
