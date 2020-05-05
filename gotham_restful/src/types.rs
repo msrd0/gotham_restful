@@ -43,13 +43,36 @@ impl<T : ResourceType + Serialize> ResponseBody for T
 }
 
 
-/// This trait must be implemented by every type that can be used as a request body. It allows
-/// to create the type from a hyper body chunk and it's content type.
+/**
+This trait should be implemented for every type that can be built from an HTTP request body
+plus its media type. For most use cases it is sufficient to derive this trait, you usually
+don't need to manually implement this. Therefore, make sure that the first variable of
+your struct can be built from [`Bytes`], and the second one can be build from [`Mime`].
+If you have any additional variables, they need to be `Default`. This is an example of
+such a struct:
+
+```rust
+# #[macro_use] extern crate gotham_restful;
+# use gotham_restful::*;
+#[derive(FromBody, RequestBody)]
+#[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
+struct RawImage {
+	content: Vec<u8>,
+	content_type: Mime
+}
+```
+
+ [`Bytes`]: ../bytes/struct.Bytes.html
+ [`Mime`]: ../mime/struct.Mime.html
+*/
 pub trait FromBody : Sized
 {
+	/// The error type returned by the conversion if it was unsuccessfull. When using the derive
+	/// macro, there is no way to trigger an error, so
+	/// [`FromBodyNoError`](struct.FromBodyNoError.html) is used here.
 	type Err : Error;
 	
-	/// Create the request body from a raw body and the content type.
+	/// Perform the conversion.
 	fn from_body(body : Bytes, content_type : Mime) -> Result<Self, Self::Err>;
 }
 
@@ -63,9 +86,8 @@ impl<T : DeserializeOwned> FromBody for T
 	}
 }
 
-/// This error type can be used by `FromBody` implementations when there is no need to return any
-/// errors.
-
+/// This error type can be used by [`FromBody`](trait.FromBody.html) implementations when there
+/// is no need to return any errors.
 #[derive(Clone, Copy, Debug, Error)]
 #[error("No Error")]
 pub struct FromBodyNoError;

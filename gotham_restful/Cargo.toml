@@ -39,6 +39,7 @@ uuid = { version = "0.8.1", optional = true }
 diesel = { version = "1.4.4", features = ["postgres"] }
 futures-executor = "0.3.4"
 paste = "0.1.12"
+trybuild = "1.0.26"
 
 [features]
 default = ["errorlog"]

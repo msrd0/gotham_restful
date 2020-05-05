@@ -21,25 +21,25 @@ struct ParsedFields
 
 impl ParsedFields
 {
-	fn from_named<I>(fields : I) -> Result<Self>
+	fn from_named<I>(fields : I) -> Self
 	where
 		I : Iterator<Item = Field>
 	{
 		let fields = fields.map(|field| (field.ident.unwrap(), field.ty)).collect();
-		Ok(Self { fields, named: true })
+		Self { fields, named: true }
 	}
 	
-	fn from_unnamed<I>(fields : I) -> Result<Self>
+	fn from_unnamed<I>(fields : I) -> Self
 	where
 		I : Iterator<Item = Field>
 	{
 		let fields = fields.enumerate().map(|(i, field)| (format_ident!("arg{}", i), field.ty)).collect();
-		Ok(Self { fields, named: false })
+		Self { fields, named: false }
 	}
 	
-	fn from_unit() -> Result<Self>
+	fn from_unit() -> Self
 	{
-		Ok(Self { fields: Vec::new(), named: false })
+		Self { fields: Vec::new(), named: false }
 	}
 }
 
@@ -53,12 +53,12 @@ pub fn expand_from_body(input : DeriveInput) -> Result<TokenStream>
 		Data::Enum(inum) => Err(inum.enum_token.span()),
 		Data::Struct(strukt) => Ok(strukt),
 		Data::Union(uni) => Err(uni.union_token.span())
-	}.map_err(|span| Error::new(span, "#[derive(FromBody)] only works for enums"))?;
+	}.map_err(|span| Error::new(span, "#[derive(FromBody)] only works for structs"))?;
 	
 	let fields = match strukt.fields {
-		Fields::Named(named) => ParsedFields::from_named(named.named.into_iter())?,
-		Fields::Unnamed(unnamed) => ParsedFields::from_unnamed(unnamed.unnamed.into_iter())?,
-		Fields::Unit => ParsedFields::from_unit()?
+		Fields::Named(named) => ParsedFields::from_named(named.named.into_iter()),
+		Fields::Unnamed(unnamed) => ParsedFields::from_unnamed(unnamed.unnamed.into_iter()),
+		Fields::Unit => ParsedFields::from_unit()
 	};
 	
 	let mut where_clause = quote!();
