@@ -1,10 +1,10 @@
 use super::{IntoResponseError, ResourceResult, handle_error};
-use crate::{Response, StatusCode};
+use crate::{FromBody, FromBodyNoError, RequestBody, ResourceType, Response, StatusCode};
 #[cfg(feature = "openapi")]
 use crate::OpenapiSchema;
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
-use gotham::hyper::Body;
+use gotham::hyper::body::{Body, Bytes};
 use mime::Mime;
 #[cfg(feature = "openapi")]
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
@@ -14,6 +14,33 @@ use std::{
 	pin::Pin
 };
 
+/**
+This type can be used both as a raw request body, as well as as a raw response. However, all types
+of request bodies are accepted by this type. It is therefore recommended to derive your own type
+from [`RequestBody`] and only use this when you need to return a raw response. This is a usage
+example that simply returns its body:
+
+```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::router::builder::*;
+# use gotham_restful::*;
+#[derive(Resource)]
+#[resource(create)]
+struct ImageResource;
+
+#[create(ImageResource)]
+fn create(body : Raw<Vec<u8>>) -> Raw<Vec<u8>> {
+	body
+}
+# fn main() {
+# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+# 		route.resource::<ImageResource>("img");
+# 	}));
+# }
+```
+
+ [`OpenapiType`]: trait.OpenapiType.html
+*/
 #[derive(Debug)]
 pub struct Raw<T>
 {
@@ -29,6 +56,26 @@ impl<T> Raw<T>
 	}
 }
 
+impl<T, U> AsMut<U> for Raw<T>
+where
+	T : AsMut<U>
+{
+	fn as_mut(&mut self) -> &mut U
+	{
+		self.raw.as_mut()
+	}
+}
+
+impl<T, U> AsRef<U> for Raw<T>
+where
+	T : AsRef<U>
+{
+	fn as_ref(&self) -> &U
+	{
+		self.raw.as_ref()
+	}
+}
+
 impl<T : Clone> Clone for Raw<T>
 {
 	fn clone(&self) -> Self
@@ -38,6 +85,22 @@ impl<T : Clone> Clone for Raw<T>
 			mime: self.mime.clone()
 		}
 	}
+}
+
+impl<T : for<'a> From<&'a [u8]>> FromBody for Raw<T>
+{
+	type Err = FromBodyNoError;
+	
+	fn from_body(body : Bytes, mime : Mime) -> Result<Self, Self::Err>
+	{
+		Ok(Self::new(body.as_ref().into(), mime))
+	}
+}
+
+impl<T> RequestBody for Raw<T>
+where
+	Raw<T> : FromBody + ResourceType
+{
 }
 
 impl<T : Into<Body>> ResourceResult for Raw<T>
