@@ -1,7 +1,8 @@
 use trybuild::TestCases;
 
 #[test]
-fn ui()
+#[ignore]
+fn trybuild_ui()
 {
 	let t = TestCases::new();
 	
