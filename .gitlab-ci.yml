@@ -13,6 +13,7 @@ test-default:
   before_script:
     - cargo -V
   script:
+    - cargo test --workspace --tests
     - cargo test --workspace --tests -- --ignored
   cache:
     paths:
@@ -27,7 +28,7 @@ test-all:
     - cargo -V
   script:
     - cargo test --workspace --all-features --doc
-    - cargo test trybuild_ui -- --ignored
+    - cargo test --workspace --tests -- --ignored
     - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
   artifacts:
     paths:
