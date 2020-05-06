@@ -1,6 +1,7 @@
 
 stages:
   - test
+  - build
   - publish
 
 variables:
@@ -42,6 +43,36 @@ readme:
   script:
     - cargo readme -t README.tpl >README.md.new
     - diff README.md README.md.new
+
+doc:
+  stage: build
+  image: msrd0/rust:alpine
+  before_script:
+    - cargo -V
+  script:
+    - cargo doc --all-features
+    - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >target/doc/index.html
+  artifacts:
+    paths:
+      - target/doc/
+  cache:
+    paths:
+      - cargo/
+      - target/
+  only:
+    - master
+
+pages:
+  stage: publish
+  image: busybox
+  script:
+    - mv target/doc public
+    - mv tarpaulin-report.html public/coverage.html
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
 
 publish:
   stage: publish
