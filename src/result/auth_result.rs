@@ -58,7 +58,7 @@ error, or delegates to another error type. This type is best used with [`AuthRes
 #[derive(Debug, ResourceError)]
 pub enum AuthErrorOrOther<E>
 {
-	#[status(UNAUTHORIZED)]
+	#[status(FORBIDDEN)]
 	#[display("Forbidden")]
 	Forbidden,
 	#[display("{0}")]
