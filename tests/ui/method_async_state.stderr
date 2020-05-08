@@ -1,0 +1,21 @@
+error: async fn must not take &State as an argument as State is not Sync, consider boxing
+ --> $DIR/method_async_state.rs:9:19
+  |
+9 | async fn read_all(state : &State)
+  |                   ^^^^^
+
+error[E0433]: failed to resolve: use of undeclared type or module `_gotham_restful_resource_foo_resource_method_read_all`
+ --> $DIR/method_async_state.rs:4:10
+  |
+4 | #[derive(Resource)]
+  |          ^^^^^^^^ use of undeclared type or module `_gotham_restful_resource_foo_resource_method_read_all`
+  |
+  = note: this error originates in a derive macro (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unused import: `gotham_restful::State`
+ --> $DIR/method_async_state.rs:2:5
+  |
+2 | use gotham_restful::State;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default

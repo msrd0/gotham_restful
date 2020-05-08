@@ -10,6 +10,11 @@ use gotham::{
 use gotham_restful::*;
 use mime::TEXT_PLAIN;
 
+#[allow(dead_code)]
+mod util { include!("util/mod.rs"); }
+use util::test_get_response;
+
+
 const RESPONSE : &[u8] = b"This is the only valid response.";
 
 #[derive(Resource)]
@@ -22,13 +27,6 @@ fn read_all() -> Raw<&'static [u8]>
 	Raw::new(RESPONSE, TEXT_PLAIN)
 }
 
-
-fn test_response(server : &TestServer, path : &str)
-{
-	let res = server.client().get(path).perform().unwrap().read_body().unwrap();
-	let body : &[u8] = res.as_ref();
-	assert_eq!(body, RESPONSE);
-}
 
 #[test]
 fn test()
@@ -51,10 +49,10 @@ fn test()
 		});
 	})).unwrap();
 	
-	test_response(&server, "http://localhost/foo1");
-	test_response(&server, "http://localhost/bar/foo2");
-	test_response(&server, "http://localhost/bar/baz/foo3");
-	test_response(&server, "http://localhost/foo4");
+	test_get_response(&server, "http://localhost/foo1", RESPONSE);
+	test_get_response(&server, "http://localhost/bar/foo2", RESPONSE);
+	test_get_response(&server, "http://localhost/bar/baz/foo3", RESPONSE);
+	test_get_response(&server, "http://localhost/foo4", RESPONSE);
 }
 
 

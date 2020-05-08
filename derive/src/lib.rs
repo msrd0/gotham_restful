@@ -122,13 +122,13 @@ pub fn change(attr : TokenStream, item : TokenStream) -> TokenStream
 }
 
 #[proc_macro_attribute]
-pub fn delete_all(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn remove_all(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	expand_macro(attr, item, |attr, item| expand_method(Method::RemoveAll, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn delete(attr : TokenStream, item : TokenStream) -> TokenStream
+pub fn remove(attr : TokenStream, item : TokenStream) -> TokenStream
 {
 	expand_macro(attr, item, |attr, item| expand_method(Method::Remove, attr, item))
 }

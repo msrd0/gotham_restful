@@ -1,0 +1,13 @@
+error: Too many arguments
+ --> $DIR/method_too_many_args.rs:8:13
+  |
+8 | fn read_all(_id : u64)
+  |             ^^^
+
+error[E0433]: failed to resolve: use of undeclared type or module `_gotham_restful_resource_foo_resource_method_read_all`
+ --> $DIR/method_too_many_args.rs:3:10
+  |
+3 | #[derive(Resource)]
+  |          ^^^^^^^^ use of undeclared type or module `_gotham_restful_resource_foo_resource_method_read_all`
+  |
+  = note: this error originates in a derive macro (in Nightly builds, run with -Z macro-backtrace for more info)

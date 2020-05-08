@@ -1,7 +1,3 @@
-mod custom_request_body
-{
-
-
 use gotham::{
 	hyper::header::CONTENT_TYPE,
 	router::builder::*,
@@ -9,6 +5,7 @@ use gotham::{
 };
 use gotham_restful::*;
 use mime::TEXT_PLAIN;
+
 
 const RESPONSE : &[u8] = b"This is the only valid response.";
 
@@ -30,7 +27,7 @@ fn create(body : Foo) -> Raw<Vec<u8>> {
 
 
 #[test]
-fn test()
+fn custom_request_body()
 {
 	let server = TestServer::new(build_simple_router(|router| {
 		router.resource::<FooResource>("foo");
@@ -43,7 +40,4 @@ fn test()
 	let res = res.read_body().unwrap();
 	let body : &[u8] = res.as_ref();
 	assert_eq!(body, RESPONSE);
-}
-
-
 }

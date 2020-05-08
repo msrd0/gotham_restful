@@ -76,14 +76,14 @@ fn update(id : u64, body : User)
 	info!("Change User {} to {}", id, body.username);
 }
 
-#[delete_all(Users)]
-fn delete_all()
+#[remove_all(Users)]
+fn remove_all()
 {
 	info!("Delete all Users");
 }
 
-#[delete(Users)]
-fn delete(id : u64)
+#[remove(Users)]
+fn remove(id : u64)
 {
 	info!("Delete User {}", id);
 }

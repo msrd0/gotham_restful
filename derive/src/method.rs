@@ -150,12 +150,17 @@ impl MethodArgumentType
 		matches!(self, Self::AuthStatus(_) | Self::AuthStatusRef(_))
 	}
 	
-	fn quote_ty(&self) -> Option<TokenStream>
+	fn ty(&self) -> Option<&Type>
 	{
 		match self {
-			Self::MethodArg(ty) | Self::DatabaseConnection(ty) | Self::AuthStatus(ty) | Self::AuthStatusRef(ty) => Some(quote!(#ty)),
+			Self::MethodArg(ty) | Self::DatabaseConnection(ty) | Self::AuthStatus(ty) | Self::AuthStatusRef(ty) => Some(ty),
 			_ => None
 		}
+	}
+	
+	fn quote_ty(&self) -> Option<TokenStream>
+	{
+		self.ty().map(|ty| quote!(#ty))
 	}
 }
 
@@ -279,6 +284,10 @@ pub fn expand_method(method : Method, mut attrs : AttributeArgs, fun : ItemFn) -
 	let krate = super::krate();
 	
 	// parse attributes
+	if attrs.len() < 1
+	{
+		return Err(Error::new(Span::call_site(), "Missing Resource struct. Example: #[read_all(MyResource)]"));
+	}
 	let resource_path = match attrs.remove(0) {
 		NestedMeta::Meta(Meta::Path(path)) => path,
 		p => return Err(Error::new(p.span(), "Expected name of the Resource struct this method belongs to"))
@@ -372,7 +381,7 @@ pub fn expand_method(method : Method, mut attrs : AttributeArgs, fun : ItemFn) -
 	{
 		if let Some(arg) = args.iter().find(|arg| (*arg).ty.is_state_ref())
 		{
-			return Err(Error::new(arg.span(), "async fn must not take &State as an argument as State is not Sync"));
+			return Err(Error::new(arg.span(), "async fn must not take &State as an argument as State is not Sync, consider boxing"));
 		}
 		block = quote!(#block.await);
 	}
