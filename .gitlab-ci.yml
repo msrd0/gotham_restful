@@ -15,6 +15,8 @@ test-default:
   script:
     - cargo test --workspace --tests
     - cargo test --workspace --tests -- --ignored
+  after_script:
+    - cargo clean
   cache:
     paths:
       - cargo/
@@ -30,6 +32,8 @@ test-all:
     - cargo test --workspace --all-features --doc
     - cargo test --workspace --tests -- --ignored
     - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
+  after_script:
+    - cargo clean
   artifacts:
     paths:
       - tarpaulin-report.html
@@ -53,6 +57,8 @@ doc:
   script:
     - cargo doc --all-features
     - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >target/doc/index.html
+  after_script:
+    - cargo clean
   artifacts:
     paths:
       - target/doc/
@@ -84,7 +90,7 @@ publish:
   script:
     - cd gotham_restful_derive
     - cargo publish
-    - sleep 10s
+    - sleep 1m
     - cd ../gotham_restful
     - cargo publish
     - cd ..
