@@ -2,14 +2,20 @@
 #![warn(missing_debug_implementations, rust_2018_idioms)]
 #![deny(intra_doc_link_resolution_failure)]
 /*!
-**Note:** The `stable` branch contains some bugfixes against the last release. The `master`
-branch currently tracks gotham's master branch and the next release will use gotham 0.5.0 and be
-compatible with the new future / async stuff.
-
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned methods that aim to be a more convenient way of creating handlers
-for requests. Assuming you assign `/foobar` to your resource, you can implement the following
-methods:
+for requests.
+
+# Design Goals
+
+This is an opinionated framework on top of [gotham]. Unless your web server handles mostly JSON as
+request/response bodies and does that in a RESTful way, this framework is probably a bad fit for
+your application. The ultimate goal of gotham-restful is to provide a way to write a RESTful
+web server in Rust as convenient as possible with the least amount of boilerplate neccessary.
+
+# Methods
+
+Assuming you assign `/foobar` to your resource, you can implement the following methods:
 
 | Method Name | Required Arguments | HTTP Verb | HTTP Path      |
 | ----------- | ------------------ | --------- | -----------    |

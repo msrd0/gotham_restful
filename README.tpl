@@ -26,4 +26,8 @@
 </div>
 <br/>
 
+**Note:** The `stable` branch contains some bugfixes against the last release. The `master`
+branch currently tracks gotham's master branch and the next release will use gotham 0.5.0 and be
+compatible with the new future / async stuff.
+
 {{readme}}
