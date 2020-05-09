@@ -16,6 +16,7 @@ use syn::{
 	Generics,
 	GenericParam,
 	Lit,
+	LitStr,
 	Meta,
 	NestedMeta,
 	Result,
@@ -175,6 +176,7 @@ fn expand_field(field : &Field) -> Result<TokenStream>
 		Some(ident) => ident,
 		None => return Err(Error::new(field.span(), "#[derive(OpenapiType)] does not support fields without an ident"))
 	};
+	let ident_str = LitStr::new(&ident.to_string(), ident.span());
 	let ty = &field.ty;
 	
 	let attrs = parse_attributes(&field.attrs)?;
@@ -193,7 +195,7 @@ fn expand_field(field : &Field) -> Result<TokenStream>
 		}
 		else if !#nullable
 		{
-			required.push(stringify!(#ident).to_string());
+			required.push(#ident_str.to_string());
 		}
 		
 		let keys : Vec<String> = schema.dependencies.keys().map(|k| k.to_string()).collect();
