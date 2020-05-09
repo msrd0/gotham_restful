@@ -108,7 +108,7 @@ fn expand_variant(variant : &Variant) -> Result<TokenStream>
 {
 	if variant.fields != Fields::Unit
 	{
-		return Err(Error::new(variant.span(), "Enum Variants with Fields not supported"));
+		return Err(Error::new(variant.span(), "#[derive(OpenapiType)] does not support enum variants with fields"));
 	}
 	
 	let ident = &variant.ident;
@@ -173,7 +173,7 @@ fn expand_field(field : &Field) -> Result<TokenStream>
 {
 	let ident = match &field.ident {
 		Some(ident) => ident,
-		None => return Err(Error::new(field.span(), "Fields without ident are not supported"))
+		None => return Err(Error::new(field.span(), "#[derive(OpenapiType)] does not support fields without an ident"))
 	};
 	let ty = &field.ty;
 	
@@ -242,7 +242,7 @@ fn expand_struct(ident : Ident, generics : Generics, attrs : Vec<Attribute>, inp
 				.map(expand_field)
 				.collect_to_result()?
 		},
-		Fields::Unnamed(fields) => return Err(Error::new(fields.span(), "Unnamed fields are not supported")),
+		Fields::Unnamed(fields) => return Err(Error::new(fields.span(), "#[derive(OpenapiType)] does not support unnamed fields")),
 		Fields::Unit => Vec::new()
 	};
 	
