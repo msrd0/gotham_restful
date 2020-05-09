@@ -48,11 +48,6 @@ pub fn expand_resource(input : DeriveInput) -> Result<TokenStream>
 	Ok(quote! {
 		impl #krate::Resource for #ident
 		{
-			fn name() -> String
-			{
-				stringify!(#ident).to_string()
-			}
-			
 			fn setup<D : #krate::DrawResourceRoutes>(mut route : D)
 			{
 				#(#methods)*
