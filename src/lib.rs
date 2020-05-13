@@ -285,6 +285,15 @@ pub use auth::{
 	StaticAuthHandler
 };
 
+#[cfg(feature = "cors")]
+mod cors;
+#[cfg(feature = "cors")]
+pub use cors::{
+	handle_cors,
+	CorsConfig,
+	Origin
+};
+
 pub mod matcher;
 
 #[cfg(feature = "openapi")]

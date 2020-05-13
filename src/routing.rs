@@ -100,10 +100,16 @@ fn response_from(res : Response, state : &State) -> gotham::hyper::Response<Body
 	{
 		r.headers_mut().insert(CONTENT_TYPE, mime.as_ref().parse().unwrap());
 	}
-	if Method::borrow_from(state) != Method::HEAD
+	
+	let method = Method::borrow_from(state);
+	if method != Method::HEAD
 	{
 		*r.body_mut() = res.body;
 	}
+	
+	#[cfg(feature = "cors")]
+	crate::cors::handle_cors(state, &mut r);
+	
 	r
 }
 

@@ -47,6 +47,7 @@ trybuild = "1.0.26"
 [features]
 default = ["errorlog"]
 auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
+cors = []
 errorlog = []
 database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
 openapi = ["gotham_restful_derive/openapi", "indexmap", "openapiv3"]
