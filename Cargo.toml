@@ -45,7 +45,7 @@ paste = "0.1.12"
 trybuild = "1.0.26"
 
 [features]
-default = ["errorlog"]
+default = ["cors", "errorlog"]
 auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
 cors = []
 errorlog = []

@@ -8,6 +8,10 @@ pub use accept::AcceptHeaderMatcher;
 mod content_type;
 pub use content_type::ContentTypeMatcher;
 
+#[cfg(feature = "cors")]
+mod access_control_request_method;
+pub use access_control_request_method::AccessControlRequestMethodMatcher;
+
 type LookupTable = HashMap<String, Vec<usize>>;
 
 trait LookupTableFromTypes

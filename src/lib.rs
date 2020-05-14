@@ -291,6 +291,7 @@ mod cors;
 pub use cors::{
 	handle_cors,
 	CorsConfig,
+	CorsRoute,
 	Origin
 };
 

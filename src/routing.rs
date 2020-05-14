@@ -6,6 +6,8 @@ use crate::{
 	Response,
 	StatusCode
 };
+#[cfg(feature = "cors")]
+use crate::CorsRoute;
 #[cfg(feature = "openapi")]
 use crate::openapi::{
 	builder::{OpenapiBuilder, OpenapiInfo},
@@ -391,6 +393,8 @@ macro_rules! implDrawResourceRoutes {
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
 					.to(|state| create_handler::<Handler>(state));
+				#[cfg(feature = "cors")]
+				self.0.cors(&self.1, Method::POST);
 			}
 
 			fn change_all<Handler : ResourceChangeAll>(&mut self)
@@ -404,6 +408,8 @@ macro_rules! implDrawResourceRoutes {
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
 					.to(|state| change_all_handler::<Handler>(state));
+				#[cfg(feature = "cors")]
+				self.0.cors(&self.1, Method::PUT);
 			}
 
 			fn change<Handler : ResourceChange>(&mut self)
@@ -413,11 +419,14 @@ macro_rules! implDrawResourceRoutes {
 			{
 				let accept_matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
 				let content_matcher : MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
-				self.0.put(&format!("{}/:id", self.1))
+				let path = format!("{}/:id", self.1);
+				self.0.put(&path)
 					.extend_route_matcher(accept_matcher)
 					.extend_route_matcher(content_matcher)
 					.with_path_extractor::<PathExtractor<Handler::ID>>()
 					.to(|state| change_handler::<Handler>(state));
+				#[cfg(feature = "cors")]
+				self.0.cors(&path, Method::PUT);
 			}
 
 			fn remove_all<Handler : ResourceRemoveAll>(&mut self)
@@ -426,15 +435,20 @@ macro_rules! implDrawResourceRoutes {
 				self.0.delete(&self.1)
 					.extend_route_matcher(matcher)
 					.to(|state| remove_all_handler::<Handler>(state));
+				#[cfg(feature = "cors")]
+				self.0.cors(&self.1, Method::DELETE);
 			}
 
 			fn remove<Handler : ResourceRemove>(&mut self)
 			{
 				let matcher : MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				self.0.delete(&format!("{}/:id", self.1))
+				let path = format!("{}/:id", self.1);
+				self.0.delete(&path)
 					.extend_route_matcher(matcher)
 					.with_path_extractor::<PathExtractor<Handler::ID>>()
 					.to(|state| remove_handler::<Handler>(state));
+				#[cfg(feature = "cors")]
+				self.0.cors(&path, Method::POST);
 			}
 		}
 	}
