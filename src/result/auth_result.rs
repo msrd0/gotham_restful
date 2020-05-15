@@ -22,9 +22,9 @@ client is authenticated. Otherwise, an empty _403 Forbidden_ response will be is
 look something like this (assuming the `auth` feature is enabled):
 
 ```rust
+# #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "auth")]
 # mod auth_feature_enabled {
-# #[macro_use] extern crate gotham_restful_derive;
 # use gotham::state::State;
 # use gotham_restful::*;
 # use serde::Deserialize;
@@ -82,9 +82,9 @@ client is authenticated. Otherwise, an empty _403 Forbidden_ response will be is
 look something like this (assuming the `auth` feature is enabled):
 
 ```
+# #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "auth")]
 # mod auth_feature_enabled {
-# #[macro_use] extern crate gotham_restful_derive;
 # use gotham::state::State;
 # use gotham_restful::*;
 # use serde::Deserialize;

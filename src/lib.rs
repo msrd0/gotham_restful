@@ -123,9 +123,9 @@ None of this is currently supported by gotham's own JWT middleware.
 A simple example that uses only a single secret could look like this:
 
 ```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "auth")]
 # mod auth_feature_enabled {
-# #[macro_use] extern crate gotham_restful_derive;
 # use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};

@@ -14,6 +14,7 @@ test-default:
     - cargo -V
     - cargo sweep -s
   script:
+    - cargo test --workspace --doc
     - cargo test --workspace --tests
     - cargo test --workspace --tests -- --ignored
   after_script:
