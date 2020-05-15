@@ -1,8 +1,4 @@
-#[cfg(feature = "openapi")]
-mod openapi_supports_scope
-{
-
-
+#![cfg(feature = "openapi")]
 use gotham::{
 	router::builder::*,
 	test::TestServer
@@ -29,7 +25,7 @@ fn read_all() -> Raw<&'static [u8]>
 
 
 #[test]
-fn test()
+fn openapi_supports_scope()
 {
 	let info = OpenapiInfo {
 		title: "Test".to_owned(),
@@ -54,6 +50,3 @@ fn test()
 	test_get_response(&server, "http://localhost/bar/baz/foo3", RESPONSE);
 	test_get_response(&server, "http://localhost/foo4", RESPONSE);
 }
-
-
-} // mod test
