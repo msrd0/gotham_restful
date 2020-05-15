@@ -29,7 +29,7 @@ Usage example:
 # struct MyResource;
 #
 #[derive(Deserialize, Serialize)]
-# #[derive(OpenapiType)]
+# #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct MyResponse {
 	message: &'static str
 }

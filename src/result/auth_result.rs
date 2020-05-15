@@ -21,9 +21,10 @@ This return type can be used to map another `ResourceResult` that can only be re
 client is authenticated. Otherwise, an empty _403 Forbidden_ response will be issued. Use can
 look something like this (assuming the `auth` feature is enabled):
 
-```
+```rust
+# #[cfg(feature = "auth")]
+# mod auth_feature_enabled {
 # #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
 # use gotham::state::State;
 # use gotham_restful::*;
 # use serde::Deserialize;
@@ -81,8 +82,9 @@ client is authenticated. Otherwise, an empty _403 Forbidden_ response will be is
 look something like this (assuming the `auth` feature is enabled):
 
 ```
+# #[cfg(feature = "auth")]
+# mod auth_feature_enabled {
 # #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
 # use gotham::state::State;
 # use gotham_restful::*;
 # use serde::Deserialize;

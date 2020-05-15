@@ -43,7 +43,7 @@ struct FooResource;
 
 /// The return type of the foo read method.
 #[derive(Serialize)]
-# #[derive(OpenapiType)]
+# #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct Foo {
 	id: u64
 }
@@ -123,6 +123,8 @@ None of this is currently supported by gotham's own JWT middleware.
 A simple example that uses only a single secret could look like this:
 
 ```rust,no_run
+# #[cfg(feature = "auth")]
+# mod auth_feature_enabled {
 # #[macro_use] extern crate gotham_restful_derive;
 # use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
 # use gotham_restful::*;
@@ -132,7 +134,7 @@ A simple example that uses only a single secret could look like this:
 struct SecretResource;
 
 #[derive(Serialize)]
-# #[derive(OpenapiType)]
+# #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct Secret {
 	id: u64,
 	intended_for: String
@@ -161,6 +163,7 @@ fn main() {
 		route.resource::<SecretResource>("secret");
 	}));
 }
+# }
 ```
 
 ## Database Feature
@@ -173,6 +176,8 @@ you'll need to borrow the connection from the [`State`] yourself and return a bo
 A simple non-async example could look like this:
 
 ```rust,no_run
+# #[cfg(feature = "database")]
+# mod database_feature_enabled {
 # #[macro_use] extern crate diesel;
 # #[macro_use] extern crate gotham_restful_derive;
 # use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
@@ -192,7 +197,7 @@ A simple non-async example could look like this:
 struct FooResource;
 
 #[derive(Queryable, Serialize)]
-# #[derive(OpenapiType)]
+# #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct Foo {
 	id: i64,
 	value: String
@@ -214,6 +219,7 @@ fn main() {
 		route.resource::<FooResource>("foo");
 	}));
 }
+# }
 ```
 
 # Examples
