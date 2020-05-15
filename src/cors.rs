@@ -166,7 +166,7 @@ pub fn handle_cors(state : &State, res : &mut Response<Body>)
 	let config = CorsConfig::try_borrow_from(state);
 	let headers = res.headers_mut();
 	
-    // non-preflight requests require nothing other than the Access-Control-Allow-Origin header
+    // non-preflight requests require the Access-Control-Allow-Origin header
 	if let Some(header) = config.and_then(|cfg| cfg.origin.header_value(state))
 	{
 		headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, header);
