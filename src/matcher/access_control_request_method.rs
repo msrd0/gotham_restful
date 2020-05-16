@@ -48,7 +48,7 @@ impl RouteMatcher for AccessControlRequestMethodMatcher
 	{
 		match HeaderMap::borrow_from(state).get(ACCESS_CONTROL_REQUEST_METHOD)
 			.and_then(|value| value.to_str().ok())
-    		.and_then(|str| str.parse::<Method>().ok())
+			.and_then(|str| str.parse::<Method>().ok())
 		{
 			Some(m) if m == self.method => Ok(()),
 			_ => Err(RouteNonMatch::new(StatusCode::NOT_FOUND))

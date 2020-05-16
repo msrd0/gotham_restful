@@ -1,8 +1,8 @@
 use crate::matcher::AccessControlRequestMethodMatcher;
 use gotham::{
-    handler::HandlerFuture,
+	handler::HandlerFuture,
 	helpers::http::response::create_empty_response,
-    hyper::{
+	hyper::{
 		header::{
 			ACCESS_CONTROL_ALLOW_CREDENTIALS, ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_METHODS,
 			ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_MAX_AGE, ACCESS_CONTROL_REQUEST_METHOD, ORIGIN, VARY,
@@ -10,10 +10,10 @@ use gotham::{
 		},
 		Body, Method, Response, StatusCode
 	},
-    middleware::Middleware,
+	middleware::Middleware,
 	pipeline::chain::PipelineHandleChain,
 	router::builder::*,
-    state::{FromState, State},
+	state::{FromState, State},
 };
 use itertools::Itertools;
 use std::{
@@ -30,11 +30,11 @@ allowed to make the request.
 pub enum Origin
 {
 	/// Do not send any `Access-Control-Allow-Origin` headers.
-    None,
+	None,
 	/// Send `Access-Control-Allow-Origin: *`. Note that browser will not send credentials.
-    Star,
+	Star,
 	/// Set the `Access-Control-Allow-Origin` header to a single origin.
-    Single(String),
+	Single(String),
 	/// Copy the `Origin` header into the `Access-Control-Allow-Origin` header.
 	Copy
 }
@@ -75,7 +75,7 @@ To change settings, you need to put this type into gotham's [`State`]:
 # use gotham_restful::*;
 fn main() {
 	let cors = CorsConfig {
-    	origin: Origin::Star,
+		origin: Origin::Star,
 		..Default::default()
 	};
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
@@ -140,13 +140,13 @@ pub struct CorsConfig
 
 impl Middleware for CorsConfig
 {
-    fn call<Chain>(self, mut state : State, chain : Chain) -> Pin<Box<HandlerFuture>>
-    where
-        Chain : FnOnce(State) -> Pin<Box<HandlerFuture>>
-    {
-        state.put(self);
-        chain(state)
-    }
+	fn call<Chain>(self, mut state : State, chain : Chain) -> Pin<Box<HandlerFuture>>
+	where
+		Chain : FnOnce(State) -> Pin<Box<HandlerFuture>>
+	{
+		state.put(self);
+		chain(state)
+	}
 }
 
 /**
@@ -166,7 +166,7 @@ pub fn handle_cors(state : &State, res : &mut Response<Body>)
 	let config = CorsConfig::try_borrow_from(state);
 	let headers = res.headers_mut();
 	
-    // non-preflight requests require the Access-Control-Allow-Origin header
+	// non-preflight requests require the Access-Control-Allow-Origin header
 	if let Some(header) = config.and_then(|cfg| cfg.origin.header_value(state))
 	{
 		headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, header);
@@ -207,7 +207,7 @@ pub fn handle_cors(state : &State, res : &mut Response<Body>)
 pub trait CorsRoute<C, P>
 where
 	C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
-    P : RefUnwindSafe + Send + Sync + 'static
+	P : RefUnwindSafe + Send + Sync + 'static
 {
 	/// Handle a preflight request on `path` for `method`. To configure the behaviour, use
 	/// [`CorsConfig`](struct.CorsConfig.html).
@@ -252,14 +252,14 @@ fn cors_preflight_handler(state : State) -> (State, Response<Body>)
 impl<D, C, P> CorsRoute<C, P> for D
 where
 	D : DrawRoutes<C, P>,
-    C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
-    P : RefUnwindSafe + Send + Sync + 'static
+	C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
+	P : RefUnwindSafe + Send + Sync + 'static
 {
 	fn cors(&mut self, path : &str, method : Method)
 	{
 		let matcher = AccessControlRequestMethodMatcher::new(method);
 		self.options(path)
-    		.extend_route_matcher(matcher)
-    		.to(cors_preflight_handler);
+			.extend_route_matcher(matcher)
+			.to(cors_preflight_handler);
 	}
 }

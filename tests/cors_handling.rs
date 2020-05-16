@@ -50,8 +50,8 @@ fn test_preflight(server : &TestServer, method : &str, origin : Option<&str>, va
 {
 	let res = server.client().options("http://example.org/foo")
 		.with_header(ACCESS_CONTROL_REQUEST_METHOD, method.parse().unwrap())
-    	.with_header(ORIGIN, "http://example.org".parse().unwrap())
-    	.perform().unwrap();
+		.with_header(ORIGIN, "http://example.org".parse().unwrap())
+		.perform().unwrap();
 	assert_eq!(res.status(), StatusCode::NO_CONTENT);
 	let headers = res.headers();
 	println!("{}", headers.keys().join(","));

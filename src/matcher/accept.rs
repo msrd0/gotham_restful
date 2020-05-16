@@ -76,7 +76,7 @@ let matcher = AcceptHeaderMatcher::new(types);
 # build_simple_router(|route| {
 // use the matcher for your request
 route.post("/foo")
-     .extend_route_matcher(matcher)
+ 	.extend_route_matcher(matcher)
 	 .to(|state| {
 	 	// we know that the client is a modern browser and can handle webp images
 # let IMAGE_WEBP : mime::Mime = "image/webp".parse().unwrap();

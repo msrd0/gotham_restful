@@ -26,7 +26,7 @@ let matcher = ContentTypeMatcher::new(types)
 # build_simple_router(|route| {
 // use the matcher for your request
 route.post("/foo")
-     .extend_route_matcher(matcher)
+ 	.extend_route_matcher(matcher)
 	 .to(|state| {
 	 	let res = create_response(&state, StatusCode::OK, mime::TEXT_PLAIN, "Correct Content Type!");
 		(state, res)
