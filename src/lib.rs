@@ -176,10 +176,10 @@ you'll need to borrow the connection from the [`State`] yourself and return a bo
 A simple non-async example could look like this:
 
 ```rust,no_run
-# #[cfg(feature = "database")]
-# mod database_feature_enabled {
 # #[macro_use] extern crate diesel;
 # #[macro_use] extern crate gotham_restful_derive;
+# #[cfg(feature = "database")]
+# mod database_feature_enabled {
 # use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
 # use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
 # use gotham_middleware_diesel::DieselMiddleware;
