@@ -91,36 +91,36 @@ configurations for different scopes, you need to register the middleware inside 
 ```rust,no_run
 # use gotham::{router::builder::*, pipeline::*, pipeline::set::*, state::State};
 # use gotham_restful::*;
-fn main() {
-	let pipelines = new_pipeline_set();
-	
-	let cors_a = CorsConfig {
-    	origin: Origin::Star,
-		..Default::default()
-	};
-	let (pipelines, chain_a) = pipelines.add(
-		new_pipeline().add(cors_a).build()
-	);
-	
-	let cors_b = CorsConfig {
-    	origin: Origin::Copy,
-		..Default::default()
-	};
-	let (pipelines, chain_b) = pipelines.add(
-		new_pipeline().add(cors_b).build()
-	);
-	
-	let pipeline_set = finalize_pipeline_set(pipelines);
-	gotham::start("127.0.0.1:8080", build_router((), pipeline_set, |route| {
-		// routing without any cors config
-		route.with_pipeline_chain((chain_a, ()), |route| {
-			// routing with cors config a
-		});
-		route.with_pipeline_chain((chain_b, ()), |route| {
-			// routing with cors config b
-		});
-	}));
-}
+let pipelines = new_pipeline_set();
+
+// The first cors configuration
+let cors_a = CorsConfig {
+	origin: Origin::Star,
+	..Default::default()
+};
+let (pipelines, chain_a) = pipelines.add(
+	new_pipeline().add(cors_a).build()
+);
+
+// The second cors configuration
+let cors_b = CorsConfig {
+	origin: Origin::Copy,
+	..Default::default()
+};
+let (pipelines, chain_b) = pipelines.add(
+	new_pipeline().add(cors_b).build()
+);
+
+let pipeline_set = finalize_pipeline_set(pipelines);
+gotham::start("127.0.0.1:8080", build_router((), pipeline_set, |route| {
+	// routing without any cors config
+	route.with_pipeline_chain((chain_a, ()), |route| {
+		// routing with cors config a
+	});
+	route.with_pipeline_chain((chain_b, ()), |route| {
+		// routing with cors config b
+	});
+}));
 ```
 
  [`State`]: ../gotham/state/struct.State.html
@@ -186,12 +186,31 @@ pub fn handle_cors(state : &State, res : &mut Response<Body>)
 	}
 }
 
-/// Add CORS routing for your path.
+/// Add CORS routing for your path. This is required for handling preflight requests.
+/// 
+/// Example:
+/// 
+/// ```rust,no_run
+/// # use gotham::{hyper::{Body, Method, Response}, router::builder::*};
+/// # use gotham_restful::*;
+/// build_simple_router(|router| {
+/// 	// The handler that needs preflight handling
+/// 	router.post("/foo").to(|state| {
+/// 		let mut res : Response<Body> = unimplemented!();
+/// 		handle_cors(&state, &mut res);
+/// 		(state, res)
+/// 	});
+/// 	// Add preflight handling
+/// 	router.cors("/foo", Method::POST);
+/// });
+/// ```
 pub trait CorsRoute<C, P>
 where
 	C : PipelineHandleChain<P> + Copy + Send + Sync + 'static,
     P : RefUnwindSafe + Send + Sync + 'static
 {
+	/// Handle a preflight request on `path` for `method`. To configure the behaviour, use
+	/// [`CorsConfig`](struct.CorsConfig.html).
 	fn cors(&mut self, path : &str, method : Method);
 }
 

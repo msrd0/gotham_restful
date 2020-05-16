@@ -166,6 +166,49 @@ fn main() {
 # }
 ```
 
+## CORS Feature
+
+The cors feature allows an easy usage of this web server from other origins. By default, only
+the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired
+configuration as a middleware.
+
+A simple example that allows authentication from every origin (note that `*` always disallows
+authentication), and every content type, could look like this:
+
+```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
+# #[cfg(feature = "cors")]
+# mod cors_feature_enabled {
+# use gotham::{hyper::header::*, router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham_restful::*;
+# use serde::{Deserialize, Serialize};
+#[derive(Resource)]
+#[resource(read_all)]
+struct FooResource;
+
+#[read_all(FooResource)]
+fn read_all() {
+	// your handler
+}
+
+fn main() {
+	let cors = CorsConfig {
+		origin: Origin::Copy,
+		headers: vec![CONTENT_TYPE],
+		max_age: 0,
+		credentials: true
+	};
+	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
+	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
+		route.resource::<FooResource>("foo");
+	}));
+}
+# }
+```
+
+The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`]
+for an example.
+
 ## Database Feature
 
 The database feature allows an easy integration of [diesel] into your handler functions. Please
@@ -238,6 +281,7 @@ Licensed under your option of:
  [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
  [gotham]: https://gotham.rs/
  [serde_json]: https://github.com/serde-rs/json#serde-json----
+ [`CorsRoute`]: trait.CorsRoute.html
  [`QueryStringExtractor`]: ../gotham/extractor/trait.QueryStringExtractor.html
  [`RequestBody`]: trait.RequestBody.html
  [`State`]: ../gotham/state/struct.State.html
