@@ -8,7 +8,7 @@ use mime::TEXT_PLAIN;
 
 #[allow(dead_code)]
 mod util { include!("util/mod.rs"); }
-use util::test_get_response;
+use util::{test_get_response, test_openapi_response};
 
 
 const RESPONSE : &[u8] = b"This is the only valid response.";
@@ -34,6 +34,7 @@ fn openapi_supports_scope()
 	};
 	let server = TestServer::new(build_simple_router(|router| {
 		router.with_openapi(info, |mut router| {
+			router.get_openapi("openapi");
 			router.resource::<FooResource>("foo1");
 			router.scope("/bar", |router| {
 				router.resource::<FooResource>("foo2");
@@ -49,4 +50,5 @@ fn openapi_supports_scope()
 	test_get_response(&server, "http://localhost/bar/foo2", RESPONSE);
 	test_get_response(&server, "http://localhost/bar/baz/foo3", RESPONSE);
 	test_get_response(&server, "http://localhost/foo4", RESPONSE);
+	test_openapi_response(&server, "http://localhost/openapi", "tests/openapi_supports_scope.json");
 }

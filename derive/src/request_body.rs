@@ -3,10 +3,11 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::iter;
 use syn::{
-	parenthesized,
 	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
+	spanned::Spanned,
 	DeriveInput,
+	Error,
 	Generics,
 	Path,
 	Result,
@@ -19,9 +20,7 @@ impl Parse for MimeList
 {
 	fn parse(input: ParseStream) -> Result<Self>
 	{
-		let content;
-		let _paren = parenthesized!(content in input);
-		let list = Punctuated::parse_separated_nonempty(&content)?;
+		let list = Punctuated::parse_separated_nonempty(&input)?;
 		Ok(Self(list))
 	}
 }
@@ -61,10 +60,15 @@ pub fn expand_request_body(input : DeriveInput) -> Result<TokenStream>
 	
 	let types = input.attrs.into_iter()
 		.filter(|attr| attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string()))
-		.flat_map(|attr|
-			syn::parse2::<MimeList>(attr.tokens)
+		.flat_map(|attr| {
+			let span = attr.span();
+			attr.parse_args::<MimeList>()
 				.map(|list| Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path>>>)
-				.unwrap_or_else(|err| Box::new(iter::once(Err(err)))))
+				.unwrap_or_else(|mut err| {
+					err.combine(Error::new(span, "Hint: Types list should look like #[supported_types(TEXT_PLAIN, APPLICATION_JSON)]"));
+					Box::new(iter::once(Err(err)))
+				})
+		})
 		.collect_to_result()?;
 	
 	let types = match types {
