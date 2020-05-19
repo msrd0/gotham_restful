@@ -66,10 +66,7 @@ fn test_preflight(server : &TestServer, method : &str, origin : Option<&str>, va
 #[test]
 fn cors_origin_none()
 {
-	let cfg = CorsConfig {
-		origin: Origin::None,
-		..Default::default()
-	};
+	let cfg = Default::default();
 	let server = test_server(cfg);
 
 	test_preflight(&server, "PUT", None, "Access-Control-Request-Method", false, 0);

@@ -3,6 +3,7 @@
 
 use fake::{faker::internet::en::Username, Fake};
 use gotham::{
+	hyper::header::CONTENT_TYPE,
 	middleware::logger::RequestLogger,
 	pipeline::{new_pipeline, single::single_pipeline},
 	router::builder::*,
@@ -124,12 +125,20 @@ fn main()
 		.unwrap();
 	log4rs::init_config(config).unwrap();
 	
+	let cors = CorsConfig {
+		origin: Origin::Copy,
+		headers: vec![CONTENT_TYPE],
+		credentials: true,
+		..Default::default()
+	};
+	
 	let auth = <AuthMiddleware<(), Handler>>::from_source(AuthSource::AuthorizationHeader);
 	let logging = RequestLogger::new(log::Level::Info);
 	let (chain, pipelines) = single_pipeline(
 		new_pipeline()
 			.add(auth)
 			.add(logging)
+			.add(cors)
 			.build()
 	);
 
