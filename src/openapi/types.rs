@@ -10,7 +10,7 @@ use openapiv3::{
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
 use std::{
-	collections::{BTreeSet, HashSet},
+	collections::{BTreeSet, HashMap, HashSet},
 	hash::BuildHasher
 };
 
@@ -267,8 +267,7 @@ impl<T : OpenapiType> OpenapiType for Vec<T>
 		let schema = T::schema();
 		let mut dependencies = schema.dependencies.clone();
 		
-		let items = match schema.name.clone()
-		{
+		let items = match schema.name.clone() {
 			Some(name) => {
 				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
 				dependencies.insert(name, schema);
@@ -307,6 +306,34 @@ impl<T : OpenapiType, S : BuildHasher> OpenapiType for HashSet<T, S>
 	}
 }
 
+impl<K, T : OpenapiType, S : BuildHasher> OpenapiType for HashMap<K, T, S>
+{
+	fn schema() -> OpenapiSchema
+	{
+		let schema = T::schema();
+		let mut dependencies = schema.dependencies.clone();
+		
+		let items = Box::new(match schema.name.clone() {
+			Some(name) => {
+				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				dependencies.insert(name, schema);
+				reference
+			},
+			None => Item(schema.into_schema())
+		});
+		
+		OpenapiSchema {
+			nullable: false,
+			name: None,
+			schema: SchemaKind::Type(Type::Object(ObjectType {
+				additional_properties: Some(AdditionalProperties::Schema(items)),
+				..Default::default()
+			})),
+			dependencies
+		}
+	}
+}
+
 impl OpenapiType for serde_json::Value
 {
 	fn schema() -> OpenapiSchema
@@ -330,12 +357,12 @@ mod test
 	type Unit = ();
 	
 	macro_rules! assert_schema {
-		($ty:ident $(<$generic:ident>)* => $json:expr) => {
+		($ty:ident $(<$($generic:ident),+>)* => $json:expr) => {
 			paste::item! {
 				#[test]
-				fn [<test_schema_ $ty:snake $(_ $generic:snake)*>]()
+				fn [<test_schema_ $ty:lower $($(_ $generic:lower)+)*>]()
 				{
-					let schema = <$ty $(<$generic>)* as OpenapiType>::schema().into_schema();
+					let schema = <$ty $(<$($generic),+>)* as OpenapiType>::schema().into_schema();
 					let schema_json = serde_json::to_string(&schema).expect(&format!("Unable to serialize schema for {}", stringify!($ty)));
 					assert_eq!(schema_json, $json);
 				}
@@ -382,6 +409,8 @@ mod test
 	
 	assert_schema!(Option<String> => r#"{"nullable":true,"type":"string"}"#);
 	assert_schema!(Vec<String> => r#"{"type":"array","items":{"type":"string"}}"#);
-	
+	assert_schema!(BTreeSet<String> => r#"{"type":"array","items":{"type":"string"}}"#);
+	assert_schema!(HashSet<String> => r#"{"type":"array","items":{"type":"string"}}"#);
+	assert_schema!(HashMap<String, String> => r#"{"type":"object","additionalProperties":{"type":"string"}}"#);
 	assert_schema!(Value => r#"{"nullable":true}"#);
 }
