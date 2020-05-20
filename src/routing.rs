@@ -1,5 +1,4 @@
 use crate::{
-	matcher::{AcceptHeaderMatcher, ContentTypeMatcher},
 	resource::*,
 	result::{ResourceError, ResourceResult},
 	RequestBody,
@@ -22,7 +21,7 @@ use gotham::{
 	router::{
 		builder::*,
 		non_match::RouteNonMatch,
-		route::matcher::RouteMatcher
+		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher}
 	},
 	state::{FromState, State}
 };
@@ -262,7 +261,7 @@ fn remove_handler<Handler : ResourceRemove>(state : State) -> Pin<Box<HandlerFut
 #[derive(Clone)]
 struct MaybeMatchAcceptHeader
 {
-	matcher : Option<AcceptHeaderMatcher>
+	matcher : Option<AcceptHeaderRouteMatcher>
 }
 
 impl RouteMatcher for MaybeMatchAcceptHeader
@@ -285,7 +284,7 @@ impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader
 			types => types
 		};
 		Self {
-			matcher: types.map(AcceptHeaderMatcher::new)
+			matcher: types.map(AcceptHeaderRouteMatcher::new)
 		}
 	}
 }
@@ -293,7 +292,7 @@ impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader
 #[derive(Clone)]
 struct MaybeMatchContentTypeHeader
 {
-	matcher : Option<ContentTypeMatcher>
+	matcher : Option<ContentTypeHeaderRouteMatcher>
 }
 
 impl RouteMatcher for MaybeMatchContentTypeHeader
@@ -312,7 +311,7 @@ impl From<Option<Vec<Mime>>> for MaybeMatchContentTypeHeader
 	fn from(types : Option<Vec<Mime>>) -> Self
 	{
 		Self {
-			matcher: types.map(ContentTypeMatcher::new).map(ContentTypeMatcher::allow_no_type)
+			matcher: types.map(|types| ContentTypeHeaderRouteMatcher::new(types).allow_no_type())
 		}
 	}
 }
