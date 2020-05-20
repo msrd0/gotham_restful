@@ -14,10 +14,10 @@ repository = "https://gitlab.com/msrd0/gotham-restful"
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 
 [dependencies]
-fake = "2.2"
+fake = "2.2.2"
 gotham = { version = "0.5.0-rc.1", default-features = false }
 gotham_derive = "0.5.0-rc.1"
-gotham_restful = { version = "0.1.0-dev", features = ["auth", "openapi"] }
+gotham_restful = { version = "0.1.0-rc0", features = ["auth", "openapi"] }
 log = "0.4.8"
-log4rs = { version = "0.12", features = ["console_appender"], default-features = false }
-serde = "1.0.106"
+log4rs = { version = "0.12.0", features = ["console_appender"], default-features = false }
+serde = "1.0.110"
