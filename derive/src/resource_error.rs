@@ -1,8 +1,6 @@
 use crate::util::{CollectToResult, remove_parens};
-use lazy_static::lazy_static;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use regex::Regex;
 use std::iter;
 use syn::{
 	spanned::Spanned,
@@ -105,11 +103,6 @@ fn path_segment(name : &str) -> PathSegment
 	}
 }
 
-lazy_static! {
-	// TODO this is a really ugly regex that requires at least two characters between captures
-	static ref DISPLAY_REGEX : Regex = Regex::new(r"(^|[^\{])\{(?P<param>[^\}]+)\}([^\}]|$)").unwrap();
-}
-
 impl ErrorVariant
 {
 	fn fields_pat(&self) -> TokenStream
@@ -131,8 +124,42 @@ impl ErrorVariant
 		
 		// lets find all required format parameters
 		let display_str = display.value();
-		let params = DISPLAY_REGEX.captures_iter(&display_str)
-			.map(|cap| format_ident!("{}{}", if self.is_named { "" } else { "arg" }, cap.name("param").unwrap().as_str()));
+		let mut params : Vec<&str> = Vec::new();
+		let len = display_str.len();
+		let mut start = len;
+		let mut iter = display_str.chars().enumerate().peekable();
+		while let Some((i, c)) = iter.next()
+		{
+			// we found a new opening brace
+			if start == len && c == '{'
+			{
+				start = i + 1;
+			}
+			// we found a duplicate opening brace
+			else if start == i && c == '{'
+			{
+				start = len;
+			}
+			// we found a closing brace
+			else if start < i && c == '}'
+			{
+				match iter.peek() {
+					Some((_, '}')) => return Err(Error::new(display.span(), "Error parsing format string: curly braces not allowed inside parameter name")),
+					_ => params.push(&display_str[start..i])
+				};
+				start = len;
+			}
+			// we found a closing brace without content
+			else if start == i && c == '}'
+			{
+				return Err(Error::new(display.span(), "Error parsing format string: parameter name must not be empty"))
+			}
+		}
+		if start != len
+		{
+			return Err(Error::new(display.span(), "Error parsing format string: Unmatched opening brace"));
+		}
+		let params = params.into_iter().map(|name| format_ident!("{}{}", if self.is_named { "" } else { "arg" }, name));
 		
 		let fields_pat = self.fields_pat();
 		Ok(quote! {
