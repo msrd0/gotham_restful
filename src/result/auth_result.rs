@@ -62,8 +62,9 @@ pub enum AuthErrorOrOther<E>
 	#[status(FORBIDDEN)]
 	#[display("Forbidden")]
 	Forbidden,
+	#[status(INTERNAL_SERVER_ERROR)]
 	#[display("{0}")]
-	Other(#[from] E)
+	Other(E)
 }
 
 impl<E> From<AuthError> for AuthErrorOrOther<E>
@@ -73,6 +74,17 @@ impl<E> From<AuthError> for AuthErrorOrOther<E>
 		match err {
 			AuthError::Forbidden => Self::Forbidden
 		}
+	}
+}
+
+impl<E, F> From<F> for AuthErrorOrOther<E>
+where
+	// TODO https://gitlab.com/msrd0/gotham-restful/-/issues/20
+	F : std::error::Error + Into<E>
+{
+	fn from(err : F) -> Self
+	{
+		Self::Other(err.into())
 	}
 }
 

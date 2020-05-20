@@ -167,7 +167,7 @@ impl ErrorVariant
 		})
 	}
 	
-	fn into_match_arm(self, krate : &TokenStream, enum_ident : &Ident) -> TokenStream
+	fn into_match_arm(self, krate : &TokenStream, enum_ident : &Ident) -> Result<TokenStream>
 	{
 		let ident = &self.ident;
 		let fields_pat = self.fields_pat();
@@ -185,21 +185,23 @@ impl ErrorVariant
 		});
 		
 		// the response will come directly from the from_ty if present
-		let res = match self.from_ty {
-			Some((from_index, _)) => {
+		let res = match (self.from_ty, status) {
+			(Some((from_index, _)), None) => {
 				let from_field = &self.fields[from_index].ident;
 				quote!(#from_field.into_response_error())
 			},
-			None => quote!(Ok(#krate::Response {
+			(Some(_), Some(_)) => return Err(Error::new(ident.span(), "When #[from] is used, #[status] must not be used!")),
+			(None, Some(status)) => quote!(Ok(#krate::Response {
 				status: { #status }.into(),
 				body: #krate::gotham::hyper::Body::empty(),
 				mime: None
-			}))
+			})),
+			(None, None) => return Err(Error::new(ident.span(), "Missing #[status(code)] for this variant"))
 		};
 		
-		quote! {
+		Ok(quote! {
 			#enum_ident::#ident #fields_pat => #res
-		}
+		})
 	}
 	
 	fn were(&self) -> Option<TokenStream>
@@ -293,7 +295,9 @@ pub fn expand_resource_error(input : DeriveInput) -> Result<TokenStream>
 	}
 	
 	let were = variants.iter().filter_map(|variant| variant.were()).collect::<Vec<_>>();
-	let variants = variants.into_iter().map(|variant| variant.into_match_arm(&krate, &ident));
+	let variants = variants.into_iter()
+		.map(|variant| variant.into_match_arm(&krate, &ident))
+    	.collect_to_result()?;
 	
 	Ok(quote! {
 		#display_impl
