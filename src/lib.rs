@@ -110,7 +110,14 @@ fn create(body : RawImage) -> Raw<Vec<u8>> {
 # Features
 
 To make life easier for common use-cases, this create offers a few features that might be helpful
-when you implement your web server.
+when you implement your web server.  The complete feature list is
+ - [`auth`](#authentication-feature) Advanced JWT middleware
+ - `chrono` openapi support for chrono types
+ - [`cors`](#cors-feature) CORS handling for all method handlers
+ - [`database`](#database-feature) diesel middleware support
+ - `errorlog` log errors returned from method handlers
+ - [`openapi`](#openapi-feature) router additions to generate an openapi spec
+ - `uuid` openapi support for uuid
 
 ## Authentication Feature
 
@@ -263,6 +270,79 @@ fn main() {
 	}));
 }
 # }
+```
+
+## OpenAPI Feature
+
+The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section
+carefully both as a binary as well as a library author to avoid unwanted suprises.
+
+In order to automatically create an openapi specification, gotham-restful needs knowledge over
+all routes and the types returned. `serde` does a great job at serialization but doesn't give
+enough type information, so all types used in the router need to implement `OpenapiType`. This
+can be derived for almoust any type and there should be no need to implement it manually. A simple
+example could look like this:
+
+```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
+# #[cfg(feature = "openapi")]
+# mod openapi_feature_enabled {
+# use gotham::{router::builder::*, state::State};
+# use gotham_restful::*;
+# use serde::{Deserialize, Serialize};
+#[derive(Resource)]
+#[resource(read_all)]
+struct FooResource;
+
+#[derive(OpenapiType, Serialize)]
+struct Foo {
+	bar: String
+}
+
+#[read_all(FooResource)]
+fn read_all() -> Success<Foo> {
+	Foo { bar: "Hello World".to_owned() }.into()
+}
+
+fn main() {
+	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+		let info = OpenapiInfo {
+			title: "My Foo API".to_owned(),
+			version: "0.1.0".to_owned(),
+			urls: vec!["https://example.org/foo/api/v1".to_owned()]
+		};
+		route.with_openapi(info, |mut route| {
+			route.resource::<FooResource>("foo");
+			route.get_openapi("openapi");
+		});
+	}));
+}
+# }
+```
+
+Above example adds the resource as before, but adds another endpoint that we specified as `/openapi`
+that will return the generated openapi specification. This allows you to easily write clients
+in different languages without worying to exactly replicate your api in each of those languages.
+
+However, as of right now there is one caveat. If you wrote code before enabling the openapi feature,
+it is likely to break. This is because of the new requirement of `OpenapiType` for all types used
+with resources, even outside of the `with_openapi` scope. This issue will eventually be resolved.
+If you are writing a library that uses gotham-restful, make sure that you expose an openapi feature.
+In other words, put
+
+```toml
+[features]
+openapi = ["gotham-restful/openapi"]
+```
+
+into your libraries `Cargo.toml` and use the following for all types used with handlers:
+
+```
+# use gotham_restful::OpenapiType;
+# use serde::{Deserialize, Serialize};
+#[derive(Deserialize, Serialize)]
+#[cfg_attr(feature = "openapi", derive(OpenapiType))]
+struct Foo;
 ```
 
 # Examples
