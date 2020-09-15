@@ -1,5 +1,4 @@
-
-const SECURITY_NAME : &str = "authToken";
+const SECURITY_NAME: &str = "authToken";
 
 pub mod builder;
 pub mod handler;

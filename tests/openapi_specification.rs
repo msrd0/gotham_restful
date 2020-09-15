@@ -1,6 +1,7 @@
 #![cfg(all(feature = "auth", feature = "chrono", feature = "openapi"))]
 
-#[macro_use] extern crate gotham_derive;
+#[macro_use]
+extern crate gotham_derive;
 
 use chrono::{NaiveDate, NaiveDateTime};
 use gotham::{
@@ -13,9 +14,10 @@ use mime::IMAGE_PNG;
 use serde::{Deserialize, Serialize};
 
 #[allow(dead_code)]
-mod util { include!("util/mod.rs"); }
+mod util {
+	include!("util/mod.rs");
+}
 use util::{test_get_response, test_openapi_response};
-
 
 const IMAGE_RESPONSE : &[u8] = b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUA/wA0XsCoAAAAAXRSTlN/gFy0ywAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=";
 
@@ -28,71 +30,59 @@ struct ImageResource;
 struct Image(Vec<u8>);
 
 #[read(ImageResource, operation_id = "getImage")]
-fn get_image(_id : u64) -> Raw<&'static [u8]>
-{
+fn get_image(_id: u64) -> Raw<&'static [u8]> {
 	Raw::new(IMAGE_RESPONSE, "image/png;base64".parse().unwrap())
 }
 
 #[change(ImageResource, operation_id = "setImage")]
-fn set_image(_id : u64, _image : Image)
-{
-}
-
+fn set_image(_id: u64, _image: Image) {}
 
 #[derive(Resource)]
 #[resource(read, search)]
 struct SecretResource;
 
 #[derive(Deserialize, Clone)]
-struct AuthData
-{
-	sub : String,
-	iat : u64,
-	exp : u64
+struct AuthData {
+	sub: String,
+	iat: u64,
+	exp: u64
 }
 
 type AuthStatus = gotham_restful::AuthStatus<AuthData>;
 
 #[derive(OpenapiType, Serialize)]
-struct Secret
-{
-	code : f32
+struct Secret {
+	code: f32
 }
 
 #[derive(OpenapiType, Serialize)]
-struct Secrets
-{
-	secrets : Vec<Secret>
+struct Secrets {
+	secrets: Vec<Secret>
 }
 
 #[derive(Deserialize, OpenapiType, StateData, StaticResponseExtender)]
-struct SecretQuery
-{
-	date : NaiveDate,
-	hour : Option<u16>,
-	minute : Option<u16>
+struct SecretQuery {
+	date: NaiveDate,
+	hour: Option<u16>,
+	minute: Option<u16>
 }
 
 #[read(SecretResource)]
-fn read_secret(auth : AuthStatus, _id : NaiveDateTime) -> AuthSuccess<Secret>
-{
+fn read_secret(auth: AuthStatus, _id: NaiveDateTime) -> AuthSuccess<Secret> {
 	auth.ok()?;
 	Ok(Secret { code: 4.2 })
 }
 
 #[search(SecretResource)]
-fn search_secret(auth : AuthStatus, _query : SecretQuery) -> AuthSuccess<Secrets>
-{
+fn search_secret(auth: AuthStatus, _query: SecretQuery) -> AuthSuccess<Secrets> {
 	auth.ok()?;
 	Ok(Secrets {
 		secrets: vec![Secret { code: 4.2 }, Secret { code: 3.14 }]
 	})
 }
 
-
 #[test]
-fn openapi_supports_scope()
-{
+fn openapi_supports_scope() {
 	let info = OpenapiInfo {
 		title: "This is just a test".to_owned(),
 		version: "1.2.3".to_owned(),
@@ -110,7 +100,8 @@ fn openapi_supports_scope()
 			router.get_openapi("openapi");
 			router.resource::<SecretResource>("secret");
 		});
-	})).unwrap();
-	
+	}))
+	.unwrap();
+
 	test_openapi_response(&server, "http://localhost/openapi", "tests/openapi_specification.json");
 }

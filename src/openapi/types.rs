@@ -1,18 +1,17 @@
 #[cfg(feature = "chrono")]
-use chrono::{
-	Date, DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc
-};
+use chrono::{Date, DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc};
 use indexmap::IndexMap;
 use openapiv3::{
-	AdditionalProperties, ArrayType, IntegerType, NumberFormat, NumberType, ObjectType, ReferenceOr::Item,
-	ReferenceOr::Reference, Schema, SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty
+	AdditionalProperties, ArrayType, IntegerType, NumberFormat, NumberType, ObjectType,
+	ReferenceOr::{Item, Reference},
+	Schema, SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty
 };
-#[cfg(feature = "uuid")]
-use uuid::Uuid;
 use std::{
 	collections::{BTreeSet, HashMap, HashSet},
 	hash::BuildHasher
 };
+#[cfg(feature = "uuid")]
+use uuid::Uuid;
 
 /**
 This struct needs to be available for every type that can be part of an OpenAPI Spec. It is
@@ -22,26 +21,23 @@ for your type, simply derive from [`OpenapiType`].
 [`OpenapiType`]: trait.OpenapiType.html
 */
 #[derive(Debug, Clone, PartialEq)]
-pub struct OpenapiSchema
-{
+pub struct OpenapiSchema {
 	/// The name of this schema. If it is None, the schema will be inlined.
-	pub name : Option<String>,
+	pub name: Option<String>,
 	/// Whether this particular schema is nullable. Note that there is no guarantee that this will
 	/// make it into the final specification, it might just be interpreted as a hint to make it
 	/// an optional parameter.
-	pub nullable : bool,
+	pub nullable: bool,
 	/// The actual OpenAPI schema.
-	pub schema : SchemaKind,
+	pub schema: SchemaKind,
 	/// Other schemas that this schema depends on. They will be included in the final OpenAPI Spec
 	/// along with this schema.
-	pub dependencies : IndexMap<String, OpenapiSchema>
+	pub dependencies: IndexMap<String, OpenapiSchema>
 }
 
-impl OpenapiSchema
-{
+impl OpenapiSchema {
 	/// Create a new schema that has no name.
-	pub fn new(schema : SchemaKind) -> Self
-	{
+	pub fn new(schema: SchemaKind) -> Self {
 		Self {
 			name: None,
 			nullable: false,
@@ -49,10 +45,9 @@ impl OpenapiSchema
 			dependencies: IndexMap::new()
 		}
 	}
-	
+
 	/// Convert this schema to an `openapiv3::Schema` that can be serialized to the OpenAPI Spec.
-	pub fn into_schema(self) -> Schema
-	{
+	pub fn into_schema(self) -> Schema {
 		Schema {
 			schema_data: SchemaData {
 				nullable: self.nullable,
@@ -80,15 +75,12 @@ struct MyResponse {
 
 [`OpenapiSchema`]: struct.OpenapiSchema.html
 */
-pub trait OpenapiType
-{
+pub trait OpenapiType {
 	fn schema() -> OpenapiSchema;
 }
 
-impl OpenapiType for ()
-{
-	fn schema() -> OpenapiSchema
-	{
+impl OpenapiType for () {
+	fn schema() -> OpenapiSchema {
 		OpenapiSchema::new(SchemaKind::Type(Type::Object(ObjectType {
 			additional_properties: Some(AdditionalProperties::Any(false)),
 			..Default::default()
@@ -96,11 +88,9 @@ impl OpenapiType for ()
 	}
 }
 
-impl OpenapiType for bool
-{
-	fn schema() -> OpenapiSchema
-	{
-		OpenapiSchema::new(SchemaKind::Type(Type::Boolean{}))
+impl OpenapiType for bool {
+	fn schema() -> OpenapiSchema {
+		OpenapiSchema::new(SchemaKind::Type(Type::Boolean {}))
 	}
 }
 
@@ -114,7 +104,7 @@ macro_rules! int_types {
 			}
 		}
 	)*};
-	
+
 	(unsigned $($int_ty:ty),*) => {$(
 		impl OpenapiType for $int_ty
 		{
@@ -127,7 +117,7 @@ macro_rules! int_types {
 			}
 		}
 	)*};
-	
+
 	(bits = $bits:expr, $($int_ty:ty),*) => {$(
 		impl OpenapiType for $int_ty
 		{
@@ -140,7 +130,7 @@ macro_rules! int_types {
 			}
 		}
 	)*};
-	
+
 	(unsigned bits = $bits:expr, $($int_ty:ty),*) => {$(
 		impl OpenapiType for $int_ty
 		{
@@ -203,7 +193,7 @@ macro_rules! str_types {
 			fn schema() -> OpenapiSchema
 			{
 				use openapiv3::StringFormat;
-				
+
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Item(StringFormat::$format),
 					..Default::default()
@@ -211,7 +201,7 @@ macro_rules! str_types {
 			}
 		}
 	)*};
-	
+
 	(format_str = $format:expr, $($str_ty:ty),*) => {$(
 		impl OpenapiType  for $str_ty
 		{
@@ -231,26 +221,32 @@ str_types!(String, &str);
 #[cfg(feature = "chrono")]
 str_types!(format = Date, Date<FixedOffset>, Date<Local>, Date<Utc>, NaiveDate);
 #[cfg(feature = "chrono")]
-str_types!(format = DateTime, DateTime<FixedOffset>, DateTime<Local>, DateTime<Utc>, NaiveDateTime);
+str_types!(
+	format = DateTime,
+	DateTime<FixedOffset>,
+	DateTime<Local>,
+	DateTime<Utc>,
+	NaiveDateTime
+);
 
 #[cfg(feature = "uuid")]
 str_types!(format_str = "uuid", Uuid);
 
-impl<T : OpenapiType> OpenapiType for Option<T>
-{
-	fn schema() -> OpenapiSchema
-	{
+impl<T: OpenapiType> OpenapiType for Option<T> {
+	fn schema() -> OpenapiSchema {
 		let schema = T::schema();
 		let mut dependencies = schema.dependencies.clone();
 		let schema = match schema.name.clone() {
 			Some(name) => {
-				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				let reference = Reference {
+					reference: format!("#/components/schemas/{}", name)
+				};
 				dependencies.insert(name, schema);
 				SchemaKind::AllOf { all_of: vec![reference] }
 			},
 			None => schema.schema
 		};
-		
+
 		OpenapiSchema {
 			nullable: true,
 			name: None,
@@ -260,22 +256,22 @@ impl<T : OpenapiType> OpenapiType for Option<T>
 	}
 }
 
-impl<T : OpenapiType> OpenapiType for Vec<T>
-{
-	fn schema() -> OpenapiSchema
-	{
+impl<T: OpenapiType> OpenapiType for Vec<T> {
+	fn schema() -> OpenapiSchema {
 		let schema = T::schema();
 		let mut dependencies = schema.dependencies.clone();
-		
+
 		let items = match schema.name.clone() {
 			Some(name) => {
-				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				let reference = Reference {
+					reference: format!("#/components/schemas/{}", name)
+				};
 				dependencies.insert(name, schema);
 				reference
 			},
 			None => Item(Box::new(schema.into_schema()))
 		};
-		
+
 		OpenapiSchema {
 			nullable: false,
 			name: None,
@@ -290,38 +286,34 @@ impl<T : OpenapiType> OpenapiType for Vec<T>
 	}
 }
 
-impl<T : OpenapiType> OpenapiType for BTreeSet<T>
-{
-	fn schema() -> OpenapiSchema
-	{
+impl<T: OpenapiType> OpenapiType for BTreeSet<T> {
+	fn schema() -> OpenapiSchema {
 		<Vec<T> as OpenapiType>::schema()
 	}
 }
 
-impl<T : OpenapiType, S : BuildHasher> OpenapiType for HashSet<T, S>
-{
-	fn schema() -> OpenapiSchema
-	{
+impl<T: OpenapiType, S: BuildHasher> OpenapiType for HashSet<T, S> {
+	fn schema() -> OpenapiSchema {
 		<Vec<T> as OpenapiType>::schema()
 	}
 }
 
-impl<K, T : OpenapiType, S : BuildHasher> OpenapiType for HashMap<K, T, S>
-{
-	fn schema() -> OpenapiSchema
-	{
+impl<K, T: OpenapiType, S: BuildHasher> OpenapiType for HashMap<K, T, S> {
+	fn schema() -> OpenapiSchema {
 		let schema = T::schema();
 		let mut dependencies = schema.dependencies.clone();
-		
+
 		let items = Box::new(match schema.name.clone() {
 			Some(name) => {
-				let reference = Reference { reference: format!("#/components/schemas/{}", name) };
+				let reference = Reference {
+					reference: format!("#/components/schemas/{}", name)
+				};
 				dependencies.insert(name, schema);
 				reference
 			},
 			None => Item(schema.into_schema())
 		});
-		
+
 		OpenapiSchema {
 			nullable: false,
 			name: None,
@@ -334,10 +326,8 @@ impl<K, T : OpenapiType, S : BuildHasher> OpenapiType for HashMap<K, T, S>
 	}
 }
 
-impl OpenapiType for serde_json::Value
-{
-	fn schema() -> OpenapiSchema
-	{
+impl OpenapiType for serde_json::Value {
+	fn schema() -> OpenapiSchema {
 		OpenapiSchema {
 			nullable: true,
 			name: None,
@@ -347,15 +337,13 @@ impl OpenapiType for serde_json::Value
 	}
 }
 
-
 #[cfg(test)]
-mod test
-{
+mod test {
 	use super::*;
 	use serde_json::Value;
-	
+
 	type Unit = ();
-	
+
 	macro_rules! assert_schema {
 		($ty:ident $(<$($generic:ident),+>)* => $json:expr) => {
 			paste::item! {
@@ -369,7 +357,7 @@ mod test
 			}
 		};
 	}
-	
+
 	assert_schema!(Unit => r#"{"type":"object","additionalProperties":false}"#);
 	assert_schema!(bool => r#"{"type":"boolean"}"#);
 	assert_schema!(isize => r#"{"type":"integer"}"#);
@@ -386,7 +374,7 @@ mod test
 	assert_schema!(u128 => r#"{"type":"integer","format":"int128","minimum":0}"#);
 	assert_schema!(f32 => r#"{"type":"number","format":"float"}"#);
 	assert_schema!(f64 => r#"{"type":"number","format":"double"}"#);
-	
+
 	assert_schema!(String => r#"{"type":"string"}"#);
 	#[cfg(feature = "chrono")]
 	assert_schema!(Date<FixedOffset> => r#"{"type":"string","format":"date"}"#);
@@ -406,7 +394,7 @@ mod test
 	assert_schema!(NaiveDateTime => r#"{"type":"string","format":"date-time"}"#);
 	#[cfg(feature = "uuid")]
 	assert_schema!(Uuid => r#"{"type":"string","format":"uuid"}"#);
-	
+
 	assert_schema!(Option<String> => r#"{"nullable":true,"type":"string"}"#);
 	assert_schema!(Vec<String> => r#"{"type":"array","items":{"type":"string"}}"#);
 	assert_schema!(BTreeSet<String> => r#"{"type":"array","items":{"type":"string"}}"#);

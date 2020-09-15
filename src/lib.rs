@@ -263,7 +263,7 @@ type Repo = gotham_middleware_diesel::Repo<PgConnection>;
 fn main() {
 	let repo = Repo::new(&env::var("DATABASE_URL").unwrap());
 	let diesel = DieselMiddleware::new(repo);
-	
+
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(diesel).build());
 	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
 		route.resource::<FooResource>("foo");
@@ -347,7 +347,7 @@ struct Foo;
 
 # Examples
 
-There is a lack of good examples, but there is currently a collection of code in the [example] 
+There is a lack of good examples, but there is currently a collection of code in the [example]
 directory, that might help you. Any help writing more examples is highly appreciated.
 
 # License
@@ -370,9 +370,12 @@ Licensed under your option of:
 // weird proc macro issue
 extern crate self as gotham_restful;
 
-#[macro_use] extern crate gotham_derive;
-#[macro_use] extern crate log;
-#[macro_use] extern crate serde;
+#[macro_use]
+extern crate gotham_derive;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate serde;
 
 #[doc(no_inline)]
 pub use gotham;
@@ -388,15 +391,14 @@ pub use gotham_restful_derive::*;
 
 /// Not public API
 #[doc(hidden)]
-pub mod export
-{
+pub mod export {
 	pub use futures_util::future::FutureExt;
-	
+
 	pub use serde_json;
-	
+
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;
-	
+
 	#[cfg(feature = "openapi")]
 	pub use indexmap::IndexMap;
 	#[cfg(feature = "openapi")]
@@ -406,24 +408,12 @@ pub mod export
 #[cfg(feature = "auth")]
 mod auth;
 #[cfg(feature = "auth")]
-pub use auth::{
-	AuthHandler,
-	AuthMiddleware,
-	AuthSource,
-	AuthStatus,
-	AuthValidation,
-	StaticAuthHandler
-};
+pub use auth::{AuthHandler, AuthMiddleware, AuthSource, AuthStatus, AuthValidation, StaticAuthHandler};
 
 #[cfg(feature = "cors")]
 mod cors;
 #[cfg(feature = "cors")]
-pub use cors::{
-	handle_cors,
-	CorsConfig,
-	CorsRoute,
-	Origin
-};
+pub use cors::{handle_cors, CorsConfig, CorsRoute, Origin};
 
 pub mod matcher;
 
@@ -438,16 +428,8 @@ pub use openapi::{
 
 mod resource;
 pub use resource::{
-	Resource,
-	ResourceMethod,
-	ResourceReadAll,
-	ResourceRead,
-	ResourceSearch,
-	ResourceCreate,
-	ResourceChangeAll,
-	ResourceChange,
-	ResourceRemoveAll,
-	ResourceRemove
+	Resource, ResourceChange, ResourceChangeAll, ResourceCreate, ResourceMethod, ResourceRead, ResourceReadAll,
+	ResourceRemove, ResourceRemoveAll, ResourceSearch
 };
 
 mod response;
@@ -455,22 +437,14 @@ pub use response::Response;
 
 mod result;
 pub use result::{
-	AuthError,
-	AuthError::Forbidden,
-	AuthErrorOrOther,
-	AuthResult,
-	AuthSuccess,
-	IntoResponseError,
-	NoContent,
-	Raw,
-	ResourceResult,
-	Success
+	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponseError, NoContent, Raw,
+	ResourceResult, Success
 };
 
 mod routing;
-pub use routing::{DrawResources, DrawResourceRoutes};
 #[cfg(feature = "openapi")]
 pub use routing::WithOpenapi;
+pub use routing::{DrawResourceRoutes, DrawResources};
 
 mod types;
 pub use types::*;

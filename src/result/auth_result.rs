@@ -1,6 +1,5 @@
 use gotham_restful_derive::ResourceError;
 
-
 /**
 This is an error type that always yields a _403 Forbidden_ response. This type is best used in
 combination with [`AuthSuccess`] or [`AuthResult`].
@@ -9,8 +8,7 @@ combination with [`AuthSuccess`] or [`AuthResult`].
   [`AuthResult`]: type.AuthResult.html
 */
 #[derive(Debug, Clone, Copy, ResourceError)]
-pub enum AuthError
-{
+pub enum AuthError {
 	#[status(FORBIDDEN)]
 	#[display("Forbidden")]
 	Forbidden
@@ -57,8 +55,7 @@ error, or delegates to another error type. This type is best used with [`AuthRes
   [`AuthResult`]: type.AuthResult.html
 */
 #[derive(Debug, ResourceError)]
-pub enum AuthErrorOrOther<E>
-{
+pub enum AuthErrorOrOther<E> {
 	#[status(FORBIDDEN)]
 	#[display("Forbidden")]
 	Forbidden,
@@ -67,10 +64,8 @@ pub enum AuthErrorOrOther<E>
 	Other(E)
 }
 
-impl<E> From<AuthError> for AuthErrorOrOther<E>
-{
-	fn from(err : AuthError) -> Self
-	{
+impl<E> From<AuthError> for AuthErrorOrOther<E> {
+	fn from(err: AuthError) -> Self {
 		match err {
 			AuthError::Forbidden => Self::Forbidden
 		}
@@ -80,10 +75,9 @@ impl<E> From<AuthError> for AuthErrorOrOther<E>
 impl<E, F> From<F> for AuthErrorOrOther<E>
 where
 	// TODO https://gitlab.com/msrd0/gotham-restful/-/issues/20
-	F : std::error::Error + Into<E>
+	F: std::error::Error + Into<E>
 {
-	fn from(err : F) -> Self
-	{
+	fn from(err: F) -> Self {
 		Self::Other(err.into())
 	}
 }
