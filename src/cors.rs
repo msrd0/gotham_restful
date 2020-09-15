@@ -1,4 +1,3 @@
-use crate::matcher::AccessControlRequestMethodMatcher;
 use gotham::{
 	handler::HandlerFuture,
 	helpers::http::response::create_empty_response,
@@ -12,7 +11,7 @@ use gotham::{
 	},
 	middleware::Middleware,
 	pipeline::chain::PipelineHandleChain,
-	router::builder::*,
+	router::{builder::*, route::matcher::AccessControlRequestMethodMatcher},
 	state::{FromState, State}
 };
 use itertools::Itertools;

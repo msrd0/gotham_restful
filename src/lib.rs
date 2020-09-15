@@ -415,8 +415,6 @@ mod cors;
 #[cfg(feature = "cors")]
 pub use cors::{handle_cors, CorsConfig, CorsRoute, Origin};
 
-pub mod matcher;
-
 #[cfg(feature = "openapi")]
 mod openapi;
 #[cfg(feature = "openapi")]
