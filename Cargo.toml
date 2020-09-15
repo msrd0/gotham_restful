@@ -56,6 +56,5 @@ openapi = ["gotham_restful_derive/openapi", "indexmap", "openapiv3"]
 all-features = true
 
 [patch.crates-io]
-gotham = { path = "../gotham/gotham" }
 gotham_restful = { path = "." }
 gotham_restful_derive = { path = "./derive" }
