@@ -84,7 +84,7 @@ fn parse_attributes(input: &[Attribute]) -> Result<Attrs> {
 }
 
 fn expand_variant(variant: &Variant) -> Result<TokenStream> {
-	if variant.fields != Fields::Unit {
+	if !matches!(variant.fields, Fields::Unit) {
 		return Err(Error::new(
 			variant.span(),
 			"#[derive(OpenapiType)] does not support enum variants with fields"
