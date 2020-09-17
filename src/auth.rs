@@ -5,6 +5,7 @@ use futures_util::{
 	future::{FutureExt, TryFutureExt}
 };
 use gotham::{
+	anyhow,
 	handler::HandlerFuture,
 	hyper::header::{HeaderMap, AUTHORIZATION},
 	middleware::{Middleware, NewMiddleware},
@@ -280,7 +281,7 @@ where
 {
 	type Instance = Self;
 
-	fn new_middleware(&self) -> Result<Self::Instance, std::io::Error> {
+	fn new_middleware(&self) -> anyhow::Result<Self> {
 		let c: Self = self.clone();
 		Ok(c)
 	}

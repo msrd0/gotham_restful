@@ -1,7 +1,7 @@
 use super::SECURITY_NAME;
 use futures_util::{future, future::FutureExt};
 use gotham::{
-	error::Result,
+	anyhow,
 	handler::{Handler, HandlerFuture, NewHandler},
 	helpers::http::response::create_response,
 	state::State
@@ -28,7 +28,7 @@ impl OpenapiHandler {
 impl NewHandler for OpenapiHandler {
 	type Instance = Self;
 
-	fn new_handler(&self) -> Result<Self> {
+	fn new_handler(&self) -> anyhow::Result<Self> {
 		Ok(self.clone())
 	}
 }
