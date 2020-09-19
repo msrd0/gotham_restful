@@ -338,11 +338,14 @@ openapi = ["gotham-restful/openapi"]
 into your libraries `Cargo.toml` and use the following for all types used with handlers:
 
 ```
+# #[cfg(feature = "openapi")]
+# mod openapi_feature_enabled {
 # use gotham_restful::OpenapiType;
 # use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize)]
 #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct Foo;
+# }
 ```
 
 # Examples

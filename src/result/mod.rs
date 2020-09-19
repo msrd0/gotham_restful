@@ -104,8 +104,17 @@ where
 	E: Display + IntoResponseError
 {
 	into_response_helper(|| {
-		errorlog(&e);
-		e.into_response_error()
+		let msg = e.to_string();
+		let res = e.into_response_error();
+		match &res {
+			Ok(res) if res.status.is_server_error() => errorlog(msg),
+			Err(err) => {
+				errorlog(msg);
+				errorlog(&err);
+			},
+			_ => {}
+		};
+		res
 	})
 }
 
