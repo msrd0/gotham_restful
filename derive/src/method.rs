@@ -364,10 +364,10 @@ pub fn expand_method(method: Method, mut attrs: AttributeArgs, fun: ItemFn) -> R
 	let mut block = quote!(#fun_ident(#(#args_pass),*));
 	let mut state_block = quote!();
 	if fun_is_async {
-		if let Some(arg) = args.iter().find(|arg| (*arg).ty.is_state_ref()) {
+		if let Some(arg) = args.iter().find(|arg| matches!((*arg).ty, MethodArgumentType::StateRef)) {
 			return Err(Error::new(
 				arg.span(),
-				"async fn must not take &State as an argument as State is not Sync, consider boxing"
+				"async fn must not take &State as an argument as State is not Sync, consider taking &mut State"
 			));
 		}
 		block = quote!(#block.await);
