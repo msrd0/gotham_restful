@@ -1,6 +1,6 @@
 #![allow(clippy::tabs_in_doc_comments)]
 #![warn(missing_debug_implementations, rust_2018_idioms)]
-#![deny(intra_doc_link_resolution_failure)]
+#![deny(broken_intra_doc_links)]
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned methods that aim to be a more convenient way of creating handlers
