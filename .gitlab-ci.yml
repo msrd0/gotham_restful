@@ -9,16 +9,13 @@ variables:
 
 test-default:
   stage: test
-  image: msrd0/rust:alpine-sweep
+  image: msrd0/rust:alpine
   before_script:
     - cargo -V
-    - cargo sweep -s
   script:
     - cargo test --workspace --doc
     - cargo test --workspace --tests
     - cargo test --workspace --tests -- --ignored
-  after_script:
-    - cargo sweep -f
   cache:
     key: cargo-default
     paths:
@@ -27,17 +24,14 @@ test-default:
 
 test-all:
   stage: test
-  image: msrd0/rust:alpine-tarpaulin-sweep
+  image: msrd0/rust:alpine-tarpaulin
   before_script:
     - apk add --no-cache postgresql-dev
     - cargo -V
-    - cargo sweep -s
   script:
     - cargo test --workspace --all-features --doc
     - cargo test --workspace --tests -- --ignored
     - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
-  after_script:
-    - cargo sweep -f
   artifacts:
     paths:
       - tarpaulin-report.html
@@ -56,15 +50,12 @@ readme:
 
 doc:
   stage: build
-  image: msrd0/rust:alpine-sweep
+  image: msrd0/rust:alpine
   before_script:
     - cargo -V
-    - cargo sweep -s
   script:
     - cargo doc --all-features
     - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >target/doc/index.html
-  after_script:
-    - cargo sweep -f
   artifacts:
     paths:
       - target/doc/
