@@ -4,10 +4,10 @@ error: Too few arguments
 8 | fn read()
   |    ^^^^
 
-error[E0433]: failed to resolve: use of undeclared type or module `_gotham_restful_resource_foo_resource_method_read`
+error[E0433]: failed to resolve: use of undeclared crate or module `_gotham_restful_resource_foo_resource_method_read`
  --> $DIR/method_too_few_args.rs:3:10
   |
 3 | #[derive(Resource)]
-  |          ^^^^^^^^ use of undeclared type or module `_gotham_restful_resource_foo_resource_method_read`
+  |          ^^^^^^^^ use of undeclared crate or module `_gotham_restful_resource_foo_resource_method_read`
   |
   = note: this error originates in a derive macro (in Nightly builds, run with -Z macro-backtrace for more info)

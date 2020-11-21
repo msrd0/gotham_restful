@@ -9,34 +9,62 @@ variables:
 
 test-default:
   stage: test
-  image: msrd0/rust:alpine
+  image: rust:1.42-slim
   before_script:
     - cargo -V
   script:
-    - cargo test --workspace --doc
-    - cargo test --workspace --tests
-    - cargo test --workspace --tests -- --ignored
+    - cargo test --workspace
   cache:
-    key: cargo-default
+    key: cargo-1-42-default
     paths:
       - cargo/
       - target/
 
 test-all:
   stage: test
-  image: msrd0/rust:alpine-tarpaulin
+  image: rust:1.42-slim
   before_script:
-    - apk add --no-cache postgresql-dev
+    - apt update -y
+    - apt install -y --no-install-recommends libpq-dev
     - cargo -V
   script:
-    - cargo test --workspace --all-features --doc
-    - cargo test --workspace --tests -- --ignored
+    - cargo test --workspace --all-features
+  cache:
+    key: cargo-1-42-all
+    paths:
+      - cargo/
+      - target/
+
+test-tarpaulin:
+  stage: test
+  image: rust:slim
+  before_script:
+    - apt update -y
+    - apt install -y --no-install-recommends libpq-dev libssl-dev pkgconf
+    - cargo -V
+    - cargo install cargo-tarpaulin
+  script:
     - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
   artifacts:
     paths:
       - tarpaulin-report.html
   cache:
-    key: cargo-all
+    key: cargo-stable-all
+    paths:
+      - cargo/
+      - target/
+
+test-trybuild-ui:
+  stage: test
+  image: rust:1.48-slim
+  before_script:
+    - apt update -y
+    - apt install -y --no-install-recommends libpq-dev
+    - cargo -V
+  script:
+    - cargo test --workspace --all-features --tests -- --ignored
+  cache:
+    key: cargo-1-48-all
     paths:
       - cargo/
       - target/
@@ -50,29 +78,27 @@ readme:
 
 doc:
   stage: build
-  image: msrd0/rust:alpine
+  image: rust:slim
   before_script:
     - cargo -V
   script:
     - cargo doc --all-features
-    - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >target/doc/index.html
   artifacts:
     paths:
       - target/doc/
   cache:
-    key: cargo-doc
+    key: cargo-stable-doc
     paths:
       - cargo/
       - target/
-  only:
-    - master
 
 pages:
   stage: publish
   image: busybox
   script:
-    - mv target/doc public
     - mv tarpaulin-report.html public/coverage.html
+    - mv target/doc public
+    - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >public/index.html
   artifacts:
     paths:
       - public

@@ -4,11 +4,11 @@ error: Unknown method: `read_any'
 4 | #[resource(read_any)]
   |            ^^^^^^^^
 
-error[E0277]: the trait bound `FooResource: gotham_restful::Resource` is not satisfied
+error[E0277]: the trait bound `FooResource: Resource` is not satisfied
  --> $DIR/resource_unknown_method.rs:7:1
   |
 7 | #[read_all(FooResource)]
-  | ^^^^^^^^^^^^^^^^^^^^^^^^ the trait `gotham_restful::Resource` is not implemented for `FooResource`
+  | ^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Resource` is not implemented for `FooResource`
   |
   = help: see issue #48214
   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
