@@ -140,13 +140,13 @@ impl Middleware for CorsConfig {
 
 /**
 Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that
-the response is aligned with the `state`'s [`CorsConfig`].
+the response is aligned with the `state`'s [CorsConfig].
 
-If you are using the [`Resource`] type (which is the recommended way), you'll never have to call
+If you are using the [Resource](crate::Resource) type (which is the recommended way), you'll never have to call
 this method. However, if you are writing your own handler method, you might want to call this
 after your request to add the required CORS headers.
 
-For further information on CORS, read https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS.
+For further information on CORS, read [https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
 
  [`CorsConfig`]: ./struct.CorsConfig.html
 */
