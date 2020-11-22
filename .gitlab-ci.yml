@@ -96,6 +96,7 @@ pages:
   stage: publish
   image: busybox
   script:
+    - find . -maxdepth 3
     - mv tarpaulin-report.html public/coverage.html
     - mv target/doc public
     - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >public/index.html
