@@ -78,6 +78,15 @@ readme:
     - cargo readme -t README.tpl >README.md.new
     - diff README.md README.md.new
 
+rustfmt:
+  stage: test
+  image: rustlang/rust:nightly-slim
+  before_script:
+    - cargo -V
+    - cargo fmt --version
+  script:
+    - cargo fmt -- --check
+
 doc:
   stage: build
   image: rust:slim
