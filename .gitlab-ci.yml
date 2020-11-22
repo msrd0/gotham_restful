@@ -44,10 +44,12 @@ test-tarpaulin:
     - cargo -V
     - cargo install cargo-tarpaulin
   script:
-    - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --ignore-panics --ignore-tests --out Html -v
+    - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --exclude-files 'target/*' --ignore-panics --ignore-tests --out Html --out Xml -v
   artifacts:
     paths:
       - tarpaulin-report.html
+    reports:
+      cobertura: cobertura.xml
   cache:
     key: cargo-stable-all
     paths:
@@ -96,9 +98,8 @@ pages:
   stage: publish
   image: busybox
   script:
-    - find . -maxdepth 3
-    - mv tarpaulin-report.html public/coverage.html
     - mv target/doc public
+    - mv tarpaulin-report.html public/coverage.html
     - echo '<!DOCTYPE HTML><html><head><meta http-equiv="Refresh" content="0; url=./gotham_restful/index.html"/></head><body>The documentation is located <a href="./gotham_restful/index.html">here</a></body></html>' >public/index.html
   artifacts:
     paths:
