@@ -231,7 +231,7 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 	let variants = inum.variants.into_iter().map(process_variant).collect_to_result()?;
 
 	let display_impl = if variants.iter().any(|v| v.display.is_none()) {
-		None
+		None // TODO issue warning if display is present on some but not all
 	} else {
 		let were = generics.params.iter().filter_map(|param| match param {
 			GenericParam::Type(ty) => {
