@@ -75,6 +75,7 @@ pub enum AuthSource {
 This trait will help the auth middleware to determine the validity of an authentication token.
 
 A very basic implementation could look like this:
+
 ```
 # use gotham_restful::{AuthHandler, State};
 #
@@ -93,7 +94,7 @@ pub trait AuthHandler<Data> {
 	fn jwt_secret<F: FnOnce() -> Option<Data>>(&self, state: &mut State, decode_data: F) -> Option<Vec<u8>>;
 }
 
-/// An `AuthHandler` returning always the same secret. See `AuthMiddleware` for a usage example.
+/// An [AuthHandler] returning always the same secret. See [AuthMiddleware] for a usage example.
 #[derive(Clone, Debug)]
 pub struct StaticAuthHandler {
 	secret: Vec<u8>

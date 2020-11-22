@@ -44,13 +44,13 @@ pub trait WithOpenapi<D> {
 }
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
-/// any RESTful `Resource` with a path.
+/// any RESTful [Resource] with a path.
 pub trait DrawResources {
 	fn resource<R: Resource>(&mut self, path: &str);
 }
 
 /// This trait allows to draw routes within an resource. Use this only inside the
-/// `Resource::setup` method.
+/// [Resource::setup] method.
 pub trait DrawResourceRoutes {
 	fn read_all<Handler: ResourceReadAll>(&mut self);
 

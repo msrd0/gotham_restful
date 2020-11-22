@@ -16,9 +16,7 @@ use uuid::Uuid;
 /**
 This struct needs to be available for every type that can be part of an OpenAPI Spec. It is
 already implemented for primitive types, String, Vec, Option and the like. To have it available
-for your type, simply derive from [`OpenapiType`].
-
-[`OpenapiType`]: trait.OpenapiType.html
+for your type, simply derive from [OpenapiType].
 */
 #[derive(Debug, Clone, PartialEq)]
 pub struct OpenapiSchema {
@@ -46,7 +44,7 @@ impl OpenapiSchema {
 		}
 	}
 
-	/// Convert this schema to an `openapiv3::Schema` that can be serialized to the OpenAPI Spec.
+	/// Convert this schema to an [openapiv3::Schema] that can be serialized to the OpenAPI Spec.
 	pub fn into_schema(self) -> Schema {
 		Schema {
 			schema_data: SchemaData {
@@ -61,7 +59,7 @@ impl OpenapiSchema {
 
 /**
 This trait needs to be implemented by every type that is being used in the OpenAPI Spec. It gives
-access to the [`OpenapiSchema`] of this type. It is provided for primitive types, String and the
+access to the [OpenapiSchema] of this type. It is provided for primitive types, String and the
 like. For use on your own types, there is a derive macro:
 
 ```
@@ -72,8 +70,6 @@ struct MyResponse {
 	message: String
 }
 ```
-
-[`OpenapiSchema`]: struct.OpenapiSchema.html
 */
 pub trait OpenapiType {
 	fn schema() -> OpenapiSchema;

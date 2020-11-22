@@ -30,13 +30,13 @@ pub trait ResourceMethod {
 	}
 }
 
-/// The read_all [`ResourceMethod`](trait.ResourceMethod.html).
+/// The read_all [ResourceMethod].
 pub trait ResourceReadAll: ResourceMethod {
 	/// Handle a GET request on the Resource root.
 	fn read_all(state: State) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The read [`ResourceMethod`](trait.ResourceMethod.html).
+/// The read [ResourceMethod].
 pub trait ResourceRead: ResourceMethod {
 	/// The ID type to be parsed from the request path.
 	type ID: ResourceID + 'static;
@@ -45,7 +45,7 @@ pub trait ResourceRead: ResourceMethod {
 	fn read(state: State, id: Self::ID) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The search [`ResourceMethod`](trait.ResourceMethod.html).
+/// The search [ResourceMethod].
 pub trait ResourceSearch: ResourceMethod {
 	/// The Query type to be parsed from the request parameters.
 	type Query: ResourceType + QueryStringExtractor<Body> + Sync;
@@ -54,7 +54,7 @@ pub trait ResourceSearch: ResourceMethod {
 	fn search(state: State, query: Self::Query) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The create [`ResourceMethod`](trait.ResourceMethod.html).
+/// The create [ResourceMethod].
 pub trait ResourceCreate: ResourceMethod {
 	/// The Body type to be parsed from the request body.
 	type Body: RequestBody;
@@ -63,7 +63,7 @@ pub trait ResourceCreate: ResourceMethod {
 	fn create(state: State, body: Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The change_all [`ResourceMethod`](trait.ResourceMethod.html).
+/// The change_all [ResourceMethod].
 pub trait ResourceChangeAll: ResourceMethod {
 	/// The Body type to be parsed from the request body.
 	type Body: RequestBody;
@@ -72,7 +72,7 @@ pub trait ResourceChangeAll: ResourceMethod {
 	fn change_all(state: State, body: Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The change [`ResourceMethod`](trait.ResourceMethod.html).
+/// The change [ResourceMethod].
 pub trait ResourceChange: ResourceMethod {
 	/// The Body type to be parsed from the request body.
 	type Body: RequestBody;
@@ -83,13 +83,13 @@ pub trait ResourceChange: ResourceMethod {
 	fn change(state: State, id: Self::ID, body: Self::Body) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The remove_all [`ResourceMethod`](trait.ResourceMethod.html).
+/// The remove_all [ResourceMethod].
 pub trait ResourceRemoveAll: ResourceMethod {
 	/// Handle a DELETE request on the Resource root.
 	fn remove_all(state: State) -> Pin<Box<dyn Future<Output = (State, Self::Res)> + Send>>;
 }
 
-/// The remove [`ResourceMethod`](trait.ResourceMethod.html).
+/// The remove [ResourceMethod].
 pub trait ResourceRemove: ResourceMethod {
 	/// The ID type to be parsed from the request path.
 	type ID: ResourceID + 'static;

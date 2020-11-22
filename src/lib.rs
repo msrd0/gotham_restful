@@ -1,17 +1,26 @@
 #![allow(clippy::tabs_in_doc_comments)]
 #![warn(missing_debug_implementations, rust_2018_idioms)]
 #![deny(broken_intra_doc_links)]
+#![forbid(unsafe_code)]
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned methods that aim to be a more convenient way of creating handlers
 for requests.
 
-# Design Goals
+# Features
 
-This is an opinionated framework on top of [gotham]. Unless your web server handles mostly JSON as
-request/response bodies and does that in a RESTful way, this framework is probably a bad fit for
-your application. The ultimate goal of gotham-restful is to provide a way to write a RESTful
-web server in Rust as convenient as possible with the least amount of boilerplate neccessary.
+ - Automatically parse **JSON** request and produce response bodies
+ - Allow using **raw** request and response bodies
+ - Convenient **macros** to create responses that can be registered with gotham's router
+ - Auto-Generate an **OpenAPI** specification for your API
+ - Manage **CORS** headers so you don't have to
+ - Manage **Authentication** with JWT
+ - Integrate diesel connection pools for easy **database** integration
+
+# Safety
+
+This crate is just as safe as you'd expect from anything written in safe Rust - and
+`#![forbid(unsafe_code)]` ensures that no unsafe was used.
 
 # Methods
 

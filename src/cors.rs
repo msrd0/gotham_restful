@@ -59,7 +59,7 @@ impl Origin {
 This is the configuration that the CORS handler will follow. Its default configuration is basically
 not to touch any responses, resulting in the browser's default behaviour.
 
-To change settings, you need to put this type into gotham's [`State`]:
+To change settings, you need to put this type into gotham's [State]:
 
 ```rust,no_run
 # use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
@@ -113,8 +113,6 @@ gotham::start("127.0.0.1:8080", build_router((), pipeline_set, |route| {
 	});
 }));
 ```
-
- [`State`]: ../gotham/state/struct.State.html
 */
 #[derive(Clone, Debug, Default, NewMiddleware, StateData)]
 pub struct CorsConfig {
@@ -142,13 +140,12 @@ impl Middleware for CorsConfig {
 Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that
 the response is aligned with the `state`'s [CorsConfig].
 
-If you are using the [Resource](crate::Resource) type (which is the recommended way), you'll never have to call
-this method. However, if you are writing your own handler method, you might want to call this
-after your request to add the required CORS headers.
+If you are using the [Resource](crate::Resource) type (which is the recommended way), you'll never
+have to call this method. However, if you are writing your own handler method, you might want to
+call this after your request to add the required CORS headers.
 
-For further information on CORS, read [https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
-
- [`CorsConfig`]: ./struct.CorsConfig.html
+For further information on CORS, read
+[https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
 */
 pub fn handle_cors(state: &State, res: &mut Response<Body>) {
 	let config = CorsConfig::try_borrow_from(state);
@@ -195,7 +192,7 @@ where
 	P: RefUnwindSafe + Send + Sync + 'static
 {
 	/// Handle a preflight request on `path` for `method`. To configure the behaviour, use
-	/// [`CorsConfig`](struct.CorsConfig.html).
+	/// [CorsConfig].
 	fn cors(&mut self, path: &str, method: Method);
 }
 

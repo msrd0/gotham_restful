@@ -13,7 +13,7 @@ use std::{
 
 /**
 This can be returned from a resource when there is no cause of an error. It behaves similar to a
-smart pointer like box, it that it implements `AsRef`, `Deref` and the likes.
+smart pointer like box, it that it implements [AsRef], [Deref] and the likes.
 
 Usage example:
 

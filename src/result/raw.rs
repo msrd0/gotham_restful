@@ -14,7 +14,7 @@ use std::{convert::Infallible, fmt::Display, pin::Pin};
 /**
 This type can be used both as a raw request body, as well as as a raw response. However, all types
 of request bodies are accepted by this type. It is therefore recommended to derive your own type
-from [`RequestBody`] and only use this when you need to return a raw response. This is a usage
+from [RequestBody] and only use this when you need to return a raw response. This is a usage
 example that simply returns its body:
 
 ```rust,no_run
@@ -35,8 +35,6 @@ fn create(body : Raw<Vec<u8>>) -> Raw<Vec<u8>> {
 # 	}));
 # }
 ```
-
- [`OpenapiType`]: trait.OpenapiType.html
 */
 #[derive(Debug)]
 pub struct Raw<T> {

@@ -2,10 +2,7 @@ use gotham_restful_derive::ResourceError;
 
 /**
 This is an error type that always yields a _403 Forbidden_ response. This type is best used in
-combination with [`AuthSuccess`] or [`AuthResult`].
-
-  [`AuthSuccess`]: type.AuthSuccess.html
-  [`AuthResult`]: type.AuthResult.html
+combination with [AuthSuccess] or [AuthResult].
 */
 #[derive(Debug, Clone, Copy, ResourceError)]
 pub enum AuthError {
@@ -15,9 +12,11 @@ pub enum AuthError {
 }
 
 /**
-This return type can be used to map another `ResourceResult` that can only be returned if the
-client is authenticated. Otherwise, an empty _403 Forbidden_ response will be issued. Use can
-look something like this (assuming the `auth` feature is enabled):
+This return type can be used to map another [ResourceResult](crate::ResourceResult) that can
+only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_ response
+will be issued.
+
+Use can look something like this (assuming the `auth` feature is enabled):
 
 ```rust
 # #[macro_use] extern crate gotham_restful_derive;
@@ -50,9 +49,7 @@ pub type AuthSuccess<T> = Result<T, AuthError>;
 
 /**
 This is an error type that either yields a _403 Forbidden_ respone if produced from an authentication
-error, or delegates to another error type. This type is best used with [`AuthResult`].
-
-  [`AuthResult`]: type.AuthResult.html
+error, or delegates to another error type. This type is best used with [AuthResult].
 */
 #[derive(Debug, ResourceError)]
 pub enum AuthErrorOrOther<E> {
@@ -83,9 +80,11 @@ where
 }
 
 /**
-This return type can be used to map another `ResourceResult` that can only be returned if the
-client is authenticated. Otherwise, an empty _403 Forbidden_ response will be issued. Use can
-look something like this (assuming the `auth` feature is enabled):
+This return type can be used to map another [ResourceResult](crate::ResourceResult) that can
+only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_ response
+will be issued.
+
+Use can look something like this (assuming the `auth` feature is enabled):
 
 ```
 # #[macro_use] extern crate gotham_restful_derive;
