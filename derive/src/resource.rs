@@ -38,9 +38,8 @@ pub fn expand_resource(input: DeriveInput) -> Result<TokenStream> {
 			.flat_map(|list| match list {
 				Ok(iter) => Box::new(iter.map(|method| {
 					let method = Method::from_str(&method.to_string()).map_err(|err| Error::new(method.span(), err))?;
-					let mod_ident = method.mod_ident(&name);
 					let ident = method.setup_ident(&name);
-					Ok(quote!(#mod_ident::#ident(&mut route);))
+					Ok(quote!(#ident(&mut route);))
 				})) as Box<dyn Iterator<Item = Result<TokenStream>>>,
 				Err(err) => Box::new(iter::once(Err(err)))
 			})

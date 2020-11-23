@@ -4,7 +4,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote};
 use std::str::FromStr;
 use syn::{
-	spanned::Spanned, Attribute, AttributeArgs, Error, FnArg, ItemFn, Lit, LitBool, Meta, NestedMeta, PatType, Result,
+	spanned::Spanned, Attribute, AttributeArgs, Error, FnArg, ItemFn, Lit, LitBool, Meta, NestedMeta, PatType, Path, Result,
 	ReturnType, Type
 };
 
@@ -82,20 +82,12 @@ impl Method {
 		format_ident!("{}", name)
 	}
 
-	pub fn mod_ident(&self, resource: &str) -> Ident {
-		format_ident!(
-			"_gotham_restful_resource_{}_method_{}",
-			resource.to_snake_case(),
-			self.fn_ident()
-		)
-	}
-
 	pub fn handler_struct_ident(&self, resource: &str) -> Ident {
 		format_ident!("{}{}Handler", resource.to_camel_case(), self.trait_ident())
 	}
 
 	pub fn setup_ident(&self, resource: &str) -> Ident {
-		format_ident!("{}_{}_setup_impl", resource.to_snake_case(), self.fn_ident())
+		format_ident!("_gotham_restful_{}_{}_setup_impl", resource.to_snake_case(), self.fn_ident())
 	}
 }
 
@@ -249,33 +241,16 @@ fn expand_wants_auth(attrs: &[NestedMeta], default: bool) -> TokenStream {
 }
 
 #[allow(clippy::comparison_chain)]
-pub fn expand_method(method: Method, mut attrs: AttributeArgs, fun: ItemFn) -> Result<TokenStream> {
+fn setup_body(
+	method: &Method,
+	fun: &ItemFn,
+	attrs: &[NestedMeta],
+	resource_name: &str,
+	resource_path: &Path
+) -> Result<TokenStream> {
 	let krate = super::krate();
 
-	// parse attributes
-	if attrs.len() < 1 {
-		return Err(Error::new(
-			Span::call_site(),
-			"Missing Resource struct. Example: #[read_all(MyResource)]"
-		));
-	}
-	let resource_path = match attrs.remove(0) {
-		NestedMeta::Meta(Meta::Path(path)) => path,
-		p => {
-			return Err(Error::new(
-				p.span(),
-				"Expected name of the Resource struct this method belongs to"
-			))
-		},
-	};
-	let resource_name = resource_path
-		.segments
-		.last()
-		.map(|s| s.ident.to_string())
-		.ok_or_else(|| Error::new(resource_path.span(), "Resource name must not be empty"))?;
-
 	let fun_ident = &fun.sig.ident;
-	let fun_vis = &fun.vis;
 	let fun_is_async = fun.sig.asyncness.is_some();
 
 	if let Some(unsafety) = fun.sig.unsafety {
@@ -284,9 +259,7 @@ pub fn expand_method(method: Method, mut attrs: AttributeArgs, fun: ItemFn) -> R
 
 	let trait_ident = method.trait_ident();
 	let method_ident = method.fn_ident();
-	let mod_ident = method.mod_ident(&resource_name);
-	let handler_ident = method.handler_struct_ident(&resource_name);
-	let setup_ident = method.setup_ident(&resource_name);
+	let handler_ident = method.handler_struct_ident(resource_name);
 
 	let (ret, is_no_content) = match &fun.sig.output {
 		ReturnType::Default => (quote!(#krate::NoContent), true),
@@ -410,52 +383,84 @@ pub fn expand_method(method: Method, mut attrs: AttributeArgs, fun: ItemFn) -> R
 	}
 
 	// attribute generated code
-	let operation_id = expand_operation_id(&attrs);
-	let wants_auth = expand_wants_auth(&attrs, args.iter().any(|arg| (*arg).ty.is_auth_status()));
+	let operation_id = expand_operation_id(attrs);
+	let wants_auth = expand_wants_auth(attrs, args.iter().any(|arg| (*arg).ty.is_auth_status()));
 
 	// put everything together
+	let mut dummy = format_ident!("_IMPL_RESOURCEMETHOD_FOR_{}", fun_ident);
+	dummy.set_span(Span::call_site());
+	Ok(quote! {
+		struct #handler_ident;
+
+		impl #krate::ResourceMethod for #handler_ident {
+			type Res = #ret;
+
+			#operation_id
+			#wants_auth
+		}
+
+		impl #krate::#trait_ident for #handler_ident
+		where #where_clause
+		{
+			#(#generics)*
+
+			fn #method_ident(#(#args_def),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = (#krate::State, #ret)> + Send>> {
+				#[allow(unused_imports)]
+				use #krate::{export::FutureExt, FromState};
+
+				#state_block
+
+				async move {
+					let #res_ident = { #block };
+					(#state_ident, #res_ident)
+				}.boxed()
+			}
+		}
+
+		route.#method_ident::<#handler_ident>();
+	})
+}
+
+pub fn expand_method(method: Method, mut attrs: AttributeArgs, fun: ItemFn) -> Result<TokenStream> {
+	let krate = super::krate();
+
+	// parse attributes
+	if attrs.len() < 1 {
+		return Err(Error::new(
+			Span::call_site(),
+			"Missing Resource struct. Example: #[read_all(MyResource)]"
+		));
+	}
+	let resource_path = match attrs.remove(0) {
+		NestedMeta::Meta(Meta::Path(path)) => path,
+		p => {
+			return Err(Error::new(
+				p.span(),
+				"Expected name of the Resource struct this method belongs to"
+			))
+		},
+	};
+	let resource_name = resource_path
+		.segments
+		.last()
+		.map(|s| s.ident.to_string())
+		.ok_or_else(|| Error::new(resource_path.span(), "Resource name must not be empty"))?;
+
+	let fun_vis = &fun.vis;
+	let setup_ident = method.setup_ident(&resource_name);
+	let setup_body = match setup_body(&method, &fun, &attrs, &resource_name, &resource_path) {
+		Ok(body) => body,
+		Err(err) => err.to_compile_error()
+	};
+
 	Ok(quote! {
 		#fun
 
-		#fun_vis mod #mod_ident
-		{
-			use super::*;
-
-			struct #handler_ident;
-
-			impl #krate::ResourceMethod for #handler_ident
-			{
-				type Res = #ret;
-
-				#operation_id
-				#wants_auth
-			}
-
-			impl #krate::#trait_ident for #handler_ident
-			where #where_clause
-			{
-				#(#generics)*
-
-				fn #method_ident(#(#args_def),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = (#krate::State, #ret)> + Send>>
-				{
-					#[allow(unused_imports)]
-					use #krate::{export::FutureExt, FromState};
-
-					#state_block
-
-					async move {
-						let #res_ident = { #block };
-						(#state_ident, #res_ident)
-					}.boxed()
-				}
-			}
-
-			#[deny(dead_code)]
-			pub fn #setup_ident<D : #krate::DrawResourceRoutes>(route : &mut D)
-			{
-				route.#method_ident::<#handler_ident>();
-			}
-
+		#[deny(dead_code)]
+		#[doc(hidden)]
+		/// `gotham_restful` implementation detail.
+		#fun_vis fn #setup_ident<D : #krate::DrawResourceRoutes>(route : &mut D) {
+			#setup_body
 		}
 	})
 }

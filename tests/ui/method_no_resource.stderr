@@ -6,10 +6,10 @@ error: Missing Resource struct. Example: #[read_all(MyResource)]
   |
   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0433]: failed to resolve: use of undeclared crate or module `_gotham_restful_resource_foo_resource_method_read_all`
+error[E0425]: cannot find function `_gotham_restful_foo_resource_read_all_setup_impl` in this scope
  --> $DIR/method_no_resource.rs:3:10
   |
 3 | #[derive(Resource)]
-  |          ^^^^^^^^ use of undeclared crate or module `_gotham_restful_resource_foo_resource_method_read_all`
+  |          ^^^^^^^^ not found in this scope
   |
   = note: this error originates in a derive macro (in Nightly builds, run with -Z macro-backtrace for more info)
