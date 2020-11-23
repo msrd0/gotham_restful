@@ -8,7 +8,7 @@ use gotham::{
 	anyhow,
 	handler::HandlerFuture,
 	hyper::header::{HeaderMap, AUTHORIZATION},
-	middleware::{Middleware, NewMiddleware},
+	middleware::{cookie::CookieParser, Middleware, NewMiddleware},
 	state::{FromState, State}
 };
 use jsonwebtoken::{errors::ErrorKind, DecodingKey};
@@ -209,8 +209,12 @@ where
 		// extract the provided token, if any
 		let token = match &self.source {
 			AuthSource::Cookie(name) => CookieJar::try_borrow_from(&state)
-				.and_then(|jar| jar.get(&name))
-				.map(|cookie| cookie.value().to_owned()),
+				.map(|jar| jar.get(&name).map(|cookie| cookie.value().to_owned()))
+				.unwrap_or_else(|| {
+					CookieParser::from_state(&state)
+						.get(&name)
+						.map(|cookie| cookie.value().to_owned())
+				}),
 			AuthSource::Header(name) => HeaderMap::try_borrow_from(&state)
 				.and_then(|map| map.get(name))
 				.and_then(|header| header.to_str().ok())
@@ -292,6 +296,7 @@ where
 mod test {
 	use super::*;
 	use cookie::Cookie;
+	use gotham::hyper::header::COOKIE;
 	use std::fmt::Debug;
 
 	// 256-bit random string
@@ -451,6 +456,22 @@ mod test {
 			let mut jar = CookieJar::new();
 			jar.add_original(Cookie::new(cookie_name, VALID_TOKEN));
 			state.put(jar);
+			let status = middleware.auth_status(&mut state);
+			match status {
+				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
+				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+			};
+		})
+	}
+
+	#[test]
+	fn test_auth_middleware_cookie_no_jar() {
+		let cookie_name = "znoiprwmvfexju";
+		let middleware = new_middleware::<TestData>(AuthSource::Cookie(cookie_name.to_owned()));
+		State::with_new(|mut state| {
+			let mut headers = HeaderMap::new();
+			headers.insert(COOKIE, format!("{}={}", cookie_name, VALID_TOKEN).parse().unwrap());
+			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
