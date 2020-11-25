@@ -6,9 +6,11 @@ use openapiv3::{
 	ReferenceOr::{Item, Reference},
 	Schema, SchemaData, SchemaKind, StringType, Type, VariantOrUnknownOrEmpty
 };
+
 use std::{
 	collections::{BTreeSet, HashMap, HashSet},
-	hash::BuildHasher
+	hash::BuildHasher,
+	num::{NonZeroU128, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize}
 };
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
@@ -114,6 +116,19 @@ macro_rules! int_types {
 		}
 	)*};
 
+	(gtzero $($int_ty:ty),*) => {$(
+		impl OpenapiType for $int_ty
+		{
+			fn schema() -> OpenapiSchema
+			{
+				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType {
+					minimum: Some(1),
+					..Default::default()
+				})))
+			}
+		}
+	)*};
+
 	(bits = $bits:expr, $($int_ty:ty),*) => {$(
 		impl OpenapiType for $int_ty
 		{
@@ -140,20 +155,40 @@ macro_rules! int_types {
 			}
 		}
 	)*};
+
+	(gtzero bits = $bits:expr, $($int_ty:ty),*) => {$(
+		impl OpenapiType for $int_ty
+		{
+			fn schema() -> OpenapiSchema
+			{
+				OpenapiSchema::new(SchemaKind::Type(Type::Integer(IntegerType {
+					format: VariantOrUnknownOrEmpty::Unknown(format!("int{}", $bits)),
+					minimum: Some(1),
+					..Default::default()
+				})))
+			}
+		}
+	)*};
 }
 
 int_types!(isize);
 int_types!(unsigned usize);
+int_types!(gtzero NonZeroUsize);
 int_types!(bits = 8, i8);
 int_types!(unsigned bits = 8, u8);
+int_types!(gtzero bits = 8, NonZeroU8);
 int_types!(bits = 16, i16);
 int_types!(unsigned bits = 16, u16);
+int_types!(gtzero bits = 16, NonZeroU16);
 int_types!(bits = 32, i32);
 int_types!(unsigned bits = 32, u32);
+int_types!(gtzero bits = 32, NonZeroU32);
 int_types!(bits = 64, i64);
 int_types!(unsigned bits = 64, u64);
+int_types!(gtzero bits = 64, NonZeroU64);
 int_types!(bits = 128, i128);
 int_types!(unsigned bits = 128, u128);
+int_types!(gtzero bits = 128, NonZeroU128);
 
 macro_rules! num_types {
 	($($num_ty:ty = $num_fmt:ident),*) => {$(
@@ -356,6 +391,7 @@ mod test {
 
 	assert_schema!(Unit => r#"{"type":"object","additionalProperties":false}"#);
 	assert_schema!(bool => r#"{"type":"boolean"}"#);
+
 	assert_schema!(isize => r#"{"type":"integer"}"#);
 	assert_schema!(usize => r#"{"type":"integer","minimum":0}"#);
 	assert_schema!(i8 => r#"{"type":"integer","format":"int8"}"#);
@@ -368,28 +404,35 @@ mod test {
 	assert_schema!(u64 => r#"{"type":"integer","format":"int64","minimum":0}"#);
 	assert_schema!(i128 => r#"{"type":"integer","format":"int128"}"#);
 	assert_schema!(u128 => r#"{"type":"integer","format":"int128","minimum":0}"#);
+
+	assert_schema!(NonZeroUsize => r#"{"type":"integer","minimum":1}"#);
+	assert_schema!(NonZeroU8 => r#"{"type":"integer","format":"int8","minimum":1}"#);
+	assert_schema!(NonZeroU16 => r#"{"type":"integer","format":"int16","minimum":1}"#);
+	assert_schema!(NonZeroU32 => r#"{"type":"integer","format":"int32","minimum":1}"#);
+	assert_schema!(NonZeroU64 => r#"{"type":"integer","format":"int64","minimum":1}"#);
+	assert_schema!(NonZeroU128 => r#"{"type":"integer","format":"int128","minimum":1}"#);
+
 	assert_schema!(f32 => r#"{"type":"number","format":"float"}"#);
 	assert_schema!(f64 => r#"{"type":"number","format":"double"}"#);
 
 	assert_schema!(String => r#"{"type":"string"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(Date<FixedOffset> => r#"{"type":"string","format":"date"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(Date<Local> => r#"{"type":"string","format":"date"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(Date<Utc> => r#"{"type":"string","format":"date"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(NaiveDate => r#"{"type":"string","format":"date"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(DateTime<FixedOffset> => r#"{"type":"string","format":"date-time"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(DateTime<Local> => r#"{"type":"string","format":"date-time"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(DateTime<Utc> => r#"{"type":"string","format":"date-time"}"#);
-	#[cfg(feature = "chrono")]
-	assert_schema!(NaiveDateTime => r#"{"type":"string","format":"date-time"}"#);
+
 	#[cfg(feature = "uuid")]
 	assert_schema!(Uuid => r#"{"type":"string","format":"uuid"}"#);
+
+	#[cfg(feature = "chrono")]
+	mod chrono {
+		use super::*;
+
+		assert_schema!(Date<FixedOffset> => r#"{"type":"string","format":"date"}"#);
+		assert_schema!(Date<Local> => r#"{"type":"string","format":"date"}"#);
+		assert_schema!(Date<Utc> => r#"{"type":"string","format":"date"}"#);
+		assert_schema!(NaiveDate => r#"{"type":"string","format":"date"}"#);
+		assert_schema!(DateTime<FixedOffset> => r#"{"type":"string","format":"date-time"}"#);
+		assert_schema!(DateTime<Local> => r#"{"type":"string","format":"date-time"}"#);
+		assert_schema!(DateTime<Utc> => r#"{"type":"string","format":"date-time"}"#);
+		assert_schema!(NaiveDateTime => r#"{"type":"string","format":"date-time"}"#);
+	}
 
 	assert_schema!(Option<String> => r#"{"nullable":true,"type":"string"}"#);
 	assert_schema!(Vec<String> => r#"{"type":"array","items":{"type":"string"}}"#);
