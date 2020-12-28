@@ -12,12 +12,6 @@ use gotham::{
 	state::State
 };
 use gotham_restful::*;
-use log::LevelFilter;
-use log4rs::{
-	append::console::ConsoleAppender,
-	config::{Appender, Config, Root},
-	encode::pattern::PatternEncoder
-};
 use serde::{Deserialize, Serialize};
 
 #[derive(Resource)]
@@ -103,15 +97,7 @@ impl<T> AuthHandler<T> for Handler {
 }
 
 fn main() {
-	let encoder = PatternEncoder::new("{d(%Y-%m-%d %H:%M:%S%.3f %Z)} [{l}] {M} - {m}\n");
-	let config = Config::builder()
-		.appender(Appender::builder().build(
-			"stdout",
-			Box::new(ConsoleAppender::builder().encoder(Box::new(encoder)).build())
-		))
-		.build(Root::builder().appender("stdout").build(LevelFilter::Info))
-		.unwrap();
-	log4rs::init_config(config).unwrap();
+	pretty_env_logger::init_timed();
 
 	let cors = CorsConfig {
 		origin: Origin::Copy,
