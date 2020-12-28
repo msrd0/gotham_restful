@@ -13,6 +13,7 @@ keywords = ["gotham", "rest", "restful", "web", "http"]
 license = "EPL-2.0 OR Apache-2.0"
 readme = "README.md"
 repository = "https://gitlab.com/msrd0/gotham-restful"
+include = ["src/**/*", "LICENSE.md", "LICENSE-*", "README.md", "CHANGELOG.md"]
 
 [badges]
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
