@@ -26,8 +26,17 @@
 </div>
 <br/>
 
-**Note:** The `stable` branch contains some bugfixes against the last release. The `master`
-branch currently tracks gotham's master branch and the next release will use gotham 0.5.0 and be
-compatible with the new future / async stuff.
-
 {{readme}}
+
+## Versioning
+
+Like all rust crates, this crate will follow semantic versioning guidelines. However, changing
+the MSRV (minimum supported rust version) is not considered a breaking change.
+
+## License
+
+Copyright (C) 2020-2021 Dominic Meiser and [contributors](https://gitlab.com/msrd0/gotham-restful/-/graphs/master).
+
+Licensed under your option of:
+ - [Apache License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-Apache)
+ - [Eclipse Public License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-EPL)

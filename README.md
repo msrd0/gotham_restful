@@ -26,10 +26,6 @@
 </div>
 <br/>
 
-**Note:** The `stable` branch contains some bugfixes against the last release. The `master`
-branch currently tracks gotham's master branch and the next release will use gotham 0.5.0 and be
-compatible with the new future / async stuff.
-
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned methods that aim to be a more convenient way of creating handlers
 for requests.
@@ -325,12 +321,6 @@ struct Foo;
 There is a lack of good examples, but there is currently a collection of code in the [example]
 directory, that might help you. Any help writing more examples is highly appreciated.
 
-## License
-
-Licensed under your option of:
- - [Apache License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-Apache)
- - [Eclipse Public License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-EPL)
-
 
  [diesel]: https://diesel.rs/
  [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
@@ -340,3 +330,16 @@ Licensed under your option of:
  [`QueryStringExtractor`]: ../gotham/extractor/trait.QueryStringExtractor.html
  [`RequestBody`]: trait.RequestBody.html
  [`State`]: ../gotham/state/struct.State.html
+
+## Versioning
+
+Like all rust crates, this crate will follow semantic versioning guidelines. However, changing
+the MSRV (minimum supported rust version) is not considered a breaking change.
+
+## License
+
+Copyright (C) 2020-2021 Dominic Meiser and [contributors](https://gitlab.com/msrd0/gotham-restful/-/graphs/master).
+
+Licensed under your option of:
+ - [Apache License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-Apache)
+ - [Eclipse Public License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-EPL)

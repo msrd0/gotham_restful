@@ -362,12 +362,6 @@ struct Foo;
 There is a lack of good examples, but there is currently a collection of code in the [example]
 directory, that might help you. Any help writing more examples is highly appreciated.
 
-# License
-
-Licensed under your option of:
- - [Apache License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-Apache)
- - [Eclipse Public License Version 2.0](https://gitlab.com/msrd0/gotham-restful/blob/master/LICENSE-EPL)
-
 
  [diesel]: https://diesel.rs/
  [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
