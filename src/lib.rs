@@ -196,7 +196,7 @@ authentication), and every content type, could look like this:
 # #[cfg(feature = "cors")]
 # mod cors_feature_enabled {
 # use gotham::{hyper::header::*, router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
-# use gotham_restful::*;
+# use gotham_restful::{*, cors::*};
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
 #[resource(read_all)]
@@ -210,7 +210,7 @@ fn read_all() {
 fn main() {
 	let cors = CorsConfig {
 		origin: Origin::Copy,
-		headers: vec![CONTENT_TYPE],
+		headers: Headers::List(vec![CONTENT_TYPE]),
 		max_age: 0,
 		credentials: true
 	};
@@ -417,9 +417,9 @@ mod auth;
 pub use auth::{AuthHandler, AuthMiddleware, AuthSource, AuthStatus, AuthValidation, StaticAuthHandler};
 
 #[cfg(feature = "cors")]
-mod cors;
+pub mod cors;
 #[cfg(feature = "cors")]
-pub use cors::{handle_cors, CorsConfig, CorsRoute, Origin};
+pub use cors::{handle_cors, CorsConfig, CorsRoute};
 
 #[cfg(feature = "openapi")]
 mod openapi;
