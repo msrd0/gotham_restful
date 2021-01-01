@@ -11,7 +11,7 @@ use gotham::{
 	router::builder::*,
 	state::State
 };
-use gotham_restful::*;
+use gotham_restful::{cors::*, *};
 use serde::{Deserialize, Serialize};
 
 #[derive(Resource)]
@@ -101,7 +101,7 @@ fn main() {
 
 	let cors = CorsConfig {
 		origin: Origin::Copy,
-		headers: vec![CONTENT_TYPE],
+		headers: Headers::List(vec![CONTENT_TYPE]),
 		credentials: true,
 		..Default::default()
 	};
