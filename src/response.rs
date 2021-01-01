@@ -11,6 +11,7 @@ pub struct Response {
 
 impl Response {
 	/// Create a new [Response] from raw data.
+	#[must_use = "Creating a response is pointless if you don't use it"]
 	pub fn new<B: Into<Body>>(status: StatusCode, body: B, mime: Option<Mime>) -> Self {
 		Self {
 			status,
@@ -20,6 +21,7 @@ impl Response {
 	}
 
 	/// Create a [Response] with mime type json from already serialized data.
+	#[must_use = "Creating a response is pointless if you don't use it"]
 	pub fn json<B: Into<Body>>(status: StatusCode, body: B) -> Self {
 		Self {
 			status,
@@ -29,6 +31,7 @@ impl Response {
 	}
 
 	/// Create a _204 No Content_ [Response].
+	#[must_use = "Creating a response is pointless if you don't use it"]
 	pub fn no_content() -> Self {
 		Self {
 			status: StatusCode::NO_CONTENT,
@@ -38,6 +41,7 @@ impl Response {
 	}
 
 	/// Create an empty _403 Forbidden_ [Response].
+	#[must_use = "Creating a response is pointless if you don't use it"]
 	pub fn forbidden() -> Self {
 		Self {
 			status: StatusCode::FORBIDDEN,

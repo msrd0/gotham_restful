@@ -92,7 +92,7 @@ where
 	type Err = SerdeJsonError; // just for easier handling of `Result<Raw<T>, E>`
 
 	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, SerdeJsonError>> + Send>> {
-		future::ok(Response::new(StatusCode::OK, self.raw, Some(self.mime.clone()))).boxed()
+		future::ok(Response::new(StatusCode::OK, self.raw, Some(self.mime))).boxed()
 	}
 
 	#[cfg(feature = "openapi")]

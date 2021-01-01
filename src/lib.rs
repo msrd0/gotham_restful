@@ -1,5 +1,10 @@
 #![allow(clippy::tabs_in_doc_comments)]
-#![warn(missing_debug_implementations, rust_2018_idioms)]
+#![warn(
+	missing_debug_implementations,
+	rust_2018_idioms,
+	clippy::wildcard_imports,
+	clippy::redundant_closure_for_method_calls
+)]
 #![deny(broken_intra_doc_links)]
 #![forbid(unsafe_code)]
 /*!

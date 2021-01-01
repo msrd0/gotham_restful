@@ -11,7 +11,10 @@ use gotham::{
 	},
 	middleware::Middleware,
 	pipeline::chain::PipelineHandleChain,
-	router::{builder::*, route::matcher::AccessControlRequestMethodMatcher},
+	router::{
+		builder::{DefineSingleRoute, DrawRoutes, ExtendRouteMatcher},
+		route::matcher::AccessControlRequestMethodMatcher
+	},
 	state::{FromState, State}
 };
 use std::{panic::RefUnwindSafe, pin::Pin};

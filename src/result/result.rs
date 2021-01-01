@@ -71,7 +71,7 @@ mod test {
 		let res = block_on(ok.into_response()).expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::OK);
 		assert_eq!(res.mime, Some(APPLICATION_JSON));
-		assert_eq!(res.full_body().unwrap(), r#"{"msg":""}"#.as_bytes());
+		assert_eq!(res.full_body().unwrap(), br#"{"msg":""}"#);
 	}
 
 	#[test]

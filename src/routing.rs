@@ -6,7 +6,10 @@ use crate::openapi::{
 #[cfg(feature = "cors")]
 use crate::CorsRoute;
 use crate::{
-	resource::*,
+	resource::{
+		Resource, ResourceChange, ResourceChangeAll, ResourceCreate, ResourceRead, ResourceReadAll, ResourceRemove,
+		ResourceRemoveAll, ResourceSearch
+	},
 	result::{ResourceError, ResourceResult},
 	RequestBody, Response, StatusCode
 };
@@ -18,7 +21,7 @@ use gotham::{
 	hyper::{body::to_bytes, header::CONTENT_TYPE, Body, HeaderMap, Method},
 	pipeline::chain::PipelineHandleChain,
 	router::{
-		builder::*,
+		builder::{DefineSingleRoute, DrawRoutes, ExtendRouteMatcher, RouterBuilder, ScopeBuilder},
 		non_match::RouteNonMatch,
 		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher}
 	},

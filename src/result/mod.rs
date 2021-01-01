@@ -125,7 +125,7 @@ where
 	type Err = Res::Err;
 
 	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, Self::Err>> + Send>> {
-		self.then(|result| result.into_response()).boxed()
+		self.then(ResourceResult::into_response).boxed()
 	}
 
 	fn accepted_types() -> Option<Vec<Mime>> {
