@@ -2,13 +2,14 @@
 
 [package]
 name = "gotham_restful_derive"
-version = "0.1.1"
+version = "0.2.0-dev"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
-description = "RESTful additions for the gotham web framework - Derive"
+description = "Derive macros for gotham_restful"
 keywords = ["gotham", "rest", "restful", "web", "http"]
-license = "EPL-2.0 OR Apache-2.0"
+license = "Apache-2.0"
 repository = "https://gitlab.com/msrd0/gotham-restful"
+workspace = ".."
 
 [lib]
 proc-macro = true
