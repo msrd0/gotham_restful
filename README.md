@@ -200,7 +200,7 @@ fn read_all() {
 fn main() {
 	let cors = CorsConfig {
 		origin: Origin::Copy,
-		headers: vec![CONTENT_TYPE],
+		headers: Headers::List(vec![CONTENT_TYPE]),
 		max_age: 0,
 		credentials: true
 	};
