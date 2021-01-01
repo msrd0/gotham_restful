@@ -58,7 +58,7 @@ test-tarpaulin:
 
 test-trybuild-ui:
   stage: test
-  image: rust:1.48-slim
+  image: rust:1.49-slim
   before_script:
     - apt update -y
     - apt install -y --no-install-recommends libpq-dev
