@@ -46,11 +46,16 @@ thiserror = "1.0.18"
 trybuild = "1.0.27"
 
 [features]
-default = ["cors", "errorlog"]
+default = ["cors", "errorlog", "without-openapi"]
+full = ["auth", "cors", "database", "errorlog", "openapi"]
+
 auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
 cors = []
-errorlog = []
 database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
+errorlog = []
+
+# These features are exclusive - https://gitlab.com/msrd0/gotham-restful/-/issues/4
+without-openapi = []
 openapi = ["gotham_restful_derive/openapi", "indexmap", "openapiv3"]
 
 [package.metadata.docs.rs]

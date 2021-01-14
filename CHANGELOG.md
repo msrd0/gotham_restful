@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - The cors handler can now copy headers from the request if desired
  - All fields of `Response` are now private
+ - If not enabling the `openapi` feature, `without-openapi` has to be enabled
 
 ## [0.1.1] - 2020-12-28
 ### Added

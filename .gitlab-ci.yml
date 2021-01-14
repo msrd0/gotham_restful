@@ -20,7 +20,7 @@ test-default:
       - cargo/
       - target/
 
-test-all:
+test-full:
   stage: test
   image: rust:1.42-slim
   before_script:
@@ -28,7 +28,7 @@ test-all:
     - apt install -y --no-install-recommends libpq-dev
     - cargo -V
   script:
-    - cargo test --workspace --all-features
+    - cargo test --no-default-features --features full
   cache:
     key: cargo-1-42-all
     paths:
@@ -64,7 +64,7 @@ test-trybuild-ui:
     - apt install -y --no-install-recommends libpq-dev
     - cargo -V
   script:
-    - cargo test --workspace --all-features --tests -- --ignored
+    - cargo test --no-default-features --features full --tests -- --ignored
   cache:
     key: cargo-1-48-all
     paths:

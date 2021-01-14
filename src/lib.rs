@@ -378,6 +378,12 @@ directory, that might help you. Any help writing more examples is highly appreci
  [`State`]: ../gotham/state/struct.State.html
 */
 
+#[cfg(all(feature = "openapi", feature = "without-openapi"))]
+compile_error!("The 'openapi' and 'without-openapi' features cannot be combined");
+
+#[cfg(all(not(feature = "openapi"), not(feature = "without-openapi")))]
+compile_error!("Either the 'openapi' or 'without-openapi' feature needs to be enabled");
+
 // weird proc macro issue
 extern crate self as gotham_restful;
 
