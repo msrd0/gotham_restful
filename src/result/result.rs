@@ -49,7 +49,6 @@ where
 }
 
 #[cfg(test)]
-#[allow(deprecated)]
 mod test {
 	use super::*;
 	use crate::result::OrAllTypes;

@@ -124,7 +124,6 @@ mod test {
 	}
 
 	#[test]
-	#[allow(deprecated)]
 	fn success_always_successfull() {
 		let success: Success<Msg> = Msg::default().into();
 		let res = block_on(success.into_response()).expect("didn't expect error response");

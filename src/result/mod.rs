@@ -99,7 +99,6 @@ fn errorlog<E: Display>(e: E) {
 #[cfg(not(feature = "errorlog"))]
 fn errorlog<E>(_e: E) {}
 
-#[allow(deprecated)]
 fn handle_error<E>(e: E) -> Pin<Box<dyn Future<Output = Result<Response, E::Err>> + Send>>
 where
 	E: Display + IntoResponseError
@@ -161,7 +160,6 @@ mod test {
 	struct MsgError;
 
 	#[test]
-	#[allow(deprecated)]
 	fn result_from_future() {
 		let nc = NoContent::default();
 		let res = block_on(nc.into_response()).unwrap();

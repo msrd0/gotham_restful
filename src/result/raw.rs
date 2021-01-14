@@ -131,7 +131,6 @@ mod test {
 	use mime::TEXT_PLAIN;
 
 	#[test]
-	#[allow(deprecated)]
 	fn raw_response() {
 		let msg = "Test";
 		let raw = Raw::new(msg, TEXT_PLAIN);

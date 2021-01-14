@@ -21,8 +21,8 @@ mod resource_error {
 	fn io_error() {
 		let err = Error::IoError(std::io::Error::last_os_error());
 		let res = err.into_response_error().unwrap();
-		assert_eq!(res.status, StatusCode::INTERNAL_SERVER_ERROR);
-		assert_eq!(res.mime, Some(APPLICATION_JSON));
+		assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);
+		assert_eq!(res.mime(), Some(&APPLICATION_JSON));
 	}
 
 	#[test]
@@ -31,7 +31,7 @@ mod resource_error {
 		assert_eq!(&format!("{}", err), "Internal Server Error: Brocken");
 
 		let res = err.into_response_error().unwrap();
-		assert_eq!(res.status, StatusCode::INTERNAL_SERVER_ERROR);
-		assert_eq!(res.mime, None); // TODO shouldn't this be a json error message?
+		assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);
+		assert_eq!(res.mime(), None); // TODO shouldn't this be a json error message?
 	}
 }

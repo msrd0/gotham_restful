@@ -81,7 +81,6 @@ pub trait DrawResourceRoutes {
 	fn remove<Handler: ResourceRemove>(&mut self);
 }
 
-#[allow(deprecated)]
 fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> {
 	let mut r = create_empty_response(state, res.status);
 	let headers = r.headers_mut();

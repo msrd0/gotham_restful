@@ -7,17 +7,12 @@ use mime::{Mime, APPLICATION_JSON};
 /// A response, used to create the final gotham response from.
 #[derive(Debug)]
 pub struct Response {
-	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
-	pub status: StatusCode,
-	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
-	pub body: Body,
-	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
-	pub mime: Option<Mime>,
-	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
-	pub headers: HeaderMap
+	pub(crate) status: StatusCode,
+	pub(crate) body: Body,
+	pub(crate) mime: Option<Mime>,
+	pub(crate) headers: HeaderMap
 }
 
-#[allow(deprecated)]
 impl Response {
 	/// Create a new [Response] from raw data.
 	#[must_use = "Creating a response is pointless if you don't use it"]
@@ -63,8 +58,18 @@ impl Response {
 		}
 	}
 
+	/// Return the status code of this [Response].
+	pub fn status(&self) -> StatusCode {
+		self.status
+	}
+
+	/// Return the mime type of this [Response].
+	pub fn mime(&self) -> Option<&Mime> {
+		self.mime.as_ref()
+	}
+
 	/// Add an HTTP header to the [Response].
-	pub fn add_header(&mut self, name: HeaderName, value: HeaderValue) {
+	pub fn header(&mut self, name: HeaderName, value: HeaderValue) {
 		self.headers.insert(name, value);
 	}
 
