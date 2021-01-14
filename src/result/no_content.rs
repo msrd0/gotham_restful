@@ -92,6 +92,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod test {
 	use super::*;
 	use futures_executor::block_on;

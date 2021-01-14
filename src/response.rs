@@ -1,14 +1,23 @@
-use gotham::hyper::{Body, StatusCode};
+use gotham::hyper::{
+	header::{HeaderMap, HeaderName, HeaderValue},
+	Body, StatusCode
+};
 use mime::{Mime, APPLICATION_JSON};
 
 /// A response, used to create the final gotham response from.
 #[derive(Debug)]
 pub struct Response {
+	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
 	pub status: StatusCode,
+	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
 	pub body: Body,
-	pub mime: Option<Mime>
+	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
+	pub mime: Option<Mime>,
+	#[deprecated(since = "0.1.2", note = "This field will be private in an upcomming release")]
+	pub headers: HeaderMap
 }
 
+#[allow(deprecated)]
 impl Response {
 	/// Create a new [Response] from raw data.
 	#[must_use = "Creating a response is pointless if you don't use it"]
@@ -16,7 +25,8 @@ impl Response {
 		Self {
 			status,
 			body: body.into(),
-			mime
+			mime,
+			headers: Default::default()
 		}
 	}
 
@@ -26,7 +36,8 @@ impl Response {
 		Self {
 			status,
 			body: body.into(),
-			mime: Some(APPLICATION_JSON)
+			mime: Some(APPLICATION_JSON),
+			headers: Default::default()
 		}
 	}
 
@@ -36,7 +47,8 @@ impl Response {
 		Self {
 			status: StatusCode::NO_CONTENT,
 			body: Body::empty(),
-			mime: None
+			mime: None,
+			headers: Default::default()
 		}
 	}
 
@@ -46,8 +58,14 @@ impl Response {
 		Self {
 			status: StatusCode::FORBIDDEN,
 			body: Body::empty(),
-			mime: None
+			mime: None,
+			headers: Default::default()
 		}
+	}
+
+	/// Add an HTTP header to the [Response].
+	pub fn add_header(&mut self, name: HeaderName, value: HeaderValue) {
+		self.headers.insert(name, value);
 	}
 
 	#[cfg(test)]

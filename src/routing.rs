@@ -81,10 +81,21 @@ pub trait DrawResourceRoutes {
 	fn remove<Handler: ResourceRemove>(&mut self);
 }
 
+#[allow(deprecated)]
 fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> {
 	let mut r = create_empty_response(state, res.status);
+	let headers = r.headers_mut();
 	if let Some(mime) = res.mime {
-		r.headers_mut().insert(CONTENT_TYPE, mime.as_ref().parse().unwrap());
+		headers.insert(CONTENT_TYPE, mime.as_ref().parse().unwrap());
+	}
+	let mut last_name = None;
+	for (name, value) in res.headers {
+		if name.is_some() {
+			last_name = name;
+		}
+		// this unwrap is safe: the first item will always be Some
+		let name = last_name.clone().unwrap();
+		headers.insert(name, value);
 	}
 
 	let method = Method::borrow_from(state);

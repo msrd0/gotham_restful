@@ -196,11 +196,11 @@ impl ErrorVariant {
 				quote!(#from_field.into_response_error())
 			},
 			(Some(_), Some(_)) => return Err(Error::new(ident.span(), "When #[from] is used, #[status] must not be used!")),
-			(None, Some(status)) => quote!(Ok(#krate::Response {
-				status: { #status }.into(),
-				body: #krate::gotham::hyper::Body::empty(),
-				mime: None
-			})),
+			(None, Some(status)) => quote!(Ok(#krate::Response::new(
+				{ #status }.into(),
+				#krate::gotham::hyper::Body::empty(),
+				None
+			))),
 			(None, None) => return Err(Error::new(ident.span(), "Missing #[status(code)] for this variant"))
 		};
 

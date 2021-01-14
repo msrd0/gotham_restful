@@ -10,6 +10,7 @@ enum Error {
 	InternalServerError(String)
 }
 
+#[allow(deprecated)]
 mod resource_error {
 	use super::Error;
 	use gotham::hyper::StatusCode;
