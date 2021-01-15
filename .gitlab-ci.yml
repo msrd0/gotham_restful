@@ -13,7 +13,7 @@ test-default:
   before_script:
     - cargo -V
   script:
-    - cargo test --workspace
+    - cargo test
   cache:
     key: cargo-1-42-default
     paths:
