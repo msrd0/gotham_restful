@@ -93,7 +93,7 @@ doc:
   before_script:
     - cargo -V
   script:
-    - cargo doc --all-features
+    - cargo doc --no-default-features --features full
   artifacts:
     paths:
       - target/doc/
