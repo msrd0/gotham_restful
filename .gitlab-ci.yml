@@ -44,7 +44,7 @@ test-tarpaulin:
     - cargo -V
     - cargo install cargo-tarpaulin
   script:
-    - cargo tarpaulin --target-dir target/tarpaulin --all --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --exclude-files 'target/*' --ignore-panics --ignore-tests --out Html --out Xml -v
+    - cargo tarpaulin --target-dir target/tarpaulin --all-features --exclude-files 'cargo/*' --exclude-files 'derive/*' --exclude-files 'example/*' --exclude-files 'target/*' --ignore-panics --ignore-tests --out Html --out Xml -v
   artifacts:
     paths:
       - tarpaulin-report.html
