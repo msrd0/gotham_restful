@@ -12,7 +12,7 @@ use syn::{
 struct MimeList(Punctuated<Path, Token![,]>);
 
 impl Parse for MimeList {
-	fn parse(input: ParseStream) -> Result<Self> {
+	fn parse(input: ParseStream<'_>) -> Result<Self> {
 		let list = Punctuated::parse_separated_nonempty(&input)?;
 		Ok(Self(list))
 	}

@@ -254,6 +254,8 @@ pub fn endpoint_ident(fn_ident: &Ident) -> Ident {
 	format_ident!("{}___gotham_restful_endpoint", fn_ident)
 }
 
+// clippy doesn't realize that vectors can be used in closures
+#[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_collect))]
 fn expand_endpoint_type(ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) -> Result<TokenStream> {
 	// reject unsafe functions
 	if let Some(unsafety) = fun.sig.unsafety {

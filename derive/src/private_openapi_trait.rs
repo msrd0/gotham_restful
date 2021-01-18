@@ -86,6 +86,9 @@ pub(crate) fn expand_private_openapi_trait(mut attrs: AttributeArgs, tr8: ItemTr
 						let attrs = TraitItemAttrs::parse(method.attrs)?;
 						method.attrs = attrs.other_attrs;
 						for bound in attrs.non_openapi_bound {
+							// we compare two incompatible types using their `Display` implementation
+							// this triggers a false positive in clippy
+							#[cfg_attr(feature = "cargo-clippy", allow(clippy::cmp_owned))]
 							method
 								.sig
 								.generics
@@ -129,6 +132,9 @@ pub(crate) fn expand_private_openapi_trait(mut attrs: AttributeArgs, tr8: ItemTr
 						let attrs = TraitItemAttrs::parse(method.attrs)?;
 						method.attrs = attrs.other_attrs;
 						for bound in attrs.openapi_bound {
+							// we compare two incompatible types using their `Display` implementation
+							// this triggers a false positive in clippy
+							#[cfg_attr(feature = "cargo-clippy", allow(clippy::cmp_owned))]
 							method
 								.sig
 								.generics

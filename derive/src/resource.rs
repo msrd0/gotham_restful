@@ -15,7 +15,7 @@ use syn::{
 struct MethodList(Punctuated<Ident, Token![,]>);
 
 impl Parse for MethodList {
-	fn parse(input: ParseStream) -> Result<Self> {
+	fn parse(input: ParseStream<'_>) -> Result<Self> {
 		let content;
 		let _paren = parenthesized!(content in input);
 		let list = Punctuated::parse_separated_nonempty(&content)?;

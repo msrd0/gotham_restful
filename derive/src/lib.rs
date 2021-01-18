@@ -1,3 +1,7 @@
+#![warn(missing_debug_implementations, rust_2018_idioms)]
+#![deny(broken_intra_doc_links)]
+#![forbid(unsafe_code)]
+
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;

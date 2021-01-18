@@ -112,6 +112,7 @@ To change settings, you need to put this type into gotham's [State]:
 ```rust,no_run
 # use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
 # use gotham_restful::{*, cors::Origin};
+# #[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_doctest_main))]
 fn main() {
 	let cors = CorsConfig {
 		origin: Origin::Star,

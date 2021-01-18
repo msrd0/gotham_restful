@@ -1,12 +1,8 @@
-#![allow(clippy::tabs_in_doc_comments)]
-#![warn(
-	missing_debug_implementations,
-	rust_2018_idioms,
-	clippy::wildcard_imports,
-	clippy::redundant_closure_for_method_calls
-)]
+#![warn(missing_debug_implementations, rust_2018_idioms)]
 #![deny(broken_intra_doc_links)]
 #![forbid(unsafe_code)]
+// can we have a lint for spaces in doc comments please?
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::tabs_in_doc_comments))]
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
