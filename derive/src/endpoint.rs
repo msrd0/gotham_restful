@@ -498,6 +498,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 
 		Ok(quote! {
 			use ::gotham_restful::export::FutureExt as _;
+			use ::gotham_restful::gotham::state::FromState as _;
 			#state_block
 			async move {
 				#handle_content
