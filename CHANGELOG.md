@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - Support custom HTTP response headers
  - New `endpoint` router extension with associated `Endpoint` trait ([!18])
+ - Support for custom endpoints using the `#[endpoint]` macro ([!19])
 
 ### Changed
  - The cors handler can now copy headers from the request if desired
@@ -34,3 +35,4 @@ Previous changes are not tracked by this changelog file. Refer to the [releases]
 
 
  [!18]: https://gitlab.com/msrd0/gotham-restful/-/merge_requests/18
+ [!19]: https://gitlab.com/msrd0/gotham-restful/-/merge_requests/19

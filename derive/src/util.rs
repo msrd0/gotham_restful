@@ -1,21 +1,21 @@
 use proc_macro2::{Delimiter, TokenStream, TokenTree};
 use std::iter;
-use syn::{Error, Path};
+use syn::{Error, Lit, LitBool, LitStr, Path, Result};
 
-pub trait CollectToResult {
+pub(crate) trait CollectToResult {
 	type Item;
 
-	fn collect_to_result(self) -> Result<Vec<Self::Item>, Error>;
+	fn collect_to_result(self) -> Result<Vec<Self::Item>>;
 }
 
 impl<Item, I> CollectToResult for I
 where
-	I: Iterator<Item = Result<Item, Error>>
+	I: Iterator<Item = Result<Item>>
 {
 	type Item = Item;
 
-	fn collect_to_result(self) -> Result<Vec<Item>, Error> {
-		self.fold(<Result<Vec<Item>, Error>>::Ok(Vec::new()), |res, code| match (code, res) {
+	fn collect_to_result(self) -> Result<Vec<Item>> {
+		self.fold(Ok(Vec::new()), |res, code| match (code, res) {
 			(Ok(code), Ok(mut codes)) => {
 				codes.push(code);
 				Ok(codes)
@@ -30,6 +30,27 @@ where
 	}
 }
 
+pub(crate) trait ExpectLit {
+	fn expect_bool(self) -> Result<LitBool>;
+	fn expect_str(self) -> Result<LitStr>;
+}
+
+impl ExpectLit for Lit {
+	fn expect_bool(self) -> Result<LitBool> {
+		match self {
+			Self::Bool(bool) => Ok(bool),
+			_ => Err(Error::new(self.span(), "Expected boolean literal"))
+		}
+	}
+
+	fn expect_str(self) -> Result<LitStr> {
+		match self {
+			Self::Str(str) => Ok(str),
+			_ => Err(Error::new(self.span(), "Expected string literal"))
+		}
+	}
+}
+
 pub(crate) trait PathEndsWith {
 	fn ends_with(&self, s: &str) -> bool;
 }
@@ -40,7 +61,7 @@ impl PathEndsWith for Path {
 	}
 }
 
-pub fn remove_parens(input: TokenStream) -> TokenStream {
+pub(crate) fn remove_parens(input: TokenStream) -> TokenStream {
 	let iter = input.into_iter().flat_map(|tt| {
 		if let TokenTree::Group(group) = &tt {
 			if group.delimiter() == Delimiter::Parenthesis {

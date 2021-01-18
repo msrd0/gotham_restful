@@ -1,0 +1,11 @@
+error: `body` can only be used on custom endpoints
+ --> $DIR/non_custom_body_attribute.rs:8:12
+  |
+8 | #[read_all(body = false)]
+  |            ^^^^
+
+error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
+ --> $DIR/non_custom_body_attribute.rs:5:12
+  |
+5 | #[resource(read_all)]
+  |            ^^^^^^^^ not found in this scope

@@ -5,6 +5,7 @@ extern crate gotham_derive;
 
 use chrono::{NaiveDate, NaiveDateTime};
 use gotham::{
+	hyper::Method,
 	pipeline::{new_pipeline, single::single_pipeline},
 	router::builder::*,
 	test::TestServer
@@ -81,6 +82,22 @@ fn search_secret(auth: AuthStatus, _query: SecretQuery) -> AuthSuccess<Secrets> 
 	})
 }
 
+#[derive(Resource)]
+#[resource(custom_read_with, custom_patch)]
+struct CustomResource;
+
+#[derive(Deserialize, OpenapiType, StateData, StaticResponseExtender)]
+struct ReadWithPath {
+	from: String,
+	id: u64
+}
+
+#[endpoint(method = "Method::GET", uri = "read/:from/with/:id")]
+fn custom_read_with(_path: ReadWithPath) {}
+
+#[endpoint(method = "Method::PATCH", uri = "", body = true)]
+fn custom_patch(_body: String) {}
+
 #[test]
 fn openapi_specification() {
 	let info = OpenapiInfo {
@@ -97,8 +114,9 @@ fn openapi_specification() {
 	let server = TestServer::new(build_router(chain, pipelines, |router| {
 		router.with_openapi(info, |mut router| {
 			router.resource::<ImageResource>("img");
-			router.get_openapi("openapi");
 			router.resource::<SecretResource>("secret");
+			router.resource::<CustomResource>("custom");
+			router.get_openapi("openapi");
 		});
 	}))
 	.unwrap();

@@ -25,6 +25,11 @@ This crate is just as safe as you'd expect from anything written in safe Rust - 
 
 # Endpoints
 
+There are a set of pre-defined endpoints that should cover the majority of REST APIs. However,
+it is also possible to define your own endpoints.
+
+## Pre-defined Endpoints
+
 Assuming you assign `/foobar` to your resource, the following pre-defined endpoints exist:
 
 | Endpoint Name | Required Arguments | HTTP Verb | HTTP Path      |
@@ -66,6 +71,41 @@ fn read(id: u64) -> Success<Foo> {
 # fn main() {
 # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
 # 		route.resource::<FooResource>("foo");
+# 	}));
+# }
+```
+
+## Custom Endpoints
+
+Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that
+of the pre-defined endpoints, but you need to give it more context:
+
+```rust,no_run
+# #[macro_use] extern crate gotham_derive;
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::router::builder::*;
+# use gotham_restful::*;
+# use serde::{Deserialize, Serialize};
+use gotham_restful::gotham::hyper::Method;
+
+#[derive(Resource)]
+#[resource(custom_endpoint)]
+struct CustomResource;
+
+/// This type is used to parse path parameters.
+#[derive(Deserialize, StateData, StaticResponseExtender)]
+# #[cfg_attr(feature = "openapi", derive(OpenapiType))]
+struct CustomPath {
+	name: String
+}
+
+#[endpoint(uri = "custom/:name/read", method = "Method::GET", params = false, body = false)]
+fn custom_endpoint(path: CustomPath) -> Success<String> {
+	path.name.into()
+}
+# fn main() {
+# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+# 		route.resource::<CustomResource>("custom");
 # 	}));
 # }
 ```

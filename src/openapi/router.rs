@@ -83,10 +83,14 @@ macro_rules! implOpenapiRouter {
 				}
 
 				static URI_PLACEHOLDER_REGEX: Lazy<Regex> =
-					Lazy::new(|| Regex::new(r#"(^|/):(?P<name>[^/]+)(/|$)"#).unwrap());
+					Lazy::new(|| Regex::new(r#"(?P<prefix>^|/):(?P<name>[^/]+)(?P<suffix>/|$)"#).unwrap());
 				let uri: &str = &E::uri();
-				let uri =
-					URI_PLACEHOLDER_REGEX.replace_all(uri, |captures: &Captures<'_>| format!("{{{}}}", &captures["name"]));
+				let uri = URI_PLACEHOLDER_REGEX.replace_all(uri, |captures: &Captures<'_>| {
+					format!(
+						"{}{{{}}}{}",
+						&captures["prefix"], &captures["name"], &captures["suffix"]
+					)
+				});
 				let path = if uri.is_empty() {
 					format!("{}/{}", self.0.scope.unwrap_or_default(), self.1)
 				} else {

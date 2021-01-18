@@ -1,10 +1,13 @@
-use crate::util::{CollectToResult, PathEndsWith};
+use crate::util::{CollectToResult, ExpectLit, PathEndsWith};
+use once_cell::sync::Lazy;
+use paste::paste;
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, ToTokens};
+use regex::Regex;
 use std::str::FromStr;
 use syn::{
-	spanned::Spanned, Attribute, AttributeArgs, Error, FnArg, ItemFn, Lit, LitBool, Meta, NestedMeta, PatType, Result,
-	ReturnType, Type
+	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, Expr, FnArg, ItemFn, LitBool, LitStr, Meta, NestedMeta,
+	PatType, Result, ReturnType, Type
 };
 
 pub enum EndpointType {
@@ -15,8 +18,51 @@ pub enum EndpointType {
 	UpdateAll,
 	Update,
 	DeleteAll,
-	Delete
+	Delete,
+	Custom {
+		method: Option<Expr>,
+		uri: Option<LitStr>,
+		params: Option<LitBool>,
+		body: Option<LitBool>
+	}
 }
+
+impl EndpointType {
+	pub fn custom() -> Self {
+		Self::Custom {
+			method: None,
+			uri: None,
+			params: None,
+			body: None
+		}
+	}
+}
+
+macro_rules! endpoint_type_setter {
+	($name:ident : $ty:ty) => {
+		impl EndpointType {
+			paste! {
+				fn [<set_ $name>](&mut self, span: Span, [<new_ $name>]: $ty) -> Result<()> {
+					match self {
+						Self::Custom { $name, .. } if $name.is_some() => {
+							Err(Error::new(span, concat!("`", concat!(stringify!($name), "` must not appear more than once"))))
+						},
+						Self::Custom { $name, .. } => {
+							*$name = Some([<new_ $name>]);
+							Ok(())
+						},
+						_ => Err(Error::new(span, concat!("`", concat!(stringify!($name), "` can only be used on custom endpoints"))))
+					}
+				}
+			}
+		}
+	};
+}
+
+endpoint_type_setter!(method: Expr);
+endpoint_type_setter!(uri: LitStr);
+endpoint_type_setter!(params: LitBool);
+endpoint_type_setter!(body: LitBool);
 
 impl FromStr for EndpointType {
 	type Err = Error;
@@ -36,21 +82,26 @@ impl FromStr for EndpointType {
 	}
 }
 
+static URI_PLACEHOLDER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(^|/):(?P<name>[^/]+)(/|$)"#).unwrap());
+
 impl EndpointType {
-	fn http_method(&self) -> TokenStream {
+	fn http_method(&self) -> Option<TokenStream> {
+		let hyper_method = quote!(::gotham_restful::gotham::hyper::Method);
 		match self {
-			Self::ReadAll | Self::Read | Self::Search => quote!(::gotham_restful::gotham::hyper::Method::GET),
-			Self::Create => quote!(::gotham_restful::gotham::hyper::Method::POST),
-			Self::UpdateAll | Self::Update => quote!(::gotham_restful::gotham::hyper::Method::PUT),
-			Self::DeleteAll | Self::Delete => quote!(::gotham_restful::gotham::hyper::Method::DELETE)
+			Self::ReadAll | Self::Read | Self::Search => Some(quote!(#hyper_method::GET)),
+			Self::Create => Some(quote!(#hyper_method::POST)),
+			Self::UpdateAll | Self::Update => Some(quote!(#hyper_method::PUT)),
+			Self::DeleteAll | Self::Delete => Some(quote!(#hyper_method::DELETE)),
+			Self::Custom { method, .. } => method.as_ref().map(ToTokens::to_token_stream)
 		}
 	}
 
-	fn uri(&self) -> TokenStream {
+	fn uri(&self) -> Option<TokenStream> {
 		match self {
-			Self::ReadAll | Self::Create | Self::UpdateAll | Self::DeleteAll => quote!(""),
-			Self::Read | Self::Update | Self::Delete => quote!(":id"),
-			Self::Search => quote!("search")
+			Self::ReadAll | Self::Create | Self::UpdateAll | Self::DeleteAll => Some(quote!("")),
+			Self::Read | Self::Update | Self::Delete => Some(quote!(":id")),
+			Self::Search => Some(quote!("search")),
+			Self::Custom { uri, .. } => uri.as_ref().map(ToTokens::to_token_stream)
 		}
 	}
 
@@ -63,6 +114,13 @@ impl EndpointType {
 			Self::Read | Self::Update | Self::Delete => LitBool {
 				value: true,
 				span: Span::call_site()
+			},
+			Self::Custom { uri, .. } => LitBool {
+				value: uri
+					.as_ref()
+					.map(|uri| URI_PLACEHOLDER_REGEX.is_match(&uri.value()))
+					.unwrap_or(false),
+				span: Span::call_site()
 			}
 		}
 	}
@@ -72,7 +130,14 @@ impl EndpointType {
 			Self::ReadAll | Self::Search | Self::Create | Self::UpdateAll | Self::DeleteAll => {
 				quote!(::gotham_restful::gotham::extractor::NoopPathExtractor)
 			},
-			Self::Read | Self::Update | Self::Delete => quote!(::gotham_restful::export::IdPlaceholder::<#arg_ty>)
+			Self::Read | Self::Update | Self::Delete => quote!(::gotham_restful::export::IdPlaceholder::<#arg_ty>),
+			Self::Custom { .. } => {
+				if self.has_placeholders().value {
+					arg_ty.to_token_stream()
+				} else {
+					quote!(::gotham_restful::gotham::extractor::NoopPathExtractor)
+				}
+			},
 		}
 	}
 
@@ -87,7 +152,11 @@ impl EndpointType {
 			Self::Search => LitBool {
 				value: true,
 				span: Span::call_site()
-			}
+			},
+			Self::Custom { params, .. } => params.clone().unwrap_or_else(|| LitBool {
+				value: false,
+				span: Span::call_site()
+			})
 		}
 	}
 
@@ -96,7 +165,14 @@ impl EndpointType {
 			Self::ReadAll | Self::Read | Self::Create | Self::UpdateAll | Self::Update | Self::DeleteAll | Self::Delete => {
 				quote!(::gotham_restful::gotham::extractor::NoopQueryStringExtractor)
 			},
-			Self::Search => quote!(#arg_ty)
+			Self::Search => quote!(#arg_ty),
+			Self::Custom { .. } => {
+				if self.needs_params().value {
+					arg_ty.to_token_stream()
+				} else {
+					quote!(::gotham_restful::gotham::extractor::NoopQueryStringExtractor)
+				}
+			},
 		}
 	}
 
@@ -109,14 +185,25 @@ impl EndpointType {
 			Self::Create | Self::UpdateAll | Self::Update => LitBool {
 				value: true,
 				span: Span::call_site()
-			}
+			},
+			Self::Custom { body, .. } => body.clone().unwrap_or_else(|| LitBool {
+				value: false,
+				span: Span::call_site()
+			})
 		}
 	}
 
 	fn body_ty(&self, arg_ty: Option<&Type>) -> TokenStream {
 		match self {
 			Self::ReadAll | Self::Read | Self::Search | Self::DeleteAll | Self::Delete => quote!(()),
-			Self::Create | Self::UpdateAll | Self::Update => quote!(#arg_ty)
+			Self::Create | Self::UpdateAll | Self::Update => quote!(#arg_ty),
+			Self::Custom { .. } => {
+				if self.needs_body().value {
+					arg_ty.to_token_stream()
+				} else {
+					quote!(::gotham_restful::gotham::extractor::NoopPathExtractor)
+				}
+			},
 		}
 	}
 }
@@ -219,7 +306,7 @@ fn interpret_arg(_index: usize, arg: &PatType) -> Result<HandlerArg> {
 }
 
 #[cfg(feature = "openapi")]
-fn expand_operation_id(operation_id: Option<Lit>) -> Option<TokenStream> {
+fn expand_operation_id(operation_id: Option<LitStr>) -> Option<TokenStream> {
 	match operation_id {
 		Some(operation_id) => Some(quote! {
 			fn operation_id() -> Option<String> {
@@ -231,16 +318,14 @@ fn expand_operation_id(operation_id: Option<Lit>) -> Option<TokenStream> {
 }
 
 #[cfg(not(feature = "openapi"))]
-fn expand_operation_id(_: Option<Lit>) -> Option<TokenStream> {
+fn expand_operation_id(_: Option<LitStr>) -> Option<TokenStream> {
 	None
 }
 
-fn expand_wants_auth(wants_auth: Option<Lit>, default: bool) -> TokenStream {
-	let wants_auth = wants_auth.unwrap_or_else(|| {
-		Lit::Bool(LitBool {
-			value: default,
-			span: Span::call_site()
-		})
+fn expand_wants_auth(wants_auth: Option<LitBool>, default: bool) -> TokenStream {
+	let wants_auth = wants_auth.unwrap_or_else(|| LitBool {
+		value: default,
+		span: Span::call_site()
 	});
 
 	quote! {
@@ -256,22 +341,30 @@ pub fn endpoint_ident(fn_ident: &Ident) -> Ident {
 
 // clippy doesn't realize that vectors can be used in closures
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_collect))]
-fn expand_endpoint_type(ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) -> Result<TokenStream> {
+fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) -> Result<TokenStream> {
 	// reject unsafe functions
 	if let Some(unsafety) = fun.sig.unsafety {
 		return Err(Error::new(unsafety.span(), "Endpoint handler methods must not be unsafe"));
 	}
 
 	// parse arguments
-	let mut operation_id: Option<Lit> = None;
-	let mut wants_auth: Option<Lit> = None;
+	let mut operation_id: Option<LitStr> = None;
+	let mut wants_auth: Option<LitBool> = None;
 	for meta in attrs {
 		match meta {
 			NestedMeta::Meta(Meta::NameValue(kv)) => {
 				if kv.path.ends_with("operation_id") {
-					operation_id = Some(kv.lit);
+					operation_id = Some(kv.lit.expect_str()?);
 				} else if kv.path.ends_with("wants_auth") {
-					wants_auth = Some(kv.lit);
+					wants_auth = Some(kv.lit.expect_bool()?);
+				} else if kv.path.ends_with("method") {
+					ty.set_method(kv.path.span(), kv.lit.expect_str()?.parse_with(Expr::parse)?)?;
+				} else if kv.path.ends_with("uri") {
+					ty.set_uri(kv.path.span(), kv.lit.expect_str()?)?;
+				} else if kv.path.ends_with("params") {
+					ty.set_params(kv.path.span(), kv.lit.expect_bool()?)?;
+				} else if kv.path.ends_with("body") {
+					ty.set_body(kv.path.span(), kv.lit.expect_bool()?)?;
 				} else {
 					return Err(Error::new(kv.path.span(), "Unknown attribute"));
 				}
@@ -324,8 +417,18 @@ fn expand_endpoint_type(ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) ->
 		Ok(Some(ty))
 	};
 
-	let http_method = ty.http_method();
-	let uri = ty.uri();
+	let http_method = ty.http_method().ok_or_else(|| {
+		Error::new(
+			Span::call_site(),
+			"Missing `method` attribute (e.g. `#[endpoint(method = \"gotham_restful::gotham::hyper::Method::GET\")]`)"
+		)
+	})?;
+	let uri = ty.uri().ok_or_else(|| {
+		Error::new(
+			Span::call_site(),
+			"Missing `uri` attribute (e.g. `#[endpoint(uri = \"custom_endpoint\")]`)"
+		)
+	})?;
 	let has_placeholders = ty.has_placeholders();
 	let placeholder_ty = ty.placeholders_ty(next_arg_ty(!has_placeholders.value)?);
 	let needs_params = ty.needs_params();
@@ -339,7 +442,11 @@ fn expand_endpoint_type(ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) ->
 
 	let mut handle_args: Vec<TokenStream> = Vec::new();
 	if has_placeholders.value {
-		handle_args.push(quote!(placeholders.id));
+		if matches!(ty, EndpointType::Custom { .. }) {
+			handle_args.push(quote!(placeholders));
+		} else {
+			handle_args.push(quote!(placeholders.id));
+		}
 	}
 	if needs_params.value {
 		handle_args.push(quote!(params));

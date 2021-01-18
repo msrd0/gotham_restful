@@ -88,6 +88,11 @@ pub fn derive_resource_error(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
+pub fn endpoint(attr: TokenStream, item: TokenStream) -> TokenStream {
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::custom(), attr, item))
+}
+
+#[proc_macro_attribute]
 pub fn read_all(attr: TokenStream, item: TokenStream) -> TokenStream {
 	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::ReadAll, attr, item))
 }

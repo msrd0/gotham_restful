@@ -1,0 +1,11 @@
+error: Expected boolean literal
+ --> $DIR/wants_auth_non_bool.rs:8:25
+  |
+8 | #[read_all(wants_auth = "yes, please")]
+  |                         ^^^^^^^^^^^^^
+
+error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
+ --> $DIR/wants_auth_non_bool.rs:5:12
+  |
+5 | #[resource(read_all)]
+  |            ^^^^^^^^ not found in this scope
