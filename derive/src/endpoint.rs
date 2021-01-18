@@ -348,12 +348,15 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	}
 
 	// parse arguments
+	let mut debug: bool = false;
 	let mut operation_id: Option<LitStr> = None;
 	let mut wants_auth: Option<LitBool> = None;
 	for meta in attrs {
 		match meta {
 			NestedMeta::Meta(Meta::NameValue(kv)) => {
-				if kv.path.ends_with("operation_id") {
+				if kv.path.ends_with("debug") {
+					debug = kv.lit.expect_bool()?.value;
+				} else if kv.path.ends_with("operation_id") {
 					operation_id = Some(kv.lit.expect_str()?);
 				} else if kv.path.ends_with("wants_auth") {
 					wants_auth = Some(kv.lit.expect_bool()?);
@@ -517,7 +520,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	};
 	let operation_id = expand_operation_id(operation_id);
 	let wants_auth = expand_wants_auth(wants_auth, args.iter().any(|arg| arg.ty.is_auth_status()));
-	Ok(quote! {
+	let code = quote! {
 		#[doc(hidden)]
 		/// `gotham_restful` implementation detail
 		#[allow(non_camel_case_types)]
@@ -564,7 +567,11 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 				#wants_auth
 			}
 		};
-	})
+	};
+	if debug {
+		eprintln!("{}", code);
+	}
+	Ok(code)
 }
 
 pub fn expand_endpoint(ty: EndpointType, attrs: AttributeArgs, fun: ItemFn) -> Result<TokenStream> {
