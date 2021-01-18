@@ -56,12 +56,12 @@ pub trait Endpoint {
 	}
 
 	/// The handler for this endpoint.
-	fn handle(
-		state: &mut State,
+	fn handle<'a>(
+		state: &'a mut State,
 		placeholders: Self::Placeholders,
 		params: Self::Params,
 		body: Option<Self::Body>
-	) -> BoxFuture<'static, Self::Output>;
+	) -> BoxFuture<'a, Self::Output>;
 }
 
 #[cfg(feature = "openapi")]
@@ -94,12 +94,12 @@ impl<E: EndpointWithSchema> Endpoint for E {
 		E::wants_auth()
 	}
 
-	fn handle(
-		state: &mut State,
+	fn handle<'a>(
+		state: &'a mut State,
 		placeholders: Self::Placeholders,
 		params: Self::Params,
 		body: Option<Self::Body>
-	) -> BoxFuture<'static, Self::Output> {
+	) -> BoxFuture<'a, Self::Output> {
 		E::handle(state, placeholders, params, body)
 	}
 }

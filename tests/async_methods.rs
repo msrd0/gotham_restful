@@ -1,10 +1,15 @@
 #[macro_use]
 extern crate gotham_derive;
 
-use gotham::{router::builder::*, test::TestServer};
+use gotham::{
+	hyper::{HeaderMap, Method},
+	router::builder::*,
+	test::TestServer
+};
 use gotham_restful::*;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
 use serde::Deserialize;
+use tokio::time::{delay_for, Duration};
 
 mod util {
 	include!("util/mod.rs");
@@ -12,7 +17,7 @@ mod util {
 use util::{test_delete_response, test_get_response, test_post_response, test_put_response};
 
 #[derive(Resource)]
-#[resource(read_all, read, search, create, change_all, change, remove_all, remove)]
+#[resource(read_all, read, search, create, change_all, change, remove_all, remove, state_test)]
 struct FooResource;
 
 #[derive(Deserialize)]
@@ -77,6 +82,15 @@ async fn remove(_id: u64) -> Raw<&'static [u8]> {
 	Raw::new(REMOVE_RESPONSE, TEXT_PLAIN)
 }
 
+const STATE_TEST_RESPONSE: &[u8] = b"xxJbxOuwioqR5DfzPuVqvaqRSfpdNQGluIvHU4n1LM";
+#[endpoint(method = "Method::GET", uri = "state_test")]
+async fn state_test(state: &mut State) -> Raw<&'static [u8]> {
+	delay_for(Duration::from_nanos(1)).await;
+	state.borrow::<HeaderMap>();
+	delay_for(Duration::from_nanos(1)).await;
+	Raw::new(STATE_TEST_RESPONSE, TEXT_PLAIN)
+}
+
 #[test]
 fn async_methods() {
 	let _ = pretty_env_logger::try_init_timed();
@@ -112,4 +126,5 @@ fn async_methods() {
 	);
 	test_delete_response(&server, "http://localhost/foo", REMOVE_ALL_RESPONSE);
 	test_delete_response(&server, "http://localhost/foo/1", REMOVE_RESPONSE);
+	test_get_response(&server, "http://localhost/foo/state_test", STATE_TEST_RESPONSE);
 }

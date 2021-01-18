@@ -554,12 +554,12 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 				}
 				type Body = #body_ty;
 
-				fn handle(
-					state: &mut ::gotham_restful::gotham::state::State,
+				fn handle<'a>(
+					state: &'a mut ::gotham_restful::gotham::state::State,
 					placeholders: Self::Placeholders,
 					params: Self::Params,
 					body: ::std::option::Option<Self::Body>
-				) -> ::gotham_restful::export::BoxFuture<'static, Self::Output> {
+				) -> ::gotham_restful::export::BoxFuture<'a, Self::Output> {
 					#handle_content
 				}
 
