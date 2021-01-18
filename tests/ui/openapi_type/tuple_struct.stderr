@@ -1,0 +1,5 @@
+error: #[derive(OpenapiType)] does not support unnamed fields
+ --> $DIR/tuple_struct.rs:5:11
+  |
+5 | struct Foo(String);
+  |           ^^^^^^^^

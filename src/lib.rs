@@ -9,7 +9,7 @@
 #![forbid(unsafe_code)]
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
-create resources with assigned methods that aim to be a more convenient way of creating handlers
+create resources with assigned endpoints that aim to be a more convenient way of creating handlers
 for requests.
 
 # Features
@@ -27,23 +27,23 @@ for requests.
 This crate is just as safe as you'd expect from anything written in safe Rust - and
 `#![forbid(unsafe_code)]` ensures that no unsafe was used.
 
-# Methods
+# Endpoints
 
-Assuming you assign `/foobar` to your resource, you can implement the following methods:
+Assuming you assign `/foobar` to your resource, the following pre-defined endpoints exist:
 
-| Method Name | Required Arguments | HTTP Verb | HTTP Path      |
-| ----------- | ------------------ | --------- | -----------    |
-| read_all    |                    | GET       | /foobar        |
-| read        | id                 | GET       | /foobar/:id    |
-| search      | query              | GET       | /foobar/search |
-| create      | body               | POST      | /foobar        |
-| change_all  | body               | PUT       | /foobar        |
-| change      | id, body           | PUT       | /foobar/:id    |
-| remove_all  |                    | DELETE    | /foobar        |
-| remove      | id                 | DELETE    | /foobar/:id    |
+| Endpoint Name | Required Arguments | HTTP Verb | HTTP Path      |
+| ------------- | ------------------ | --------- | -------------- |
+| read_all      |                    | GET       | /foobar        |
+| read          | id                 | GET       | /foobar/:id    |
+| search        | query              | GET       | /foobar/search |
+| create        | body               | POST      | /foobar        |
+| change_all    | body               | PUT       | /foobar        |
+| change        | id, body           | PUT       | /foobar/:id    |
+| remove_all    |                    | DELETE    | /foobar        |
+| remove        | id                 | DELETE    | /foobar/:id    |
 
-Each of those methods has a macro that creates the neccessary boilerplate for the Resource. A
-simple example could look like this:
+Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
+simple example looks like this:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
@@ -55,15 +55,15 @@ simple example could look like this:
 #[resource(read)]
 struct FooResource;
 
-/// The return type of the foo read method.
+/// The return type of the foo read endpoint.
 #[derive(Serialize)]
 # #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct Foo {
 	id: u64
 }
 
-/// The foo read method handler.
-#[read(FooResource)]
+/// The foo read endpoint.
+#[read]
 fn read(id: u64) -> Success<Foo> {
 	Foo { id }.into()
 }
@@ -76,17 +76,16 @@ fn read(id: u64) -> Success<Foo> {
 
 # Arguments
 
-Some methods require arguments. Those should be
- * **id** Should be a deserializable json-primitive like `i64` or `String`.
+Some endpoints require arguments. Those should be
+ * **id** Should be a deserializable json-primitive like [`i64`] or [`String`].
  * **body** Should be any deserializable object, or any type implementing [`RequestBody`].
  * **query** Should be any deserializable object whose variables are json-primitives. It will
    however not be parsed from json, but from HTTP GET parameters like in `search?id=1`. The
-   type needs to implement [`QueryStringExtractor`].
+   type needs to implement [`QueryStringExtractor`](gotham::extractor::QueryStringExtractor).
 
-Additionally, non-async handlers may take a reference to gotham's [`State`]. If you need to
-have an async handler (that is, the function that the method macro is invoked on is declared
-as `async fn`), consider returning the boxed future instead. Since [`State`] does not implement
-`Sync` there is unfortunately no more convenient way.
+Additionally, all handlers may take a reference to gotham's [`State`]. Please note that for async
+handlers, it needs to be a mutable reference until rustc's lifetime checks across await bounds
+improve.
 
 # Uploads and Downloads
 
@@ -110,7 +109,7 @@ struct RawImage {
 	content_type: Mime
 }
 
-#[create(ImageResource)]
+#[create]
 fn create(body : RawImage) -> Raw<Vec<u8>> {
 	Raw::new(body.content, body.content_type)
 }
@@ -127,21 +126,23 @@ To make life easier for common use-cases, this create offers a few features that
 when you implement your web server.  The complete feature list is
  - [`auth`](#authentication-feature) Advanced JWT middleware
  - `chrono` openapi support for chrono types
- - [`cors`](#cors-feature) CORS handling for all method handlers
+ - `full` enables all features except `without-openapi`
+ - [`cors`](#cors-feature) CORS handling for all endpoint handlers
  - [`database`](#database-feature) diesel middleware support
- - `errorlog` log errors returned from method handlers
+ - `errorlog` log errors returned from endpoint handlers
  - [`openapi`](#openapi-feature) router additions to generate an openapi spec
  - `uuid` openapi support for uuid
+ - `without-openapi` (**default**) disables `openapi` support.
 
 ## Authentication Feature
 
 In order to enable authentication support, enable the `auth` feature gate. This allows you to
 register a middleware that can automatically check for the existence of an JWT authentication
-token. Besides being supported by the method macros, it supports to lookup the required JWT secret
+token. Besides being supported by the endpoint macros, it supports to lookup the required JWT secret
 with the JWT data, hence you can use several JWT secrets and decide on the fly which secret to use.
 None of this is currently supported by gotham's own JWT middleware.
 
-A simple example that uses only a single secret could look like this:
+A simple example that uses only a single secret looks like this:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
@@ -167,7 +168,7 @@ struct AuthData {
 	exp: u64
 }
 
-#[read(SecretResource)]
+#[read]
 fn read(auth: AuthStatus<AuthData>, id: u64) -> AuthSuccess<Secret> {
 	let intended_for = auth.ok()?.sub;
 	Ok(Secret { id, intended_for })
@@ -194,7 +195,7 @@ the `Access-Control-Allow-Methods` header is touched. To change the behaviour, a
 configuration as a middleware.
 
 A simple example that allows authentication from every origin (note that `*` always disallows
-authentication), and every content type, could look like this:
+authentication), and every content type, looks like this:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
@@ -207,7 +208,7 @@ authentication), and every content type, could look like this:
 #[resource(read_all)]
 struct FooResource;
 
-#[read_all(FooResource)]
+#[read_all]
 fn read_all() {
 	// your handler
 }
@@ -237,7 +238,7 @@ note however that due to the way gotham's diesel middleware implementation, it i
 to run async code while holding a database connection. If you need to combine async and database,
 you'll need to borrow the connection from the [`State`] yourself and return a boxed future.
 
-A simple non-async example could look like this:
+A simple non-async example looks like this:
 
 ```rust,no_run
 # #[macro_use] extern crate diesel;
@@ -267,7 +268,7 @@ struct Foo {
 	value: String
 }
 
-#[read_all(FooResource)]
+#[read_all]
 fn read_all(conn: &PgConnection) -> QueryResult<Vec<Foo>> {
 	foo::table.load(conn)
 }
@@ -295,7 +296,7 @@ In order to automatically create an openapi specification, gotham-restful needs 
 all routes and the types returned. `serde` does a great job at serialization but doesn't give
 enough type information, so all types used in the router need to implement `OpenapiType`. This
 can be derived for almoust any type and there should be no need to implement it manually. A simple
-example could look like this:
+example looks like this:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
@@ -313,7 +314,7 @@ struct Foo {
 	bar: String
 }
 
-#[read_all(FooResource)]
+#[read_all]
 fn read_all() -> Success<Foo> {
 	Foo { bar: "Hello World".to_owned() }.into()
 }
@@ -334,48 +335,37 @@ fn main() {
 # }
 ```
 
-Above example adds the resource as before, but adds another endpoint that we specified as `/openapi`
-that will return the generated openapi specification. This allows you to easily write clients
-in different languages without worying to exactly replicate your api in each of those languages.
+Above example adds the resource as before, but adds another endpoint that we specified as `/openapi`.
+It will return the generated openapi specification in JSON format. This allows you to easily write
+clients in different languages without worying to exactly replicate your api in each of those
+languages.
 
-However, as of right now there is one caveat. If you wrote code before enabling the openapi feature,
-it is likely to break. This is because of the new requirement of `OpenapiType` for all types used
-with resources, even outside of the `with_openapi` scope. This issue will eventually be resolved.
-If you are writing a library that uses gotham-restful, make sure that you expose an openapi feature.
-In other words, put
+However, please note that by default, the `without-openapi` feature of this crate is enabled.
+Disabling it in favour of the `openapi` feature will add an additional type bound, [`OpenapiType`],
+on some of the types in [`Endpoint`] and related traits. This means that some code might only
+compile on either feature, but not on both. If you are writing a library that uses gotham-restful,
+it is strongly recommended to pass both features through and conditionally enable the openapi
+code, like this:
 
-```toml
-[features]
-openapi = ["gotham-restful/openapi"]
-```
-
-into your libraries `Cargo.toml` and use the following for all types used with handlers:
-
-```
-# #[cfg(feature = "openapi")]
-# mod openapi_feature_enabled {
-# use gotham_restful::OpenapiType;
+```rust
+# #[macro_use] extern crate gotham_restful;
 # use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize)]
 #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 struct Foo;
-# }
 ```
 
 # Examples
 
-There is a lack of good examples, but there is currently a collection of code in the [example]
-directory, that might help you. Any help writing more examples is highly appreciated.
+This readme and the crate documentation contain some of example. In addition to that, there is
+a collection of code in the [example] directory that might help you. Any help writing more
+examples is highly appreciated.
 
 
  [diesel]: https://diesel.rs/
  [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
  [gotham]: https://gotham.rs/
  [serde_json]: https://github.com/serde-rs/json#serde-json----
- [`CorsRoute`]: trait.CorsRoute.html
- [`QueryStringExtractor`]: ../gotham/extractor/trait.QueryStringExtractor.html
- [`RequestBody`]: trait.RequestBody.html
- [`State`]: ../gotham/state/struct.State.html
 */
 
 #[cfg(all(feature = "openapi", feature = "without-openapi"))]
@@ -389,6 +379,8 @@ extern crate self as gotham_restful;
 
 #[macro_use]
 extern crate gotham_derive;
+#[macro_use]
+extern crate gotham_restful_derive;
 #[macro_use]
 extern crate log;
 #[macro_use]
@@ -409,7 +401,9 @@ pub use gotham_restful_derive::*;
 /// Not public API
 #[doc(hidden)]
 pub mod export {
-	pub use futures_util::future::FutureExt;
+	pub use crate::routing::PathExtractor as IdPlaceholder;
+
+	pub use futures_util::future::{BoxFuture, FutureExt};
 
 	pub use serde_json;
 
@@ -441,11 +435,10 @@ pub use openapi::{
 	types::{OpenapiSchema, OpenapiType}
 };
 
-mod resource;
-pub use resource::{
-	Resource, ResourceChange, ResourceChangeAll, ResourceCreate, ResourceMethod, ResourceRead, ResourceReadAll,
-	ResourceRemove, ResourceRemoveAll, ResourceSearch
-};
+mod endpoint;
+pub use endpoint::Endpoint;
+#[cfg(feature = "openapi")]
+pub use endpoint::EndpointWithSchema;
 
 mod response;
 pub use response::Response;
@@ -457,9 +450,21 @@ pub use result::{
 };
 
 mod routing;
-#[cfg(feature = "openapi")]
-pub use routing::WithOpenapi;
 pub use routing::{DrawResourceRoutes, DrawResources};
+#[cfg(feature = "openapi")]
+pub use routing::{DrawResourceRoutesWithSchema, DrawResourcesWithSchema, WithOpenapi};
 
 mod types;
 pub use types::*;
+
+/// This trait must be implemented for every resource. It allows you to register the different
+/// endpoints that can be handled by this resource to be registered with the underlying router.
+///
+/// It is not recommended to implement this yourself, rather just use `#[derive(Resource)]`.
+#[_private_openapi_trait(ResourceWithSchema)]
+pub trait Resource {
+	/// Register all methods handled by this resource with the underlying router.
+	#[openapi_bound("D: crate::DrawResourceRoutesWithSchema")]
+	#[non_openapi_bound("D: crate::DrawResourceRoutes")]
+	fn setup<D>(route: D);
+}

@@ -1,5 +1,0 @@
-error: #[derive(OpenapiType)] only works for structs and enums
- --> $DIR/openapi_type_union.rs:4:1
-  |
-4 | union IntOrPointer
-  | ^^^^^

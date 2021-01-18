@@ -15,7 +15,7 @@ struct Foo {
 	content_type: Mime
 }
 
-#[create(FooResource)]
+#[create]
 fn create(body: Foo) -> Raw<Vec<u8>> {
 	Raw::new(body.content, body.content_type)
 }

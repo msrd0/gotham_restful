@@ -1,6 +1,8 @@
 use super::{builder::OpenapiBuilder, handler::OpenapiHandler, operation::OperationDescription};
-use crate::{resource::*, routing::*, OpenapiType};
-use gotham::{pipeline::chain::PipelineHandleChain, router::builder::*};
+use crate::{routing::*, EndpointWithSchema, OpenapiType, ResourceWithSchema};
+use gotham::{hyper::Method, pipeline::chain::PipelineHandleChain, router::builder::*};
+use once_cell::sync::Lazy;
+use regex::{Captures, Regex};
 use std::panic::RefUnwindSafe;
 
 /// This trait adds the `get_openapi` method to an OpenAPI-aware router.
@@ -51,150 +53,62 @@ macro_rules! implOpenapiRouter {
 			}
 		}
 
-		impl<'a, 'b, C, P> DrawResources for OpenapiRouter<'a, $implType<'b, C, P>>
+		impl<'a, 'b, C, P> DrawResourcesWithSchema for OpenapiRouter<'a, $implType<'b, C, P>>
 		where
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn resource<R: Resource>(&mut self, path: &str) {
+			fn resource<R: ResourceWithSchema>(&mut self, path: &str) {
 				R::setup((self, path));
 			}
 		}
 
-		impl<'a, 'b, C, P> DrawResourceRoutes for (&mut OpenapiRouter<'a, $implType<'b, C, P>>, &str)
+		impl<'a, 'b, C, P> DrawResourceRoutesWithSchema for (&mut OpenapiRouter<'a, $implType<'b, C, P>>, &str)
 		where
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn read_all<Handler: ResourceReadAll>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
+			fn endpoint<E: EndpointWithSchema + 'static>(&mut self) {
+				let schema = (self.0).openapi_builder.add_schema::<E::Output>();
+				let mut descr = OperationDescription::new::<E>(schema);
+				if E::has_placeholders() {
+					descr.set_path_params(E::Placeholders::schema());
+				}
+				if E::needs_params() {
+					descr.set_query_params(E::Params::schema());
+				}
+				if E::needs_body() {
+					let body_schema = (self.0).openapi_builder.add_schema::<E::Body>();
+					descr.set_body::<E::Body>(body_schema);
+				}
 
-				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
+				static URI_PLACEHOLDER_REGEX: Lazy<Regex> =
+					Lazy::new(|| Regex::new(r#"(^|/):(?P<name>[^/]+)(/|$)"#).unwrap());
+				let uri: &str = &E::uri();
+				let uri =
+					URI_PLACEHOLDER_REGEX.replace_all(uri, |captures: &Captures<'_>| format!("{{{}}}", &captures["name"]));
+				let path = if uri.is_empty() {
+					format!("{}/{}", self.0.scope.unwrap_or_default(), self.1)
+				} else {
+					format!("{}/{}/{}", self.0.scope.unwrap_or_default(), self.1, uri)
+				};
+
+				let op = descr.into_operation();
 				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.get = Some(OperationDescription::new::<Handler>(schema).into_operation());
+				match E::http_method() {
+					Method::GET => item.get = Some(op),
+					Method::PUT => item.put = Some(op),
+					Method::POST => item.post = Some(op),
+					Method::DELETE => item.delete = Some(op),
+					Method::OPTIONS => item.options = Some(op),
+					Method::HEAD => item.head = Some(op),
+					Method::PATCH => item.patch = Some(op),
+					Method::TRACE => item.trace = Some(op),
+					method => warn!("Ignoring unsupported method '{}' in OpenAPI Specification", method)
+				};
 				(self.0).openapi_builder.add_path(path, item);
 
-				(&mut *(self.0).router, self.1).read_all::<Handler>()
-			}
-
-			fn read<Handler: ResourceRead>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
-
-				let path = format!("{}/{}/{{id}}", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.get = Some(
-					OperationDescription::new::<Handler>(schema)
-						.add_path_param("id", id_schema)
-						.into_operation()
-				);
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).read::<Handler>()
-			}
-
-			fn search<Handler: ResourceSearch>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-
-				let path = format!("{}/{}/search", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.get = Some(
-					OperationDescription::new::<Handler>(schema)
-						.with_query_params(Handler::Query::schema())
-						.into_operation()
-				);
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).search::<Handler>()
-			}
-
-			fn create<Handler: ResourceCreate>(&mut self)
-			where
-				Handler::Res: 'static,
-				Handler::Body: 'static
-			{
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-				let body_schema = (self.0).openapi_builder.add_schema::<Handler::Body>();
-
-				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.post = Some(
-					OperationDescription::new::<Handler>(schema)
-						.with_body::<Handler::Body>(body_schema)
-						.into_operation()
-				);
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).create::<Handler>()
-			}
-
-			fn change_all<Handler: ResourceChangeAll>(&mut self)
-			where
-				Handler::Res: 'static,
-				Handler::Body: 'static
-			{
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-				let body_schema = (self.0).openapi_builder.add_schema::<Handler::Body>();
-
-				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.put = Some(
-					OperationDescription::new::<Handler>(schema)
-						.with_body::<Handler::Body>(body_schema)
-						.into_operation()
-				);
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).change_all::<Handler>()
-			}
-
-			fn change<Handler: ResourceChange>(&mut self)
-			where
-				Handler::Res: 'static,
-				Handler::Body: 'static
-			{
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
-				let body_schema = (self.0).openapi_builder.add_schema::<Handler::Body>();
-
-				let path = format!("{}/{}/{{id}}", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.put = Some(
-					OperationDescription::new::<Handler>(schema)
-						.add_path_param("id", id_schema)
-						.with_body::<Handler::Body>(body_schema)
-						.into_operation()
-				);
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).change::<Handler>()
-			}
-
-			fn remove_all<Handler: ResourceRemoveAll>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-
-				let path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.delete = Some(OperationDescription::new::<Handler>(schema).into_operation());
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).remove_all::<Handler>()
-			}
-
-			fn remove<Handler: ResourceRemove>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema::<Handler::Res>();
-				let id_schema = (self.0).openapi_builder.add_schema::<Handler::ID>();
-
-				let path = format!("{}/{}/{{id}}", self.0.scope.unwrap_or_default(), self.1);
-				let mut item = (self.0).openapi_builder.remove_path(&path);
-				item.delete = Some(
-					OperationDescription::new::<Handler>(schema)
-						.add_path_param("id", id_schema)
-						.into_operation()
-				);
-				(self.0).openapi_builder.add_path(path, item);
-
-				(&mut *(self.0).router, self.1).remove::<Handler>()
+				(&mut *(self.0).router, self.1).endpoint::<E>()
 			}
 		}
 	};

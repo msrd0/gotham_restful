@@ -1,0 +1,5 @@
+error: #[derive(FromBody)] only works for structs
+ --> $DIR/enum.rs:5:1
+  |
+5 | enum FromBodyEnum {
+  | ^^^^

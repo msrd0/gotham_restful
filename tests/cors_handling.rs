@@ -16,10 +16,10 @@ use mime::TEXT_PLAIN;
 #[resource(read_all, change_all)]
 struct FooResource;
 
-#[read_all(FooResource)]
+#[read_all]
 fn read_all() {}
 
-#[change_all(FooResource)]
+#[change_all]
 fn change_all(_body: Raw<Vec<u8>>) {}
 
 fn test_server(cfg: CorsConfig) -> TestServer {

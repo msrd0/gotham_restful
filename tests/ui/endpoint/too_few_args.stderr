@@ -1,0 +1,11 @@
+error: Too few arguments
+ --> $DIR/too_few_args.rs:9:4
+  |
+9 | fn read() {}
+  |    ^^^^
+
+error[E0412]: cannot find type `read___gotham_restful_endpoint` in this scope
+ --> $DIR/too_few_args.rs:5:12
+  |
+5 | #[resource(read)]
+  |            ^^^^ not found in this scope

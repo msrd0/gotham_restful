@@ -33,7 +33,7 @@ Use can look something like this (assuming the `auth` feature is enabled):
 # #[derive(Clone, Deserialize)]
 # struct MyAuthData { exp : u64 }
 #
-#[read_all(MyResource)]
+#[read_all]
 fn read_all(auth : AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
 	let auth_data = match auth {
 		AuthStatus::Authenticated(data) => data,
@@ -102,7 +102,7 @@ Use can look something like this (assuming the `auth` feature is enabled):
 # #[derive(Clone, Deserialize)]
 # struct MyAuthData { exp : u64 }
 #
-#[read_all(MyResource)]
+#[read_all]
 fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent, io::Error> {
 	let auth_data = match auth {
 		AuthStatus::Authenticated(data) => data,

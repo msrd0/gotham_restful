@@ -25,7 +25,7 @@ example that simply returns its body:
 #[resource(create)]
 struct ImageResource;
 
-#[create(ImageResource)]
+#[create]
 fn create(body : Raw<Vec<u8>>) -> Raw<Vec<u8>> {
 	body
 }

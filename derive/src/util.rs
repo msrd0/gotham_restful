@@ -1,6 +1,6 @@
 use proc_macro2::{Delimiter, TokenStream, TokenTree};
 use std::iter;
-use syn::Error;
+use syn::{Error, Path};
 
 pub trait CollectToResult {
 	type Item;
@@ -27,6 +27,16 @@ where
 				Err(errors)
 			}
 		})
+	}
+}
+
+pub(crate) trait PathEndsWith {
+	fn ends_with(&self, s: &str) -> bool;
+}
+
+impl PathEndsWith for Path {
+	fn ends_with(&self, s: &str) -> bool {
+		self.segments.last().map(|segment| segment.ident.to_string()).as_deref() == Some(s)
 	}
 }
 

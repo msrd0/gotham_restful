@@ -1,5 +1,0 @@
-error: Too many arguments
- --> $DIR/method_too_many_args.rs:8:13
-  |
-8 | fn read_all(_id : u64)
-  |             ^^^

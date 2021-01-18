@@ -5,24 +5,32 @@ use syn::{parse_macro_input, parse_macro_input::ParseMacroInput, DeriveInput, Re
 
 mod util;
 
+mod endpoint;
+use endpoint::{expand_endpoint, EndpointType};
+
 mod from_body;
 use from_body::expand_from_body;
-mod method;
-use method::{expand_method, Method};
+
 mod request_body;
 use request_body::expand_request_body;
+
 mod resource;
 use resource::expand_resource;
+
 mod resource_error;
 use resource_error::expand_resource_error;
+
 #[cfg(feature = "openapi")]
 mod openapi_type;
 #[cfg(feature = "openapi")]
 use openapi_type::expand_openapi_type;
 
+mod private_openapi_trait;
+use private_openapi_trait::expand_private_openapi_trait;
+
 #[inline]
 fn print_tokens(tokens: TokenStream2) -> TokenStream {
-	//eprintln!("{}", tokens);
+	// eprintln!("{}", tokens);
 	tokens.into()
 }
 
@@ -77,40 +85,47 @@ pub fn derive_resource_error(input: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 pub fn read_all(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::ReadAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::ReadAll, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn read(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Read, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Read, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn search(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Search, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Search, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn create(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Create, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Create, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn change_all(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::ChangeAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::UpdateAll, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn change(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Change, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Update, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn remove_all(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::RemoveAll, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::DeleteAll, attr, item))
 }
 
 #[proc_macro_attribute]
 pub fn remove(attr: TokenStream, item: TokenStream) -> TokenStream {
-	expand_macro(attr, item, |attr, item| expand_method(Method::Remove, attr, item))
+	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Delete, attr, item))
+}
+
+/// PRIVATE MACRO - DO NOT USE
+#[doc(hidden)]
+#[proc_macro_attribute]
+pub fn _private_openapi_trait(attr: TokenStream, item: TokenStream) -> TokenStream {
+	expand_macro(attr, item, expand_private_openapi_trait)
 }

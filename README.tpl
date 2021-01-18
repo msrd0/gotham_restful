@@ -17,8 +17,8 @@
 	<a href="https://msrd0.gitlab.io/gotham-restful/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-master-blue.svg"/>
 	</a>
-    <a href="https://blog.rust-lang.org/2020/03/12/Rust-1.42.html">
-        <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.42+-orange.svg"/>
+    <a href="https://blog.rust-lang.org/2020/04/23/Rust-1.43.0.html">
+        <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.43+-orange.svg"/>
     </a>
 	<a href="https://deps.rs/repo/gitlab/msrd0/gotham-restful">
 		<img alt="dependencies" src="https://deps.rs/repo/gitlab/msrd0/gotham-restful/status.svg"/>

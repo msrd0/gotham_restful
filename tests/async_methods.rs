@@ -30,55 +30,57 @@ struct FooSearch {
 }
 
 const READ_ALL_RESPONSE: &[u8] = b"1ARwwSPVyOKpJKrYwqGgECPVWDl1BqajAAj7g7WJ3e";
-#[read_all(FooResource)]
+#[read_all]
 async fn read_all() -> Raw<&'static [u8]> {
 	Raw::new(READ_ALL_RESPONSE, TEXT_PLAIN)
 }
 
 const READ_RESPONSE: &[u8] = b"FEReHoeBKU17X2bBpVAd1iUvktFL43CDu0cFYHdaP9";
-#[read(FooResource)]
+#[read]
 async fn read(_id: u64) -> Raw<&'static [u8]> {
 	Raw::new(READ_RESPONSE, TEXT_PLAIN)
 }
 
 const SEARCH_RESPONSE: &[u8] = b"AWqcQUdBRHXKh3at4u79mdupOAfEbnTcx71ogCVF0E";
-#[search(FooResource)]
+#[search]
 async fn search(_body: FooSearch) -> Raw<&'static [u8]> {
 	Raw::new(SEARCH_RESPONSE, TEXT_PLAIN)
 }
 
 const CREATE_RESPONSE: &[u8] = b"y6POY7wOMAB0jBRBw0FJT7DOpUNbhmT8KdpQPLkI83";
-#[create(FooResource)]
+#[create]
 async fn create(_body: FooBody) -> Raw<&'static [u8]> {
 	Raw::new(CREATE_RESPONSE, TEXT_PLAIN)
 }
 
 const CHANGE_ALL_RESPONSE: &[u8] = b"QlbYg8gHE9OQvvk3yKjXJLTSXlIrg9mcqhfMXJmQkv";
-#[change_all(FooResource)]
+#[change_all]
 async fn change_all(_body: FooBody) -> Raw<&'static [u8]> {
 	Raw::new(CHANGE_ALL_RESPONSE, TEXT_PLAIN)
 }
 
 const CHANGE_RESPONSE: &[u8] = b"qGod55RUXkT1lgPO8h0uVM6l368O2S0GrwENZFFuRu";
-#[change(FooResource)]
+#[change]
 async fn change(_id: u64, _body: FooBody) -> Raw<&'static [u8]> {
 	Raw::new(CHANGE_RESPONSE, TEXT_PLAIN)
 }
 
 const REMOVE_ALL_RESPONSE: &[u8] = b"Y36kZ749MRk2Nem4BedJABOZiZWPLOtiwLfJlGTwm5";
-#[remove_all(FooResource)]
+#[remove_all]
 async fn remove_all() -> Raw<&'static [u8]> {
 	Raw::new(REMOVE_ALL_RESPONSE, TEXT_PLAIN)
 }
 
 const REMOVE_RESPONSE: &[u8] = b"CwRzBrKErsVZ1N7yeNfjZuUn1MacvgBqk4uPOFfDDq";
-#[remove(FooResource)]
+#[remove]
 async fn remove(_id: u64) -> Raw<&'static [u8]> {
 	Raw::new(REMOVE_RESPONSE, TEXT_PLAIN)
 }
 
 #[test]
 fn async_methods() {
+	let _ = pretty_env_logger::try_init_timed();
+
 	let server = TestServer::new(build_simple_router(|router| {
 		router.resource::<FooResource>("foo");
 	}))

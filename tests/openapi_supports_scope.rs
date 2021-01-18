@@ -15,7 +15,7 @@ const RESPONSE: &[u8] = b"This is the only valid response.";
 #[resource(read_all)]
 struct FooResource;
 
-#[read_all(FooResource)]
+#[read_all]
 fn read_all() -> Raw<&'static [u8]> {
 	Raw::new(RESPONSE, TEXT_PLAIN)
 }

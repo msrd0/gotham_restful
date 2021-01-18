@@ -1,5 +1,6 @@
 #[cfg(feature = "chrono")]
 use chrono::{Date, DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc};
+use gotham::extractor::{NoopPathExtractor, NoopQueryStringExtractor};
 use indexmap::IndexMap;
 use openapiv3::{
 	AdditionalProperties, ArrayType, IntegerType, NumberFormat, NumberType, ObjectType,
@@ -83,6 +84,20 @@ impl OpenapiType for () {
 			additional_properties: Some(AdditionalProperties::Any(false)),
 			..Default::default()
 		})))
+	}
+}
+
+impl OpenapiType for NoopPathExtractor {
+	fn schema() -> OpenapiSchema {
+		warn!("You're asking for the OpenAPI Schema for gotham::extractor::NoopPathExtractor. This is probably not what you want.");
+		<()>::schema()
+	}
+}
+
+impl OpenapiType for NoopQueryStringExtractor {
+	fn schema() -> OpenapiSchema {
+		warn!("You're asking for the OpenAPI Schema for gotham::extractor::NoopQueryStringExtractor. This is probably not what you want.");
+		<()>::schema()
 	}
 }
 

@@ -3,37 +3,33 @@ use crate::openapi::{
 	builder::{OpenapiBuilder, OpenapiInfo},
 	router::OpenapiRouter
 };
-#[cfg(feature = "cors")]
-use crate::CorsRoute;
 use crate::{
-	resource::{
-		Resource, ResourceChange, ResourceChangeAll, ResourceCreate, ResourceRead, ResourceReadAll, ResourceRemove,
-		ResourceRemoveAll, ResourceSearch
-	},
 	result::{ResourceError, ResourceResult},
-	RequestBody, Response, StatusCode
+	Endpoint, FromBody, Resource, Response, StatusCode
 };
 
-use futures_util::{future, future::FutureExt};
 use gotham::{
-	handler::{HandlerError, HandlerFuture},
+	handler::HandlerError,
 	helpers::http::response::{create_empty_response, create_response},
 	hyper::{body::to_bytes, header::CONTENT_TYPE, Body, HeaderMap, Method},
 	pipeline::chain::PipelineHandleChain,
 	router::{
-		builder::{DefineSingleRoute, DrawRoutes, ExtendRouteMatcher, RouterBuilder, ScopeBuilder},
+		builder::{DefineSingleRoute, DrawRoutes, RouterBuilder, ScopeBuilder},
 		non_match::RouteNonMatch,
-		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher}
+		route::matcher::{
+			AcceptHeaderRouteMatcher, AccessControlRequestMethodMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher
+		}
 	},
 	state::{FromState, State}
 };
 use mime::{Mime, APPLICATION_JSON};
-use std::{future::Future, panic::RefUnwindSafe, pin::Pin};
+use std::panic::RefUnwindSafe;
 
 /// Allow us to extract an id from a path.
-#[derive(Deserialize, StateData, StaticResponseExtender)]
-struct PathExtractor<ID: RefUnwindSafe + Send + 'static> {
-	id: ID
+#[derive(Debug, Deserialize, StateData, StaticResponseExtender)]
+#[cfg_attr(feature = "openapi", derive(OpenapiType))]
+pub struct PathExtractor<ID: RefUnwindSafe + Send + 'static> {
+	pub id: ID
 }
 
 /// This trait adds the `with_openapi` method to gotham's routing. It turns the default
@@ -48,37 +44,20 @@ pub trait WithOpenapi<D> {
 
 /// This trait adds the `resource` method to gotham's routing. It allows you to register
 /// any RESTful [Resource] with a path.
+#[_private_openapi_trait(DrawResourcesWithSchema)]
 pub trait DrawResources {
-	fn resource<R: Resource>(&mut self, path: &str);
+	#[openapi_bound("R: crate::ResourceWithSchema")]
+	#[non_openapi_bound("R: crate::Resource")]
+	fn resource<R>(&mut self, path: &str);
 }
 
 /// This trait allows to draw routes within an resource. Use this only inside the
 /// [Resource::setup] method.
+#[_private_openapi_trait(DrawResourceRoutesWithSchema)]
 pub trait DrawResourceRoutes {
-	fn read_all<Handler: ResourceReadAll>(&mut self);
-
-	fn read<Handler: ResourceRead>(&mut self);
-
-	fn search<Handler: ResourceSearch>(&mut self);
-
-	fn create<Handler: ResourceCreate>(&mut self)
-	where
-		Handler::Res: 'static,
-		Handler::Body: 'static;
-
-	fn change_all<Handler: ResourceChangeAll>(&mut self)
-	where
-		Handler::Res: 'static,
-		Handler::Body: 'static;
-
-	fn change<Handler: ResourceChange>(&mut self)
-	where
-		Handler::Res: 'static,
-		Handler::Body: 'static;
-
-	fn remove_all<Handler: ResourceRemoveAll>(&mut self);
-
-	fn remove<Handler: ResourceRemove>(&mut self);
+	#[openapi_bound("E: crate::EndpointWithSchema")]
+	#[non_openapi_bound("E: crate::Endpoint")]
+	fn endpoint<E: 'static>(&mut self);
 }
 
 fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> {
@@ -108,149 +87,42 @@ fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> 
 	r
 }
 
-async fn to_handler_future<F, R>(
-	state: State,
-	get_result: F
-) -> Result<(State, gotham::hyper::Response<Body>), (State, HandlerError)>
-where
-	F: FnOnce(State) -> Pin<Box<dyn Future<Output = (State, R)> + Send>>,
-	R: ResourceResult
-{
-	let (state, res) = get_result(state).await;
-	let res = res.into_response().await;
-	match res {
-		Ok(res) => {
-			let r = response_from(res, &state);
-			Ok((state, r))
-		},
-		Err(e) => Err((state, e.into()))
-	}
-}
+async fn endpoint_handler<E: Endpoint>(state: &mut State) -> Result<gotham::hyper::Response<Body>, HandlerError> {
+	trace!("entering endpoint_handler");
+	let placeholders = E::Placeholders::take_from(state);
+	let params = E::Params::take_from(state);
 
-async fn body_to_res<B, F, R>(
-	mut state: State,
-	get_result: F
-) -> (State, Result<gotham::hyper::Response<Body>, HandlerError>)
-where
-	B: RequestBody,
-	F: FnOnce(State, B) -> Pin<Box<dyn Future<Output = (State, R)> + Send>>,
-	R: ResourceResult
-{
-	let body = to_bytes(Body::take_from(&mut state)).await;
+	let body = match E::needs_body() {
+		true => {
+			let body = to_bytes(Body::take_from(state)).await?;
 
-	let body = match body {
-		Ok(body) => body,
-		Err(e) => return (state, Err(e.into()))
-	};
+			let content_type: Mime = match HeaderMap::borrow_from(state).get(CONTENT_TYPE) {
+				Some(content_type) => content_type.to_str().unwrap().parse().unwrap(),
+				None => {
+					debug!("Missing Content-Type: Returning 415 Response");
+					let res = create_empty_response(state, StatusCode::UNSUPPORTED_MEDIA_TYPE);
+					return Ok(res);
+				}
+			};
 
-	let content_type: Mime = match HeaderMap::borrow_from(&state).get(CONTENT_TYPE) {
-		Some(content_type) => content_type.to_str().unwrap().parse().unwrap(),
-		None => {
-			let res = create_empty_response(&state, StatusCode::UNSUPPORTED_MEDIA_TYPE);
-			return (state, Ok(res));
-		}
-	};
-
-	let res = {
-		let body = match B::from_body(body, content_type) {
-			Ok(body) => body,
-			Err(e) => {
-				let error: ResourceError = e.into();
-				let res = match serde_json::to_string(&error) {
-					Ok(json) => {
-						let res = create_response(&state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
-						Ok(res)
-					},
-					Err(e) => Err(e.into())
-				};
-				return (state, res);
+			match E::Body::from_body(body, content_type) {
+				Ok(body) => Some(body),
+				Err(e) => {
+					debug!("Invalid Body: Returning 400 Response");
+					let error: ResourceError = e.into();
+					let json = serde_json::to_string(&error)?;
+					let res = create_response(state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
+					return Ok(res);
+				}
 			}
-		};
-		get_result(state, body)
-	};
-
-	let (state, res) = res.await;
-	let res = res.into_response().await;
-
-	let res = match res {
-		Ok(res) => {
-			let r = response_from(res, &state);
-			Ok(r)
 		},
-		Err(e) => Err(e.into())
+		false => None
 	};
-	(state, res)
-}
 
-fn handle_with_body<B, F, R>(state: State, get_result: F) -> Pin<Box<HandlerFuture>>
-where
-	B: RequestBody + 'static,
-	F: FnOnce(State, B) -> Pin<Box<dyn Future<Output = (State, R)> + Send>> + Send + 'static,
-	R: ResourceResult + Send + 'static
-{
-	body_to_res(state, get_result)
-		.then(|(state, res)| match res {
-			Ok(ok) => future::ok((state, ok)),
-			Err(err) => future::err((state, err))
-		})
-		.boxed()
-}
-
-fn read_all_handler<Handler: ResourceReadAll>(state: State) -> Pin<Box<HandlerFuture>> {
-	to_handler_future(state, |state| Handler::read_all(state)).boxed()
-}
-
-fn read_handler<Handler: ResourceRead>(state: State) -> Pin<Box<HandlerFuture>> {
-	let id = {
-		let path: &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
-		path.id.clone()
-	};
-	to_handler_future(state, |state| Handler::read(state, id)).boxed()
-}
-
-fn search_handler<Handler: ResourceSearch>(mut state: State) -> Pin<Box<HandlerFuture>> {
-	let query = Handler::Query::take_from(&mut state);
-	to_handler_future(state, |state| Handler::search(state, query)).boxed()
-}
-
-fn create_handler<Handler: ResourceCreate>(state: State) -> Pin<Box<HandlerFuture>>
-where
-	Handler::Res: 'static,
-	Handler::Body: 'static
-{
-	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::create(state, body))
-}
-
-fn change_all_handler<Handler: ResourceChangeAll>(state: State) -> Pin<Box<HandlerFuture>>
-where
-	Handler::Res: 'static,
-	Handler::Body: 'static
-{
-	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::change_all(state, body))
-}
-
-fn change_handler<Handler: ResourceChange>(state: State) -> Pin<Box<HandlerFuture>>
-where
-	Handler::Res: 'static,
-	Handler::Body: 'static
-{
-	let id = {
-		let path: &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
-		path.id.clone()
-	};
-	handle_with_body::<Handler::Body, _, _>(state, |state, body| Handler::change(state, id, body))
-}
-
-fn remove_all_handler<Handler: ResourceRemoveAll>(state: State) -> Pin<Box<HandlerFuture>> {
-	to_handler_future(state, |state| Handler::remove_all(state)).boxed()
-}
-
-fn remove_handler<Handler: ResourceRemove>(state: State) -> Pin<Box<HandlerFuture>> {
-	let id = {
-		let path: &PathExtractor<Handler::ID> = PathExtractor::borrow_from(&state);
-		path.id.clone()
-	};
-	to_handler_future(state, |state| Handler::remove(state, id)).boxed()
+	let out = E::handle(state, placeholders, params, body).await;
+	let res = out.into_response().await?;
+	debug!("Returning response {:?}", res);
+	Ok(response_from(res, state))
 }
 
 #[derive(Clone)]
@@ -267,8 +139,8 @@ impl RouteMatcher for MaybeMatchAcceptHeader {
 	}
 }
 
-impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader {
-	fn from(types: Option<Vec<Mime>>) -> Self {
+impl MaybeMatchAcceptHeader {
+	fn new(types: Option<Vec<Mime>>) -> Self {
 		let types = match types {
 			Some(types) if types.is_empty() => None,
 			types => types
@@ -276,6 +148,12 @@ impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader {
 		Self {
 			matcher: types.map(AcceptHeaderRouteMatcher::new)
 		}
+	}
+}
+
+impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader {
+	fn from(types: Option<Vec<Mime>>) -> Self {
+		Self::new(types)
 	}
 }
 
@@ -293,11 +171,17 @@ impl RouteMatcher for MaybeMatchContentTypeHeader {
 	}
 }
 
-impl From<Option<Vec<Mime>>> for MaybeMatchContentTypeHeader {
-	fn from(types: Option<Vec<Mime>>) -> Self {
+impl MaybeMatchContentTypeHeader {
+	fn new(types: Option<Vec<Mime>>) -> Self {
 		Self {
 			matcher: types.map(|types| ContentTypeHeaderRouteMatcher::new(types).allow_no_type())
 		}
+	}
+}
+
+impl From<Option<Vec<Mime>>> for MaybeMatchContentTypeHeader {
+	fn from(types: Option<Vec<Mime>>) -> Self {
+		Self::new(types)
 	}
 }
 
@@ -332,108 +216,30 @@ macro_rules! implDrawResourceRoutes {
 			}
 		}
 
-		#[allow(clippy::redundant_closure)] // doesn't work because of type parameters
 		impl<'a, C, P> DrawResourceRoutes for (&mut $implType<'a, C, P>, &str)
 		where
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn read_all<Handler: ResourceReadAll>(&mut self) {
-				let matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				self.0
-					.get(&self.1)
-					.extend_route_matcher(matcher)
-					.to(|state| read_all_handler::<Handler>(state));
-			}
+			fn endpoint<E: Endpoint + 'static>(&mut self) {
+				let uri = format!("{}/{}", self.1, E::uri());
+				debug!("Registering endpoint for {}", uri);
+				self.0.associate(&uri, |assoc| {
+					assoc
+						.request(vec![E::http_method()])
+						.add_route_matcher(MaybeMatchAcceptHeader::new(E::Output::accepted_types()))
+						.with_path_extractor::<E::Placeholders>()
+						.with_query_string_extractor::<E::Params>()
+						.to_async_borrowing(endpoint_handler::<E>);
 
-			fn read<Handler: ResourceRead>(&mut self) {
-				let matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				self.0
-					.get(&format!("{}/:id", self.1))
-					.extend_route_matcher(matcher)
-					.with_path_extractor::<PathExtractor<Handler::ID>>()
-					.to(|state| read_handler::<Handler>(state));
-			}
-
-			fn search<Handler: ResourceSearch>(&mut self) {
-				let matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				self.0
-					.get(&format!("{}/search", self.1))
-					.extend_route_matcher(matcher)
-					.with_query_string_extractor::<Handler::Query>()
-					.to(|state| search_handler::<Handler>(state));
-			}
-
-			fn create<Handler: ResourceCreate>(&mut self)
-			where
-				Handler::Res: Send + 'static,
-				Handler::Body: 'static
-			{
-				let accept_matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				let content_matcher: MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
-				self.0
-					.post(&self.1)
-					.extend_route_matcher(accept_matcher)
-					.extend_route_matcher(content_matcher)
-					.to(|state| create_handler::<Handler>(state));
-				#[cfg(feature = "cors")]
-				self.0.cors(&self.1, Method::POST);
-			}
-
-			fn change_all<Handler: ResourceChangeAll>(&mut self)
-			where
-				Handler::Res: Send + 'static,
-				Handler::Body: 'static
-			{
-				let accept_matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				let content_matcher: MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
-				self.0
-					.put(&self.1)
-					.extend_route_matcher(accept_matcher)
-					.extend_route_matcher(content_matcher)
-					.to(|state| change_all_handler::<Handler>(state));
-				#[cfg(feature = "cors")]
-				self.0.cors(&self.1, Method::PUT);
-			}
-
-			fn change<Handler: ResourceChange>(&mut self)
-			where
-				Handler::Res: Send + 'static,
-				Handler::Body: 'static
-			{
-				let accept_matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				let content_matcher: MaybeMatchContentTypeHeader = Handler::Body::supported_types().into();
-				let path = format!("{}/:id", self.1);
-				self.0
-					.put(&path)
-					.extend_route_matcher(accept_matcher)
-					.extend_route_matcher(content_matcher)
-					.with_path_extractor::<PathExtractor<Handler::ID>>()
-					.to(|state| change_handler::<Handler>(state));
-				#[cfg(feature = "cors")]
-				self.0.cors(&path, Method::PUT);
-			}
-
-			fn remove_all<Handler: ResourceRemoveAll>(&mut self) {
-				let matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				self.0
-					.delete(&self.1)
-					.extend_route_matcher(matcher)
-					.to(|state| remove_all_handler::<Handler>(state));
-				#[cfg(feature = "cors")]
-				self.0.cors(&self.1, Method::DELETE);
-			}
-
-			fn remove<Handler: ResourceRemove>(&mut self) {
-				let matcher: MaybeMatchAcceptHeader = Handler::Res::accepted_types().into();
-				let path = format!("{}/:id", self.1);
-				self.0
-					.delete(&path)
-					.extend_route_matcher(matcher)
-					.with_path_extractor::<PathExtractor<Handler::ID>>()
-					.to(|state| remove_handler::<Handler>(state));
-				#[cfg(feature = "cors")]
-				self.0.cors(&path, Method::POST);
+					#[cfg(feature = "cors")]
+					if E::http_method() != Method::GET {
+						assoc
+							.options()
+							.add_route_matcher(AccessControlRequestMethodMatcher::new(E::http_method()))
+							.to(crate::cors::cors_preflight_handler);
+					}
+				});
 			}
 		}
 	};

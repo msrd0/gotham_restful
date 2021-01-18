@@ -6,23 +6,24 @@ stages:
 
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
+  RUST_LOG: info,gotham=debug,gotham_restful=trace 
 
 test-default:
   stage: test
-  image: rust:1.42-slim
+  image: rust:1.43-slim
   before_script:
     - cargo -V
   script:
     - cargo test
   cache:
-    key: cargo-1-42-default
+    key: cargo-1-43-default
     paths:
       - cargo/
       - target/
 
 test-full:
   stage: test
-  image: rust:1.42-slim
+  image: rust:1.43-slim
   before_script:
     - apt update -y
     - apt install -y --no-install-recommends libpq-dev
@@ -30,7 +31,7 @@ test-full:
   script:
     - cargo test --no-default-features --features full
   cache:
-    key: cargo-1-42-all
+    key: cargo-1-43-all
     paths:
       - cargo/
       - target/
@@ -86,6 +87,7 @@ rustfmt:
     - cargo fmt --version
   script:
     - cargo fmt -- --check
+    - ./tests/ui/rustfmt.sh --check
 
 doc:
   stage: build

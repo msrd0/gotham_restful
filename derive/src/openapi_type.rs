@@ -3,7 +3,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{
 	parse_macro_input, spanned::Spanned, Attribute, AttributeArgs, Data, DataEnum, DataStruct, DeriveInput, Error, Field,
-	Fields, GenericParam, Generics, Lit, LitStr, Meta, NestedMeta, Result, Variant
+	Fields, GenericParam, Generics, Lit, LitStr, Meta, NestedMeta, Path, PathSegment, PredicateType, Result, TraitBound,
+	TraitBoundModifier, Type, TypeParamBound, TypePath, Variant, WhereClause, WherePredicate
 };
 
 pub fn expand_openapi_type(input: DeriveInput) -> Result<TokenStream> {
@@ -17,24 +18,46 @@ pub fn expand_openapi_type(input: DeriveInput) -> Result<TokenStream> {
 	}
 }
 
-fn expand_where(generics: &Generics) -> TokenStream {
+fn update_generics(generics: &Generics, where_clause: &mut Option<WhereClause>) {
 	if generics.params.is_empty() {
-		return quote!();
+		return;
 	}
 
-	let krate = super::krate();
-	let idents = generics
-		.params
-		.iter()
-		.map(|param| match param {
-			GenericParam::Type(ty) => Some(ty.ident.clone()),
-			_ => None
-		})
-		.filter(|param| param.is_some())
-		.map(|param| param.unwrap());
+	if where_clause.is_none() {
+		*where_clause = Some(WhereClause {
+			where_token: Default::default(),
+			predicates: Default::default()
+		});
+	}
+	let where_clause = where_clause.as_mut().unwrap();
 
-	quote! {
-		where #(#idents : #krate::OpenapiType),*
+	for param in &generics.params {
+		if let GenericParam::Type(ty_param) = param {
+			where_clause.predicates.push(WherePredicate::Type(PredicateType {
+				lifetimes: None,
+				bounded_ty: Type::Path(TypePath {
+					qself: None,
+					path: Path {
+						leading_colon: None,
+						segments: vec![PathSegment {
+							ident: ty_param.ident.clone(),
+							arguments: Default::default()
+						}]
+						.into_iter()
+						.collect()
+					}
+				}),
+				colon_token: Default::default(),
+				bounds: vec![TypeParamBound::Trait(TraitBound {
+					paren_token: None,
+					modifier: TraitBoundModifier::None,
+					lifetimes: None,
+					path: syn::parse_str("::gotham_restful::OpenapiType").unwrap()
+				})]
+				.into_iter()
+				.collect()
+			}));
+		}
 	}
 }
 
@@ -106,7 +129,9 @@ fn expand_variant(variant: &Variant) -> Result<TokenStream> {
 
 fn expand_enum(ident: Ident, generics: Generics, attrs: Vec<Attribute>, input: DataEnum) -> Result<TokenStream> {
 	let krate = super::krate();
-	let where_clause = expand_where(&generics);
+	let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+	let mut where_clause = where_clause.cloned();
+	update_generics(&generics, &mut where_clause);
 
 	let attrs = parse_attributes(&attrs)?;
 	let nullable = attrs.nullable;
@@ -118,7 +143,7 @@ fn expand_enum(ident: Ident, generics: Generics, attrs: Vec<Attribute>, input: D
 	let variants = input.variants.iter().map(expand_variant).collect_to_result()?;
 
 	Ok(quote! {
-		impl #generics #krate::OpenapiType for #ident #generics
+		impl #impl_generics #krate::OpenapiType for #ident #ty_generics
 		#where_clause
 		{
 			fn schema() -> #krate::OpenapiSchema
@@ -208,7 +233,9 @@ fn expand_field(field: &Field) -> Result<TokenStream> {
 
 fn expand_struct(ident: Ident, generics: Generics, attrs: Vec<Attribute>, input: DataStruct) -> Result<TokenStream> {
 	let krate = super::krate();
-	let where_clause = expand_where(&generics);
+	let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+	let mut where_clause = where_clause.cloned();
+	update_generics(&generics, &mut where_clause);
 
 	let attrs = parse_attributes(&attrs)?;
 	let nullable = attrs.nullable;
@@ -229,7 +256,7 @@ fn expand_struct(ident: Ident, generics: Generics, attrs: Vec<Attribute>, input:
 	};
 
 	Ok(quote! {
-		impl #generics #krate::OpenapiType for #ident #generics
+		impl #impl_generics #krate::OpenapiType for #ident #ty_generics
 		#where_clause
 		{
 			fn schema() -> #krate::OpenapiSchema

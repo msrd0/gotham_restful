@@ -1,5 +1,0 @@
-error: Resource methods must not be unsafe
- --> $DIR/method_unsafe.rs:8:1
-  |
-8 | unsafe fn read_all()
-  | ^^^^^^

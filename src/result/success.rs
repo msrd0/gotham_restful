@@ -34,8 +34,8 @@ struct MyResponse {
 	message: &'static str
 }
 
-#[read_all(MyResource)]
-fn read_all(_state: &mut State) -> Success<MyResponse> {
+#[read_all]
+fn read_all() -> Success<MyResponse> {
 	let res = MyResponse { message: "I'm always happy" };
 	res.into()
 }

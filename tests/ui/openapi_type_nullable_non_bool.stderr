@@ -1,5 +1,0 @@
-error: Expected bool
- --> $DIR/openapi_type_nullable_non_bool.rs:6:23
-  |
-6 |     #[openapi(nullable = "yes, please")]
-  |                          ^^^^^^^^^^^^^

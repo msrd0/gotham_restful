@@ -21,8 +21,8 @@ the function attributes:
 # #[resource(read_all)]
 # struct MyResource;
 #
-#[read_all(MyResource)]
-fn read_all(_state: &mut State) {
+#[read_all]
+fn read_all() {
 	// do something
 }
 # }

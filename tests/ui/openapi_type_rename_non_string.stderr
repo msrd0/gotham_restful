@@ -1,5 +1,0 @@
-error: Expected string literal
- --> $DIR/openapi_type_rename_non_string.rs:6:21
-  |
-6 |     #[openapi(rename = 42)]
-  |                        ^^

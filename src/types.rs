@@ -4,7 +4,7 @@ use crate::OpenapiType;
 use gotham::hyper::body::Bytes;
 use mime::{Mime, APPLICATION_JSON};
 use serde::{de::DeserializeOwned, Serialize};
-use std::{error::Error, panic::RefUnwindSafe};
+use std::error::Error;
 
 #[cfg(not(feature = "openapi"))]
 pub trait ResourceType {}
@@ -98,12 +98,3 @@ impl<T: ResourceType + DeserializeOwned> RequestBody for T {
 		Some(vec![APPLICATION_JSON])
 	}
 }
-
-/// A type than can be used as a parameter to a resource method. Implemented for every type
-/// that is deserialize and thread-safe. If the `openapi` feature is used, it must also be of
-/// type [OpenapiType].
-///
-///  [OpenapiType]: trait.OpenapiType.html
-pub trait ResourceID: ResourceType + DeserializeOwned + Clone + RefUnwindSafe + Send + Sync {}
-
-impl<T: ResourceType + DeserializeOwned + Clone + RefUnwindSafe + Send + Sync> ResourceID for T {}

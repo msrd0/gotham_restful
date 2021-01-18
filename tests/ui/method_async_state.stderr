@@ -1,5 +1,0 @@
-error: async fn must not take &State as an argument as State is not Sync, consider taking &mut State
- --> $DIR/method_async_state.rs:9:19
-  |
-9 | async fn read_all(state : &State)
-  |                   ^^^^^

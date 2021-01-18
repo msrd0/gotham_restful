@@ -136,7 +136,7 @@ struct AuthData {
 	exp: u64
 }
 
-#[read_all(AuthResource)]
+#[read_all]
 fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
 	format!("{:?}", auth).into()
 }

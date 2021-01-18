@@ -246,7 +246,7 @@ where
 	fn cors(&mut self, path: &str, method: Method);
 }
 
-fn cors_preflight_handler(state: State) -> (State, Response<Body>) {
+pub(crate) fn cors_preflight_handler(state: State) -> (State, Response<Body>) {
 	let config = CorsConfig::try_borrow_from(&state);
 
 	// prepare the response

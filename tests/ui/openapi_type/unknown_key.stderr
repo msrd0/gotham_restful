@@ -1,0 +1,5 @@
+error: Unknown key
+ --> $DIR/unknown_key.rs:6:12
+  |
+6 |     #[openapi(like = "pizza")]
+  |               ^^^^

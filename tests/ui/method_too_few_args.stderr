@@ -1,5 +1,0 @@
-error: Too few arguments
- --> $DIR/method_too_few_args.rs:8:4
-  |
-8 | fn read()
-  |    ^^^^

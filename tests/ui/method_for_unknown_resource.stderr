@@ -1,5 +1,0 @@
-error[E0412]: cannot find type `UnknownResource` in this scope
- --> $DIR/method_for_unknown_resource.rs:3:12
-  |
-3 | #[read_all(UnknownResource)]
-  |            ^^^^^^^^^^^^^^^ not found in this scope

@@ -1,5 +1,5 @@
 use super::SECURITY_NAME;
-use crate::{resource::*, result::*, OpenapiSchema, RequestBody};
+use crate::{result::*, EndpointWithSchema, OpenapiSchema, RequestBody};
 use indexmap::IndexMap;
 use mime::Mime;
 use openapiv3::{
@@ -8,31 +8,40 @@ use openapiv3::{
 };
 
 #[derive(Default)]
-struct OperationParams<'a> {
-	path_params: Vec<(&'a str, ReferenceOr<Schema>)>,
+struct OperationParams {
+	path_params: Option<OpenapiSchema>,
 	query_params: Option<OpenapiSchema>
 }
 
-impl<'a> OperationParams<'a> {
-	fn add_path_params(&self, params: &mut Vec<ReferenceOr<Parameter>>) {
-		for param in &self.path_params {
+impl OperationParams {
+	fn add_path_params(path_params: Option<OpenapiSchema>, params: &mut Vec<ReferenceOr<Parameter>>) {
+		let path_params = match path_params {
+			Some(pp) => pp.schema,
+			None => return
+		};
+		let path_params = match path_params {
+			SchemaKind::Type(Type::Object(ty)) => ty,
+			_ => panic!("Path Parameters needs to be a plain struct")
+		};
+		for (name, schema) in path_params.properties {
+			let required = path_params.required.contains(&name);
 			params.push(Item(Parameter::Path {
 				parameter_data: ParameterData {
-					name: (*param).0.to_string(),
+					name,
 					description: None,
-					required: true,
+					required,
 					deprecated: None,
-					format: ParameterSchemaOrContent::Schema((*param).1.clone()),
+					format: ParameterSchemaOrContent::Schema(schema.unbox()),
 					example: None,
 					examples: IndexMap::new()
 				},
 				style: Default::default()
-			}));
+			}))
 		}
 	}
 
-	fn add_query_params(self, params: &mut Vec<ReferenceOr<Parameter>>) {
-		let query_params = match self.query_params {
+	fn add_query_params(query_params: Option<OpenapiSchema>, params: &mut Vec<ReferenceOr<Parameter>>) {
+		let query_params = match query_params {
 			Some(qp) => qp.schema,
 			None => return
 		};
@@ -61,51 +70,48 @@ impl<'a> OperationParams<'a> {
 
 	fn into_params(self) -> Vec<ReferenceOr<Parameter>> {
 		let mut params: Vec<ReferenceOr<Parameter>> = Vec::new();
-		self.add_path_params(&mut params);
-		self.add_query_params(&mut params);
+		Self::add_path_params(self.path_params, &mut params);
+		Self::add_query_params(self.query_params, &mut params);
 		params
 	}
 }
 
-pub struct OperationDescription<'a> {
+pub struct OperationDescription {
 	operation_id: Option<String>,
 	default_status: crate::StatusCode,
 	accepted_types: Option<Vec<Mime>>,
 	schema: ReferenceOr<Schema>,
-	params: OperationParams<'a>,
+	params: OperationParams,
 	body_schema: Option<ReferenceOr<Schema>>,
 	supported_types: Option<Vec<Mime>>,
 	requires_auth: bool
 }
 
-impl<'a> OperationDescription<'a> {
-	pub fn new<Handler: ResourceMethod>(schema: ReferenceOr<Schema>) -> Self {
+impl OperationDescription {
+	pub fn new<E: EndpointWithSchema>(schema: ReferenceOr<Schema>) -> Self {
 		Self {
-			operation_id: Handler::operation_id(),
-			default_status: Handler::Res::default_status(),
-			accepted_types: Handler::Res::accepted_types(),
+			operation_id: E::operation_id(),
+			default_status: E::Output::default_status(),
+			accepted_types: E::Output::accepted_types(),
 			schema,
 			params: Default::default(),
 			body_schema: None,
 			supported_types: None,
-			requires_auth: Handler::wants_auth()
+			requires_auth: E::wants_auth()
 		}
 	}
 
-	pub fn add_path_param(mut self, name: &'a str, schema: ReferenceOr<Schema>) -> Self {
-		self.params.path_params.push((name, schema));
-		self
+	pub fn set_path_params(&mut self, params: OpenapiSchema) {
+		self.params.path_params = Some(params);
 	}
 
-	pub fn with_query_params(mut self, params: OpenapiSchema) -> Self {
+	pub fn set_query_params(&mut self, params: OpenapiSchema) {
 		self.params.query_params = Some(params);
-		self
 	}
 
-	pub fn with_body<Body: RequestBody>(mut self, schema: ReferenceOr<Schema>) -> Self {
+	pub fn set_body<Body: RequestBody>(&mut self, schema: ReferenceOr<Schema>) {
 		self.body_schema = Some(schema);
 		self.supported_types = Body::supported_types();
-		self
 	}
 
 	fn schema_to_content(types: Vec<Mime>, schema: ReferenceOr<Schema>) -> IndexMap<String, MediaType> {

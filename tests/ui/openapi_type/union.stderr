@@ -1,0 +1,5 @@
+error: #[derive(OpenapiType)] only works for structs and enums
+ --> $DIR/union.rs:5:1
+  |
+5 | union IntOrPointer {
+  | ^^^^^
