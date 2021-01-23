@@ -69,10 +69,16 @@ impl<E> From<AuthError> for AuthErrorOrOther<E> {
 	}
 }
 
+mod private {
+	use gotham::anyhow;
+	pub trait Sealed {}
+	impl<E: Into<anyhow::Error>> Sealed for E {}
+}
+
 impl<E, F> From<F> for AuthErrorOrOther<E>
 where
 	// TODO https://gitlab.com/msrd0/gotham-restful/-/issues/20
-	F: std::error::Error + Into<E>
+	F: private::Sealed + Into<E>
 {
 	fn from(err: F) -> Self {
 		Self::Other(err.into())
