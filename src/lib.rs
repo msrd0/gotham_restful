@@ -481,7 +481,7 @@ pub use response::Response;
 
 mod result;
 pub use result::{
-	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponseError, NoContent, Raw,
+	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponseError, NoContent, Raw, Redirect,
 	ResourceResult, Success
 };
 
