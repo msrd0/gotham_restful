@@ -1,11 +1,17 @@
-#!/bin/bash
+#!/bin/busybox ash
 set -euo pipefail
 
 rustfmt=${RUSTFMT:-rustfmt}
 version="$($rustfmt -V)"
-if [[ $version != *nightly* ]]; then
-	rustfmt="$rustfmt +nightly"
-fi
+case "$version" in
+	*nightly*)
+		# all good, no additional flags required
+		;;
+	*)
+		# assume we're using some sort of rustup setup
+		rustfmt="$rustfmt +nightly"
+		;;
+esac
 
 return=0
 find "$(dirname "$0")" -name '*.rs' -type f | while read file; do
