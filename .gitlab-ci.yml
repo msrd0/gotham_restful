@@ -81,7 +81,7 @@ readme:
 
 rustfmt:
   stage: test
-  image: rustlang/rust:nightly-slim
+  image: iamsauravsharma/rust-fmt:nightly-alpine
   before_script:
     - cargo -V
     - cargo fmt --version
