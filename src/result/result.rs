@@ -9,7 +9,7 @@ use mime::{Mime, APPLICATION_JSON};
 use std::{error::Error, fmt::Display, pin::Pin};
 
 pub trait IntoResponseError {
-	type Err: Error + Send + 'static;
+	type Err: Display + Send + 'static;
 
 	fn into_response_error(self) -> Result<Response, Self::Err>;
 }

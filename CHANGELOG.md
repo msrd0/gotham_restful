@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Support custom HTTP response headers
  - New `endpoint` router extension with associated `Endpoint` trait ([!18])
  - Support for custom endpoints using the `#[endpoint]` macro ([!19])
+ - Support for `anyhow::Error` (or any type implementing `Into<HandlerError>`) in most responses
 
 ### Changed
  - The cors handler can now copy headers from the request if desired

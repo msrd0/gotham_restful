@@ -1,7 +1,7 @@
-use super::{handle_error, NoContent, ResourceResult};
-#[cfg(feature = "openapi")]
-use crate::OpenapiSchema;
+use super::{handle_error, ResourceResult};
 use crate::{IntoResponseError, Response};
+#[cfg(feature = "openapi")]
+use crate::{NoContent, OpenapiSchema};
 use futures_util::future::{BoxFuture, FutureExt, TryFutureExt};
 use gotham::hyper::{
 	header::{InvalidHeaderValue, LOCATION},
@@ -78,7 +78,7 @@ pub enum RedirectError<E: StdError + 'static> {
 impl<E> ResourceResult for Result<Redirect, E>
 where
 	E: Display + IntoResponseError,
-	<E as IntoResponseError>::Err: Sync
+	<E as IntoResponseError>::Err: StdError + Sync
 {
 	type Err = RedirectError<<E as IntoResponseError>::Err>;
 

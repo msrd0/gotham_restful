@@ -3,12 +3,12 @@ use crate::OpenapiSchema;
 use crate::Response;
 
 use futures_util::future::FutureExt;
+use gotham::handler::HandlerError;
 #[cfg(feature = "openapi")]
 use gotham::hyper::StatusCode;
 use mime::{Mime, STAR_STAR};
 use serde::Serialize;
 use std::{
-	error::Error,
 	fmt::{Debug, Display},
 	future::Future,
 	pin::Pin
@@ -45,7 +45,7 @@ impl OrAllTypes for Option<Vec<Mime>> {
 
 /// A trait provided to convert a resource's result to json.
 pub trait ResourceResult {
-	type Err: Error + Send + Sync + 'static;
+	type Err: Into<HandlerError> + Send + Sync + 'static;
 
 	/// Turn this into a response that can be returned to the browser. This api will likely
 	/// change in the future.

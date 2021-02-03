@@ -8,6 +8,8 @@ use crate::{
 	Endpoint, FromBody, Resource, Response
 };
 
+#[cfg(feature = "cors")]
+use gotham::router::route::matcher::AccessControlRequestMethodMatcher;
 use gotham::{
 	handler::HandlerError,
 	helpers::http::response::{create_empty_response, create_response},
@@ -16,9 +18,7 @@ use gotham::{
 	router::{
 		builder::{DefineSingleRoute, DrawRoutes, RouterBuilder, ScopeBuilder},
 		non_match::RouteNonMatch,
-		route::matcher::{
-			AcceptHeaderRouteMatcher, AccessControlRequestMethodMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher
-		}
+		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher}
 	},
 	state::{FromState, State}
 };
@@ -87,7 +87,11 @@ fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> 
 	r
 }
 
-async fn endpoint_handler<E: Endpoint>(state: &mut State) -> Result<gotham::hyper::Response<Body>, HandlerError> {
+async fn endpoint_handler<E: Endpoint>(state: &mut State) -> Result<gotham::hyper::Response<Body>, HandlerError>
+where
+	E: Endpoint,
+	<E::Output as ResourceResult>::Err: Into<HandlerError>
+{
 	trace!("entering endpoint_handler");
 	let placeholders = E::Placeholders::take_from(state);
 	let params = E::Params::take_from(state);
@@ -120,7 +124,7 @@ async fn endpoint_handler<E: Endpoint>(state: &mut State) -> Result<gotham::hype
 	};
 
 	let out = E::handle(state, placeholders, params, body).await;
-	let res = out.into_response().await?;
+	let res = out.into_response().await.map_err(Into::into)?;
 	debug!("Returning response {:?}", res);
 	Ok(response_from(res, state))
 }

@@ -1,5 +1,5 @@
+#![cfg_attr(not(feature = "auth"), allow(unused_imports))]
 use super::SECURITY_NAME;
-
 use futures_util::{future, future::FutureExt};
 use gotham::{
 	anyhow,
@@ -67,7 +67,7 @@ fn get_security(state: &mut State) -> IndexMap<String, ReferenceOr<SecuritySchem
 }
 
 #[cfg(not(feature = "auth"))]
-fn get_security(state: &mut State) -> (Vec<SecurityRequirement>, IndexMap<String, ReferenceOr<SecurityScheme>>) {
+fn get_security(_state: &mut State) -> IndexMap<String, ReferenceOr<SecurityScheme>> {
 	Default::default()
 }
 

@@ -70,9 +70,9 @@ impl<E> From<AuthError> for AuthErrorOrOther<E> {
 }
 
 mod private {
-	use gotham::anyhow;
+	use gotham::handler::HandlerError;
 	pub trait Sealed {}
-	impl<E: Into<anyhow::Error>> Sealed for E {}
+	impl<E: Into<HandlerError>> Sealed for E {}
 }
 
 impl<E, F> From<F> for AuthErrorOrOther<E>
