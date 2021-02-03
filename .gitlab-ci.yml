@@ -10,20 +10,20 @@ variables:
 
 test-default:
   stage: test
-  image: rust:1.43-slim
+  image: rust:1.49-slim
   before_script:
     - cargo -V
   script:
     - cargo test
   cache:
-    key: cargo-1-43-default
+    key: cargo-1-49-default
     paths:
       - cargo/
       - target/
 
 test-full:
   stage: test
-  image: rust:1.43-slim
+  image: rust:1.49-slim
   before_script:
     - apt update -y
     - apt install -y --no-install-recommends libpq-dev
@@ -31,7 +31,7 @@ test-full:
   script:
     - cargo test --no-default-features --features full
   cache:
-    key: cargo-1-43-all
+    key: cargo-1-49-all
     paths:
       - cargo/
       - target/
@@ -67,7 +67,7 @@ test-trybuild-ui:
   script:
     - cargo test --no-default-features --features full --tests -- --ignored
   cache:
-    key: cargo-1-48-all
+    key: cargo-1-49-all
     paths:
       - cargo/
       - target/
