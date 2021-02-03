@@ -1,9 +1,11 @@
 use super::SECURITY_NAME;
+
 use futures_util::{future, future::FutureExt};
 use gotham::{
 	anyhow,
 	handler::{Handler, HandlerFuture, NewHandler},
 	helpers::http::response::create_response,
+	hyper::StatusCode,
 	state::State
 };
 use indexmap::IndexMap;
@@ -75,7 +77,7 @@ impl Handler for OpenapiHandler {
 			Ok(openapi) => openapi,
 			Err(e) => {
 				error!("Unable to acquire read lock for the OpenAPI specification: {}", e);
-				let res = create_response(&state, crate::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
+				let res = create_response(&state, StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
 				return future::ok((state, res)).boxed();
 			}
 		};
@@ -88,12 +90,12 @@ impl Handler for OpenapiHandler {
 
 		match serde_json::to_string(&openapi) {
 			Ok(body) => {
-				let res = create_response(&state, crate::StatusCode::OK, APPLICATION_JSON, body);
+				let res = create_response(&state, StatusCode::OK, APPLICATION_JSON, body);
 				future::ok((state, res)).boxed()
 			},
 			Err(e) => {
 				error!("Unable to handle OpenAPI request due to error: {}", e);
-				let res = create_response(&state, crate::StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
+				let res = create_response(&state, StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
 				future::ok((state, res)).boxed()
 			}
 		}

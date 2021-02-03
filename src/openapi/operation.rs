@@ -78,7 +78,7 @@ impl OperationParams {
 
 pub struct OperationDescription {
 	operation_id: Option<String>,
-	default_status: crate::StatusCode,
+	default_status: gotham::hyper::StatusCode,
 	accepted_types: Option<Vec<Mime>>,
 	schema: ReferenceOr<Schema>,
 	params: OperationParams,

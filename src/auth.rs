@@ -1,4 +1,5 @@
-use crate::{AuthError, Forbidden, HeaderName};
+use crate::{AuthError, Forbidden};
+
 use cookie::CookieJar;
 use futures_util::{
 	future,
@@ -7,7 +8,7 @@ use futures_util::{
 use gotham::{
 	anyhow,
 	handler::HandlerFuture,
-	hyper::header::{HeaderMap, AUTHORIZATION},
+	hyper::header::{HeaderMap, HeaderName, AUTHORIZATION},
 	middleware::{cookie::CookieParser, Middleware, NewMiddleware},
 	state::{FromState, State}
 };
@@ -15,6 +16,7 @@ use jsonwebtoken::{errors::ErrorKind, DecodingKey};
 use serde::de::DeserializeOwned;
 use std::{marker::PhantomData, panic::RefUnwindSafe, pin::Pin};
 
+#[doc(no_inline)]
 pub use jsonwebtoken::Validation as AuthValidation;
 
 /// The authentication status returned by the auth middleware for each request.
@@ -77,7 +79,7 @@ This trait will help the auth middleware to determine the validity of an authent
 A very basic implementation could look like this:
 
 ```
-# use gotham_restful::{AuthHandler, State};
+# use gotham_restful::{AuthHandler, gotham::state::State};
 #
 const SECRET : &'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
 

@@ -5,13 +5,13 @@ use crate::openapi::{
 };
 use crate::{
 	result::{ResourceError, ResourceResult},
-	Endpoint, FromBody, Resource, Response, StatusCode
+	Endpoint, FromBody, Resource, Response
 };
 
 use gotham::{
 	handler::HandlerError,
 	helpers::http::response::{create_empty_response, create_response},
-	hyper::{body::to_bytes, header::CONTENT_TYPE, Body, HeaderMap, Method},
+	hyper::{body::to_bytes, header::CONTENT_TYPE, Body, HeaderMap, Method, StatusCode},
 	pipeline::chain::PipelineHandleChain,
 	router::{
 		builder::{DefineSingleRoute, DrawRoutes, RouterBuilder, ScopeBuilder},

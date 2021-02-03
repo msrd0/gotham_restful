@@ -148,7 +148,7 @@ fn expand_enum(ident: Ident, generics: Generics, attrs: Vec<Attribute>, input: D
 		{
 			fn schema() -> #krate::OpenapiSchema
 			{
-				use #krate::{export::openapi::*, OpenapiSchema};
+				use #krate::{private::openapi::*, OpenapiSchema};
 
 				let mut enumeration : Vec<String> = Vec::new();
 
@@ -261,7 +261,7 @@ fn expand_struct(ident: Ident, generics: Generics, attrs: Vec<Attribute>, input:
 		{
 			fn schema() -> #krate::OpenapiSchema
 			{
-				use #krate::{export::{openapi::*, IndexMap}, OpenapiSchema};
+				use #krate::{private::{openapi::*, IndexMap}, OpenapiSchema};
 
 				let mut properties : IndexMap<String, ReferenceOr<Box<Schema>>> = IndexMap::new();
 				let mut required : Vec<String> = Vec::new();

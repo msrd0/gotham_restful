@@ -1,7 +1,10 @@
 #[cfg(feature = "openapi")]
 use crate::OpenapiSchema;
 use crate::Response;
+
 use futures_util::future::FutureExt;
+#[cfg(feature = "openapi")]
+use gotham::hyper::StatusCode;
 use mime::{Mime, STAR_STAR};
 use serde::Serialize;
 use std::{
@@ -57,8 +60,8 @@ pub trait ResourceResult {
 	fn schema() -> OpenapiSchema;
 
 	#[cfg(feature = "openapi")]
-	fn default_status() -> crate::StatusCode {
-		crate::StatusCode::OK
+	fn default_status() -> StatusCode {
+		StatusCode::OK
 	}
 }
 
@@ -141,7 +144,7 @@ where
 	}
 
 	#[cfg(feature = "openapi")]
-	fn default_status() -> crate::StatusCode {
+	fn default_status() -> StatusCode {
 		Res::default_status()
 	}
 }

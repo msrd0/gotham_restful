@@ -4,6 +4,7 @@ extern crate gotham_derive;
 use gotham::{
 	hyper::{HeaderMap, Method},
 	router::builder::*,
+	state::State,
 	test::TestServer
 };
 use gotham_restful::*;

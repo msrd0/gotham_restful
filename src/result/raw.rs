@@ -1,10 +1,14 @@
 use super::{handle_error, IntoResponseError, ResourceResult};
 #[cfg(feature = "openapi")]
 use crate::OpenapiSchema;
-use crate::{FromBody, RequestBody, ResourceType, Response, StatusCode};
+use crate::{FromBody, RequestBody, ResourceType, Response};
+
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
-use gotham::hyper::body::{Body, Bytes};
+use gotham::hyper::{
+	body::{Body, Bytes},
+	StatusCode
+};
 use mime::Mime;
 #[cfg(feature = "openapi")]
 use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};

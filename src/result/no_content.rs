@@ -2,7 +2,10 @@ use super::{handle_error, ResourceResult};
 use crate::{IntoResponseError, Response};
 #[cfg(feature = "openapi")]
 use crate::{OpenapiSchema, OpenapiType};
+
 use futures_util::{future, future::FutureExt};
+#[cfg(feature = "openapi")]
+use gotham::hyper::StatusCode;
 use mime::Mime;
 use std::{fmt::Display, future::Future, pin::Pin};
 
@@ -58,8 +61,8 @@ impl ResourceResult for NoContent {
 
 	/// This will always be a _204 No Content_
 	#[cfg(feature = "openapi")]
-	fn default_status() -> crate::StatusCode {
-		crate::StatusCode::NO_CONTENT
+	fn default_status() -> StatusCode {
+		StatusCode::NO_CONTENT
 	}
 }
 
@@ -86,7 +89,7 @@ where
 	}
 
 	#[cfg(feature = "openapi")]
-	fn default_status() -> crate::StatusCode {
+	fn default_status() -> StatusCode {
 		NoContent::default_status()
 	}
 }

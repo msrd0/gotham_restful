@@ -32,7 +32,7 @@ fn impl_openapi_type(ident: &Ident, generics: &Generics) -> TokenStream {
 		{
 			fn schema() -> #krate::OpenapiSchema
 			{
-				use #krate::{export::openapi::*, OpenapiSchema};
+				use #krate::{private::openapi::*, OpenapiSchema};
 
 				OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
 					format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),

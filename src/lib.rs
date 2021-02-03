@@ -1,8 +1,10 @@
 #![warn(missing_debug_implementations, rust_2018_idioms)]
-#![deny(broken_intra_doc_links)]
 #![forbid(unsafe_code)]
 // can we have a lint for spaces in doc comments please?
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::tabs_in_doc_comments))]
+// intra-doc links only fully work when OpenAPI is enabled
+#![cfg_attr(feature = "openapi", deny(broken_intra_doc_links))]
+#![cfg_attr(not(feature = "openapi"), allow(broken_intra_doc_links))]
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
@@ -402,6 +404,7 @@ examples is highly appreciated.
  [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
  [gotham]: https://gotham.rs/
  [serde_json]: https://github.com/serde-rs/json#serde-json----
+ [`State`]: gotham::state::State
 */
 
 #[cfg(all(feature = "openapi", feature = "without-openapi"))]
@@ -425,18 +428,13 @@ extern crate serde;
 #[doc(no_inline)]
 pub use gotham;
 #[doc(no_inline)]
-pub use gotham::{
-	hyper::{header::HeaderName, StatusCode},
-	state::{FromState, State}
-};
-#[doc(no_inline)]
 pub use mime::Mime;
 
 pub use gotham_restful_derive::*;
 
 /// Not public API
 #[doc(hidden)]
-pub mod export {
+pub mod private {
 	pub use crate::routing::PathExtractor as IdPlaceholder;
 
 	pub use futures_util::future::{BoxFuture, FutureExt};

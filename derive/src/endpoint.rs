@@ -130,7 +130,7 @@ impl EndpointType {
 			Self::ReadAll | Self::Search | Self::Create | Self::UpdateAll | Self::DeleteAll => {
 				quote!(::gotham_restful::gotham::extractor::NoopPathExtractor)
 			},
-			Self::Read | Self::Update | Self::Delete => quote!(::gotham_restful::export::IdPlaceholder::<#arg_ty>),
+			Self::Read | Self::Update | Self::Delete => quote!(::gotham_restful::private::IdPlaceholder::<#arg_ty>),
 			Self::Custom { .. } => {
 				if self.has_placeholders().value {
 					arg_ty.to_token_stream()
@@ -490,7 +490,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 			let conn_ty = arg.ty.quote_ty();
 			state_block = quote! {
 				#state_block
-				let repo = <::gotham_restful::export::Repo<#conn_ty>>::borrow_from(state).clone();
+				let repo = <::gotham_restful::private::Repo<#conn_ty>>::borrow_from(state).clone();
 			};
 			handle_content = quote! {
 				repo.run::<_, _, ()>(move |conn| {
@@ -500,7 +500,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		}
 
 		Ok(quote! {
-			use ::gotham_restful::export::FutureExt as _;
+			use ::gotham_restful::private::FutureExt as _;
 			use ::gotham_restful::gotham::state::FromState as _;
 			#state_block
 			async move {
@@ -559,7 +559,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					placeholders: Self::Placeholders,
 					params: Self::Params,
 					body: ::std::option::Option<Self::Body>
-				) -> ::gotham_restful::export::BoxFuture<'a, Self::Output> {
+				) -> ::gotham_restful::private::BoxFuture<'a, Self::Output> {
 					#handle_content
 				}
 

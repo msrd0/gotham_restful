@@ -316,7 +316,7 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		impl #generics #krate::IntoResponseError for #ident #generics
 		where #( #were ),*
 		{
-			type Err = #krate::export::serde_json::Error;
+			type Err = #krate::private::serde_json::Error;
 
 			fn into_response_error(self) -> Result<#krate::Response, Self::Err>
 			{

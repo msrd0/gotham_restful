@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate gotham_restful;
-use gotham_restful::State;
+use gotham::state::State;
 
 #[derive(Resource)]
 #[resource(read_all)]

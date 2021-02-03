@@ -1,8 +1,10 @@
 use super::{handle_error, into_response_helper, ResourceResult};
 #[cfg(feature = "openapi")]
 use crate::OpenapiSchema;
-use crate::{result::ResourceError, Response, ResponseBody, StatusCode};
+use crate::{result::ResourceError, Response, ResponseBody};
+
 use futures_core::future::Future;
+use gotham::hyper::StatusCode;
 use mime::{Mime, APPLICATION_JSON};
 use std::{error::Error, fmt::Display, pin::Pin};
 

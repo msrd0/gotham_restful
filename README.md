@@ -352,6 +352,7 @@ examples is highly appreciated.
  [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
  [gotham]: https://gotham.rs/
  [serde_json]: https://github.com/serde-rs/json#serde-json----
+ [`State`]: gotham::state::State
 
 ## Versioning
 
