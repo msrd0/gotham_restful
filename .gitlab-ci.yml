@@ -59,7 +59,7 @@ test-tarpaulin:
 
 test-trybuild-ui:
   stage: test
-  image: rust:1.49-slim
+  image: rust:1.50-slim
   before_script:
     - apt update -y
     - apt install -y --no-install-recommends libpq-dev
@@ -67,7 +67,7 @@ test-trybuild-ui:
   script:
     - cargo test --no-default-features --features full --tests -- --ignored
   cache:
-    key: cargo-1-49-all
+    key: cargo-1-50-all
     paths:
       - cargo/
       - target/
@@ -81,8 +81,13 @@ readme:
 
 rustfmt:
   stage: test
-  image: iamsauravsharma/rust-fmt:nightly-alpine
+  image:
+    name: alpine:3.13
   before_script:
+    - apk add rustup
+    - rustup-init -qy --default-host x86_64-unknown-linux-musl --default-toolchain none </dev/null
+    - source $CARGO_HOME/env
+    - rustup toolchain install nightly --profile minimal --component rustfmt
     - cargo -V
     - cargo fmt --version
   script:
