@@ -74,9 +74,11 @@ test-trybuild-ui:
 
 readme:
   stage: test
-  image: msrd0/cargo-readme
+  image: ghcr.io/msrd0/cargo-readme
+  before_script:
+    - cargo readme -V
   script:
-    - cargo readme -t README.tpl >README.md.new
+    - cargo readme -t README.tpl -o README.md.new
     - diff README.md README.md.new
 
 rustfmt:
