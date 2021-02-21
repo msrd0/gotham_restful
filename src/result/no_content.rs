@@ -1,7 +1,7 @@
 use super::{handle_error, ResourceResult};
 use crate::{IntoResponseError, Response};
 #[cfg(feature = "openapi")]
-use crate::{OpenapiSchema, OpenapiType};
+use crate::{OpenapiSchema, OpenapiType, ResourceResultSchema};
 
 use futures_util::{future, future::FutureExt};
 #[cfg(feature = "openapi")]
@@ -52,15 +52,16 @@ impl ResourceResult for NoContent {
 	fn accepted_types() -> Option<Vec<Mime>> {
 		Some(Vec::new())
 	}
+}
 
+#[cfg(feature = "openapi")]
+impl ResourceResultSchema for NoContent {
 	/// Returns the schema of the `()` type.
-	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema {
 		<()>::schema()
 	}
 
 	/// This will always be a _204 No Content_
-	#[cfg(feature = "openapi")]
 	fn default_status() -> StatusCode {
 		StatusCode::NO_CONTENT
 	}
@@ -82,10 +83,15 @@ where
 	fn accepted_types() -> Option<Vec<Mime>> {
 		NoContent::accepted_types()
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<E> ResourceResultSchema for Result<NoContent, E>
+where
+	E: Display + IntoResponseError<Err = serde_json::Error>
+{
 	fn schema() -> OpenapiSchema {
-		<NoContent as ResourceResult>::schema()
+		<NoContent as ResourceResultSchema>::schema()
 	}
 
 	#[cfg(feature = "openapi")]

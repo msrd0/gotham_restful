@@ -1,7 +1,7 @@
 use super::{handle_error, ResourceResult};
 use crate::{IntoResponseError, Response};
 #[cfg(feature = "openapi")]
-use crate::{NoContent, OpenapiSchema};
+use crate::{NoContent, OpenapiSchema, ResourceResultSchema};
 use futures_util::future::{BoxFuture, FutureExt, TryFutureExt};
 use gotham::hyper::{
 	header::{InvalidHeaderValue, LOCATION},
@@ -53,15 +53,16 @@ impl ResourceResult for Redirect {
 		}
 		.boxed()
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl ResourceResultSchema for Redirect {
 	fn default_status() -> StatusCode {
 		StatusCode::SEE_OTHER
 	}
 
-	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema {
-		<NoContent as ResourceResult>::schema()
+		<NoContent as ResourceResultSchema>::schema()
 	}
 }
 
@@ -88,15 +89,20 @@ where
 			Err(e) => handle_error(e).map_err(|e| RedirectError::Other(e)).boxed()
 		}
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<E> ResourceResultSchema for Result<Redirect, E>
+where
+	E: Display + IntoResponseError,
+	<E as IntoResponseError>::Err: StdError + Sync
+{
 	fn default_status() -> StatusCode {
 		Redirect::default_status()
 	}
 
-	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema {
-		<Redirect as ResourceResult>::schema()
+		<Redirect as ResourceResultSchema>::schema()
 	}
 }
 

@@ -1,7 +1,7 @@
 use super::{handle_error, IntoResponseError, ResourceResult};
 use crate::{FromBody, RequestBody, ResourceType, Response};
 #[cfg(feature = "openapi")]
-use crate::{OpenapiSchema, OpenapiType};
+use crate::{OpenapiSchema, OpenapiType, ResourceResultSchema};
 
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
@@ -108,8 +108,13 @@ where
 	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, SerdeJsonError>> + Send>> {
 		future::ok(Response::new(StatusCode::OK, self.raw, Some(self.mime))).boxed()
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<T: Into<Body>> ResourceResultSchema for Raw<T>
+where
+	Self: Send
+{
 	fn schema() -> OpenapiSchema {
 		<Self as OpenapiType>::schema()
 	}
@@ -128,10 +133,16 @@ where
 			Err(e) => handle_error(e)
 		}
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<T, E> ResourceResultSchema for Result<Raw<T>, E>
+where
+	Raw<T>: ResourceResult + ResourceResultSchema,
+	E: Display + IntoResponseError<Err = <Raw<T> as ResourceResult>::Err>
+{
 	fn schema() -> OpenapiSchema {
-		<Raw<T> as ResourceResult>::schema()
+		<Raw<T> as ResourceResultSchema>::schema()
 	}
 }
 

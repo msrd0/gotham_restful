@@ -1,7 +1,7 @@
 use super::{handle_error, into_response_helper, ResourceResult};
-#[cfg(feature = "openapi")]
-use crate::OpenapiSchema;
 use crate::{result::ResourceError, Response, ResponseBody};
+#[cfg(feature = "openapi")]
+use crate::{OpenapiSchema, ResourceResultSchema};
 
 use futures_core::future::Future;
 use gotham::hyper::StatusCode;
@@ -43,8 +43,14 @@ where
 	fn accepted_types() -> Option<Vec<Mime>> {
 		Some(vec![APPLICATION_JSON])
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<R, E> ResourceResultSchema for Result<R, E>
+where
+	R: ResponseBody,
+	E: Display + IntoResponseError<Err = serde_json::Error>
+{
 	fn schema() -> OpenapiSchema {
 		R::schema()
 	}

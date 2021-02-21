@@ -482,6 +482,8 @@ pub use result::{
 	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponseError, NoContent, Raw, Redirect,
 	ResourceResult, Success
 };
+#[cfg(feature = "openapi")]
+pub use result::{ResourceResultSchema, ResourceResultWithSchema};
 
 mod routing;
 pub use routing::{DrawResourceRoutes, DrawResources};

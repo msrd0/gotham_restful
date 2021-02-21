@@ -16,6 +16,7 @@ pub trait Endpoint {
 	fn uri() -> Cow<'static, str>;
 
 	/// The output type that provides the response.
+	#[openapi_bound("Output: crate::ResourceResultSchema")]
 	type Output: ResourceResult + Send;
 
 	/// Returns `true` _iff_ the URI contains placeholders. `false` by default.

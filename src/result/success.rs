@@ -1,6 +1,6 @@
 use super::{into_response_helper, ResourceResult};
 #[cfg(feature = "openapi")]
-use crate::OpenapiSchema;
+use crate::{OpenapiSchema, ResourceResultSchema};
 use crate::{Response, ResponseBody};
 use gotham::hyper::StatusCode;
 use mime::{Mime, APPLICATION_JSON};
@@ -104,8 +104,13 @@ where
 	fn accepted_types() -> Option<Vec<Mime>> {
 		Some(vec![APPLICATION_JSON])
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<T: ResponseBody> ResourceResultSchema for Success<T>
+where
+	Self: Send
+{
 	fn schema() -> OpenapiSchema {
 		T::schema()
 	}

@@ -2,7 +2,7 @@
 use crate::OpenapiSchema;
 use crate::Response;
 
-use futures_util::future::FutureExt;
+use futures_util::future::{BoxFuture, FutureExt};
 use gotham::handler::HandlerError;
 #[cfg(feature = "openapi")]
 use gotham::hyper::StatusCode;
@@ -49,21 +49,40 @@ pub trait ResourceResult {
 
 	/// Turn this into a response that can be returned to the browser. This api will likely
 	/// change in the future.
-	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, Self::Err>> + Send>>;
+	fn into_response(self) -> BoxFuture<'static, Result<Response, Self::Err>>;
 
 	/// Return a list of supported mime types.
 	fn accepted_types() -> Option<Vec<Mime>> {
 		None
 	}
+}
 
-	#[cfg(feature = "openapi")]
+/// Additional details for [ResourceResult] to be used with an OpenAPI-aware router.
+#[cfg(feature = "openapi")]
+pub trait ResourceResultSchema {
 	fn schema() -> OpenapiSchema;
 
-	#[cfg(feature = "openapi")]
 	fn default_status() -> StatusCode {
 		StatusCode::OK
 	}
 }
+
+#[cfg(feature = "openapi")]
+mod private {
+	pub trait Sealed {}
+}
+
+/// A trait provided to convert a resource's result to json, and provide an OpenAPI schema to the
+/// router. This trait is implemented for all types that implement [ResourceResult] and
+/// [ResourceResultSchema].
+#[cfg(feature = "openapi")]
+pub trait ResourceResultWithSchema: ResourceResult + ResourceResultSchema + private::Sealed {}
+
+#[cfg(feature = "openapi")]
+impl<R: ResourceResult + ResourceResultSchema> private::Sealed for R {}
+
+#[cfg(feature = "openapi")]
+impl<R: ResourceResult + ResourceResultSchema> ResourceResultWithSchema for R {}
 
 /// The default json returned on an 500 Internal Server Error.
 #[derive(Debug, Serialize)]
@@ -130,8 +149,13 @@ where
 	fn accepted_types() -> Option<Vec<Mime>> {
 		Res::accepted_types()
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl<Res> ResourceResultSchema for Pin<Box<dyn Future<Output = Res> + Send>>
+where
+	Res: ResourceResultSchema
+{
 	fn schema() -> OpenapiSchema {
 		Res::schema()
 	}

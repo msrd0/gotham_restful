@@ -1,5 +1,5 @@
 use super::{builder::OpenapiBuilder, handler::OpenapiHandler, operation::OperationDescription};
-use crate::{routing::*, EndpointWithSchema, OpenapiType, ResourceResult, ResourceWithSchema};
+use crate::{routing::*, EndpointWithSchema, OpenapiType, ResourceResultSchema, ResourceWithSchema};
 use gotham::{hyper::Method, pipeline::chain::PipelineHandleChain, router::builder::*};
 use once_cell::sync::Lazy;
 use regex::{Captures, Regex};
