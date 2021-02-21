@@ -1,0 +1,10 @@
+error[E0277]: the trait bound `FooResponse: ResourceResult` is not satisfied
+  --> $DIR/invalid_return_type.rs:12:18
+   |
+12 | fn endpoint() -> FooResponse {
+   |                  ^^^^^^^^^^^ the trait `ResourceResult` is not implemented for `FooResponse`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Output: ResourceResult + Send;
+   |                  -------------- required by this bound in `gotham_restful::Endpoint::Output`

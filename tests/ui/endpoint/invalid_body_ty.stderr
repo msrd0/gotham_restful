@@ -1,0 +1,13 @@
+error[E0277]: the trait bound `for<'de> FooBody: serde::de::Deserialize<'de>` is not satisfied
+  --> $DIR/invalid_body_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooBody) {
+   |                ^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooBody`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Body: RequestBody + Send;
+   |                ----------- required by this bound in `gotham_restful::Endpoint::Body`
+   |
+   = note: required because of the requirements on the impl of `serde::de::DeserializeOwned` for `FooBody`
+   = note: required because of the requirements on the impl of `RequestBody` for `FooBody`

@@ -1,0 +1,32 @@
+error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<'de>` is not satisfied
+  --> $DIR/invalid_placeholders_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooPlaceholders) {
+   |                ^^^^^^^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooPlaceholders`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Placeholders: PathExtractor<Body> + Sync;
+   |                        ------------------- required by this bound in `gotham_restful::Endpoint::Placeholders`
+
+error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
+  --> $DIR/invalid_placeholders_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooPlaceholders) {
+   |                ^^^^^^^^^^^^^^^ the trait `StateData` is not implemented for `FooPlaceholders`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Placeholders: PathExtractor<Body> + Sync;
+   |                        ------------------- required by this bound in `gotham_restful::Endpoint::Placeholders`
+
+error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not satisfied
+  --> $DIR/invalid_placeholders_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooPlaceholders) {
+   |                ^^^^^^^^^^^^^^^ the trait `StaticResponseExtender` is not implemented for `FooPlaceholders`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Placeholders: PathExtractor<Body> + Sync;
+   |                        ------------------- required by this bound in `gotham_restful::Endpoint::Placeholders`

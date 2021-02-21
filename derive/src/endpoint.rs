@@ -2,7 +2,7 @@ use crate::util::{CollectToResult, ExpectLit, PathEndsWith};
 use once_cell::sync::Lazy;
 use paste::paste;
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::{format_ident, quote, ToTokens};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use regex::Regex;
 use std::str::FromStr;
 use syn::{
@@ -405,6 +405,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		ReturnType::Default => (quote!(::gotham_restful::NoContent), true),
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
+	let output_typedef = quote_spanned!(output_ty.span() => type Output = #output_ty;);
 
 	let arg_tys = args.iter().filter(|arg| arg.ty.is_method_arg()).collect::<Vec<_>>();
 	let mut arg_ty_idx = 0;
@@ -434,10 +435,13 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	})?;
 	let has_placeholders = ty.has_placeholders();
 	let placeholder_ty = ty.placeholders_ty(next_arg_ty(!has_placeholders.value)?);
+	let placeholder_typedef = quote_spanned!(placeholder_ty.span() => type Placeholders = #placeholder_ty;);
 	let needs_params = ty.needs_params();
 	let params_ty = ty.params_ty(next_arg_ty(!needs_params.value)?);
+	let params_typedef = quote_spanned!(params_ty.span() => type Params = #params_ty;);
 	let needs_body = ty.needs_body();
 	let body_ty = ty.body_ty(next_arg_ty(!needs_body.value)?);
+	let body_typedef = quote_spanned!(body_ty.span() => type Body = #body_ty;);
 
 	if arg_ty_idx < arg_tys.len() {
 		return Err(Error::new(fun_ident.span(), "Too many arguments"));
@@ -537,22 +541,22 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					{ #uri }.into()
 				}
 
-				type Output = #output_ty;
+				#output_typedef
 
 				fn has_placeholders() -> bool {
 					#has_placeholders
 				}
-				type Placeholders = #placeholder_ty;
+				#placeholder_typedef
 
 				fn needs_params() -> bool {
 					#needs_params
 				}
-				type Params = #params_ty;
+				#params_typedef
 
 				fn needs_body() -> bool {
 					#needs_body
 				}
-				type Body = #body_ty;
+				#body_typedef
 
 				fn handle<'a>(
 					state: &'a mut ::gotham_restful::gotham::state::State,
