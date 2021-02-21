@@ -184,12 +184,11 @@ impl OperationDescription {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use crate::{OpenapiType, ResourceResult};
 
 	#[test]
 	fn no_content_schema_to_content() {
 		let types = NoContent::accepted_types();
-		let schema = <NoContent as OpenapiType>::schema();
+		let schema = <NoContent as ResourceResult>::schema();
 		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
 		assert!(content.is_empty());
 	}
@@ -197,7 +196,7 @@ mod test {
 	#[test]
 	fn raw_schema_to_content() {
 		let types = Raw::<&str>::accepted_types();
-		let schema = <Raw<&str> as OpenapiType>::schema();
+		let schema = <Raw<&str> as ResourceResult>::schema();
 		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();

@@ -65,13 +65,6 @@ pub trait ResourceResult {
 	}
 }
 
-#[cfg(feature = "openapi")]
-impl<Res: ResourceResult> crate::OpenapiType for Res {
-	fn schema() -> OpenapiSchema {
-		Self::schema()
-	}
-}
-
 /// The default json returned on an 500 Internal Server Error.
 #[derive(Debug, Serialize)]
 pub(crate) struct ResourceError {

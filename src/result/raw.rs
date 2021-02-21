@@ -1,7 +1,7 @@
 use super::{handle_error, IntoResponseError, ResourceResult};
-#[cfg(feature = "openapi")]
-use crate::OpenapiSchema;
 use crate::{FromBody, RequestBody, ResourceType, Response};
+#[cfg(feature = "openapi")]
+use crate::{OpenapiSchema, OpenapiType};
 
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
@@ -89,6 +89,16 @@ impl<T: for<'a> From<&'a [u8]>> FromBody for Raw<T> {
 
 impl<T> RequestBody for Raw<T> where Raw<T>: FromBody + ResourceType {}
 
+#[cfg(feature = "openapi")]
+impl<T> OpenapiType for Raw<T> {
+	fn schema() -> OpenapiSchema {
+		OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
+			format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),
+			..Default::default()
+		})))
+	}
+}
+
 impl<T: Into<Body>> ResourceResult for Raw<T>
 where
 	Self: Send
@@ -101,10 +111,7 @@ where
 
 	#[cfg(feature = "openapi")]
 	fn schema() -> OpenapiSchema {
-		OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
-			format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),
-			..Default::default()
-		})))
+		<Self as OpenapiType>::schema()
 	}
 }
 

@@ -7,4 +7,4 @@ error[E0277]: the trait bound `FooResponse: ResourceResult` is not satisfied
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Output: ResourceResult + Send;
-   |                  -------------- required by this bound in `gotham_restful::Endpoint::Output`
+   |                  -------------- required by this bound in `gotham_restful::EndpointWithSchema::Output`

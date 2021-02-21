@@ -7,7 +7,7 @@ error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Sync;
-   |                        ------------------- required by this bound in `gotham_restful::Endpoint::Placeholders`
+   |                        ------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
   --> $DIR/invalid_placeholders_ty.rs:15:16
@@ -18,7 +18,7 @@ error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Sync;
-   |                        ------------------- required by this bound in `gotham_restful::Endpoint::Placeholders`
+   |                        ------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not satisfied
   --> $DIR/invalid_placeholders_ty.rs:15:16
@@ -29,4 +29,15 @@ error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not s
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Sync;
-   |                        ------------------- required by this bound in `gotham_restful::Endpoint::Placeholders`
+   |                        ------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+
+error[E0277]: the trait bound `FooPlaceholders: OpenapiType` is not satisfied
+  --> $DIR/invalid_placeholders_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooPlaceholders) {
+   |                ^^^^^^^^^^^^^^^ the trait `OpenapiType` is not implemented for `FooPlaceholders`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     #[openapi_bound("Placeholders: crate::OpenapiType")]
+   |                     ---------------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`

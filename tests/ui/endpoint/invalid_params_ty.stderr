@@ -7,7 +7,7 @@ error[E0277]: the trait bound `for<'de> FooParams: serde::de::Deserialize<'de>` 
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Sync;
-   |                  -------------------------- required by this bound in `gotham_restful::Endpoint::Params`
+   |                  -------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
 
 error[E0277]: the trait bound `FooParams: StateData` is not satisfied
   --> $DIR/invalid_params_ty.rs:15:16
@@ -18,7 +18,7 @@ error[E0277]: the trait bound `FooParams: StateData` is not satisfied
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Sync;
-   |                  -------------------------- required by this bound in `gotham_restful::Endpoint::Params`
+   |                  -------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
 
 error[E0277]: the trait bound `FooParams: StaticResponseExtender` is not satisfied
   --> $DIR/invalid_params_ty.rs:15:16
@@ -29,4 +29,15 @@ error[E0277]: the trait bound `FooParams: StaticResponseExtender` is not satisfi
   ::: $WORKSPACE/src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Sync;
-   |                  -------------------------- required by this bound in `gotham_restful::Endpoint::Params`
+   |                  -------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
+
+error[E0277]: the trait bound `FooParams: OpenapiType` is not satisfied
+  --> $DIR/invalid_params_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooParams) {
+   |                ^^^^^^^^^ the trait `OpenapiType` is not implemented for `FooParams`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     #[openapi_bound("Params: crate::OpenapiType")]
+   |                     ---------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`

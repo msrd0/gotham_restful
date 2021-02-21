@@ -1,5 +1,5 @@
 use super::{builder::OpenapiBuilder, handler::OpenapiHandler, operation::OperationDescription};
-use crate::{routing::*, EndpointWithSchema, OpenapiType, ResourceWithSchema};
+use crate::{routing::*, EndpointWithSchema, OpenapiType, ResourceResult, ResourceWithSchema};
 use gotham::{hyper::Method, pipeline::chain::PipelineHandleChain, router::builder::*};
 use once_cell::sync::Lazy;
 use regex::{Captures, Regex};
@@ -69,7 +69,7 @@ macro_rules! implOpenapiRouter {
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
 			fn endpoint<E: EndpointWithSchema + 'static>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema::<E::Output>();
+				let schema = (self.0).openapi_builder.add_schema(E::Output::schema());
 				let mut descr = OperationDescription::new::<E>(schema);
 				if E::has_placeholders() {
 					descr.set_path_params(E::Placeholders::schema());
@@ -78,7 +78,7 @@ macro_rules! implOpenapiRouter {
 					descr.set_query_params(E::Params::schema());
 				}
 				if E::needs_body() {
-					let body_schema = (self.0).openapi_builder.add_schema::<E::Body>();
+					let body_schema = (self.0).openapi_builder.add_schema(E::Body::schema());
 					descr.set_body::<E::Body>(body_schema);
 				}
 

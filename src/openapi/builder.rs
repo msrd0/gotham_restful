@@ -1,4 +1,4 @@
-use crate::{OpenapiSchema, OpenapiType};
+use crate::OpenapiSchema;
 use indexmap::IndexMap;
 use openapiv3::{
 	Components, OpenAPI, PathItem, ReferenceOr,
@@ -83,8 +83,7 @@ impl OpenapiBuilder {
 		}
 	}
 
-	pub fn add_schema<T: OpenapiType>(&mut self) -> ReferenceOr<Schema> {
-		let mut schema = T::schema();
+	pub fn add_schema(&mut self, mut schema: OpenapiSchema) -> ReferenceOr<Schema> {
 		match schema.name.clone() {
 			Some(name) => {
 				let reference = Reference {
@@ -105,6 +104,7 @@ impl OpenapiBuilder {
 #[allow(dead_code)]
 mod test {
 	use super::*;
+	use crate::OpenapiType;
 
 	#[derive(OpenapiType)]
 	struct Message {
@@ -142,7 +142,7 @@ mod test {
 	#[test]
 	fn add_schema() {
 		let mut builder = OpenapiBuilder::new(info());
-		builder.add_schema::<Option<Messages>>();
+		builder.add_schema(<Option<Messages>>::schema());
 		let openapi = openapi(builder);
 
 		assert_eq!(
