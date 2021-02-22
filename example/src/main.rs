@@ -15,11 +15,11 @@ use gotham_restful::{cors::*, *};
 use serde::{Deserialize, Serialize};
 
 #[derive(Resource)]
-#[resource(read_all, read, search, create, change_all, change, remove, remove_all)]
+#[resource(read_all, read, search, create, update_all, update, remove, remove_all)]
 struct Users {}
 
 #[derive(Resource)]
-#[resource(ReadAll)]
+#[resource(auth_read_all)]
 struct Auth {}
 
 #[derive(Deserialize, OpenapiType, Serialize, StateData, StaticResponseExtender)]
@@ -27,7 +27,7 @@ struct User {
 	username: String
 }
 
-#[read_all(Users)]
+#[read_all]
 fn read_all() -> Success<Vec<Option<User>>> {
 	vec![Username().fake(), Username().fake()]
 		.into_iter()
@@ -36,7 +36,7 @@ fn read_all() -> Success<Vec<Option<User>>> {
 		.into()
 }
 
-#[read(Users)]
+#[read]
 fn read(id: u64) -> Success<User> {
 	let username: String = Username().fake();
 	User {
@@ -45,17 +45,17 @@ fn read(id: u64) -> Success<User> {
 	.into()
 }
 
-#[search(Users)]
+#[search]
 fn search(query: User) -> Success<User> {
 	query.into()
 }
 
-#[create(Users)]
+#[create]
 fn create(body: User) {
 	info!("Created User: {}", body.username);
 }
 
-#[change_all(Users)]
+#[change_all]
 fn update_all(body: Vec<User>) {
 	info!(
 		"Changing all Users to {:?}",
@@ -63,22 +63,22 @@ fn update_all(body: Vec<User>) {
 	);
 }
 
-#[change(Users)]
+#[change]
 fn update(id: u64, body: User) {
 	info!("Change User {} to {}", id, body.username);
 }
 
-#[remove_all(Users)]
+#[remove_all]
 fn remove_all() {
 	info!("Delete all Users");
 }
 
-#[remove(Users)]
+#[remove]
 fn remove(id: u64) {
 	info!("Delete User {}", id);
 }
 
-#[read_all(Auth)]
+#[read_all]
 fn auth_read_all(auth: AuthStatus<()>) -> AuthSuccess<String> {
 	match auth {
 		AuthStatus::Authenticated(data) => Ok(format!("{:?}", data)),

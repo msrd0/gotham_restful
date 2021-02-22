@@ -8,6 +8,19 @@ variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
   RUST_LOG: info,gotham=debug,gotham_restful=trace 
 
+check-example:
+  stage: test
+  image: rust:slim
+  before_script:
+    - cargo -V
+  script:
+    - cargo check -p example
+  cache:
+    key: cargo-stable-example
+    paths:
+      - cargo/
+      - target/
+  
 test-default:
   stage: test
   image: rust:1.49-slim
