@@ -14,7 +14,8 @@ check-example:
   before_script:
     - cargo -V
   script:
-    - cargo check -p example
+    - cd example
+    - cargo check
   cache:
     key: cargo-stable-example
     paths:
