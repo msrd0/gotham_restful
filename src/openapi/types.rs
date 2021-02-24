@@ -344,10 +344,24 @@ impl<T: OpenapiType, S: BuildHasher> OpenapiType for HashSet<T, S> {
 	}
 }
 
-impl<K, T: OpenapiType, S: BuildHasher> OpenapiType for HashMap<K, T, S> {
+impl<K: OpenapiType, T: OpenapiType, S: BuildHasher> OpenapiType for HashMap<K, T, S> {
 	fn schema() -> OpenapiSchema {
+		let key_schema = K::schema();
+		let mut dependencies = key_schema.dependencies.clone();
+
+		let keys = match key_schema.name.clone() {
+			Some(name) => {
+				let reference = Reference {
+					reference: format!("#/components/schemas/{}", name)
+				};
+				dependencies.insert(name, key_schema);
+				reference
+			},
+			None => Item(Box::new(key_schema.into_schema()))
+		};
+
 		let schema = T::schema();
-		let mut dependencies = schema.dependencies.clone();
+		dependencies.extend(schema.dependencies.iter().map(|(k, v)| (k.clone(), v.clone())));
 
 		let items = Box::new(match schema.name.clone() {
 			Some(name) => {
@@ -360,10 +374,15 @@ impl<K, T: OpenapiType, S: BuildHasher> OpenapiType for HashMap<K, T, S> {
 			None => Item(schema.into_schema())
 		});
 
+		let mut properties = IndexMap::new();
+		properties.insert("default".to_owned(), keys);
+
 		OpenapiSchema {
 			nullable: false,
 			name: None,
 			schema: SchemaKind::Type(Type::Object(ObjectType {
+				properties,
+				required: vec!["default".to_owned()],
 				additional_properties: Some(AdditionalProperties::Schema(items)),
 				..Default::default()
 			})),
@@ -453,6 +472,6 @@ mod test {
 	assert_schema!(Vec<String> => r#"{"type":"array","items":{"type":"string"}}"#);
 	assert_schema!(BTreeSet<String> => r#"{"type":"array","items":{"type":"string"}}"#);
 	assert_schema!(HashSet<String> => r#"{"type":"array","items":{"type":"string"}}"#);
-	assert_schema!(HashMap<String, String> => r#"{"type":"object","additionalProperties":{"type":"string"}}"#);
+	assert_schema!(HashMap<i64, String> => r#"{"type":"object","properties":{"default":{"type":"integer","format":"int64"}},"required":["default"],"additionalProperties":{"type":"string"}}"#);
 	assert_schema!(Value => r#"{"nullable":true}"#);
 }

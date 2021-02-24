@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - If not enabling the `openapi` feature, `without-openapi` has to be enabled
  - The endpoint macro attributes (`read`, `create`, ...) no longer take the resource ident and reject all unknown attributes ([!18])
  - The `ResourceResult` trait has been split into `ResourceResult` and `ResourceResultSchema`
+ - `HashMap`'s keys are included in the generated OpenAPI spec (they defaulted to `type: string` previously)
 
 ### Removed
  - All pre-defined methods (`read`, `create`, ...) from our router extensions ([!18])
