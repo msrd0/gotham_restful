@@ -1,13 +1,18 @@
-use super::{builder::OpenapiBuilder, handler::OpenapiHandler, operation::OperationDescription};
+use super::{
+	builder::OpenapiBuilder,
+	handler::{OpenapiHandler, SwaggerUiHandler},
+	operation::OperationDescription
+};
 use crate::{routing::*, EndpointWithSchema, OpenapiType, ResourceResultSchema, ResourceWithSchema};
 use gotham::{hyper::Method, pipeline::chain::PipelineHandleChain, router::builder::*};
 use once_cell::sync::Lazy;
 use regex::{Captures, Regex};
 use std::panic::RefUnwindSafe;
 
-/// This trait adds the `get_openapi` method to an OpenAPI-aware router.
+/// This trait adds the `get_openapi` and `swagger_ui` method to an OpenAPI-aware router.
 pub trait GetOpenapi {
 	fn get_openapi(&mut self, path: &str);
+	fn swagger_ui(&mut self, path: &str);
 }
 
 #[derive(Debug)]
@@ -50,6 +55,12 @@ macro_rules! implOpenapiRouter {
 				self.router
 					.get(path)
 					.to_new_handler(OpenapiHandler::new(self.openapi_builder.openapi.clone()));
+			}
+
+			fn swagger_ui(&mut self, path: &str) {
+				self.router
+					.get(path)
+					.to_new_handler(SwaggerUiHandler::new(self.openapi_builder.openapi.clone()));
 			}
 		}
 

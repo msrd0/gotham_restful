@@ -20,26 +20,32 @@ include = ["src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
 gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
 
 [dependencies]
-base64 = { version = "0.13.0", optional = true }
-chrono = { version = "0.4.19", features = ["serde"], optional = true }
-cookie = { version = "0.14", optional = true }
 futures-core = "0.3.7"
 futures-util = "0.3.7"
 gotham = { version = "0.5.0", default-features = false }
 gotham_derive = "0.5.0"
-gotham_middleware_diesel = { version = "0.2.0", optional = true }
 gotham_restful_derive = "0.2.0-dev"
-indexmap = { version = "1.3.2", optional = true }
-jsonwebtoken = { version = "7.1.0", optional = true }
 log = "0.4.8"
 mime = "0.3.16"
-once_cell = { version = "1.5", optional = true }
-openapiv3 = { version = "0.3.2", optional = true }
-regex = { version = "1.4", optional = true }
 serde = { version = "1.0.110", features = ["derive"] }
 serde_json = "1.0.58"
 thiserror = "1.0"
+
+# features
+chrono = { version = "0.4.19", features = ["serde"], optional = true }
 uuid = { version = "0.8.1", optional = true }
+
+# non-feature optional dependencies
+base64 = { version = "0.13.0", optional = true }
+cookie = { version = "0.14", optional = true }
+gotham_middleware_diesel = { version = "0.2.0", optional = true }
+indexmap = { version = "1.3.2", optional = true }
+indoc = { version = "1.0", optional = true }
+jsonwebtoken = { version = "7.1.0", optional = true }
+once_cell = { version = "1.5", optional = true }
+openapiv3 = { version = "0.3.2", optional = true }
+regex = { version = "1.4", optional = true }
+sha2 = { version = "0.9.3", optional = true }
 
 [dev-dependencies]
 diesel = { version = "1.4.4", features = ["postgres"] }
@@ -61,7 +67,7 @@ errorlog = []
 
 # These features are exclusive - https://gitlab.com/msrd0/gotham-restful/-/issues/4
 without-openapi = []
-openapi = ["gotham_restful_derive/openapi", "indexmap", "once_cell", "openapiv3", "regex"]
+openapi = ["gotham_restful_derive/openapi", "base64", "indexmap", "indoc", "once_cell", "openapiv3", "regex", "sha2"]
 
 [package.metadata.docs.rs]
 no-default-features = true

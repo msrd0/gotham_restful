@@ -122,6 +122,7 @@ fn main() {
 				route.resource::<Users>("users");
 				route.resource::<Auth>("auth");
 				route.get_openapi("openapi");
+				route.swagger_ui("");
 			});
 		})
 	);

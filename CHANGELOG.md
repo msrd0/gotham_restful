@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - New `endpoint` router extension with associated `Endpoint` trait ([!18])
  - Support for custom endpoints using the `#[endpoint]` macro ([!19])
  - Support for `anyhow::Error` (or any type implementing `Into<HandlerError>`) in most responses
+ - `swagger_ui` method to the OpenAPI router to render the specification using Swagger UI
 
 ### Changed
  - The cors handler can now copy headers from the request if desired
