@@ -5,7 +5,7 @@ members = [".", "./derive", "./example"]
 
 [package]
 name = "gotham_restful"
-version = "0.2.0-dev"
+version = "0.2.0"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 description = "RESTful additions for the gotham web framework"
@@ -24,7 +24,7 @@ futures-core = "0.3.7"
 futures-util = "0.3.7"
 gotham = { version = "0.5.0", default-features = false }
 gotham_derive = "0.5.0"
-gotham_restful_derive = "0.2.0-dev"
+gotham_restful_derive = "0.2.0"
 log = "0.4.8"
 mime = "0.3.16"
 serde = { version = "1.0.110", features = ["derive"] }
