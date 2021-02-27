@@ -1,7 +1,7 @@
-use super::{handle_error, into_response_helper, ResourceResult};
-use crate::{result::ResourceError, Response, ResponseBody};
+use super::{handle_error, IntoResponse, ResourceError};
 #[cfg(feature = "openapi")]
-use crate::{OpenapiSchema, ResourceResultSchema};
+use crate::{OpenapiSchema, ResponseSchema};
+use crate::{Response, ResponseBody, Success};
 
 use futures_core::future::Future;
 use gotham::hyper::StatusCode;
@@ -26,7 +26,7 @@ impl<E: Error> IntoResponseError for E {
 	}
 }
 
-impl<R, E> ResourceResult for Result<R, E>
+impl<R, E> IntoResponse for Result<R, E>
 where
 	R: ResponseBody,
 	E: Display + IntoResponseError<Err = serde_json::Error>
@@ -35,7 +35,7 @@ where
 
 	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, E::Err>> + Send>> {
 		match self {
-			Ok(r) => into_response_helper(|| Ok(Response::json(StatusCode::OK, serde_json::to_string(&r)?))),
+			Ok(r) => Success::from(r).into_response(),
 			Err(e) => handle_error(e)
 		}
 	}
@@ -46,7 +46,7 @@ where
 }
 
 #[cfg(feature = "openapi")]
-impl<R, E> ResourceResultSchema for Result<R, E>
+impl<R, E> ResponseSchema for Result<R, E>
 where
 	R: ResponseBody,
 	E: Display + IntoResponseError<Err = serde_json::Error>
@@ -59,7 +59,7 @@ where
 #[cfg(test)]
 mod test {
 	use super::*;
-	use crate::result::OrAllTypes;
+	use crate::response::OrAllTypes;
 	use futures_executor::block_on;
 	use thiserror::Error;
 

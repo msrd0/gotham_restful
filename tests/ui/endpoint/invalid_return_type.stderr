@@ -1,21 +1,21 @@
-error[E0277]: the trait bound `FooResponse: ResourceResultSchema` is not satisfied
+error[E0277]: the trait bound `FooResponse: ResponseSchema` is not satisfied
   --> $DIR/invalid_return_type.rs:12:18
    |
 12 | fn endpoint() -> FooResponse {
-   |                  ^^^^^^^^^^^ the trait `ResourceResultSchema` is not implemented for `FooResponse`
+   |                  ^^^^^^^^^^^ the trait `ResponseSchema` is not implemented for `FooResponse`
    |
   ::: $WORKSPACE/src/endpoint.rs
    |
-   |     #[openapi_bound("Output: crate::ResourceResultSchema")]
-   |                     ------------------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Output`
+   |     #[openapi_bound("Output: crate::ResponseSchema")]
+   |                     ------------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Output`
 
-error[E0277]: the trait bound `FooResponse: ResourceResult` is not satisfied
+error[E0277]: the trait bound `FooResponse: gotham_restful::IntoResponse` is not satisfied
   --> $DIR/invalid_return_type.rs:12:18
    |
 12 | fn endpoint() -> FooResponse {
-   |                  ^^^^^^^^^^^ the trait `ResourceResult` is not implemented for `FooResponse`
+   |                  ^^^^^^^^^^^ the trait `gotham_restful::IntoResponse` is not implemented for `FooResponse`
    |
   ::: $WORKSPACE/src/endpoint.rs
    |
-   |     type Output: ResourceResult + Send;
-   |                  -------------- required by this bound in `gotham_restful::EndpointWithSchema::Output`
+   |     type Output: IntoResponse + Send;
+   |                  ------------ required by this bound in `gotham_restful::EndpointWithSchema::Output`

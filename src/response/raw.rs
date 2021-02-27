@@ -1,7 +1,7 @@
-use super::{handle_error, IntoResponseError, ResourceResult};
+use super::{handle_error, IntoResponse, IntoResponseError};
 use crate::{FromBody, RequestBody, ResourceType, Response};
 #[cfg(feature = "openapi")]
-use crate::{OpenapiSchema, OpenapiType, ResourceResultSchema};
+use crate::{IntoResponseWithSchema, OpenapiSchema, OpenapiType, ResponseSchema};
 
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
@@ -99,7 +99,7 @@ impl<T> OpenapiType for Raw<T> {
 	}
 }
 
-impl<T: Into<Body>> ResourceResult for Raw<T>
+impl<T: Into<Body>> IntoResponse for Raw<T>
 where
 	Self: Send
 {
@@ -111,7 +111,7 @@ where
 }
 
 #[cfg(feature = "openapi")]
-impl<T: Into<Body>> ResourceResultSchema for Raw<T>
+impl<T: Into<Body>> ResponseSchema for Raw<T>
 where
 	Self: Send
 {
@@ -120,10 +120,10 @@ where
 	}
 }
 
-impl<T, E> ResourceResult for Result<Raw<T>, E>
+impl<T, E> IntoResponse for Result<Raw<T>, E>
 where
-	Raw<T>: ResourceResult,
-	E: Display + IntoResponseError<Err = <Raw<T> as ResourceResult>::Err>
+	Raw<T>: IntoResponse,
+	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
 	type Err = E::Err;
 
@@ -136,13 +136,13 @@ where
 }
 
 #[cfg(feature = "openapi")]
-impl<T, E> ResourceResultSchema for Result<Raw<T>, E>
+impl<T, E> ResponseSchema for Result<Raw<T>, E>
 where
-	Raw<T>: ResourceResult + ResourceResultSchema,
-	E: Display + IntoResponseError<Err = <Raw<T> as ResourceResult>::Err>
+	Raw<T>: IntoResponseWithSchema,
+	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
 	fn schema() -> OpenapiSchema {
-		<Raw<T> as ResourceResultSchema>::schema()
+		<Raw<T> as ResponseSchema>::schema()
 	}
 }
 

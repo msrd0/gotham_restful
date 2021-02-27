@@ -158,6 +158,37 @@ fn create(body : RawImage) -> Raw<Vec<u8>> {
 # }
 ```
 
+# Custom HTTP Headers
+
+You can read request headers from the state as you would in any other gotham handler, and specify
+custom response headers using [Response::header].
+
+```rust,no_run
+# #[macro_use] extern crate gotham_restful_derive;
+# use gotham::hyper::header::{ACCEPT, HeaderMap, VARY};
+# use gotham::{router::builder::*, state::State};
+# use gotham_restful::*;
+#[derive(Resource)]
+#[resource(read_all)]
+struct FooResource;
+
+#[read_all]
+async fn read_all(state: &mut State) -> NoContent {
+	let headers: &HeaderMap = state.borrow();
+	let accept = &headers[ACCEPT];
+# drop(accept);
+
+	let mut res = NoContent::default();
+	res.header(VARY, "accept".parse().unwrap());
+	res
+}
+# fn main() {
+# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+# 		route.resource::<FooResource>("foo");
+# 	}));
+# }
+```
+
 # Features
 
 To make life easier for common use-cases, this create offers a few features that might be helpful
@@ -475,15 +506,12 @@ pub use endpoint::Endpoint;
 pub use endpoint::EndpointWithSchema;
 
 mod response;
-pub use response::Response;
-
-mod result;
-pub use result::{
-	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponseError, NoContent, Raw, Redirect,
-	ResourceResult, Success
+pub use response::{
+	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponse, IntoResponseError, NoContent,
+	Raw, Redirect, Response, Success
 };
 #[cfg(feature = "openapi")]
-pub use result::{ResourceResultSchema, ResourceResultWithSchema};
+pub use response::{IntoResponseWithSchema, ResponseSchema};
 
 mod routing;
 pub use routing::{DrawResourceRoutes, DrawResources};
@@ -496,7 +524,7 @@ pub use types::*;
 /// This trait must be implemented for every resource. It allows you to register the different
 /// endpoints that can be handled by this resource to be registered with the underlying router.
 ///
-/// It is not recommended to implement this yourself, rather just use `#[derive(Resource)]`.
+/// It is not recommended to implement this yourself, just use `#[derive(Resource)]`.
 #[_private_openapi_trait(ResourceWithSchema)]
 pub trait Resource {
 	/// Register all methods handled by this resource with the underlying router.

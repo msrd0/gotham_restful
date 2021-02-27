@@ -148,6 +148,27 @@ fn create(body : RawImage) -> Raw<Vec<u8>> {
 }
 ```
 
+## Custom HTTP Headers
+
+You can read request headers from the state as you would in any other gotham handler, and specify
+custom response headers using [Response::header].
+
+```rust
+#[derive(Resource)]
+#[resource(read_all)]
+struct FooResource;
+
+#[read_all]
+async fn read_all(state: &mut State) -> NoContent {
+	let headers: &HeaderMap = state.borrow();
+	let accept = &headers[ACCEPT];
+
+	let mut res = NoContent::default();
+	res.header(VARY, "accept".parse().unwrap());
+	res
+}
+```
+
 ## Features
 
 To make life easier for common use-cases, this create offers a few features that might be helpful

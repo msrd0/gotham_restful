@@ -3,10 +3,7 @@ use crate::openapi::{
 	builder::{OpenapiBuilder, OpenapiInfo},
 	router::OpenapiRouter
 };
-use crate::{
-	result::{ResourceError, ResourceResult},
-	Endpoint, FromBody, Resource, Response
-};
+use crate::{response::ResourceError, Endpoint, FromBody, IntoResponse, Resource, Response};
 
 #[cfg(feature = "cors")]
 use gotham::router::route::matcher::AccessControlRequestMethodMatcher;
@@ -90,7 +87,7 @@ fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> 
 async fn endpoint_handler<E: Endpoint>(state: &mut State) -> Result<gotham::hyper::Response<Body>, HandlerError>
 where
 	E: Endpoint,
-	<E::Output as ResourceResult>::Err: Into<HandlerError>
+	<E::Output as IntoResponse>::Err: Into<HandlerError>
 {
 	trace!("entering endpoint_handler");
 	let placeholders = E::Placeholders::take_from(state);

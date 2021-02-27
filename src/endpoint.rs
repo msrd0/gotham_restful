@@ -1,4 +1,4 @@
-use crate::{RequestBody, ResourceResult};
+use crate::{IntoResponse, RequestBody};
 use futures_util::future::BoxFuture;
 use gotham::{
 	extractor::{PathExtractor, QueryStringExtractor},
@@ -16,8 +16,8 @@ pub trait Endpoint {
 	fn uri() -> Cow<'static, str>;
 
 	/// The output type that provides the response.
-	#[openapi_bound("Output: crate::ResourceResultSchema")]
-	type Output: ResourceResult + Send;
+	#[openapi_bound("Output: crate::ResponseSchema")]
+	type Output: IntoResponse + Send;
 
 	/// Returns `true` _iff_ the URI contains placeholders. `false` by default.
 	fn has_placeholders() -> bool {

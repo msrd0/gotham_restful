@@ -487,7 +487,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 			handle_content = quote!(#handle_content.await);
 		}
 		if is_no_content {
-			handle_content = quote!(#handle_content; ::gotham_restful::NoContent)
+			handle_content = quote!(#handle_content; <::gotham_restful::NoContent as ::std::default::Default>::default())
 		}
 
 		if let Some(arg) = args.iter().find(|arg| arg.ty.is_database_conn()) {

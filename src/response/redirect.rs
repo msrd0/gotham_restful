@@ -1,7 +1,7 @@
-use super::{handle_error, ResourceResult};
+use super::{handle_error, IntoResponse};
 use crate::{IntoResponseError, Response};
 #[cfg(feature = "openapi")]
-use crate::{NoContent, OpenapiSchema, ResourceResultSchema};
+use crate::{NoContent, OpenapiSchema, ResponseSchema};
 use futures_util::future::{BoxFuture, FutureExt, TryFutureExt};
 use gotham::hyper::{
 	header::{InvalidHeaderValue, LOCATION},
@@ -42,7 +42,7 @@ pub struct Redirect {
 	pub to: String
 }
 
-impl ResourceResult for Redirect {
+impl IntoResponse for Redirect {
 	type Err = InvalidHeaderValue;
 
 	fn into_response(self) -> BoxFuture<'static, Result<Response, Self::Err>> {
@@ -56,13 +56,13 @@ impl ResourceResult for Redirect {
 }
 
 #[cfg(feature = "openapi")]
-impl ResourceResultSchema for Redirect {
+impl ResponseSchema for Redirect {
 	fn default_status() -> StatusCode {
 		StatusCode::SEE_OTHER
 	}
 
 	fn schema() -> OpenapiSchema {
-		<NoContent as ResourceResultSchema>::schema()
+		<NoContent as ResponseSchema>::schema()
 	}
 }
 
@@ -76,7 +76,7 @@ pub enum RedirectError<E: StdError + 'static> {
 }
 
 #[allow(ambiguous_associated_items)] // an enum variant is not a type. never.
-impl<E> ResourceResult for Result<Redirect, E>
+impl<E> IntoResponse for Result<Redirect, E>
 where
 	E: Display + IntoResponseError,
 	<E as IntoResponseError>::Err: StdError + Sync
@@ -92,7 +92,7 @@ where
 }
 
 #[cfg(feature = "openapi")]
-impl<E> ResourceResultSchema for Result<Redirect, E>
+impl<E> ResponseSchema for Result<Redirect, E>
 where
 	E: Display + IntoResponseError,
 	<E as IntoResponseError>::Err: StdError + Sync
@@ -102,7 +102,7 @@ where
 	}
 
 	fn schema() -> OpenapiSchema {
-		<Redirect as ResourceResultSchema>::schema()
+		<Redirect as ResponseSchema>::schema()
 	}
 }
 

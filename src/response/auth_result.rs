@@ -12,9 +12,9 @@ pub enum AuthError {
 }
 
 /**
-This return type can be used to map another [ResourceResult](crate::ResourceResult) that can
-only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_ response
-will be issued.
+This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
+that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
+response will be issued.
 
 Use can look something like this (assuming the `auth` feature is enabled):
 
@@ -86,9 +86,9 @@ where
 }
 
 /**
-This return type can be used to map another [ResourceResult](crate::ResourceResult) that can
-only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_ response
-will be issued.
+This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
+that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
+response will be issued.
 
 Use can look something like this (assuming the `auth` feature is enabled):
 
