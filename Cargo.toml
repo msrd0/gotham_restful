@@ -1,0 +1,76 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[workspace]
+members = [".", "./derive", "./example"]
+
+[package]
+name = "gotham_restful"
+version = "0.3.0-dev"
+authors = ["Dominic Meiser <git@msrd0.de>"]
+edition = "2018"
+description = "RESTful additions for the gotham web framework"
+keywords = ["gotham", "rest", "restful", "web", "http"]
+categories = ["web-programming", "web-programming::http-server"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://gitlab.com/msrd0/gotham-restful"
+include = ["src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
+
+[badges]
+gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
+
+[dependencies]
+futures-core = "0.3.7"
+futures-util = "0.3.7"
+gotham = { git = "https://github.com/gotham-rs/gotham", default-features = false }
+gotham_derive = "0.5.0"
+gotham_restful_derive = "0.3.0-dev"
+log = "0.4.8"
+mime = "0.3.16"
+serde = { version = "1.0.110", features = ["derive"] }
+serde_json = "1.0.58"
+thiserror = "1.0"
+
+# non-feature optional dependencies
+base64 = { version = "0.13.0", optional = true }
+cookie = { version = "0.15", optional = true }
+gotham_middleware_diesel = { git = "https://github.com/gotham-rs/gotham", optional = true }
+indexmap = { version = "1.3.2", optional = true }
+indoc = { version = "1.0", optional = true }
+jsonwebtoken = { version = "7.1.0", optional = true }
+once_cell = { version = "1.5", optional = true }
+openapiv3 = { version = "=0.3.2", optional = true }
+openapi_type = { version = "0.1.0-dev", optional = true }
+regex = { version = "1.4", optional = true }
+sha2 = { version = "0.9.3", optional = true }
+
+[dev-dependencies]
+diesel = { version = "1.4.4", features = ["postgres"] }
+futures-executor = "0.3.5"
+paste = "1.0"
+pretty_env_logger = "0.4"
+tokio = { version = "1.0", features = ["time"], default-features = false }
+thiserror = "1.0.18"
+trybuild = "1.0.27"
+
+[features]
+default = ["cors", "errorlog", "without-openapi"]
+full = ["auth", "cors", "database", "errorlog", "openapi"]
+
+auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
+cors = []
+database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
+errorlog = []
+
+# These features are exclusive - https://gitlab.com/msrd0/gotham-restful/-/issues/4
+without-openapi = []
+openapi = ["gotham_restful_derive/openapi", "base64", "indexmap", "indoc", "once_cell", "openapiv3", "openapi_type", "regex", "sha2"]
+
+[package.metadata.docs.rs]
+no-default-features = true
+features = ["full"]
+
+[patch.crates-io]
+gotham_restful = { path = "." }
+gotham_restful_derive = { path = "./derive" }
+openapi_type = { git = "https://github.com/msrd0/openapi_type" }

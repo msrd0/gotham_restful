@@ -1,0 +1,24 @@
+error[E0277]: the trait bound `FooBody: OpenapiType` is not satisfied
+  --> $DIR/invalid_body_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooBody) {
+   |                ^^^^^^^ the trait `OpenapiType` is not implemented for `FooBody`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Body: RequestBody + Send;
+   |                ----------- required by this bound in `gotham_restful::EndpointWithSchema::Body`
+
+error[E0277]: the trait bound `for<'de> FooBody: serde::de::Deserialize<'de>` is not satisfied
+  --> $DIR/invalid_body_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooBody) {
+   |                ^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooBody`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Body: RequestBody + Send;
+   |                ----------- required by this bound in `gotham_restful::EndpointWithSchema::Body`
+   |
+   = note: required because of the requirements on the impl of `serde::de::DeserializeOwned` for `FooBody`
+   = note: required because of the requirements on the impl of `gotham_restful::RequestBody` for `FooBody`

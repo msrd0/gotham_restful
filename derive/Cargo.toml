@@ -1,0 +1,32 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[package]
+name = "gotham_restful_derive"
+version = "0.3.0-dev"
+authors = ["Dominic Meiser <git@msrd0.de>"]
+edition = "2018"
+description = "Derive macros for gotham_restful"
+keywords = ["gotham", "rest", "restful", "web", "http"]
+license = "Apache-2.0"
+repository = "https://gitlab.com/msrd0/gotham-restful"
+workspace = ".."
+
+[lib]
+proc-macro = true
+
+[badges]
+gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
+
+[dependencies]
+once_cell = "1.5"
+paste = "1.0"
+proc-macro2 = "1.0.13"
+quote = "1.0.6"
+regex = "1.4"
+syn = { version = "1.0.22", features = ["full"] }
+
+[features]
+default = []
+auth = []
+database = []
+openapi = []

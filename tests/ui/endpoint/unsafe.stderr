@@ -1,0 +1,11 @@
+error: Endpoint handler methods must not be unsafe
+ --> $DIR/unsafe.rs:9:1
+  |
+9 | unsafe fn read_all() {}
+  | ^^^^^^
+
+error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
+ --> $DIR/unsafe.rs:5:12
+  |
+5 | #[resource(read_all)]
+  |            ^^^^^^^^ not found in this scope

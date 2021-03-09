@@ -1,0 +1,78 @@
+{
+  "components": {},
+  "info": {
+    "title": "Test",
+    "version": "1.2.3"
+  },
+  "openapi": "3.0.2",
+  "paths": {
+    "/bar/baz/foo3": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/bar/foo2": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/foo1": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/foo4": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

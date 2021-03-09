@@ -1,0 +1,54 @@
+error[E0277]: the trait bound `FooParams: OpenapiType` is not satisfied
+  --> $DIR/invalid_params_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooParams) {
+   |                ^^^^^^^^^ the trait `OpenapiType` is not implemented for `FooParams`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     #[openapi_bound("Params: OpenapiType")]
+   |                     --------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
+
+error[E0277]: the trait bound `for<'de> FooParams: serde::de::Deserialize<'de>` is not satisfied
+  --> $DIR/invalid_params_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooParams) {
+   |                ^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooParams`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Params: QueryStringExtractor<Body> + Clone + Sync;
+   |                  -------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
+
+error[E0277]: the trait bound `FooParams: StateData` is not satisfied
+  --> $DIR/invalid_params_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooParams) {
+   |                ^^^^^^^^^ the trait `StateData` is not implemented for `FooParams`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Params: QueryStringExtractor<Body> + Clone + Sync;
+   |                  -------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
+
+error[E0277]: the trait bound `FooParams: StaticResponseExtender` is not satisfied
+  --> $DIR/invalid_params_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooParams) {
+   |                ^^^^^^^^^ the trait `StaticResponseExtender` is not implemented for `FooParams`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Params: QueryStringExtractor<Body> + Clone + Sync;
+   |                  -------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Params`
+
+error[E0277]: the trait bound `FooParams: Clone` is not satisfied
+  --> $DIR/invalid_params_ty.rs:15:16
+   |
+15 | fn endpoint(_: FooParams) {
+   |                ^^^^^^^^^ the trait `Clone` is not implemented for `FooParams`
+   |
+  ::: $WORKSPACE/src/endpoint.rs
+   |
+   |     type Params: QueryStringExtractor<Body> + Clone + Sync;
+   |                                               ----- required by this bound in `gotham_restful::EndpointWithSchema::Params`

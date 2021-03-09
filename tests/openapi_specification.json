@@ -1,0 +1,252 @@
+{
+  "components": {
+    "schemas": {
+      "Secret": {
+        "properties": {
+          "code": {
+            "format": "float",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "Secret",
+        "type": "object"
+      },
+      "Secrets": {
+        "properties": {
+          "secrets": {
+            "items": {
+              "$ref": "#/components/schemas/Secret"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "secrets"
+        ],
+        "title": "Secrets",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "authToken": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "This is just a test",
+    "version": "1.2.3"
+  },
+  "openapi": "3.0.2",
+  "paths": {
+    "/custom": {
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/custom/read/{from}/with/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/img/{id}": {
+      "get": {
+        "operationId": "getImage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "operationId": "setImage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "image/png": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/secret/search": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "hour",
+            "schema": {
+              "format": "int16",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "minute",
+            "schema": {
+              "format": "int16",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Secrets"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "/secret/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Secret"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:12345/api/v1"
+    }
+  ]
+}

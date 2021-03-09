@@ -1,0 +1,11 @@
+error: Too many arguments
+ --> $DIR/too_many_args.rs:9:4
+  |
+9 | fn read_all(_id: u64) {}
+  |    ^^^^^^^^
+
+error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
+ --> $DIR/too_many_args.rs:5:12
+  |
+5 | #[resource(read_all)]
+  |            ^^^^^^^^ not found in this scope
