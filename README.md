@@ -1,19 +1,19 @@
 <br/>
 <div>
-	<a href="https://gitlab.com/msrd0/gotham-restful/pipelines">
-		<img alt="pipeline status" src="https://gitlab.com/msrd0/gotham-restful/badges/master/pipeline.svg"/>
+	<a href="https://github.com/msrd0/gotham_restful/actions/workflows/rust.yml">
+		<img alt="build status" src="https://github.com/msrd0/gotham_restful/actions/workflows/rust.yml/badge.svg"/>
 	</a>
-	<a href="https://msrd0.gitlab.io/gotham-restful/coverage.html">
-		<img alt="coverage report" src="https://gitlab.com/msrd0/gotham-restful/badges/master/coverage.svg"/>
+	<a href="https://msrd0.github.io/gotham_restful/tarpaulin-report.html">
+		<img alt="coverage report" src="https://msrd0.github.io/gotham_restful/coverage.svg"/>
 	</a>
-	<a href="https://msrd0.gitlab.io/gotham-restful/gotham_restful/index.html">
+	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-master-blue.svg"/>
 	</a>
     <a href="https://blog.rust-lang.org/2020/12/31/Rust-1.49.0.html">
         <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.49+-orange.svg"/>
     </a>
-	<a href="https://deps.rs/repo/gitlab/msrd0/gotham-restful">
-		<img alt="dependencies" src="https://deps.rs/repo/gitlab/msrd0/gotham-restful/status.svg"/>
+	<a href="https://deps.rs/repo/github/msrd0/gotham_restful">
+		<img alt="dependencies" src="https://deps.rs/repo/github/msrd0/gotham_restful/status.svg"/>
 	</a>
 </div>
 <br/>
