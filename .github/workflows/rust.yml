@@ -39,7 +39,11 @@ jobs:
             ~/.cargo/registry
             target
           key: ${{ runner.os }}-rust-${{ steps.rust-version.outputs.version }}
-      - run: cargo test $([${{ matrix.features }} == "full"] && printf -- "--no-default-features --features full" || true)
+      - run: |
+          features=""
+          [ "${{ matrix.features }}" == "default" ] || features="--no-default-features --features full"
+          echo "\$ cargo test $features"
+          cargo test $features
         env:
           RUST_BACKTRACE: 1
   
