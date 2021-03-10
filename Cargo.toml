@@ -16,9 +16,6 @@ readme = "README.md"
 repository = "https://gitlab.com/msrd0/gotham-restful"
 include = ["src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
 
-[badges]
-gitlab = { repository = "msrd0/gotham-restful", branch = "master" }
-
 [dependencies]
 futures-core = "0.3.7"
 futures-util = "0.3.7"
