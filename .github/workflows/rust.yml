@@ -1,0 +1,184 @@
+name: Rust
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [1.49, stable, beta]
+        nightly: [false]
+        include:
+          - toolchain: nightly
+            nightly: true
+    runs-on: ubuntu-latest
+    name: test-${{ matrix.toolchain }}
+    continue-on-error: ${{ matrix.nightly }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - name: Get Rust Version
+        id: rust-version
+        run: echo "::set-output name=version::$(cargo -V | head -n1 | awk '{print $2}')"
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/git
+            ~/.cargo/registry
+            target
+          key: ${{ runner.os }}-rust-${{ steps.rust-version.outputs.version }}
+      - run: cargo test --workspace -- --skip trybuild
+        env:
+          RUST_BACKTRACE: 1
+  
+  test-trybuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@1.50.0
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-cargo-1.50 }}
+      - run: cargo test -- trybuild
+        env:
+          RUST_BACKTRACE: 1
+  
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Get Rust Version
+        id: rust-version
+        run: echo "::set-output name=version::$(cargo -V | head -n1 | awk '{print $2}')"
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/git
+            ~/.cargo/registry
+            target
+          key: ${{ runner.os }}-rust-${{ steps.rust-version.outputs.version }}-clippy
+      - run: cargo clippy --workspace --profile test -- -Dclippy::all
+  
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+      - run: ./tests/ui/rustfmt.sh --check
+  
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://ghcr.io/msrd0/alpine-cargo-readme
+        with:
+          entrypoint: /bin/ash
+          args: cargo readme -V && cargo readme -t README.tpl -o README.md.new && diff README.md README.md.new
+  
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Get Rust Version
+        id: rust-version
+        run: echo "::set-output name=version::$(cargo -V | head -n1 | awk '{print $2}')"
+      - name: Get Tarpaulin Version
+        id: tarpaulin-version
+        run: echo "::set-output name=version::$(wget -qO- 'https://api.github.com/repos/xd009642/tarpaulin/releases/latest' | jq -r '.tag_name')"
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/cargo-tarpaulin
+            ~/.cargo/git
+            ~/.cargo/registry
+            target
+          key: ${{ runner.os }}-cargo-${{ steps.rust-version.outputs.version }}-tarpaulin-${{ steps.tarpaulin-version.outputs.version }}
+      - name: Install Tarpaulin
+        run: |
+          test -e ~/.cargo/bin/cargo-tarpaulin || cargo install cargo-tarpaulin --version ${{ steps.tarpaulin-version.outputs.version }}
+      - name: Run Tarpaulin coverage tests
+        run: |
+          cargo tarpaulin -v \
+          	--target-dir target/tarpaulin \
+          	--workspace \
+          	--all-features \
+          	--exclude-files 'derive/*' \
+          	--exclude-files 'target/*' \
+          	--ignore-panics --ignore-tests \
+          	--out Html --out Json \
+          	-- --skip trybuild
+        env:
+          RUST_BACKTRACE: 1
+      - uses: actions/upload-artifact@v2
+        with:
+          name: tarpaulin-report
+          path: |
+            tarpaulin-report.json
+            tarpaulin-report.html
+  
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-cargo-doc }}
+      - run: cargo doc --workspace --all-features
+      - run: tar cfJ rustdoc.tar.xz target/doc/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: rustdoc
+          path: rustdoc.tar.xz
+  
+  pages:
+    runs-on: ubuntu-latest
+    needs: [coverage, doc]
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+      - uses: actions/download-artifact@v2
+        with:
+          name: rustdoc
+      - uses: actions/download-artifact@v2
+        with:
+          name: tarpaulin-report
+      
+      - run: |
+          test ! -d ./doc || rm -r ./doc
+          tar xfJ rustdoc.tar.xz --strip-components=1
+          rm rustdoc.tar.xz
+          date >./doc/.timestamp
+          
+          coverage=$(jq '.files | { covered: map(.covered) | add, coverable: map(.coverable) | add } | .covered / .coverable * 10000 | round | . / 100' tarpaulin-report.json)
+          color=$([[ $coverage < 80 ]] && printf yellow || printf brightgreen)
+          wget -qO coverage.svg "https://img.shields.io/badge/coverage-$coverage%25-$color"
+          
+          git add ./doc coverage.svg || true
+          git status
+      
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "GitHub Pages for ${{ github.sha }}"
