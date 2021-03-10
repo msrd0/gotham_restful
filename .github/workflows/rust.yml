@@ -89,7 +89,7 @@ jobs:
       - uses: docker://ghcr.io/msrd0/alpine-cargo-readme
         with:
           entrypoint: /bin/ash
-          args: cargo readme -V && cargo readme -t README.tpl -o README.md.new && diff README.md README.md.new
+          args: -euo pipefail -c "cargo readme -V && cargo readme -t README.tpl -o README.md.new && diff README.md README.md.new"
   
   coverage:
     runs-on: ubuntu-latest
