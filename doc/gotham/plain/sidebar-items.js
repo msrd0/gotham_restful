@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["init_server","Returns a `Future` used to spawn an Gotham application."],["start","Starts a Gotham application on plain, unsecured HTTP."],["start_with_num_threads","Starts a Gotham application with a designated number of threads."]],"mod":[["test","Contains helpers for Gotham applications to use during testing."]]});

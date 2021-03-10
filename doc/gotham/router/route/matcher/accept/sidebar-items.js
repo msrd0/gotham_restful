@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AcceptHeaderRouteMatcher","A `RouteMatcher` that succeeds when the `Request` has been made with an `Accept` header that includes one or more supported media types. A missing `Accept` header, or the value of `*/*` will also positvely match. It supports the quality weighted syntax, but does not take the quality into consideration when matching."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AndRouteMatcher","Allows multiple `RouteMatcher` values to be combined when accessing a request."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AnyRouteMatcher","Matches any request without restriction (i.e. will accept any request which has already matched the path to the current route). For example, this matcher is used when delegating a path prefix to another router."]]});

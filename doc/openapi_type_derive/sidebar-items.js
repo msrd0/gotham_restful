@@ -1,0 +1,1 @@
+initSidebarItems({"derive":[["OpenapiType","The derive macro for OpenapiType."]]});

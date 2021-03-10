@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ConstrainedSegmentRegex","A unwind-safe wrapper for Regex that implements PartialEq, Eq, PartialOrd, and Ord.  These traits are implemented in a potentially error-prone way by comparing the underlying &str representations of the regular expression."]]});

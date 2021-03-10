@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ContentTypeHeaderRouteMatcher","A `RouteMatcher` that succeeds when the `Request` has been made with a `Content-Type` header that includes a supported media type. The matcher will fail if the Content-Type header is missing, unless you call `allow_no_type` on it."]]});

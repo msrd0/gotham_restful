@@ -1,0 +1,5 @@
+(function() {var implementors = {};
+implementors["gotham"] = [];
+implementors["gotham_middleware_diesel"] = [{"text":"impl&lt;T&gt; NewMiddleware for DieselMiddleware&lt;T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Connection + 'static,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["gotham_restful"] = [{"text":"impl&lt;Data, Handler&gt; NewMiddleware for AuthMiddleware&lt;Data, Handler&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: Clone + Middleware + Sync + RefUnwindSafe,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl NewMiddleware for CorsConfig","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["gotham_middleware_diesel"] = [{"text":"impl&lt;T&gt; StateData for Repo&lt;T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Connection + 'static,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["gotham_restful"] = [{"text":"impl&lt;T:&nbsp;Send + 'static&gt; StateData for AuthStatus&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl StateData for AuthSource","synthetic":false,"types":[]},{"text":"impl StateData for CorsConfig","synthetic":false,"types":[]},{"text":"impl StateData for NoopExtractor","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["node","Defines `Node` for `Tree`."],["regex","Defines the wrapping type for a segment-matching regex."],["segment","Defines `SegmentType` for `Tree`."]],"struct":[["Tree","A hierarchical structure that provides a root `Node` and subtrees of linked nodes that represent valid `Request` paths."]]});

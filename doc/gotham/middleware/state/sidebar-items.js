@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["StateMiddleware","Middleware binding for generic types to enable easy shared state."]]});

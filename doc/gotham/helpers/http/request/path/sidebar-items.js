@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RequestPathSegments","Holder for `Request` URI path segments that have been split into individual segments."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["call_handler","Instantiates a `Handler` from the given `NewHandler`, and invokes it with the request. If a panic occurs from `NewHandler::new_handler` or `Handler::handle`, it is trapped and will result in a `500 Internal Server Error` response."]]});

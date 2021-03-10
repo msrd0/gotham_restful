@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DispatcherImpl","Default implementation of the `Dispatcher` trait."]],"trait":[["Dispatcher","Used by `Router` to dispatch requests via pipelines and finally into the configured `Handler`."]]});
