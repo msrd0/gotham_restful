@@ -88,7 +88,7 @@ where
 	fn into_response(self) -> BoxFuture<'static, Result<Response, Self::Err>> {
 		match self {
 			Ok(nc) => nc.into_response().map_err(Into::into).boxed(),
-			Err(e) => handle_error(e).map_err(|e| RedirectError::Other(e)).boxed()
+			Err(e) => handle_error(e).map_err(RedirectError::Other).boxed()
 		}
 	}
 }

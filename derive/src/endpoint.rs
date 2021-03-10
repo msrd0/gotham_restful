@@ -10,6 +10,7 @@ use syn::{
 	PatType, Result, ReturnType, Type
 };
 
+#[allow(clippy::large_enum_variant)]
 pub enum EndpointType {
 	ReadAll,
 	Read,

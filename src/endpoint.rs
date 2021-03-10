@@ -87,12 +87,12 @@ pub trait Endpoint {
 	}
 
 	/// The handler for this endpoint.
-	fn handle<'a>(
-		state: &'a mut State,
+	fn handle(
+		state: &mut State,
 		placeholders: Self::Placeholders,
 		params: Self::Params,
 		body: Option<Self::Body>
-	) -> BoxFuture<'a, Self::Output>;
+	) -> BoxFuture<'_, Self::Output>;
 }
 
 #[cfg(feature = "openapi")]
