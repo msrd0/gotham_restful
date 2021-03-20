@@ -1,1 +1,1 @@
-initSidebarItems({"derive":[["NewMiddleware",""],["PathExtractor",""],["QueryStringExtractor",""],["StateData",""],["StaticResponseExtender",""]]});
+initSidebarItems({"derive":[["NewMiddleware",""],["StateData",""],["StaticResponseExtender",""]]});
