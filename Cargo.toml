@@ -12,9 +12,9 @@ description = "RESTful additions for the gotham web framework"
 keywords = ["gotham", "rest", "restful", "web", "http"]
 categories = ["web-programming", "web-programming::http-server"]
 license = "Apache-2.0"
-readme = "README.md"
+readme = "crates-io.md"
 repository = "https://github.com/msrd0/gotham_restful"
-include = ["src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
+include = ["src/**/*", "LICENSE", "crates-io.md"]
 
 [dependencies]
 futures-core = "0.3.7"

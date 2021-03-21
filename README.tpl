@@ -38,7 +38,7 @@ the MSRV (minimum supported rust version) is not considered a breaking change.
 
 ## License
 
-Copyright (C) 2020-2021 Dominic Meiser and [contributors](https://gitlab.com/msrd0/gotham-restful/-/graphs/master).
+Copyright (C) 2020-2021 Dominic Meiser and [contributors](https://github.com/msrd0/gotham_restful/graphs/contributors).
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");

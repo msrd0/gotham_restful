@@ -8,7 +8,7 @@ edition = "2018"
 description = "Derive macros for gotham_restful"
 keywords = ["gotham", "rest", "restful", "web", "http"]
 license = "Apache-2.0"
-repository = "https://gitlab.com/msrd0/gotham-restful"
+repository = "https://github.com/msrd0/gotham_restful"
 workspace = ".."
 
 [lib]

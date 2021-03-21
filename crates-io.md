@@ -1,33 +1,4 @@
-<br/>
-<div>
-	<a href="https://github.com/msrd0/gotham_restful/actions/workflows/rust.yml">
-		<img alt="build status" src="https://github.com/msrd0/gotham_restful/actions/workflows/rust.yml/badge.svg"/>
-	</a>
-	<a href="https://msrd0.github.io/gotham_restful/tarpaulin-report.html">
-		<img alt="coverage report" src="https://msrd0.github.io/gotham_restful/coverage.svg"/>
-	</a>
-	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
-		<img alt="rustdoc" src="https://img.shields.io/badge/docs-master-blue.svg"/>
-	</a>
-    <a href="https://blog.rust-lang.org/2020/12/31/Rust-1.49.0.html">
-        <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.49+-orange.svg"/>
-    </a>
-	<a href="https://deps.rs/repo/github/msrd0/gotham_restful">
-		<img alt="dependencies" src="https://deps.rs/repo/github/msrd0/gotham_restful/status.svg"/>
-	</a>
-</div>
-<br/>
-
-This repository contains the following crates:
-
- - **gotham_restful**
-   [![gotham_restful on crates.io](https://img.shields.io/crates/v/gotham_restful.svg)](https://crates.io/crates/gotham_restful)
-   [![gotham_restful on docs.rs](https://docs.rs/gotham_restful/badge.svg)](https://docs.rs/gotham_restful)
- - **gotham_restful_derive**
-   [![gotham_restful_derive on crates.io](https://img.shields.io/crates/v/gotham_restful_derive.svg)](https://crates.io/crates/gotham_restful_derive)
-   [![gotham_restful_derive on docs.rs](https://docs.rs/gotham_restful_derive/badge.svg)](https://docs.rs/gotham_restful_derive)
-
-# gotham-restful
+# gotham-restful [![Rust 1.49+](https://img.shields.io/badge/rustc-1.49+-orange.svg)](https://blog.rust-lang.org/2020/12/31/Rust-1.49.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
 
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
