@@ -8,6 +8,19 @@ use openapiv3::{
 	RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode, Type
 };
 
+fn new_parameter_data(name: String, required: bool, schema: ReferenceOr<Box<Schema>>) -> ParameterData {
+	ParameterData {
+		name,
+		description: None,
+		required,
+		deprecated: None,
+		format: ParameterSchemaOrContent::Schema(schema.unbox()),
+		example: None,
+		examples: Default::default(),
+		extensions: Default::default()
+	}
+}
+
 #[derive(Default)]
 struct OperationParams {
 	path_params: Option<OpenapiSchema>,
@@ -27,15 +40,7 @@ impl OperationParams {
 		for (name, schema) in path_params.properties {
 			let required = path_params.required.contains(&name);
 			params.push(Item(Parameter::Path {
-				parameter_data: ParameterData {
-					name,
-					description: None,
-					required,
-					deprecated: None,
-					format: ParameterSchemaOrContent::Schema(schema.unbox()),
-					example: None,
-					examples: IndexMap::new()
-				},
+				parameter_data: new_parameter_data(name, required, schema),
 				style: Default::default()
 			}))
 		}
@@ -53,15 +58,7 @@ impl OperationParams {
 		for (name, schema) in query_params.properties {
 			let required = query_params.required.contains(&name);
 			params.push(Item(Parameter::Query {
-				parameter_data: ParameterData {
-					name,
-					description: None,
-					required,
-					deprecated: None,
-					format: ParameterSchemaOrContent::Schema(schema.unbox()),
-					example: None,
-					examples: IndexMap::new()
-				},
+				parameter_data: new_parameter_data(name, required, schema),
 				allow_reserved: false,
 				style: Default::default(),
 				allow_empty_value: None
@@ -153,9 +150,9 @@ impl OperationDescription {
 
 		let request_body = body_schema.map(|schema| {
 			Item(OARequestBody {
-				description: None,
 				content: Self::schema_to_content(supported_types.or_all_types(), schema),
-				required: true
+				required: true,
+				..Default::default()
 			})
 		});
 
