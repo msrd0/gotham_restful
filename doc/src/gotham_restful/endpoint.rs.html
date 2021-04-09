@@ -142,6 +142,13 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
 <span class="kw">use</span> <span class="ident">futures_util</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
@@ -233,6 +240,13 @@
 	<span class="doccomment">/// OpenAPI Specification.</span>
 	<span class="attribute">#[<span class="ident">openapi_only</span>]</span>
 	<span class="kw">fn</span> <span class="ident">operation_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+		<span class="prelude-val">None</span>
+	}
+
+	<span class="doccomment">/// Add a description to the openapi specification. Usually taken from the rustdoc comment</span>
+	<span class="doccomment">/// when using the proc macro.</span>
+	<span class="attribute">#[<span class="ident">openapi_only</span>]</span>
+	<span class="kw">fn</span> <span class="ident">description</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
 		<span class="prelude-val">None</span>
 	}
 
