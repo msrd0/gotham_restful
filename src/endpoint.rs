@@ -91,6 +91,13 @@ pub trait Endpoint {
 		None
 	}
 
+	/// Add a description to the openapi specification. Usually taken from the rustdoc comment
+	/// when using the proc macro.
+	#[openapi_only]
+	fn description() -> Option<String> {
+		None
+	}
+
 	/// The handler for this endpoint.
 	fn handle(
 		state: &mut State,

@@ -76,6 +76,7 @@ impl OperationParams {
 
 pub struct OperationDescription {
 	operation_id: Option<String>,
+	description: Option<String>,
 	default_status: gotham::hyper::StatusCode,
 	accepted_types: Option<Vec<Mime>>,
 	schema: ReferenceOr<Schema>,
@@ -94,6 +95,7 @@ impl OperationDescription {
 		});
 		Self {
 			operation_id,
+			description: E::description(),
 			default_status: E::Output::default_status(),
 			accepted_types: E::Output::accepted_types(),
 			schema,
@@ -130,8 +132,19 @@ impl OperationDescription {
 
 	pub fn into_operation(self) -> Operation {
 		// this is unfortunately neccessary to prevent rust from complaining about partially moving self
-		let (operation_id, default_status, accepted_types, schema, params, body_schema, supported_types, requires_auth) = (
+		let (
+			operation_id,
+			description,
+			default_status,
+			accepted_types,
+			schema,
+			params,
+			body_schema,
+			supported_types,
+			requires_auth
+		) = (
 			self.operation_id,
+			self.description,
 			self.default_status,
 			self.accepted_types,
 			self.schema,
@@ -171,6 +184,7 @@ impl OperationDescription {
 		Operation {
 			tags: Vec::new(),
 			operation_id,
+			description,
 			parameters: params.into_params(),
 			request_body,
 			responses: Responses {

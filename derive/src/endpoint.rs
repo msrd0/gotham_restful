@@ -413,6 +413,35 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		));
 	}
 
+	// extract the documentation
+	let mut doc: Vec<String> = Vec::new();
+	for attr in &fun.attrs {
+		if attr.path.is_ident("doc") {
+			if let Some(lit) = attr.parse_meta().and_then(|meta| {
+				Ok(match meta {
+					Meta::NameValue(kv) => Some(kv.lit.expect_str()?),
+					_ => None
+				})
+			})? {
+				doc.push(lit.value());
+			}
+		}
+	}
+	let doc = doc.join("\n");
+	#[allow(unused_variables)]
+	let doc = doc.trim();
+
+	#[allow(unused_mut)]
+	let mut description = quote!();
+	#[cfg(feature = "openapi")]
+	if !doc.is_empty() {
+		description = quote! {
+			fn description() -> ::core::option::Option<::std::string::String> {
+				::core::option::Option::Some(::std::string::String::from(#doc))
+			}
+		};
+	}
+
 	// extract arguments into pattern, ident and type
 	let args = fun
 		.sig
@@ -601,6 +630,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 				}
 
 				#operation_id
+				#description
 				#wants_auth
 			}
 		};
