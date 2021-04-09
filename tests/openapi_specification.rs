@@ -70,6 +70,9 @@ struct SecretQuery {
 	minute: Option<u16>
 }
 
+/// This endpoint gives access to the secret.
+///
+/// You need to be authenticated to call this endpoint.
 #[read]
 fn read_secret(auth: AuthStatus, _id: String) -> AuthSuccess<Secret> {
 	auth.ok()?;
