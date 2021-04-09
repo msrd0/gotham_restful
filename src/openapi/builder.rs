@@ -5,7 +5,8 @@ use openapiv3::{
 	ReferenceOr::{Item, Reference},
 	Schema, Server
 };
-use std::sync::{Arc, RwLock};
+use parking_lot::RwLock;
+use std::sync::Arc;
 
 #[derive(Clone, Debug)]
 pub struct OpenapiInfo {
@@ -45,7 +46,7 @@ impl OpenapiBuilder {
 	/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to
 	/// modify the path and add it back after the modification
 	pub fn remove_path(&mut self, path: &str) -> PathItem {
-		let mut openapi = self.openapi.write().unwrap();
+		let mut openapi = self.openapi.write();
 		match openapi.paths.swap_remove(path) {
 			Some(Item(item)) => item,
 			_ => PathItem::default()
@@ -53,14 +54,14 @@ impl OpenapiBuilder {
 	}
 
 	pub fn add_path<Path: ToString>(&mut self, path: Path, item: PathItem) {
-		let mut openapi = self.openapi.write().unwrap();
+		let mut openapi = self.openapi.write();
 		openapi.paths.insert(path.to_string(), Item(item));
 	}
 
 	fn add_schema_impl(&mut self, name: String, mut schema: OpenapiSchema) {
 		self.add_schema_dependencies(&mut schema.dependencies);
 
-		let mut openapi = self.openapi.write().unwrap();
+		let mut openapi = self.openapi.write();
 		match &mut openapi.components {
 			Some(comp) => {
 				comp.schemas.insert(name, Item(schema.into_schema()));
@@ -125,7 +126,7 @@ mod test {
 	}
 
 	fn openapi(builder: OpenapiBuilder) -> OpenAPI {
-		Arc::try_unwrap(builder.openapi).unwrap().into_inner().unwrap()
+		Arc::try_unwrap(builder.openapi).unwrap().into_inner()
 	}
 
 	#[test]

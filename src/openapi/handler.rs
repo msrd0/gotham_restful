@@ -18,11 +18,9 @@ use indexmap::IndexMap;
 use mime::{APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN};
 use once_cell::sync::Lazy;
 use openapiv3::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
+use parking_lot::RwLock;
 use sha2::{Digest, Sha256};
-use std::{
-	pin::Pin,
-	sync::{Arc, RwLock}
-};
+use std::{panic::RefUnwindSafe, pin::Pin, sync::Arc};
 
 #[cfg(feature = "auth")]
 fn get_security(state: &mut State) -> IndexMap<String, ReferenceOr<SecurityScheme>> {
@@ -61,13 +59,7 @@ fn get_security(_state: &mut State) -> IndexMap<String, ReferenceOr<SecuritySche
 }
 
 fn create_openapi_response(state: &mut State, openapi: &Arc<RwLock<OpenAPI>>) -> Response<Body> {
-	let openapi = match openapi.read() {
-		Ok(openapi) => openapi,
-		Err(e) => {
-			error!("Unable to acquire read lock for the OpenAPI specification: {}", e);
-			return create_response(&state, StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "");
-		}
-	};
+	let openapi = openapi.read();
 
 	let mut openapi = openapi.clone();
 	let security_schemes = get_security(state);
@@ -94,6 +86,10 @@ pub struct OpenapiHandler {
 	openapi: Arc<RwLock<OpenAPI>>
 }
 
+// safety: the handler only ever aquires a read lock, so this usage of
+// RwLock is, in fact, unwind safe
+impl RefUnwindSafe for OpenapiHandler {}
+
 impl OpenapiHandler {
 	pub fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
 		Self { openapi }
@@ -119,6 +115,10 @@ impl Handler for OpenapiHandler {
 pub struct SwaggerUiHandler {
 	openapi: Arc<RwLock<OpenAPI>>
 }
+
+// safety: the handler only ever aquires a read lock, so this usage of
+// RwLock is, in fact, unwind safe
+impl RefUnwindSafe for SwaggerUiHandler {}
 
 impl SwaggerUiHandler {
 	pub fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
