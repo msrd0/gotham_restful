@@ -45,6 +45,11 @@ pub trait Endpoint {
 	/// The URI that this endpoint listens on in gotham's format.
 	fn uri() -> Cow<'static, str>;
 
+	/// The verb used for generating an operation id if [Self::operation_id] returns [None].
+	/// For example `read`, `read_all`, `create`, `update` etc.
+	#[openapi_only]
+	fn operation_verb() -> Option<&'static str>;
+
 	/// The output type that provides the response.
 	#[openapi_bound("Output: crate::ResponseSchema")]
 	type Output: IntoResponse + Send;

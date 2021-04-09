@@ -1,9 +1,10 @@
-#![cfg(all(feature = "auth", feature = "chrono", feature = "openapi"))]
+#![cfg(all(feature = "auth", feature = "openapi"))]
 
 #[macro_use]
 extern crate gotham_derive;
+#[macro_use]
+extern crate pretty_assertions;
 
-use chrono::{NaiveDate, NaiveDateTime};
 use gotham::{
 	hyper::Method,
 	pipeline::{new_pipeline, single::single_pipeline},
@@ -12,6 +13,7 @@ use gotham::{
 };
 use gotham_restful::*;
 use mime::IMAGE_PNG;
+use openapi_type::OpenapiType;
 use serde::{Deserialize, Serialize};
 
 #[allow(dead_code)]
@@ -61,15 +63,15 @@ struct Secrets {
 	secrets: Vec<Secret>
 }
 
-#[derive(Deserialize, OpenapiType, StateData, StaticResponseExtender)]
+#[derive(Clone, Deserialize, OpenapiType, StateData, StaticResponseExtender)]
 struct SecretQuery {
-	date: NaiveDate,
+	date: String,
 	hour: Option<u16>,
 	minute: Option<u16>
 }
 
 #[read]
-fn read_secret(auth: AuthStatus, _id: NaiveDateTime) -> AuthSuccess<Secret> {
+fn read_secret(auth: AuthStatus, _id: String) -> AuthSuccess<Secret> {
 	auth.ok()?;
 	Ok(Secret { code: 4.2 })
 }
@@ -86,7 +88,7 @@ fn search_secret(auth: AuthStatus, _query: SecretQuery) -> AuthSuccess<Secrets> 
 #[resource(custom_read_with, custom_patch)]
 struct CustomResource;
 
-#[derive(Deserialize, OpenapiType, StateData, StaticResponseExtender)]
+#[derive(Clone, Deserialize, OpenapiType, StateData, StaticResponseExtender)]
 struct ReadWithPath {
 	from: String,
 	id: u64

@@ -1,4 +1,8 @@
 #![cfg(feature = "openapi")]
+
+#[macro_use]
+extern crate pretty_assertions;
+
 use gotham::{router::builder::*, test::TestServer};
 use gotham_restful::*;
 use mime::TEXT_PLAIN;

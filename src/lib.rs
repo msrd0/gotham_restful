@@ -457,6 +457,10 @@ extern crate log;
 #[macro_use]
 extern crate serde;
 
+#[cfg(test)]
+#[macro_use]
+extern crate pretty_assertions;
+
 #[doc(no_inline)]
 pub use gotham;
 #[doc(no_inline)]
