@@ -86,9 +86,14 @@ pub struct OperationDescription {
 }
 
 impl OperationDescription {
-	pub fn new<E: EndpointWithSchema>(schema: ReferenceOr<Schema>) -> Self {
+	/// Create a new operation description for the given endpoint type and schema. If the endpoint
+	/// does not specify an operation id, the path is used to generate one.
+	pub fn new<E: EndpointWithSchema>(schema: ReferenceOr<Schema>, path: &str) -> Self {
+		let operation_id = E::operation_id().or_else(|| {
+			E::operation_verb().map(|verb| format!("{}_{}", verb, path.replace("/", "_").trim_start_matches('_')))
+		});
 		Self {
-			operation_id: E::operation_id(),
+			operation_id,
 			default_status: E::Output::default_status(),
 			accepted_types: E::Output::accepted_types(),
 			schema,

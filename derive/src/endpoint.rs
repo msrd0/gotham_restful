@@ -106,6 +106,21 @@ impl EndpointType {
 		}
 	}
 
+	fn operation_verb(&self) -> TokenStream {
+		let some = quote!(::core::option::Option::Some);
+		match self {
+			Self::ReadAll => quote!(#some("read_all")),
+			Self::Read => quote!(#some("read")),
+			Self::Search => quote!(#some("search")),
+			Self::Create => quote!(#some("create")),
+			Self::UpdateAll => quote!(#some("update_all")),
+			Self::Update => quote!(#some("update")),
+			Self::DeleteAll => quote!(#some("delete_all")),
+			Self::Delete => quote!(#some("delete")),
+			Self::Custom { .. } => quote!(::core::option::Option::None)
+		}
+	}
+
 	fn has_placeholders(&self) -> LitBool {
 		match self {
 			Self::ReadAll | Self::Search | Self::Create | Self::UpdateAll | Self::DeleteAll => LitBool {
@@ -304,6 +319,20 @@ fn interpret_arg(_index: usize, arg: &PatType) -> Result<HandlerArg> {
 		ident_span: arg.pat.span(),
 		ty
 	})
+}
+
+#[cfg(feature = "openapi")]
+fn expand_operation_verb(operation_verb: TokenStream) -> Option<TokenStream> {
+	Some(quote! {
+		fn operation_verb() -> Option<&'static str> {
+			#operation_verb
+		}
+	})
+}
+
+#[cfg(not(feature = "openapi"))]
+fn expand_operation_verb(_: TokenStream) -> Option<TokenStream> {
+	None
 }
 
 #[cfg(feature = "openapi")]
@@ -523,6 +552,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	} else {
 		quote!(::gotham_restful::Endpoint)
 	};
+	let operation_verb = expand_operation_verb(ty.operation_verb());
 	let operation_id = expand_operation_id(operation_id);
 	let wants_auth = expand_wants_auth(wants_auth, args.iter().any(|arg| arg.ty.is_auth_status()));
 	let code = quote! {
@@ -538,23 +568,25 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					#http_method
 				}
 
-				fn uri() -> ::std::borrow::Cow<'static, str> {
+				fn uri() -> ::std::borrow::Cow<'static, ::core::primitive::str> {
 					{ #uri }.into()
 				}
 
+				#operation_verb
+
 				#output_typedef
 
-				fn has_placeholders() -> bool {
+				fn has_placeholders() -> ::core::primitive::bool {
 					#has_placeholders
 				}
 				#placeholder_typedef
 
-				fn needs_params() -> bool {
+				fn needs_params() -> ::core::primitive::bool {
 					#needs_params
 				}
 				#params_typedef
 
-				fn needs_body() -> bool {
+				fn needs_body() -> ::core::primitive::bool {
 					#needs_body
 				}
 				#body_typedef

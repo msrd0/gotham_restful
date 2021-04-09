@@ -82,7 +82,8 @@ macro_rules! implOpenapiRouter {
 		{
 			fn endpoint<E: EndpointWithSchema + 'static>(&mut self) {
 				let schema = (self.0).openapi_builder.add_schema(E::Output::schema());
-				let mut descr = OperationDescription::new::<E>(schema);
+				let mut path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
+				let mut descr = OperationDescription::new::<E>(schema, &path);
 				if E::has_placeholders() {
 					descr.set_path_params(E::Placeholders::schema());
 				}
@@ -103,11 +104,9 @@ macro_rules! implOpenapiRouter {
 						&captures["prefix"], &captures["name"], &captures["suffix"]
 					)
 				});
-				let path = if uri.is_empty() {
-					format!("{}/{}", self.0.scope.unwrap_or_default(), self.1)
-				} else {
-					format!("{}/{}/{}", self.0.scope.unwrap_or_default(), self.1, uri)
-				};
+				if !uri.is_empty() {
+					path = format!("{}/{}", path, uri);
+				}
 
 				let op = descr.into_operation();
 				let mut item = (self.0).openapi_builder.remove_path(&path);

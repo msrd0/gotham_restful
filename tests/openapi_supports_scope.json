@@ -8,6 +8,7 @@
   "paths": {
     "/bar/baz/foo3": {
       "get": {
+        "operationId": "read_all_bar_baz_foo3",
         "responses": {
           "200": {
             "content": {
@@ -25,6 +26,7 @@
     },
     "/bar/foo2": {
       "get": {
+        "operationId": "read_all_bar_foo2",
         "responses": {
           "200": {
             "content": {
@@ -42,6 +44,7 @@
     },
     "/foo1": {
       "get": {
+        "operationId": "read_all_foo1",
         "responses": {
           "200": {
             "content": {
@@ -59,6 +62,7 @@
     },
     "/foo4": {
       "get": {
+        "operationId": "read_all_foo4",
         "responses": {
           "200": {
             "content": {
