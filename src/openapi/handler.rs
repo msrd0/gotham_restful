@@ -177,7 +177,10 @@ const SWAGGER_UI_HTML: Lazy<&'static String> = Lazy::new(|| {
 		<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.43.0/swagger-ui.css" integrity="sha512-sphGjcjFvN5sAW6S28Ge+F9SCzRuc9IVkLinDHu7B1wOUHHFAY5sSQ2Axff+qs7/0GTm0Ifg4i0lQKgM8vdV2w==" crossorigin="anonymous"/>
+			<link rel="stylesheet"
+				href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.46.0/swagger-ui.css"
+				integrity="sha512-bnx7V/XrEk9agZpJrkTelwhjx/r53sx2pFAVIRGPt/2TkunsGYiXs0RetrU22ttk74IHNTY2atj77/NsKAXo1w=="
+				crossorigin="anonymous" />
 			<style>
 				html {
 					box-sizing: border-box;
@@ -233,8 +236,8 @@ window.onload = function() {
 	};
 	
 	const s0 = document.createElement('script');
-	s0.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.43.0/swagger-ui-bundle.js');
-	s0.setAttribute('integrity', 'sha512-EfK//grBlevo9MrtEDyNvf4SkBA0avHZoVLEuSR2Yl6ymnjcIwClgZ7FXdr/42yGqnhEHxb+Sv/bJeUp26YPRw==');
+	s0.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.46.0/swagger-ui-bundle.js');
+	s0.setAttribute('integrity', 'sha512-2G8MoOYwQseZnuEIsdM/qDr4imwopde6P0X4Nz561D+CMq+ouQ6Dn1WflY8Cj7R5k563YY9fl2A4JMX45CPZCw==');
 	s0.setAttribute('crossorigin', 'anonymous');
 	s0.onload = function() {
 		s0rdy = true;
@@ -243,8 +246,8 @@ window.onload = function() {
 	document.head.appendChild(s0);
 	
 	const s1 = document.createElement('script');
-	s1.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.43.0/swagger-ui-standalone-preset.js');
-	s1.setAttribute('integrity', 'sha512-Hbx9NyAhG+P6YNBU9mp6hc6ntRjGYHqo/qae4OHhzPA69xbNmF8n2aJxpzUwdbXbYICO6eor4IhgSfiSQm9OYg==');
+	s1.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.46.0/swagger-ui-standalone-preset.js');
+	s1.setAttribute('integrity', 'sha512-UO6AQ8HFTSdUk3aEeGjzApwWZ3E6pEWt91jlw8sOI2furXXdCg3tuXvBW5YqFqwvWhF4x/68R9P0xTI3i+PYOg==');
 	s1.setAttribute('crossorigin', 'anonymous');
 	s1.onload = function() {
 		s1rdy = true;
