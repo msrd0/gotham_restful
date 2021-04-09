@@ -1,4 +1,4 @@
 (function() {var implementors = {};
 implementors["gotham"] = [];
-implementors["gotham_restful"] = [{"text":"impl StaticResponseExtender for NoopExtractor","synthetic":false,"types":[]}];
+implementors["gotham_restful"] = [{"text":"impl <a class=\"trait\" href=\"gotham/router/response/extender/trait.StaticResponseExtender.html\" title=\"trait gotham::router::response::extender::StaticResponseExtender\">StaticResponseExtender</a> for <a class=\"struct\" href=\"gotham_restful/struct.NoopExtractor.html\" title=\"struct gotham_restful::NoopExtractor\">NoopExtractor</a>","synthetic":false,"types":["gotham_restful::endpoint::NoopExtractor"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

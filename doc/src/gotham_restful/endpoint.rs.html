@@ -137,6 +137,11 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
 <span class="kw">use</span> <span class="ident">futures_util</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
@@ -184,6 +189,11 @@
 	<span class="kw">fn</span> <span class="ident">http_method</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Method</span>;
 	<span class="doccomment">/// The URI that this endpoint listens on in gotham&#39;s format.</span>
 	<span class="kw">fn</span> <span class="ident">uri</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>;
+
+	<span class="doccomment">/// The verb used for generating an operation id if [Self::operation_id] returns [None].</span>
+	<span class="doccomment">/// For example `read`, `read_all`, `create`, `update` etc.</span>
+	<span class="attribute">#[<span class="ident">openapi_only</span>]</span>
+	<span class="kw">fn</span> <span class="ident">operation_verb</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>;
 
 	<span class="doccomment">/// The output type that provides the response.</span>
 	<span class="attribute">#[<span class="ident">openapi_bound</span>(<span class="string">&quot;Output: crate::ResponseSchema&quot;</span>)]</span>
@@ -275,4 +285,5 @@
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "gotham_restful";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
