@@ -16,8 +16,7 @@ use jsonwebtoken::{errors::ErrorKind, DecodingKey};
 use serde::de::DeserializeOwned;
 use std::{marker::PhantomData, panic::RefUnwindSafe, pin::Pin};
 
-#[doc(no_inline)]
-pub use jsonwebtoken::Validation as AuthValidation;
+pub type AuthValidation = jsonwebtoken::Validation;
 
 /// The authentication status returned by the auth middleware for each request.
 #[derive(Debug, StateData)]

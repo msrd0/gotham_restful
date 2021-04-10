@@ -74,7 +74,7 @@ impl OperationParams {
 	}
 }
 
-pub struct OperationDescription {
+pub(crate) struct OperationDescription {
 	operation_id: Option<String>,
 	description: Option<String>,
 	default_status: gotham::hyper::StatusCode,
@@ -89,7 +89,7 @@ pub struct OperationDescription {
 impl OperationDescription {
 	/// Create a new operation description for the given endpoint type and schema. If the endpoint
 	/// does not specify an operation id, the path is used to generate one.
-	pub fn new<E: EndpointWithSchema>(schema: ReferenceOr<Schema>, path: &str) -> Self {
+	pub(crate) fn new<E: EndpointWithSchema>(schema: ReferenceOr<Schema>, path: &str) -> Self {
 		let operation_id = E::operation_id().or_else(|| {
 			E::operation_verb().map(|verb| format!("{}_{}", verb, path.replace("/", "_").trim_start_matches('_')))
 		});
@@ -106,15 +106,15 @@ impl OperationDescription {
 		}
 	}
 
-	pub fn set_path_params(&mut self, params: OpenapiSchema) {
+	pub(crate) fn set_path_params(&mut self, params: OpenapiSchema) {
 		self.params.path_params = Some(params);
 	}
 
-	pub fn set_query_params(&mut self, params: OpenapiSchema) {
+	pub(crate) fn set_query_params(&mut self, params: OpenapiSchema) {
 		self.params.query_params = Some(params);
 	}
 
-	pub fn set_body<Body: RequestBody>(&mut self, schema: ReferenceOr<Schema>) {
+	pub(crate) fn set_body<Body: RequestBody>(&mut self, schema: ReferenceOr<Schema>) {
 		self.body_schema = Some(schema);
 		self.supported_types = Body::supported_types();
 	}
@@ -130,7 +130,7 @@ impl OperationDescription {
 		content
 	}
 
-	pub fn into_operation(self) -> Operation {
+	pub(crate) fn into_operation(self) -> Operation {
 		// this is unfortunately neccessary to prevent rust from complaining about partially moving self
 		let (
 			operation_id,

@@ -16,12 +16,12 @@ pub struct OpenapiInfo {
 }
 
 #[derive(Clone, Debug)]
-pub struct OpenapiBuilder {
-	pub openapi: Arc<RwLock<OpenAPI>>
+pub(crate) struct OpenapiBuilder {
+	pub(crate) openapi: Arc<RwLock<OpenAPI>>
 }
 
 impl OpenapiBuilder {
-	pub fn new(info: OpenapiInfo) -> Self {
+	pub(crate) fn new(info: OpenapiInfo) -> Self {
 		Self {
 			openapi: Arc::new(RwLock::new(OpenAPI {
 				openapi: "3.0.2".to_string(),
@@ -45,7 +45,7 @@ impl OpenapiBuilder {
 
 	/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to
 	/// modify the path and add it back after the modification
-	pub fn remove_path(&mut self, path: &str) -> PathItem {
+	pub(crate) fn remove_path(&mut self, path: &str) -> PathItem {
 		let mut openapi = self.openapi.write();
 		match openapi.paths.swap_remove(path) {
 			Some(Item(item)) => item,
@@ -53,7 +53,7 @@ impl OpenapiBuilder {
 		}
 	}
 
-	pub fn add_path<Path: ToString>(&mut self, path: Path, item: PathItem) {
+	pub(crate) fn add_path<Path: ToString>(&mut self, path: Path, item: PathItem) {
 		let mut openapi = self.openapi.write();
 		openapi.paths.insert(path.to_string(), Item(item));
 	}
@@ -84,7 +84,7 @@ impl OpenapiBuilder {
 		}
 	}
 
-	pub fn add_schema(&mut self, mut schema: OpenapiSchema) -> ReferenceOr<Schema> {
+	pub(crate) fn add_schema(&mut self, mut schema: OpenapiSchema) -> ReferenceOr<Schema> {
 		match schema.name.clone() {
 			Some(name) => {
 				let reference = Reference {
