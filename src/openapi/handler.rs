@@ -82,7 +82,7 @@ fn create_openapi_response(state: &mut State, openapi: &Arc<RwLock<OpenAPI>>) ->
 }
 
 #[derive(Clone)]
-pub struct OpenapiHandler {
+pub(crate) struct OpenapiHandler {
 	openapi: Arc<RwLock<OpenAPI>>
 }
 
@@ -91,7 +91,7 @@ pub struct OpenapiHandler {
 impl RefUnwindSafe for OpenapiHandler {}
 
 impl OpenapiHandler {
-	pub fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
+	pub(crate) fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
 		Self { openapi }
 	}
 }
@@ -112,7 +112,7 @@ impl Handler for OpenapiHandler {
 }
 
 #[derive(Clone)]
-pub struct SwaggerUiHandler {
+pub(crate) struct SwaggerUiHandler {
 	openapi: Arc<RwLock<OpenAPI>>
 }
 
@@ -121,7 +121,7 @@ pub struct SwaggerUiHandler {
 impl RefUnwindSafe for SwaggerUiHandler {}
 
 impl SwaggerUiHandler {
-	pub fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
+	pub(crate) fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
 		Self { openapi }
 	}
 }

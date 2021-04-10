@@ -1,6 +1,6 @@
 const SECURITY_NAME: &str = "authToken";
 
-pub mod builder;
-pub mod handler;
-pub mod operation;
-pub mod router;
+pub(crate) mod builder;
+pub(crate) mod handler;
+pub(crate) mod operation;
+pub(crate) mod router;

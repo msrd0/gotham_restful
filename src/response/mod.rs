@@ -18,22 +18,27 @@ use std::{
 };
 
 mod auth_result;
+#[allow(unreachable_pub)]
 pub use auth_result::{AuthError, AuthErrorOrOther, AuthResult, AuthSuccess};
 
 mod no_content;
+#[allow(unreachable_pub)]
 pub use no_content::NoContent;
 
 mod raw;
+#[allow(unreachable_pub)]
 pub use raw::Raw;
 
 mod redirect;
+#[allow(unreachable_pub)]
 pub use redirect::Redirect;
 
-#[allow(clippy::module_inception)]
 mod result;
+#[allow(unreachable_pub)]
 pub use result::IntoResponseError;
 
 mod success;
+#[allow(unreachable_pub)]
 pub use success::Success;
 
 pub(crate) trait OrAllTypes {

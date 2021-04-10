@@ -1,4 +1,5 @@
-#![warn(missing_debug_implementations, rust_2018_idioms)]
+#![warn(missing_debug_implementations, rust_2018_idioms, unreachable_pub)]
+#![deny(warnings)]
 #![forbid(unsafe_code)]
 // can we have a lint for spaces in doc comments please?
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::tabs_in_doc_comments))]
