@@ -59,12 +59,13 @@ impl IntoResponse for Redirect {
 
 #[cfg(feature = "openapi")]
 impl ResponseSchema for Redirect {
-	fn default_status() -> StatusCode {
-		StatusCode::SEE_OTHER
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::SEE_OTHER]
 	}
 
-	fn schema() -> OpenapiSchema {
-		<NoContent as ResponseSchema>::schema()
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::SEE_OTHER);
+		<NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT)
 	}
 }
 
@@ -99,12 +100,12 @@ where
 	E: Display + IntoResponseError,
 	<E as IntoResponseError>::Err: StdError + Sync
 {
-	fn default_status() -> StatusCode {
-		Redirect::default_status()
+	fn status_codes() -> Vec<StatusCode> {
+		Redirect::status_codes()
 	}
 
-	fn schema() -> OpenapiSchema {
-		<Redirect as ResponseSchema>::schema()
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		<Redirect as ResponseSchema>::schema(code)
 	}
 }
 

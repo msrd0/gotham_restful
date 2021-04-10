@@ -201,6 +201,14 @@
               }
             },
             "description": "OK"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Internal Server Error"
           }
         },
         "security": [
@@ -235,6 +243,14 @@
               }
             },
             "description": "OK"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Internal Server Error"
           }
         },
         "security": [

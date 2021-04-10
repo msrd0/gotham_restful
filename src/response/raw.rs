@@ -117,7 +117,8 @@ impl<T: Into<Body>> ResponseSchema for Raw<T>
 where
 	Self: Send
 {
-	fn schema() -> OpenapiSchema {
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::OK);
 		<Self as OpenapiType>::schema()
 	}
 }
@@ -143,8 +144,12 @@ where
 	Raw<T>: IntoResponseWithSchema,
 	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
-	fn schema() -> OpenapiSchema {
-		<Raw<T> as ResponseSchema>::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		<Raw<T> as ResponseSchema>::status_codes()
+	}
+
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		<Raw<T> as ResponseSchema>::schema(code)
 	}
 }
 

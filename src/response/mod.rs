@@ -161,11 +161,15 @@ pub trait IntoResponse {
 /// Additional details for [IntoResponse] to be used with an OpenAPI-aware router.
 #[cfg(feature = "openapi")]
 pub trait ResponseSchema {
-	fn schema() -> OpenapiSchema;
-
-	fn default_status() -> StatusCode {
-		StatusCode::OK
+	/// All status codes returned by this response. Returns `[StatusCode::OK]` by default.
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::OK]
 	}
+
+	/// Return the schema of the response for the given status code. The code may
+	/// only be one that was previously returned by [Self::status_codes]. The
+	/// implementation should panic if that is not the case.
+	fn schema(code: StatusCode) -> OpenapiSchema;
 }
 
 #[cfg(feature = "openapi")]
@@ -246,13 +250,12 @@ impl<Res> ResponseSchema for Pin<Box<dyn Future<Output = Res> + Send>>
 where
 	Res: ResponseSchema
 {
-	fn schema() -> OpenapiSchema {
-		Res::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		Res::status_codes()
 	}
 
-	#[cfg(feature = "openapi")]
-	fn default_status() -> StatusCode {
-		Res::default_status()
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		Res::schema(code)
 	}
 }
 

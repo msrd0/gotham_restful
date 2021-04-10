@@ -53,8 +53,18 @@ where
 	R: ResponseBody,
 	E: Display + IntoResponseError<Err = serde_json::Error>
 {
-	fn schema() -> OpenapiSchema {
-		R::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::OK, StatusCode::INTERNAL_SERVER_ERROR]
+	}
+
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		use openapiv3::{AnySchema, SchemaKind};
+
+		match code {
+			StatusCode::OK => R::schema(),
+			StatusCode::INTERNAL_SERVER_ERROR => OpenapiSchema::new(SchemaKind::Any(AnySchema::default())),
+			_ => panic!("Invalid status code")
+		}
 	}
 }
 
