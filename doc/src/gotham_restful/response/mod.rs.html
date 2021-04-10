@@ -283,6 +283,11 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures_util</span>::<span class="ident">future</span>::{<span class="self">self</span>, <span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::{
@@ -304,22 +309,27 @@
 };
 
 <span class="kw">mod</span> <span class="ident">auth_result</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">auth_result</span>::{<span class="ident">AuthError</span>, <span class="ident">AuthErrorOrOther</span>, <span class="ident">AuthResult</span>, <span class="ident">AuthSuccess</span>};
 
 <span class="kw">mod</span> <span class="ident">no_content</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">no_content</span>::<span class="ident">NoContent</span>;
 
 <span class="kw">mod</span> <span class="ident">raw</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">raw</span>::<span class="ident">Raw</span>;
 
 <span class="kw">mod</span> <span class="ident">redirect</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">redirect</span>::<span class="ident">Redirect</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">module_inception</span>)]</span>
 <span class="kw">mod</span> <span class="ident">result</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">result</span>::<span class="ident">IntoResponseError</span>;
 
 <span class="kw">mod</span> <span class="ident">success</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">success</span>::<span class="ident">Success</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">OrAllTypes</span> {

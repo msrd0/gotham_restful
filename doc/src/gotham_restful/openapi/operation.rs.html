@@ -301,7 +301,7 @@
 	}
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OperationDescription</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OperationDescription</span> {
 	<span class="ident">operation_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 	<span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 	<span class="ident">default_status</span>: <span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>,
@@ -316,7 +316,7 @@
 <span class="kw">impl</span> <span class="ident">OperationDescription</span> {
 	<span class="doccomment">/// Create a new operation description for the given endpoint type and schema. If the endpoint</span>
 	<span class="doccomment">/// does not specify an operation id, the path is used to generate one.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">EndpointWithSchema</span><span class="op">&gt;</span>(<span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">EndpointWithSchema</span><span class="op">&gt;</span>(<span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">operation_id</span> <span class="op">=</span> <span class="ident">E</span>::<span class="ident">operation_id</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
 			<span class="ident">E</span>::<span class="ident">operation_verb</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">verb</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">verb</span>, <span class="ident">path</span>.<span class="ident">replace</span>(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;_&quot;</span>).<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)))
 		});
@@ -333,15 +333,15 @@
 		}
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_path_params</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">OpenapiSchema</span>) {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_path_params</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">OpenapiSchema</span>) {
 		<span class="self">self</span>.<span class="ident">params</span>.<span class="ident">path_params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_query_params</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">OpenapiSchema</span>) {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_query_params</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">OpenapiSchema</span>) {
 		<span class="self">self</span>.<span class="ident">params</span>.<span class="ident">query_params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_body</span><span class="op">&lt;</span><span class="ident">Body</span>: <span class="ident">RequestBody</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span>) {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_body</span><span class="op">&lt;</span><span class="ident">Body</span>: <span class="ident">RequestBody</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span>) {
 		<span class="self">self</span>.<span class="ident">body_schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">schema</span>);
 		<span class="self">self</span>.<span class="ident">supported_types</span> <span class="op">=</span> <span class="ident">Body</span>::<span class="ident">supported_types</span>();
 	}
@@ -357,7 +357,7 @@
 		<span class="ident">content</span>
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_operation</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Operation</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_operation</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Operation</span> {
 		<span class="comment">// this is unfortunately neccessary to prevent rust from complaining about partially moving self</span>
 		<span class="kw">let</span> (
 			<span class="ident">operation_id</span>,
