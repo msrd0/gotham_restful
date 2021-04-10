@@ -2,7 +2,7 @@ var N = null;var sourcesIndex = {};
 sourcesIndex["aho_corasick"] = {"name":"","dirs":[{"name":"packed","dirs":[{"name":"teddy","files":["compile.rs","mod.rs","runtime.rs"]}],"files":["api.rs","mod.rs","pattern.rs","rabinkarp.rs","vector.rs"]}],"files":["ahocorasick.rs","automaton.rs","buffer.rs","byte_frequencies.rs","classes.rs","dfa.rs","error.rs","lib.rs","nfa.rs","prefilter.rs","state_id.rs"]};
 sourcesIndex["anyhow"] = {"name":"","files":["backtrace.rs","chain.rs","context.rs","error.rs","fmt.rs","kind.rs","lib.rs","macros.rs","ptr.rs","wrapper.rs"]};
 sourcesIndex["base64"] = {"name":"","dirs":[{"name":"read","files":["decoder.rs","mod.rs"]},{"name":"write","files":["encoder.rs","encoder_string_writer.rs","mod.rs"]}],"files":["chunked_encoder.rs","decode.rs","display.rs","encode.rs","lib.rs","tables.rs"]};
-sourcesIndex["bincode"] = {"name":"","dirs":[{"name":"config","files":["endian.rs","int.rs","legacy.rs","limit.rs","mod.rs","trailing.rs"]},{"name":"de","files":["mod.rs","read.rs"]},{"name":"ser","files":["mod.rs"]}],"files":["error.rs","internal.rs","lib.rs"]};
+sourcesIndex["bincode"] = {"name":"","dirs":[{"name":"config","files":["endian.rs","int.rs","legacy.rs","limit.rs","mod.rs","trailing.rs"]},{"name":"de","files":["mod.rs","read.rs"]},{"name":"ser","files":["mod.rs"]}],"files":["byteorder.rs","error.rs","internal.rs","lib.rs"]};
 sourcesIndex["bitflags"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["block_buffer"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["borrow_bag"] = {"name":"","files":["append.rs","handle.rs","lib.rs","lookup.rs"]};
