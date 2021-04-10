@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ### Changed
  - All endpoints with a known operation verb (like `read` or `update`) now have an auto-generated operation id (`openapi` feature only)
  - Endpoint macros now place the rustdoc into the operation's description (`openapi` feature only)
+ - Update `openapi_type` crate to 0.2.0
 
 ## [0.3.0] - 2021-03-21
 ### Changed
