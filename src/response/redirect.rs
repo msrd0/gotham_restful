@@ -101,11 +101,17 @@ where
 	<E as IntoResponseError>::Err: StdError + Sync
 {
 	fn status_codes() -> Vec<StatusCode> {
-		Redirect::status_codes()
+		vec![StatusCode::SEE_OTHER, StatusCode::INTERNAL_SERVER_ERROR]
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		<Redirect as ResponseSchema>::schema(code)
+		use openapiv3::{AnySchema, SchemaKind};
+
+		match code {
+			StatusCode::SEE_OTHER => <Redirect as ResponseSchema>::schema(code),
+			StatusCode::INTERNAL_SERVER_ERROR => OpenapiSchema::new(SchemaKind::Any(AnySchema::default())),
+			_ => panic!("Invalid status code")
+		}
 	}
 }
 
@@ -121,7 +127,7 @@ mod test {
 	struct MsgError;
 
 	#[test]
-	fn rediect_has_redirect_response() {
+	fn rediect_response() {
 		let redir = Redirect {
 			to: "http://localhost/foo".to_owned()
 		};
@@ -133,6 +139,9 @@ mod test {
 			Some("http://localhost/foo")
 		);
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(Redirect::status_codes(), vec![StatusCode::SEE_OTHER]);
 	}
 
 	#[test]
@@ -148,5 +157,11 @@ mod test {
 			Some("http://localhost/foo")
 		);
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(<Result<Redirect, MsgError>>::status_codes(), vec![
+			StatusCode::SEE_OTHER,
+			StatusCode::INTERNAL_SERVER_ERROR
+		]);
 	}
 }

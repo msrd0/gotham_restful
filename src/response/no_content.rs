@@ -151,6 +151,12 @@ mod test {
 		assert_eq!(res.status, StatusCode::NO_CONTENT);
 		assert_eq!(res.mime, None);
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(<Result<NoContent, MsgError>>::status_codes(), vec![
+			StatusCode::NO_CONTENT,
+			StatusCode::INTERNAL_SERVER_ERROR
+		]);
 	}
 
 	#[test]
