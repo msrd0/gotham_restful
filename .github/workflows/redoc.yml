@@ -2,7 +2,7 @@ name: ReDoc
 
 on:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: '0 4 * * *'
 
 jobs:
   swagger_ui:
@@ -36,6 +36,6 @@ jobs:
           labels: dependencies
           reviewers: msrd0
           body: |
-            Updates the linked version of ReDoc to ${{ steps.redoc-version.outputs.versions }}
+            Updates the linked version of ReDoc to ${{ steps.redoc-version.outputs.version }}
             
             <sub>Automated changes by [create-pull-request](https://github.com/peter-evans/create-pull-request) GitHub action</sub>
