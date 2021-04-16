@@ -159,7 +159,13 @@ impl Handler for SwaggerUiHandler {
 				let mut res = create_response(&state, StatusCode::OK, TEXT_HTML, SWAGGER_UI_HTML.as_bytes());
 				let headers = res.headers_mut();
 				headers.insert(CACHE_CONTROL, HeaderValue::from_static("public,max-age=2592000"));
-				headers.insert(CONTENT_SECURITY_POLICY, format!("default-src 'none'; script-src 'unsafe-inline' 'sha256-{}' 'strict-dynamic'; style-src 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self'; img-src data:;", SWAGGER_UI_SCRIPT_HASH.as_str()).parse().unwrap());
+				headers.insert(
+					CONTENT_SECURITY_POLICY,
+					format!(
+						"default-src 'none';base-uri 'none';script-src 'unsafe-inline' https://cdn.jsdelivr.net 'sha256-{}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src data:",
+						SWAGGER_UI_SCRIPT_HASH.as_str()
+					).parse().unwrap()
+				);
 				headers.insert(ETAG, SWAGGER_UI_HTML_ETAG.parse().unwrap());
 				headers.insert(REFERRER_POLICY, HeaderValue::from_static("strict-origin-when-cross-origin"));
 				headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
@@ -169,93 +175,21 @@ impl Handler for SwaggerUiHandler {
 	}
 }
 
-// inspired by https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html
-const SWAGGER_UI_HTML: Lazy<&'static String> = Lazy::new(|| {
-	let template = indoc::indoc! {
-		r#"
-		<!DOCTYPE HTML>
-		<html lang="en">
-		<head>
-			<meta charset="UTF-8"/>
-			<link rel="stylesheet"
-				href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.46.0/swagger-ui.css"
-				integrity="sha512-bnx7V/XrEk9agZpJrkTelwhjx/r53sx2pFAVIRGPt/2TkunsGYiXs0RetrU22ttk74IHNTY2atj77/NsKAXo1w=="
-				crossorigin="anonymous" />
-			<style>
-				html {
-					box-sizing: border-box;
-					overflow-y: scroll;
-				}
-				*, *::before, *::after {
-					box-sizing: inherit;
-				}
-				body {
-					margin: 0;
-					background: #fafafa;
-				}
-			</style>
-		</head>
-		<body>
-			<div id="swagger-ui"></div>
-			<script>{{script}}</script>
-		</body>
-		</html>
-		"#
-	};
-	Box::leak(Box::new(template.replace("{{script}}", SWAGGER_UI_SCRIPT)))
-});
+const SWAGGER_UI_HTML: &str = concat!(
+	r#"<!DOCTYPE HTML><html><head><meta charset="UTF-8"/>"#,
+	r#"<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Source+Code+Pro:300,400,700&display=swap"/>"#,
+	r#"</head><body style="margin:0"><div id="redoc"></div><script>"#,
+	include_str!("script.js"),
+	r#"</script></body></html>"#
+);
 static SWAGGER_UI_HTML_ETAG: Lazy<String> = Lazy::new(|| {
 	let mut hash = Sha256::new();
-	hash.update(SWAGGER_UI_HTML.as_bytes());
+	hash.update(SWAGGER_UI_HTML);
 	let hash = hash.finalize();
-	let hash = base64::encode(hash);
-	format!("\"{}\"", hash)
+	format!(r#""{}""#, base64::encode(hash))
 });
-const SWAGGER_UI_SCRIPT: &str = r#"
-let s0rdy = false;
-let s1rdy = false;
 
-window.onload = function() {
-	const cb = function() {
-		if (!s0rdy || !s1rdy)
-			return;
-		const ui = SwaggerUIBundle({
-			url: window.location.origin + window.location.pathname + '?spec',
-			dom_id: '#swagger-ui',
-			deepLinking: true,
-			presets: [
-				SwaggerUIBundle.presets.apis,
-				SwaggerUIStandalonePreset
-			],
-			plugins: [
-				SwaggerUIBundle.plugins.DownloadUrl
-			],
-			layout: 'StandaloneLayout'
-		});
-		window.ui = ui;
-	};
-	
-	const s0 = document.createElement('script');
-	s0.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.46.0/swagger-ui-bundle.js');
-	s0.setAttribute('integrity', 'sha512-2G8MoOYwQseZnuEIsdM/qDr4imwopde6P0X4Nz561D+CMq+ouQ6Dn1WflY8Cj7R5k563YY9fl2A4JMX45CPZCw==');
-	s0.setAttribute('crossorigin', 'anonymous');
-	s0.onload = function() {
-		s0rdy = true;
-		cb();
-	};
-	document.head.appendChild(s0);
-	
-	const s1 = document.createElement('script');
-	s1.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.46.0/swagger-ui-standalone-preset.js');
-	s1.setAttribute('integrity', 'sha512-UO6AQ8HFTSdUk3aEeGjzApwWZ3E6pEWt91jlw8sOI2furXXdCg3tuXvBW5YqFqwvWhF4x/68R9P0xTI3i+PYOg==');
-	s1.setAttribute('crossorigin', 'anonymous');
-	s1.onload = function() {
-		s1rdy = true;
-		cb();
-	};
-	document.head.appendChild(s1);
-};
-"#;
+const SWAGGER_UI_SCRIPT: &str = include_str!("script.js");
 static SWAGGER_UI_SCRIPT_HASH: Lazy<String> = Lazy::new(|| {
 	let mut hash = Sha256::new();
 	hash.update(SWAGGER_UI_SCRIPT);
