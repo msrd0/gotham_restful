@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
  - Endpoint macros now place the rustdoc into the operation's description (`openapi` feature only)
  - Update `openapi_type` crate to 0.2.0
  - Replace swagger-ui with redoc and a semi-dark theme (`openapi` feature only)
+ - Rename `get_openapi` to `openapi_spec` and `swagger_ui` to `openapi_doc` (that now serves redoc)
 
 ## [0.3.0] - 2021-03-21
 ### Changed

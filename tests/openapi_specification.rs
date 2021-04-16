@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 mod util {
 	include!("util/mod.rs");
 }
-use util::{test_get_response, test_openapi_response};
+use util::test_openapi_response;
 
 const IMAGE_RESPONSE : &[u8] = b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUA/wA0XsCoAAAAAXRSTlN/gFy0ywAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=";
 
@@ -121,7 +121,7 @@ fn openapi_specification() {
 			router.resource::<ImageResource>("img");
 			router.resource::<SecretResource>("secret");
 			router.resource::<CustomResource>("custom");
-			router.get_openapi("openapi");
+			router.openapi_spec("openapi");
 		});
 	}))
 	.unwrap();

@@ -86,21 +86,21 @@ fn create_openapi_response(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Res
 }
 
 #[derive(Clone)]
-pub(crate) struct OpenapiHandler {
+pub(crate) struct OpenapiSpecHandler {
 	openapi: Arc<RwLock<OpenAPI>>
 }
 
 // safety: the handler only ever aquires a read lock, so this usage of
 // RwLock is, in fact, unwind safe
-impl RefUnwindSafe for OpenapiHandler {}
+impl RefUnwindSafe for OpenapiSpecHandler {}
 
-impl OpenapiHandler {
+impl OpenapiSpecHandler {
 	pub(crate) fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
 		Self { openapi }
 	}
 }
 
-impl NewHandler for OpenapiHandler {
+impl NewHandler for OpenapiSpecHandler {
 	type Instance = Self;
 
 	fn new_handler(&self) -> anyhow::Result<Self> {
@@ -108,7 +108,7 @@ impl NewHandler for OpenapiHandler {
 	}
 }
 
-impl Handler for OpenapiHandler {
+impl Handler for OpenapiSpecHandler {
 	fn handle(self, mut state: State) -> Pin<Box<HandlerFuture>> {
 		let res = create_openapi_response(&mut state, &self.openapi);
 		future::ok((state, res)).boxed()
@@ -116,21 +116,21 @@ impl Handler for OpenapiHandler {
 }
 
 #[derive(Clone)]
-pub(crate) struct SwaggerUiHandler {
+pub(crate) struct OpenapiDocHandler {
 	openapi: Arc<RwLock<OpenAPI>>
 }
 
 // safety: the handler only ever aquires a read lock, so this usage of
 // RwLock is, in fact, unwind safe
-impl RefUnwindSafe for SwaggerUiHandler {}
+impl RefUnwindSafe for OpenapiDocHandler {}
 
-impl SwaggerUiHandler {
+impl OpenapiDocHandler {
 	pub(crate) fn new(openapi: Arc<RwLock<OpenAPI>>) -> Self {
 		Self { openapi }
 	}
 }
 
-impl NewHandler for SwaggerUiHandler {
+impl NewHandler for OpenapiDocHandler {
 	type Instance = Self;
 
 	fn new_handler(&self) -> anyhow::Result<Self> {
@@ -214,7 +214,7 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 	Ok(res)
 }
 
-impl Handler for SwaggerUiHandler {
+impl Handler for OpenapiDocHandler {
 	fn handle(self, state: State) -> Pin<Box<HandlerFuture>> {
 		match redoc_handler(&state, &self.openapi) {
 			Ok(res) => future::ok((state, res)).boxed(),
