@@ -32,6 +32,8 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
           commit-message: Update ReDoc version to ${{ steps.redoc-version.outputs.version }}
           title: Update ReDoc version to ${{ steps.redoc-version.outputs.version }}
+          author: gotham-restful-bot[bot] <82609003+gotham-restful-bot[bot]@users.noreply.github.com>
+          committer: gotham-restful-bot[bot] <82609003+gotham-restful-bot[bot]@users.noreply.github.com>
           branch: redoc-${{ steps.redoc-version.outputs.version }}
           labels: dependencies
           reviewers: msrd0
