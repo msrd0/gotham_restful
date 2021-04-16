@@ -312,23 +312,25 @@ fn main() {
 		};
 		route.with_openapi(info, |mut route| {
 			route.resource::<FooResource>("foo");
-			route.get_openapi("openapi");
+			route.openapi_spec("openapi");
+			route.openapi_doc("/");
 		});
 	}));
 }
 ```
 
-Above example adds the resource as before, but adds another endpoint that we specified as `/openapi`.
-It will return the generated openapi specification in JSON format. This allows you to easily write
-clients in different languages without worying to exactly replicate your api in each of those
-languages.
+Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`.
+The first one will return the generated openapi specification in JSON format, allowing you to easily
+generate clients in different languages without worying to exactly replicate your api in each of those
+languages. The second one will return documentation in HTML format, so you can easily view your
+api and share it with other people.
 
 However, please note that by default, the `without-openapi` feature of this crate is enabled.
-Disabling it in favour of the `openapi` feature will add an additional type bound,
-[`OpenapiType`][openapi_type::OpenapiType], on some of the types in [`Endpoint`] and related
-traits. This means that some code might only compile on either feature, but not on both. If you
-are writing a library that uses gotham-restful, it is strongly recommended to pass both features
-through and conditionally enable the openapi code, like this:
+Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements
+to some of the traits and types in this crate, for example instead of [`Endpoint`] you now have to
+implement [`EndpointWithSchema`]. This means that some code might only compile on either feature, but not
+on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both
+features through and conditionally enable the openapi code, like this:
 
 ```rust
 #[derive(Deserialize, Serialize)]
