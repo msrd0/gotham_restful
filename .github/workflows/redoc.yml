@@ -2,7 +2,7 @@ name: ReDoc
 
 on:
   schedule:
-    - cron: '10 0 * * *'
+    - cron: '30 0 * * *'
 
 jobs:
   swagger_ui:
