@@ -1,6 +1,6 @@
 window.onload = function() {
-	const REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.40/bundles/redoc.standalone.js";
-	const REDOC_SRI = "iGByzgA/G8tZoUo2VEs3tLMgXADp7QDFhIz/JbpdnF5Iy0ehv01g2mTqehbRs54g/C2pMKaSNDHV+gpur+aErA==";
+	const REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.53/bundles/redoc.standalone.js";
+	const REDOC_SRI = "FAbK/5MuJ1fv6AUK+Cjrnnx8lj5Ym7TJmxv7Lli/o44Dlm5z/bF5UDQin+INTbR77xU2r5+gm7OKPG1blrBCZA==";
 	
 	const cb = function() {
 		Redoc.init(window.location.origin + window.location.pathname + '?spec', {
