@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `gotham_restful` crate."><meta name="keywords" content="rust, rustlang, rust-lang, gotham_restful"><title>gotham_restful - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../gotham_restful/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate gotham_restful</p><div class="block version"><p>Version 0.3.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all gotham_restful's items</p></a><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="gotham_restful" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">gotham_restful</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/gotham_restful/lib.rs.html#1-538" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This crate is an extension to the popular <a href="https://gotham.rs/">gotham web framework</a> for Rust. It allows you to
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">gotham_restful</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/gotham_restful/lib.rs.html#1-540" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This crate is an extension to the popular <a href="https://gotham.rs/">gotham web framework</a> for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
 for requests.</p>
 <h1 id="features" class="section-header"><a href="#features">Features</a></h1>
@@ -278,20 +278,22 @@ should be no need to implement it manually. A simple example looks like this:</p
 		};
 		<span class="ident">route</span>.<span class="ident">with_openapi</span>(<span class="ident">info</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">route</span><span class="op">|</span> {
 			<span class="ident">route</span>.<span class="ident">resource</span>::<span class="op">&lt;</span><span class="ident">FooResource</span><span class="op">&gt;</span>(<span class="string">&quot;foo&quot;</span>);
-			<span class="ident">route</span>.<span class="ident">get_openapi</span>(<span class="string">&quot;openapi&quot;</span>);
+			<span class="ident">route</span>.<span class="ident">openapi_spec</span>(<span class="string">&quot;openapi&quot;</span>);
+			<span class="ident">route</span>.<span class="ident">openapi_doc</span>(<span class="string">&quot;/&quot;</span>);
 		});
 	}));
 }</pre></div>
-<p>Above example adds the resource as before, but adds another endpoint that we specified as <code>/openapi</code>.
-It will return the generated openapi specification in JSON format. This allows you to easily write
-clients in different languages without worying to exactly replicate your api in each of those
-languages.</p>
+<p>Above example adds the resource as before, but adds two other endpoints as well: <code>/openapi</code> and <code>/</code>.
+The first one will return the generated openapi specification in JSON format, allowing you to easily
+generate clients in different languages without worying to exactly replicate your api in each of those
+languages. The second one will return documentation in HTML format, so you can easily view your
+api and share it with other people.</p>
 <p>However, please note that by default, the <code>without-openapi</code> feature of this crate is enabled.
-Disabling it in favour of the <code>openapi</code> feature will add an additional type bound,
-<a href="../openapi_type/trait.OpenapiType.html" title="openapi_type::OpenapiType"><code>OpenapiType</code></a>, on some of the types in <a href="../gotham_restful/trait.Endpoint.html" title="Endpoint"><code>Endpoint</code></a> and related
-traits. This means that some code might only compile on either feature, but not on both. If you
-are writing a library that uses gotham-restful, it is strongly recommended to pass both features
-through and conditionally enable the openapi code, like this:</p>
+Disabling it in favour of the <code>openapi</code> feature will add additional type bounds and method requirements
+to some of the traits and types in this crate, for example instead of <a href="../gotham_restful/trait.Endpoint.html" title="Endpoint"><code>Endpoint</code></a> you now have to
+implement <a href="../gotham_restful/trait.EndpointWithSchema.html" title="EndpointWithSchema"><code>EndpointWithSchema</code></a>. This means that some code might only compile on either feature, but not
+on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both
+features through and conditionally enable the openapi code, like this:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -340,7 +342,7 @@ any RESTful <a href="../gotham_restful/trait.Resource.html" title="Resource">Res
 any RESTful <a href="../gotham_restful/trait.Resource.html" title="Resource">Resource</a> with a path.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.Endpoint.html" title="gotham_restful::Endpoint trait">Endpoint</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.EndpointWithSchema.html" title="gotham_restful::EndpointWithSchema trait">EndpointWithSchema</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.FromBody.html" title="gotham_restful::FromBody trait">FromBody</a></td><td class="docblock-short"><p>This trait should be implemented for every type that can be built from an HTTP request body
 plus its media type.</p>
-</td></tr><tr class="module-item"><td><a class="trait" href="trait.GetOpenapi.html" title="gotham_restful::GetOpenapi trait">GetOpenapi</a></td><td class="docblock-short"><p>This trait adds the <code>get_openapi</code> and <code>swagger_ui</code> method to an OpenAPI-aware router.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.GetOpenapi.html" title="gotham_restful::GetOpenapi trait">GetOpenapi</a></td><td class="docblock-short"><p>This trait adds the <code>openapi_spec</code> and <code>openapi_doc</code> method to an OpenAPI-aware router.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.IntoResponse.html" title="gotham_restful::IntoResponse trait">IntoResponse</a></td><td class="docblock-short"><p>This trait needs to be implemented by every type returned from an endpoint to
 to provide the response.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.IntoResponseError.html" title="gotham_restful::IntoResponseError trait">IntoResponseError</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.IntoResponseWithSchema.html" title="gotham_restful::IntoResponseWithSchema trait">IntoResponseWithSchema</a></td><td class="docblock-short"><p>A trait provided to convert a resource's result to json, and provide an OpenAPI schema to the
