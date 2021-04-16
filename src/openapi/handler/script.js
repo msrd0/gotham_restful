@@ -3,7 +3,8 @@ window.onload = function() {
 	const REDOC_SRI = "FAbK/5MuJ1fv6AUK+Cjrnnx8lj5Ym7TJmxv7Lli/o44Dlm5z/bF5UDQin+INTbR77xU2r5+gm7OKPG1blrBCZA==";
 	
 	const cb = function() {
-		Redoc.init(window.location.origin + window.location.pathname + '?spec', {
+		const spec = JSON.parse(decodeURI(SPEC));
+		Redoc.init(spec, {
 			theme: {
 				typography: {
 					fontFamily: '"Open Sans",sans-serif',
