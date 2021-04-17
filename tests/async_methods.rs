@@ -20,7 +20,7 @@ mod util {
 use util::{test_delete_response, test_get_response, test_post_response, test_put_response};
 
 #[derive(Resource)]
-#[resource(read_all, read, search, create, change_all, change, remove_all, remove, state_test)]
+#[resource(read_all, read, search, create, update_all, update, delete_all, delete, state_test)]
 struct FooResource;
 
 #[derive(Deserialize)]
@@ -61,28 +61,28 @@ async fn create(_body: FooBody) -> Raw<&'static [u8]> {
 	Raw::new(CREATE_RESPONSE, TEXT_PLAIN)
 }
 
-const CHANGE_ALL_RESPONSE: &[u8] = b"QlbYg8gHE9OQvvk3yKjXJLTSXlIrg9mcqhfMXJmQkv";
-#[change_all]
-async fn change_all(_body: FooBody) -> Raw<&'static [u8]> {
-	Raw::new(CHANGE_ALL_RESPONSE, TEXT_PLAIN)
+const UPDATE_ALL_RESPONSE: &[u8] = b"QlbYg8gHE9OQvvk3yKjXJLTSXlIrg9mcqhfMXJmQkv";
+#[update_all]
+async fn update_all(_body: FooBody) -> Raw<&'static [u8]> {
+	Raw::new(UPDATE_ALL_RESPONSE, TEXT_PLAIN)
 }
 
-const CHANGE_RESPONSE: &[u8] = b"qGod55RUXkT1lgPO8h0uVM6l368O2S0GrwENZFFuRu";
-#[change]
-async fn change(_id: u64, _body: FooBody) -> Raw<&'static [u8]> {
-	Raw::new(CHANGE_RESPONSE, TEXT_PLAIN)
+const UPDATE_RESPONSE: &[u8] = b"qGod55RUXkT1lgPO8h0uVM6l368O2S0GrwENZFFuRu";
+#[update]
+async fn update(_id: u64, _body: FooBody) -> Raw<&'static [u8]> {
+	Raw::new(UPDATE_RESPONSE, TEXT_PLAIN)
 }
 
-const REMOVE_ALL_RESPONSE: &[u8] = b"Y36kZ749MRk2Nem4BedJABOZiZWPLOtiwLfJlGTwm5";
-#[remove_all]
-async fn remove_all() -> Raw<&'static [u8]> {
-	Raw::new(REMOVE_ALL_RESPONSE, TEXT_PLAIN)
+const DELETE_ALL_RESPONSE: &[u8] = b"Y36kZ749MRk2Nem4BedJABOZiZWPLOtiwLfJlGTwm5";
+#[delete_all]
+async fn delete_all() -> Raw<&'static [u8]> {
+	Raw::new(DELETE_ALL_RESPONSE, TEXT_PLAIN)
 }
 
-const REMOVE_RESPONSE: &[u8] = b"CwRzBrKErsVZ1N7yeNfjZuUn1MacvgBqk4uPOFfDDq";
-#[remove]
-async fn remove(_id: u64) -> Raw<&'static [u8]> {
-	Raw::new(REMOVE_RESPONSE, TEXT_PLAIN)
+const DELETE_RESPONSE: &[u8] = b"CwRzBrKErsVZ1N7yeNfjZuUn1MacvgBqk4uPOFfDDq";
+#[delete]
+async fn delete(_id: u64) -> Raw<&'static [u8]> {
+	Raw::new(DELETE_RESPONSE, TEXT_PLAIN)
 }
 
 const STATE_TEST_RESPONSE: &[u8] = b"xxJbxOuwioqR5DfzPuVqvaqRSfpdNQGluIvHU4n1LM";
@@ -118,16 +118,16 @@ fn async_methods() {
 		"http://localhost/foo",
 		r#"{"data":"hello world"}"#,
 		APPLICATION_JSON,
-		CHANGE_ALL_RESPONSE
+		UPDATE_ALL_RESPONSE
 	);
 	test_put_response(
 		&server,
 		"http://localhost/foo/1",
 		r#"{"data":"hello world"}"#,
 		APPLICATION_JSON,
-		CHANGE_RESPONSE
+		UPDATE_RESPONSE
 	);
-	test_delete_response(&server, "http://localhost/foo", REMOVE_ALL_RESPONSE);
-	test_delete_response(&server, "http://localhost/foo/1", REMOVE_RESPONSE);
+	test_delete_response(&server, "http://localhost/foo", DELETE_ALL_RESPONSE);
+	test_delete_response(&server, "http://localhost/foo/1", DELETE_RESPONSE);
 	test_get_response(&server, "http://localhost/foo/state_test", STATE_TEST_RESPONSE);
 }

@@ -102,22 +102,22 @@ pub fn create(attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn change_all(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn update_all(attr: TokenStream, item: TokenStream) -> TokenStream {
 	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::UpdateAll, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn change(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn update(attr: TokenStream, item: TokenStream) -> TokenStream {
 	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Update, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn remove_all(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn delete_all(attr: TokenStream, item: TokenStream) -> TokenStream {
 	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::DeleteAll, attr, item))
 }
 
 #[proc_macro_attribute]
-pub fn remove(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn delete(attr: TokenStream, item: TokenStream) -> TokenStream {
 	expand_macro(attr, item, |attr, item| expand_endpoint(EndpointType::Delete, attr, item))
 }
 
