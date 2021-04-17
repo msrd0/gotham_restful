@@ -1,1 +1,1 @@
-initSidebarItems({"attr":[["change",""],["change_all",""],["create",""],["endpoint",""],["read",""],["read_all",""],["remove",""],["remove_all",""],["search",""]],"derive":[["FromBody",""],["RequestBody",""],["Resource",""],["ResourceError",""]]});
+initSidebarItems({"attr":[["create",""],["delete",""],["delete_all",""],["endpoint",""],["read",""],["read_all",""],["search",""],["update",""],["update_all",""]],"derive":[["FromBody",""],["RequestBody",""],["Resource",""],["ResourceError",""]]});

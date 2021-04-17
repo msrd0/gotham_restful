@@ -235,22 +235,22 @@
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">change_all</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_all</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
 	<span class="ident">expand_macro</span>(<span class="ident">attr</span>, <span class="ident">item</span>, <span class="op">|</span><span class="ident">attr</span>, <span class="ident">item</span><span class="op">|</span> <span class="ident">expand_endpoint</span>(<span class="ident">EndpointType</span>::<span class="ident">UpdateAll</span>, <span class="ident">attr</span>, <span class="ident">item</span>))
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">change</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
 	<span class="ident">expand_macro</span>(<span class="ident">attr</span>, <span class="ident">item</span>, <span class="op">|</span><span class="ident">attr</span>, <span class="ident">item</span><span class="op">|</span> <span class="ident">expand_endpoint</span>(<span class="ident">EndpointType</span>::<span class="ident">Update</span>, <span class="ident">attr</span>, <span class="ident">item</span>))
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_all</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_all</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
 	<span class="ident">expand_macro</span>(<span class="ident">attr</span>, <span class="ident">item</span>, <span class="op">|</span><span class="ident">attr</span>, <span class="ident">item</span><span class="op">|</span> <span class="ident">expand_endpoint</span>(<span class="ident">EndpointType</span>::<span class="ident">DeleteAll</span>, <span class="ident">attr</span>, <span class="ident">item</span>))
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
 	<span class="ident">expand_macro</span>(<span class="ident">attr</span>, <span class="ident">item</span>, <span class="op">|</span><span class="ident">attr</span>, <span class="ident">item</span><span class="op">|</span> <span class="ident">expand_endpoint</span>(<span class="ident">EndpointType</span>::<span class="ident">Delete</span>, <span class="ident">attr</span>, <span class="ident">item</span>))
 }
 

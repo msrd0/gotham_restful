@@ -585,10 +585,10 @@ Assuming you assign `/foobar` to your resource, the following pre-defined endpoi
 | read          | id                 | GET       | /foobar/:id    |
 | search        | query              | GET       | /foobar/search |
 | create        | body               | POST      | /foobar        |
-| change_all    | body               | PUT       | /foobar        |
-| change        | id, body           | PUT       | /foobar/:id    |
-| remove_all    |                    | DELETE    | /foobar        |
-| remove        | id                 | DELETE    | /foobar/:id    |
+| update_all    | body               | PUT       | /foobar        |
+| update        | id, body           | PUT       | /foobar/:id    |
+| delete_all    |                    | DELETE    | /foobar        |
+| delete        | id                 | DELETE    | /foobar/:id    |
 
 Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
 simple example looks like this:
