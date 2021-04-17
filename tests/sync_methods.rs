@@ -14,7 +14,7 @@ mod util {
 use util::{test_delete_response, test_get_response, test_post_response, test_put_response};
 
 #[derive(Resource)]
-#[resource(read_all, read, search, create, change_all, change, remove_all, remove)]
+#[resource(read_all, read, search, create, update_all, update, delete_all, delete)]
 struct FooResource;
 
 #[derive(Deserialize)]
@@ -55,28 +55,28 @@ fn create(_body: FooBody) -> Raw<&'static [u8]> {
 	Raw::new(CREATE_RESPONSE, TEXT_PLAIN)
 }
 
-const CHANGE_ALL_RESPONSE: &[u8] = b"QlbYg8gHE9OQvvk3yKjXJLTSXlIrg9mcqhfMXJmQkv";
-#[change_all]
-fn change_all(_body: FooBody) -> Raw<&'static [u8]> {
-	Raw::new(CHANGE_ALL_RESPONSE, TEXT_PLAIN)
+const UPDATE_ALL_RESPONSE: &[u8] = b"QlbYg8gHE9OQvvk3yKjXJLTSXlIrg9mcqhfMXJmQkv";
+#[update_all]
+fn update_all(_body: FooBody) -> Raw<&'static [u8]> {
+	Raw::new(UPDATE_ALL_RESPONSE, TEXT_PLAIN)
 }
 
-const CHANGE_RESPONSE: &[u8] = b"qGod55RUXkT1lgPO8h0uVM6l368O2S0GrwENZFFuRu";
-#[change]
-fn change(_id: u64, _body: FooBody) -> Raw<&'static [u8]> {
-	Raw::new(CHANGE_RESPONSE, TEXT_PLAIN)
+const UPDATE_RESPONSE: &[u8] = b"qGod55RUXkT1lgPO8h0uVM6l368O2S0GrwENZFFuRu";
+#[update]
+fn update(_id: u64, _body: FooBody) -> Raw<&'static [u8]> {
+	Raw::new(UPDATE_RESPONSE, TEXT_PLAIN)
 }
 
-const REMOVE_ALL_RESPONSE: &[u8] = b"Y36kZ749MRk2Nem4BedJABOZiZWPLOtiwLfJlGTwm5";
-#[remove_all]
-fn remove_all() -> Raw<&'static [u8]> {
-	Raw::new(REMOVE_ALL_RESPONSE, TEXT_PLAIN)
+const DELETE_ALL_RESPONSE: &[u8] = b"Y36kZ749MRk2Nem4BedJABOZiZWPLOtiwLfJlGTwm5";
+#[delete_all]
+fn delete_all() -> Raw<&'static [u8]> {
+	Raw::new(DELETE_ALL_RESPONSE, TEXT_PLAIN)
 }
 
-const REMOVE_RESPONSE: &[u8] = b"CwRzBrKErsVZ1N7yeNfjZuUn1MacvgBqk4uPOFfDDq";
-#[remove]
-fn remove(_id: u64) -> Raw<&'static [u8]> {
-	Raw::new(REMOVE_RESPONSE, TEXT_PLAIN)
+const DELETE_RESPONSE: &[u8] = b"CwRzBrKErsVZ1N7yeNfjZuUn1MacvgBqk4uPOFfDDq";
+#[delete]
+fn delete(_id: u64) -> Raw<&'static [u8]> {
+	Raw::new(DELETE_RESPONSE, TEXT_PLAIN)
 }
 
 #[test]
@@ -103,15 +103,15 @@ fn sync_methods() {
 		"http://localhost/foo",
 		r#"{"data":"hello world"}"#,
 		APPLICATION_JSON,
-		CHANGE_ALL_RESPONSE
+		UPDATE_ALL_RESPONSE
 	);
 	test_put_response(
 		&server,
 		"http://localhost/foo/1",
 		r#"{"data":"hello world"}"#,
 		APPLICATION_JSON,
-		CHANGE_RESPONSE
+		UPDATE_RESPONSE
 	);
-	test_delete_response(&server, "http://localhost/foo", REMOVE_ALL_RESPONSE);
-	test_delete_response(&server, "http://localhost/foo/1", REMOVE_RESPONSE);
+	test_delete_response(&server, "http://localhost/foo", DELETE_ALL_RESPONSE);
+	test_delete_response(&server, "http://localhost/foo/1", DELETE_RESPONSE);
 }

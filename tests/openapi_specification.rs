@@ -37,7 +37,7 @@ fn get_image(_id: u64) -> Raw<&'static [u8]> {
 	Raw::new(IMAGE_RESPONSE, "image/png;base64".parse().unwrap())
 }
 
-#[change(operation_id = "setImage")]
+#[update(operation_id = "setImage")]
 fn set_image(_id: u64, _image: Image) {}
 
 #[derive(Resource)]

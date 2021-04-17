@@ -6,21 +6,20 @@ use gotham::{
 	test::{Server, TestRequest, TestServer}
 };
 use gotham_restful::{
-	change_all,
 	cors::{Headers, Origin},
-	read_all, CorsConfig, DrawResources, Raw, Resource
+	read_all, update_all, CorsConfig, DrawResources, Raw, Resource
 };
 use mime::TEXT_PLAIN;
 
 #[derive(Resource)]
-#[resource(read_all, change_all)]
+#[resource(read_all, update_all)]
 struct FooResource;
 
 #[read_all]
 fn read_all() {}
 
-#[change_all]
-fn change_all(_body: Raw<Vec<u8>>) {}
+#[update_all]
+fn update_all(_body: Raw<Vec<u8>>) {}
 
 fn test_server(cfg: CorsConfig) -> TestServer {
 	let (chain, pipeline) = single_pipeline(new_pipeline().add(cfg).build());
