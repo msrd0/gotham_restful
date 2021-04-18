@@ -367,17 +367,7 @@ features through and conditionally enable the openapi code, like this:
 struct Foo;
 ```
 
-## Examples
-
-This readme and the crate documentation contain some of example. In addition to that, there is
-a collection of code in the [example] directory that might help you. Any help writing more
-examples is highly appreciated.
-
-
  [diesel]: https://diesel.rs/
- [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
- [gotham]: https://gotham.rs/
- [serde_json]: https://github.com/serde-rs/json#serde-json----
  [`State`]: gotham::state::State
 
 ## Versioning
