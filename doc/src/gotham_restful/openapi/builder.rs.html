@@ -159,13 +159,17 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">indexmap</span>::<span class="ident">IndexMap</span>;
-<span class="kw">use</span> <span class="ident">openapi_type</span>::<span class="ident">OpenapiSchema</span>;
-<span class="kw">use</span> <span class="ident">openapiv3</span>::{
-	<span class="ident">Components</span>, <span class="ident">OpenAPI</span>, <span class="ident">PathItem</span>, <span class="ident">ReferenceOr</span>,
-	<span class="ident">ReferenceOr</span>::{<span class="ident">Item</span>, <span class="ident">Reference</span>},
-	<span class="ident">Schema</span>, <span class="ident">Server</span>
+<span class="kw">use</span> <span class="ident">openapi_type</span>::{
+	<span class="ident">openapi</span>::{
+		<span class="self">self</span>, <span class="ident">Components</span>, <span class="ident">OpenAPI</span>, <span class="ident">PathItem</span>, <span class="ident">ReferenceOr</span>,
+		<span class="ident">ReferenceOr</span>::{<span class="ident">Item</span>, <span class="ident">Reference</span>},
+		<span class="ident">Schema</span>, <span class="ident">Server</span>
+	},
+	<span class="ident">OpenapiSchema</span>
 };
 <span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">RwLock</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
@@ -187,7 +191,7 @@
 		<span class="self">Self</span> {
 			<span class="ident">openapi</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">OpenAPI</span> {
 				<span class="ident">openapi</span>: <span class="string">&quot;3.0.2&quot;</span>.<span class="ident">to_string</span>(),
-				<span class="ident">info</span>: <span class="ident">openapiv3</span>::<span class="ident">Info</span> {
+				<span class="ident">info</span>: <span class="ident">openapi</span>::<span class="ident">Info</span> {
 					<span class="ident">title</span>: <span class="ident">info</span>.<span class="ident">title</span>,
 					<span class="ident">version</span>: <span class="ident">info</span>.<span class="ident">version</span>,
 					..<span class="ident">Default</span>::<span class="ident">default</span>()

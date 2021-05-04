@@ -224,15 +224,19 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">SECURITY_NAME</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">response</span>::<span class="ident">OrAllTypes</span>, <span class="ident">EndpointWithSchema</span>, <span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>, <span class="ident">ResponseSchema</span>};
 <span class="kw">use</span> <span class="ident">indexmap</span>::<span class="ident">IndexMap</span>;
 <span class="kw">use</span> <span class="ident">mime</span>::<span class="ident">Mime</span>;
-<span class="kw">use</span> <span class="ident">openapi_type</span>::<span class="ident">OpenapiSchema</span>;
-<span class="kw">use</span> <span class="ident">openapiv3</span>::{
-	<span class="ident">MediaType</span>, <span class="ident">Operation</span>, <span class="ident">Parameter</span>, <span class="ident">ParameterData</span>, <span class="ident">ParameterSchemaOrContent</span>, <span class="ident">ReferenceOr</span>, <span class="ident">ReferenceOr</span>::<span class="ident">Item</span>,
-	<span class="ident">RequestBody</span> <span class="kw">as</span> <span class="ident">OARequestBody</span>, <span class="ident">Response</span>, <span class="ident">Responses</span>, <span class="ident">Schema</span>, <span class="ident">SchemaKind</span>, <span class="ident">StatusCode</span>, <span class="ident">Type</span>
+<span class="kw">use</span> <span class="ident">openapi_type</span>::{
+	<span class="ident">openapi</span>::{
+		<span class="ident">MediaType</span>, <span class="ident">Operation</span>, <span class="ident">Parameter</span>, <span class="ident">ParameterData</span>, <span class="ident">ParameterSchemaOrContent</span>, <span class="ident">ReferenceOr</span>, <span class="ident">ReferenceOr</span>::<span class="ident">Item</span>,
+		<span class="ident">RequestBody</span> <span class="kw">as</span> <span class="ident">OARequestBody</span>, <span class="ident">Response</span>, <span class="ident">Responses</span>, <span class="ident">Schema</span>, <span class="ident">SchemaKind</span>, <span class="ident">StatusCode</span>, <span class="ident">Type</span>
+	},
+	<span class="ident">OpenapiSchema</span>
 };
 
 <span class="kw">fn</span> <span class="ident">new_parameter_data</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">required</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParameterData</span> {

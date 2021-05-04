@@ -529,8 +529,6 @@
 <span id="526">526</span>
 <span id="527">527</span>
 <span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">unreachable_pub</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
@@ -1010,9 +1008,7 @@ struct Foo;
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indexmap</span>::<span class="ident">IndexMap</span>;
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapiv3</span> <span class="kw">as</span> <span class="ident">openapi</span>;
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">openapi</span>, <span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>)]</span>
