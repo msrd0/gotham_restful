@@ -2,10 +2,12 @@ use super::SECURITY_NAME;
 use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody, ResponseSchema};
 use indexmap::IndexMap;
 use mime::Mime;
-use openapi_type::OpenapiSchema;
-use openapiv3::{
-	MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
-	RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode, Type
+use openapi_type::{
+	openapi::{
+		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
+		RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode, Type
+	},
+	OpenapiSchema
 };
 
 fn new_parameter_data(name: String, required: bool, schema: ReferenceOr<Box<Schema>>) -> ParameterData {
