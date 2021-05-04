@@ -1,9 +1,11 @@
 use indexmap::IndexMap;
-use openapi_type::OpenapiSchema;
-use openapiv3::{
-	Components, OpenAPI, PathItem, ReferenceOr,
-	ReferenceOr::{Item, Reference},
-	Schema, Server
+use openapi_type::{
+	openapi::{
+		self, Components, OpenAPI, PathItem, ReferenceOr,
+		ReferenceOr::{Item, Reference},
+		Schema, Server
+	},
+	OpenapiSchema
 };
 use parking_lot::RwLock;
 use std::sync::Arc;
@@ -25,7 +27,7 @@ impl OpenapiBuilder {
 		Self {
 			openapi: Arc::new(RwLock::new(OpenAPI {
 				openapi: "3.0.2".to_string(),
-				info: openapiv3::Info {
+				info: openapi::Info {
 					title: info.title,
 					version: info.version,
 					..Default::default()

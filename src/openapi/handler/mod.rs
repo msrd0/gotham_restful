@@ -16,7 +16,7 @@ use gotham::{
 };
 use indexmap::IndexMap;
 use mime::{APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN};
-use openapiv3::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
+use openapi_type::openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
 use parking_lot::RwLock;
 use percent_encoding::{utf8_percent_encode, AsciiSet, NON_ALPHANUMERIC};
 use sha2::{Digest, Sha256};

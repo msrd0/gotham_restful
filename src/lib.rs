@@ -476,9 +476,7 @@ pub mod private {
 	#[cfg(feature = "openapi")]
 	pub use indexmap::IndexMap;
 	#[cfg(feature = "openapi")]
-	pub use openapi_type::{OpenapiSchema, OpenapiType};
-	#[cfg(feature = "openapi")]
-	pub use openapiv3 as openapi;
+	pub use openapi_type::{openapi, OpenapiSchema, OpenapiType};
 }
 
 #[cfg(feature = "auth")]
