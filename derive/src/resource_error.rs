@@ -210,10 +210,7 @@ impl ErrorVariant {
 	}
 
 	fn were(&self) -> Option<TokenStream> {
-		match self.from_ty.as_ref() {
-			Some((_, ty)) => Some(quote!( #ty : ::std::error::Error )),
-			None => None
-		}
+		self.from_ty.as_ref().map(|(_, ty)| quote!( #ty : ::std::error::Error ))
 	}
 }
 

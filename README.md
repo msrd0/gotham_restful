@@ -29,12 +29,11 @@ This repository contains the following crates:
 
 # gotham-restful
 
-
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
 for requests.
 
-# Features
+## Features
 
  - Automatically parse **JSON** request and produce response bodies
  - Allow using **raw** request and response bodies
@@ -44,17 +43,17 @@ for requests.
  - Manage **Authentication** with JWT
  - Integrate diesel connection pools for easy **database** integration
 
-# Safety
+## Safety
 
 This crate is just as safe as you'd expect from anything written in safe Rust - and
 `#![forbid(unsafe_code)]` ensures that no unsafe was used.
 
-# Endpoints
+## Endpoints
 
 There are a set of pre-defined endpoints that should cover the majority of REST APIs. However,
 it is also possible to define your own endpoints.
 
-## Pre-defined Endpoints
+### Pre-defined Endpoints
 
 Assuming you assign `/foobar` to your resource, the following pre-defined endpoints exist:
 
@@ -72,11 +71,7 @@ Assuming you assign `/foobar` to your resource, the following pre-defined endpoi
 Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
 simple example looks like this:
 
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
+```rust
 /// Our RESTful resource.
 #[derive(Resource)]
 #[resource(read)]
@@ -84,7 +79,6 @@ struct FooResource;
 
 /// The return type of the foo read endpoint.
 #[derive(Serialize)]
-# #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
 struct Foo {
 	id: u64
 }
@@ -94,24 +88,14 @@ struct Foo {
 fn read(id: u64) -> Success<Foo> {
 	Foo { id }.into()
 }
-# fn main() {
-# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-# 		route.resource::<FooResource>("foo");
-# 	}));
-# }
 ```
 
-## Custom Endpoints
+### Custom Endpoints
 
 Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that
 of the pre-defined endpoints, but you need to give it more context:
 
-```rust,no_run
-# #[macro_use] extern crate gotham_derive;
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
+```rust
 use gotham_restful::gotham::hyper::Method;
 
 #[derive(Resource)]
@@ -120,7 +104,6 @@ struct CustomResource;
 
 /// This type is used to parse path parameters.
 #[derive(Clone, Deserialize, StateData, StaticResponseExtender)]
-# #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
 struct CustomPath {
 	name: String
 }
@@ -129,14 +112,9 @@ struct CustomPath {
 fn custom_endpoint(path: CustomPath) -> Success<String> {
 	path.name.into()
 }
-# fn main() {
-# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-# 		route.resource::<CustomResource>("custom");
-# 	}));
-# }
 ```
 
-# Arguments
+## Arguments
 
 Some endpoints require arguments. Those should be
  * **id** Should be a deserializable json-primitive like [`i64`] or [`String`].
@@ -149,17 +127,13 @@ Additionally, all handlers may take a reference to gotham's [`State`]. Please no
 handlers, it needs to be a mutable reference until rustc's lifetime checks across await bounds
 improve.
 
-# Uploads and Downloads
+## Uploads and Downloads
 
 By default, every request body is parsed from json, and every respone is converted to json using
 [serde_json]. However, you may also use raw bodies. This is an example where the request body
 is simply returned as the response again, no json parsing involved:
 
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
+```rust
 #[derive(Resource)]
 #[resource(create)]
 struct ImageResource;
@@ -175,23 +149,14 @@ struct RawImage {
 fn create(body : RawImage) -> Raw<Vec<u8>> {
 	Raw::new(body.content, body.content_type)
 }
-# fn main() {
-# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-# 		route.resource::<ImageResource>("image");
-# 	}));
-# }
 ```
 
-# Custom HTTP Headers
+## Custom HTTP Headers
 
 You can read request headers from the state as you would in any other gotham handler, and specify
 custom response headers using [Response::header].
 
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::hyper::header::{ACCEPT, HeaderMap, VARY};
-# use gotham::{router::builder::*, state::State};
-# use gotham_restful::*;
+```rust
 #[derive(Resource)]
 #[resource(read_all)]
 struct FooResource;
@@ -200,20 +165,14 @@ struct FooResource;
 async fn read_all(state: &mut State) -> NoContent {
 	let headers: &HeaderMap = state.borrow();
 	let accept = &headers[ACCEPT];
-# drop(accept);
 
 	let mut res = NoContent::default();
 	res.header(VARY, "accept".parse().unwrap());
 	res
 }
-# fn main() {
-# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-# 		route.resource::<FooResource>("foo");
-# 	}));
-# }
 ```
 
-# Features
+## Features
 
 To make life easier for common use-cases, this create offers a few features that might be helpful
 when you implement your web server.  The complete feature list is
@@ -227,7 +186,7 @@ when you implement your web server.  The complete feature list is
  - `uuid` openapi support for uuid
  - `without-openapi` (**default**) disables `openapi` support.
 
-## Authentication Feature
+### Authentication Feature
 
 In order to enable authentication support, enable the `auth` feature gate. This allows you to
 register a middleware that can automatically check for the existence of an JWT authentication
@@ -237,19 +196,12 @@ None of this is currently supported by gotham's own JWT middleware.
 
 A simple example that uses only a single secret looks like this:
 
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = "auth")]
-# mod auth_feature_enabled {
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
+```rust
 #[derive(Resource)]
 #[resource(read)]
 struct SecretResource;
 
 #[derive(Serialize)]
-# #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
 struct Secret {
 	id: u64,
 	intended_for: String
@@ -278,10 +230,9 @@ fn main() {
 		route.resource::<SecretResource>("secret");
 	}));
 }
-# }
 ```
 
-## CORS Feature
+### CORS Feature
 
 The cors feature allows an easy usage of this web server from other origins. By default, only
 the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired
@@ -290,13 +241,7 @@ configuration as a middleware.
 A simple example that allows authentication from every origin (note that `*` always disallows
 authentication), and every content type, looks like this:
 
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = "cors")]
-# mod cors_feature_enabled {
-# use gotham::{hyper::header::*, router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
-# use gotham_restful::{*, cors::*};
-# use serde::{Deserialize, Serialize};
+```rust
 #[derive(Resource)]
 #[resource(read_all)]
 struct FooResource;
@@ -318,13 +263,12 @@ fn main() {
 		route.resource::<FooResource>("foo");
 	}));
 }
-# }
 ```
 
 The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`]
 for an example.
 
-## Database Feature
+### Database Feature
 
 The database feature allows an easy integration of [diesel] into your handler functions. Please
 note however that due to the way gotham's diesel middleware implementation, it is not possible
@@ -333,29 +277,12 @@ you'll need to borrow the connection from the [`State`] yourself and return a bo
 
 A simple non-async example looks like this:
 
-```rust,no_run
-# #[macro_use] extern crate diesel;
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = "database")]
-# mod database_feature_enabled {
-# use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
-# use gotham_middleware_diesel::DieselMiddleware;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-# use std::env;
-# table! {
-#   foo (id) {
-#     id -> Int8,
-#     value -> Text,
-#   }
-# }
+```rust
 #[derive(Resource)]
 #[resource(read_all)]
 struct FooResource;
 
 #[derive(Queryable, Serialize)]
-# #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
 struct Foo {
 	id: i64,
 	value: String
@@ -377,10 +304,9 @@ fn main() {
 		route.resource::<FooResource>("foo");
 	}));
 }
-# }
 ```
 
-## OpenAPI Feature
+### OpenAPI Feature
 
 The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section
 carefully both as a binary as well as a library author to avoid unwanted suprises.
@@ -391,14 +317,7 @@ enough type information, so all types used in the router need to implement
 [`OpenapiType`](openapi_type::OpenapiType). This can be derived for almoust any type and there
 should be no need to implement it manually. A simple example looks like this:
 
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = "openapi")]
-# mod openapi_feature_enabled {
-# use gotham::{router::builder::*, state::State};
-# use gotham_restful::*;
-# use openapi_type::OpenapiType;
-# use serde::{Deserialize, Serialize};
+```rust
 #[derive(Resource)]
 #[resource(read_all)]
 struct FooResource;
@@ -427,7 +346,6 @@ fn main() {
 		});
 	}));
 }
-# }
 ```
 
 Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`.
@@ -444,8 +362,6 @@ on both. If you are writing a library that uses gotham-restful, it is strongly r
 features through and conditionally enable the openapi code, like this:
 
 ```rust
-# #[macro_use] extern crate gotham_restful;
-# use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize)]
 #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
 struct Foo;
@@ -453,27 +369,6 @@ struct Foo;
 
  [diesel]: https://diesel.rs/
  [`State`]: gotham::state::State
-
-
-<!-- auto-detected links -->
- [private]: https://docs.rs/gotham_restful/*/gotham_restful/private/index.html
- [`private`]: https://docs.rs/gotham_restful/*/gotham_restful/private/index.html
- [auth]: https://docs.rs/gotham_restful/*/gotham_restful/auth/index.html
- [`auth`]: https://docs.rs/gotham_restful/*/gotham_restful/auth/index.html
- [cors]: https://docs.rs/gotham_restful/*/gotham_restful/cors/index.html
- [`cors`]: https://docs.rs/gotham_restful/*/gotham_restful/cors/index.html
- [openapi]: https://docs.rs/gotham_restful/*/gotham_restful/openapi/index.html
- [`openapi`]: https://docs.rs/gotham_restful/*/gotham_restful/openapi/index.html
- [endpoint]: https://docs.rs/gotham_restful/*/gotham_restful/endpoint/index.html
- [`endpoint`]: https://docs.rs/gotham_restful/*/gotham_restful/endpoint/index.html
- [response]: https://docs.rs/gotham_restful/*/gotham_restful/response/index.html
- [`response`]: https://docs.rs/gotham_restful/*/gotham_restful/response/index.html
- [routing]: https://docs.rs/gotham_restful/*/gotham_restful/routing/index.html
- [`routing`]: https://docs.rs/gotham_restful/*/gotham_restful/routing/index.html
- [types]: https://docs.rs/gotham_restful/*/gotham_restful/types/index.html
- [`types`]: https://docs.rs/gotham_restful/*/gotham_restful/types/index.html
- [Resource]: https://docs.rs/gotham_restful/*/gotham_restful/trait.Resource.html
- [`Resource`]: https://docs.rs/gotham_restful/*/gotham_restful/trait.Resource.html
 
 ## Versioning
 
