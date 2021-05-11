@@ -365,7 +365,7 @@ carefully both as a binary as well as a library author to avoid unwanted suprise
 In order to automatically create an openapi specification, gotham-restful needs knowledge over
 all routes and the types returned. `serde` does a great job at serialization but doesn't give
 enough type information, so all types used in the router need to implement
-`OpenapiType`[openapi_type::OpenapiType]. This can be derived for almoust any type and there
+[`OpenapiType`](openapi_type::OpenapiType). This can be derived for almoust any type and there
 should be no need to implement it manually. A simple example looks like this:
 
 ```rust,no_run
