@@ -513,7 +513,7 @@ pub use routing::{DrawResourceRoutes, DrawResources};
 pub use routing::{DrawResourceRoutesWithSchema, DrawResourcesWithSchema, WithOpenapi};
 
 mod types;
-pub use types::*;
+pub use types::{FromBody, RequestBody, ResponseBody};
 
 /// This trait must be implemented for every resource. It allows you to register the different
 /// endpoints that can be handled by this resource to be registered with the underlying router.
