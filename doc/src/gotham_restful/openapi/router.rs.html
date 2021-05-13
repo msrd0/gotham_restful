@@ -137,6 +137,9 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::{
 	<span class="ident">builder</span>::<span class="ident">OpenapiBuilder</span>,
@@ -213,7 +216,10 @@
 			<span class="ident">C</span>: <span class="ident">PipelineHandleChain</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 			<span class="ident">P</span>: <span class="ident">RefUnwindSafe</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
 		{
-			<span class="kw">fn</span> <span class="ident">resource</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ResourceWithSchema</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+			<span class="kw">fn</span> <span class="ident">resource</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ResourceWithSchema</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+				<span class="kw">if</span> <span class="ident">path</span>.<span class="ident">starts_with</span>(<span class="string">&#39;/&#39;</span>) {
+					<span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">path</span>[<span class="number">1</span>..];
+				}
 				<span class="ident">R</span>::<span class="ident">setup</span>((<span class="self">self</span>, <span class="ident">path</span>));
 			}
 		}
