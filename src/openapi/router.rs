@@ -73,7 +73,10 @@ macro_rules! implOpenapiRouter {
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn resource<R: ResourceWithSchema>(&mut self, path: &str) {
+			fn resource<R: ResourceWithSchema>(&mut self, mut path: &str) {
+				if path.starts_with('/') {
+					path = &path[1..];
+				}
 				R::setup((self, path));
 			}
 		}
