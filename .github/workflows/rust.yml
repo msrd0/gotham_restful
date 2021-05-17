@@ -52,13 +52,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@1.51.0
+      - uses: dtolnay/rust-toolchain@1.52.0
       - uses: actions/cache@v2
         with:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-1.51 }}
+          key: ${{ runner.os }}-cargo-1.52
       - run: cargo test --no-default-features --features full --tests -- --ignored
         env:
           RUST_BACKTRACE: 1
