@@ -193,8 +193,8 @@ mod test {
 
 		#[cfg(feature = "openapi")]
 		assert_eq!(<Result<Raw<String>, MsgError>>::status_codes(), vec![
-			StatusCode::OK,
-			StatusCode::INTERNAL_SERVER_ERROR
+			StatusCode::INTERNAL_SERVER_ERROR,
+			StatusCode::OK
 		]);
 	}
 }

@@ -159,8 +159,8 @@ mod test {
 
 		#[cfg(feature = "openapi")]
 		assert_eq!(<Result<Redirect, MsgError>>::status_codes(), vec![
-			StatusCode::SEE_OTHER,
-			StatusCode::INTERNAL_SERVER_ERROR
+			StatusCode::INTERNAL_SERVER_ERROR,
+			StatusCode::SEE_OTHER
 		]);
 	}
 }
