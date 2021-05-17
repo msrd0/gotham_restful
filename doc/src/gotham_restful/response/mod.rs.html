@@ -288,6 +288,10 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures_util</span>::<span class="ident">future</span>::{<span class="self">self</span>, <span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::{
@@ -299,7 +303,7 @@
 };
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="ident">Mime</span>, <span class="ident">APPLICATION_JSON</span>, <span class="ident">STAR_STAR</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">openapi_type</span>::<span class="ident">OpenapiSchema</span>;
+<span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Serialize</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
 	<span class="ident">convert</span>::<span class="ident">Infallible</span>,
@@ -452,11 +456,15 @@
 <span class="doccomment">/// Additional details for [IntoResponse] to be used with an OpenAPI-aware router.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ResponseSchema</span> {
-	<span class="kw">fn</span> <span class="ident">schema</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenapiSchema</span>;
-
-	<span class="kw">fn</span> <span class="ident">default_status</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StatusCode</span> {
-		<span class="ident">StatusCode</span>::<span class="ident">OK</span>
+	<span class="doccomment">/// All status codes returned by this response. Returns `[StatusCode::OK]` by default.</span>
+	<span class="kw">fn</span> <span class="ident">status_codes</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
+		<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">StatusCode</span>::<span class="ident">OK</span>]
 	}
+
+	<span class="doccomment">/// Return the schema of the response for the given status code. The code may</span>
+	<span class="doccomment">/// only be one that was previously returned by [Self::status_codes]. The</span>
+	<span class="doccomment">/// implementation should panic if that is not the case.</span>
+	<span class="kw">fn</span> <span class="ident">schema</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenapiSchema</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
@@ -478,6 +486,7 @@
 
 <span class="doccomment">/// The default json returned on an 500 Internal Server Error.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">derive</span>(<span class="ident">OpenapiType</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ResourceError</span> {
 	<span class="ident">error</span>: <span class="ident">bool</span>,
 	<span class="ident">message</span>: <span class="ident">String</span>
@@ -537,13 +546,12 @@
 <span class="kw">where</span>
 	<span class="ident">Res</span>: <span class="ident">ResponseSchema</span>
 {
-	<span class="kw">fn</span> <span class="ident">schema</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenapiSchema</span> {
-		<span class="ident">Res</span>::<span class="ident">schema</span>()
+	<span class="kw">fn</span> <span class="ident">status_codes</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
+		<span class="ident">Res</span>::<span class="ident">status_codes</span>()
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">default_status</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StatusCode</span> {
-		<span class="ident">Res</span>::<span class="ident">default_status</span>()
+	<span class="kw">fn</span> <span class="ident">schema</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenapiSchema</span> {
+		<span class="ident">Res</span>::<span class="ident">schema</span>(<span class="ident">code</span>)
 	}
 }
 
