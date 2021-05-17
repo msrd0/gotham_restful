@@ -127,7 +127,7 @@ mod test {
 	struct MsgError;
 
 	#[test]
-	fn rediect_response() {
+	fn redirect_response() {
 		let redir = Redirect {
 			to: "http://localhost/foo".to_owned()
 		};

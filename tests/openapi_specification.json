@@ -202,13 +202,16 @@
             },
             "description": "OK"
           },
-          "500": {
+          "403": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object"
+                }
               }
             },
-            "description": "Internal Server Error"
+            "description": "Forbidden"
           }
         },
         "security": [
@@ -244,13 +247,16 @@
             },
             "description": "OK"
           },
-          "500": {
+          "403": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object"
+                }
               }
             },
-            "description": "Internal Server Error"
+            "description": "Forbidden"
           }
         },
         "security": [

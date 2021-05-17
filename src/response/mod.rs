@@ -8,7 +8,7 @@ use gotham::{
 };
 use mime::{Mime, APPLICATION_JSON, STAR_STAR};
 #[cfg(feature = "openapi")]
-use openapi_type::OpenapiSchema;
+use openapi_type::{OpenapiSchema, OpenapiType};
 use serde::Serialize;
 use std::{
 	convert::Infallible,
@@ -191,6 +191,7 @@ impl<R: IntoResponse + ResponseSchema> IntoResponseWithSchema for R {}
 
 /// The default json returned on an 500 Internal Server Error.
 #[derive(Debug, Serialize)]
+#[cfg_attr(feature = "openapi", derive(OpenapiType))]
 pub(crate) struct ResourceError {
 	error: bool,
 	message: String

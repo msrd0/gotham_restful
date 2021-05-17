@@ -165,10 +165,8 @@ impl ErrorVariant {
 		})
 	}
 
-	fn into_match_arm(self, krate: &TokenStream, enum_ident: &Ident) -> Result<TokenStream> {
-		let ident = &self.ident;
-		let fields_pat = self.fields_pat();
-		let status = self.status.map(|status| {
+	fn status(&self) -> Option<Path> {
+		self.status.as_ref().map(|status| {
 			// the status might be relative to StatusCode, so let's fix that
 			if status.leading_colon.is_none() && status.segments.len() < 2 {
 				let status_ident = status.segments.first().cloned().unwrap_or_else(|| path_segment("OK"));
@@ -185,9 +183,15 @@ impl ErrorVariant {
 					.collect()
 				}
 			} else {
-				status
+				status.clone()
 			}
-		});
+		})
+	}
+
+	fn into_match_arm(self, krate: &TokenStream, enum_ident: &Ident) -> Result<TokenStream> {
+		let ident = &self.ident;
+		let fields_pat = self.fields_pat();
+		let status = self.status();
 
 		// the response will come directly from the from_ty if present
 		let res = match (self.from_ty, status) {
@@ -301,6 +305,47 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		});
 	}
 
+	let status_codes = if cfg!(feature = "openapi") {
+		let codes = variants.iter().map(|v| match v.status() {
+			Some(code) => quote!(status_codes.push(#code);),
+			None => {
+				// we would've errored before if from_ty was not set
+				let from_ty = &v.from_ty.as_ref().unwrap().1;
+				quote!(status_codes.extend(<#from_ty as #krate::IntoResponseError>::status_codes());)
+			}
+		});
+		Some(quote! {
+			fn status_codes() -> Vec<#krate::gotham::hyper::StatusCode> {
+				let mut status_codes = <Vec<#krate::gotham::hyper::StatusCode>>::new();
+				#(#codes)*
+				status_codes
+			}
+		})
+	} else {
+		None
+	};
+
+	let schema = if cfg!(feature = "openapi") {
+		let codes = variants.iter().map(|v| match v.status() {
+			Some(code) => quote!(#code => <#krate::NoContent as #krate::ResponseSchema>::schema(#krate::gotham::hyper::StatusCode::NO_CONTENT)),
+			None => {
+				// we would've errored before if from_ty was not set
+				let from_ty = &v.from_ty.as_ref().unwrap().1;
+				quote!(code if <#from_ty as #krate::IntoResponseError>::status_codes().contains(&code) => <#from_ty as #krate::IntoResponseError>::schema(code))
+			}
+		});
+		Some(quote! {
+			fn schema(code: #krate::gotham::hyper::StatusCode) -> #krate::private::OpenapiSchema {
+				match code {
+					#(#codes,)*
+					code => panic!("Invalid status code {}", code)
+				}
+			}
+		})
+	} else {
+		None
+	};
+
 	let were = variants.iter().filter_map(|variant| variant.were()).collect::<Vec<_>>();
 	let variants = variants
 		.into_iter()
@@ -321,6 +366,9 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 					#( #variants ),*
 				}
 			}
+
+			#status_codes
+			#schema
 		}
 
 		#( #from_impls )*
