@@ -4,11 +4,15 @@ use super::{
 	operation::OperationDescription
 };
 use crate::{routing::*, EndpointWithSchema, ResourceWithSchema, ResponseSchema};
-use gotham::{hyper::Method, pipeline::chain::PipelineHandleChain, router::builder::*};
+use gotham::{
+	hyper::{Method, StatusCode},
+	pipeline::chain::PipelineHandleChain,
+	router::builder::*
+};
 use once_cell::sync::Lazy;
 use openapi_type::OpenapiType;
 use regex::{Captures, Regex};
-use std::panic::RefUnwindSafe;
+use std::{collections::HashMap, panic::RefUnwindSafe};
 
 /// This trait adds the `openapi_spec` and `openapi_doc` method to an OpenAPI-aware router.
 pub trait GetOpenapi {
@@ -87,9 +91,12 @@ macro_rules! implOpenapiRouter {
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
 			fn endpoint<E: EndpointWithSchema + 'static>(&mut self) {
-				let schema = (self.0).openapi_builder.add_schema(E::Output::schema());
+				let mut responses: HashMap<StatusCode, _> = HashMap::new();
+				for code in E::Output::status_codes() {
+					responses.insert(code, (self.0).openapi_builder.add_schema(E::Output::schema(code)));
+				}
 				let mut path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
-				let mut descr = OperationDescription::new::<E>(schema, &path);
+				let mut descr = OperationDescription::new::<E>(responses, &path);
 				if E::has_placeholders() {
 					descr.set_path_params(E::Placeholders::schema());
 				}

@@ -201,6 +201,17 @@
               }
             },
             "description": "OK"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
           }
         },
         "security": [
@@ -235,6 +246,17 @@
               }
             },
             "description": "OK"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
           }
         },
         "security": [

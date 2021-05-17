@@ -85,7 +85,8 @@ impl<T: ResponseBody> IntoResponse for Success<T> {
 
 #[cfg(feature = "openapi")]
 impl<T: ResponseBody> ResponseSchema for Success<T> {
-	fn schema() -> OpenapiSchema {
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::OK);
 		T::schema()
 	}
 }
@@ -111,7 +112,7 @@ mod test {
 		assert_eq!(res.mime, Some(APPLICATION_JSON));
 		assert_eq!(res.full_body().unwrap(), br#"{"msg":""}"#);
 		#[cfg(feature = "openapi")]
-		assert_eq!(<Success<Msg>>::default_status(), StatusCode::OK);
+		assert_eq!(<Success<Msg>>::status_codes(), vec![StatusCode::OK]);
 	}
 
 	#[test]
