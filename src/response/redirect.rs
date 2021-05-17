@@ -101,16 +101,15 @@ where
 	<E as IntoResponseError>::Err: StdError + Sync
 {
 	fn status_codes() -> Vec<StatusCode> {
-		vec![StatusCode::SEE_OTHER, StatusCode::INTERNAL_SERVER_ERROR]
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::SEE_OTHER);
+		status_codes
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapi_type::openapi::{AnySchema, SchemaKind};
-
 		match code {
-			StatusCode::SEE_OTHER => <Redirect as ResponseSchema>::schema(code),
-			StatusCode::INTERNAL_SERVER_ERROR => OpenapiSchema::new(SchemaKind::Any(AnySchema::default())),
-			_ => panic!("Invalid status code")
+			StatusCode::SEE_OTHER => <Redirect as ResponseSchema>::schema(StatusCode::SEE_OTHER),
+			code => E::schema(code)
 		}
 	}
 }

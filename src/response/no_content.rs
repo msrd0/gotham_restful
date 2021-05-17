@@ -107,16 +107,15 @@ where
 	E: Display + IntoResponseError<Err = serde_json::Error>
 {
 	fn status_codes() -> Vec<StatusCode> {
-		vec![StatusCode::NO_CONTENT, StatusCode::INTERNAL_SERVER_ERROR]
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::NO_CONTENT);
+		status_codes
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapi_type::openapi::{AnySchema, SchemaKind};
-
 		match code {
-			StatusCode::NO_CONTENT => <NoContent as ResponseSchema>::schema(code),
-			StatusCode::INTERNAL_SERVER_ERROR => OpenapiSchema::new(SchemaKind::Any(AnySchema::default())),
-			_ => panic!("Invalid status code")
+			StatusCode::NO_CONTENT => <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT),
+			code => E::schema(code)
 		}
 	}
 }

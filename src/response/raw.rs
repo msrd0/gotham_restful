@@ -145,16 +145,15 @@ where
 	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
 	fn status_codes() -> Vec<StatusCode> {
-		vec![StatusCode::OK, StatusCode::INTERNAL_SERVER_ERROR]
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::OK);
+		status_codes
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapi_type::openapi::AnySchema;
-
 		match code {
-			StatusCode::OK => <Raw<T> as ResponseSchema>::schema(code),
-			StatusCode::INTERNAL_SERVER_ERROR => OpenapiSchema::new(SchemaKind::Any(AnySchema::default())),
-			_ => panic!("Invalid status code")
+			StatusCode::OK => <Raw<T> as ResponseSchema>::schema(StatusCode::OK),
+			code => E::schema(code)
 		}
 	}
 }
