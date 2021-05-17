@@ -173,7 +173,7 @@
 <span id="170">170</span>
 <span id="171">171</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">remove_parens</span>, <span class="ident">CollectToResult</span>, <span class="ident">PathEndsWith</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">remove_parens</span>, <span class="ident">CollectToResult</span>};
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span>};
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::{
@@ -196,16 +196,16 @@
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
 		<span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">attrs</span> {
-			<span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;openapi_only&quot;</span>) {
+			<span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;openapi_only&quot;</span>) {
 				<span class="ident">openapi_only</span> <span class="op">=</span> <span class="bool-val">true</span>;
-			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;openapi_bound&quot;</span>) {
+			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;openapi_bound&quot;</span>) {
 				<span class="kw">let</span> <span class="ident">attr_arg</span>: <span class="ident">LitStr</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse2</span>(<span class="ident">remove_parens</span>(<span class="ident">attr</span>.<span class="ident">tokens</span>))<span class="question-mark">?</span>;
 				<span class="kw">let</span> <span class="ident">predicate</span> <span class="op">=</span> <span class="ident">attr_arg</span>.<span class="ident">parse_with</span>(<span class="ident">WherePredicate</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>;
 				<span class="ident">openapi_bound</span>.<span class="ident">push</span>(<span class="kw">match</span> <span class="ident">predicate</span> {
 					<span class="ident">WherePredicate</span>::<span class="ident">Type</span>(<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ty</span>,
 					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">predicate</span>.<span class="ident">span</span>(), <span class="string">&quot;Expected type bound&quot;</span>))
 				});
-			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;non_openapi_bound&quot;</span>) {
+			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;non_openapi_bound&quot;</span>) {
 				<span class="kw">let</span> <span class="ident">attr_arg</span>: <span class="ident">LitStr</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse2</span>(<span class="ident">remove_parens</span>(<span class="ident">attr</span>.<span class="ident">tokens</span>))<span class="question-mark">?</span>;
 				<span class="kw">let</span> <span class="ident">predicate</span> <span class="op">=</span> <span class="ident">attr_arg</span>.<span class="ident">parse_with</span>(<span class="ident">WherePredicate</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>;
 				<span class="ident">non_openapi_bound</span>.<span class="ident">push</span>(<span class="kw">match</span> <span class="ident">predicate</span> {

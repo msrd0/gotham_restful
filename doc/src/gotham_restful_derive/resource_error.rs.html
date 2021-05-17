@@ -371,12 +371,6 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">remove_parens</span>, <span class="ident">CollectToResult</span>};
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">TokenStream</span>};
@@ -541,34 +535,23 @@
 
 		<span class="kw">let</span> <span class="ident">fields_pat</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields_pat</span>();
 		<span class="prelude-val">Ok</span>(<span class="macro">quote</span><span class="macro">!</span> {
-			#<span class="ident">enum_ident</span>::#<span class="ident">ident</span> #<span class="ident">fields_pat</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(#<span class="ident">formatter_ident</span>, #<span class="ident">display</span> #(, #<span class="ident">params</span> <span class="op">=</span> #<span class="ident">params</span>)<span class="kw-2">*</span>)
+			#<span class="ident">enum_ident</span>::#<span class="ident">ident</span> #<span class="ident">fields_pat</span> <span class="op">=</span><span class="op">&gt;</span> ::<span class="ident">std</span>::<span class="macro">write</span><span class="macro">!</span>(#<span class="ident">formatter_ident</span>, #<span class="ident">display</span> #(, #<span class="ident">params</span> <span class="op">=</span> #<span class="ident">params</span>)<span class="kw-2">*</span>)
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">status</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">status</span><span class="op">|</span> {
 			<span class="comment">// the status might be relative to StatusCode, so let&#39;s fix that</span>
 			<span class="kw">if</span> <span class="ident">status</span>.<span class="ident">leading_colon</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">status</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
 				<span class="kw">let</span> <span class="ident">status_ident</span> <span class="op">=</span> <span class="ident">status</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">path_segment</span>(<span class="string">&quot;OK&quot;</span>));
-				<span class="ident">Path</span> {
-					<span class="ident">leading_colon</span>: <span class="prelude-val">Some</span>(<span class="ident">Default</span>::<span class="ident">default</span>()),
-					<span class="ident">segments</span>: <span class="macro">vec</span><span class="macro">!</span>[
-						<span class="ident">path_segment</span>(<span class="string">&quot;gotham_restful&quot;</span>),
-						<span class="ident">path_segment</span>(<span class="string">&quot;gotham&quot;</span>),
-						<span class="ident">path_segment</span>(<span class="string">&quot;hyper&quot;</span>),
-						<span class="ident">path_segment</span>(<span class="string">&quot;StatusCode&quot;</span>),
-						<span class="ident">status_ident</span>,
-					]
-					.<span class="ident">into_iter</span>()
-					.<span class="ident">collect</span>()
-				}
+				<span class="macro">quote</span><span class="macro">!</span>(::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>::#<span class="ident">status_ident</span>)
 			} <span class="kw">else</span> {
-				<span class="ident">status</span>.<span class="ident">clone</span>()
+				<span class="macro">quote</span><span class="macro">!</span>(::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>::<span class="ident">from</span>(#<span class="ident">status</span>))
 			}
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">into_match_arm</span>(<span class="self">self</span>, <span class="ident">krate</span>: <span class="kw-2">&amp;</span><span class="ident">TokenStream</span>, <span class="ident">enum_ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">into_match_arm</span>(<span class="self">self</span>, <span class="ident">enum_ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ident</span>;
 		<span class="kw">let</span> <span class="ident">fields_pat</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields_pat</span>();
 		<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">status</span>();
@@ -580,10 +563,10 @@
 				<span class="macro">quote</span><span class="macro">!</span>(#<span class="ident">from_field</span>.<span class="ident">into_response_error</span>())
 			},
 			(<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">ident</span>.<span class="ident">span</span>(), <span class="string">&quot;When #[from] is used, #[status] must not be used!&quot;</span>)),
-			(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">status</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote</span><span class="macro">!</span>(<span class="prelude-val">Ok</span>(#<span class="ident">krate</span>::<span class="ident">Response</span>::<span class="ident">new</span>(
-				{ #<span class="ident">status</span> }.<span class="ident">into</span>(),
-				#<span class="ident">krate</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">Body</span>::<span class="ident">empty</span>(),
-				<span class="prelude-val">None</span>
+			(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">status</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote</span><span class="macro">!</span>(::<span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span>::<span class="prelude-val">Ok</span>(::<span class="ident">gotham_restful</span>::<span class="ident">Response</span>::<span class="ident">new</span>(
+				#<span class="ident">status</span>,
+				::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">Body</span>::<span class="ident">empty</span>(),
+				::<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span>::<span class="prelude-val">None</span>
 			))),
 			(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">ident</span>.<span class="ident">span</span>(), <span class="string">&quot;Missing #[status(code)] for this variant&quot;</span>))
 		};
@@ -599,7 +582,6 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand_resource_error</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">krate</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">krate</span>();
 	<span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
 	<span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">generics</span>;
 
@@ -630,8 +612,7 @@
 			<span class="kw">impl</span> #<span class="ident">generics</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">generics</span>
 			<span class="kw">where</span> #( #<span class="ident">were</span> ),<span class="op">*</span>
 			{
-				<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, #<span class="ident">formatter_ident</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span>
-				{
+				<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, #<span class="ident">formatter_ident</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
 					<span class="kw">match</span> <span class="self">self</span> {
 						#( #<span class="ident">match_arms</span> ),<span class="op">*</span>
 					}
@@ -676,8 +657,7 @@
 			<span class="kw">impl</span> #<span class="ident">generics</span> ::<span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">From</span><span class="op">&lt;</span>#<span class="ident">from_ty</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">generics</span>
 			<span class="kw">where</span> #( #<span class="ident">fields_where</span> ),<span class="op">*</span>
 			{
-				<span class="kw">fn</span> <span class="ident">from</span>(#<span class="ident">from_ident</span> : #<span class="ident">from_ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-				{
+				<span class="kw">fn</span> <span class="ident">from</span>(#<span class="ident">from_ident</span>: #<span class="ident">from_ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 					#( #<span class="ident">fields_let</span> )<span class="op">*</span>
 					<span class="self">Self</span>::#<span class="ident">var_ident</span> #<span class="ident">fields_pat</span>
 				}
@@ -691,12 +671,12 @@
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// we would&#39;ve errored before if from_ty was not set</span>
 				<span class="kw">let</span> <span class="ident">from_ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">from_ty</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">1</span>;
-				<span class="macro">quote</span><span class="macro">!</span>(<span class="ident">status_codes</span>.<span class="ident">extend</span>(<span class="op">&lt;</span>#<span class="ident">from_ty</span> <span class="kw">as</span> #<span class="ident">krate</span>::<span class="ident">IntoResponseError</span><span class="op">&gt;</span>::<span class="ident">status_codes</span>());)
+				<span class="macro">quote</span><span class="macro">!</span>(<span class="ident">status_codes</span>.<span class="ident">extend</span>(<span class="op">&lt;</span>#<span class="ident">from_ty</span> <span class="kw">as</span> ::<span class="ident">gotham_restful</span>::<span class="ident">IntoResponseError</span><span class="op">&gt;</span>::<span class="ident">status_codes</span>());)
 			}
 		});
 		<span class="prelude-val">Some</span>(<span class="macro">quote</span><span class="macro">!</span> {
-			<span class="kw">fn</span> <span class="ident">status_codes</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>#<span class="ident">krate</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status_codes</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>#<span class="ident">krate</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+			<span class="kw">fn</span> <span class="ident">status_codes</span>() <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">Vec</span><span class="op">&lt;</span>::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status_codes</span> <span class="op">=</span> <span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">Vec</span><span class="op">&lt;</span>::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">new</span>();
 				#(#<span class="ident">codes</span>)<span class="op">*</span>
 				<span class="ident">status_codes</span>
 			}
@@ -707,15 +687,23 @@
 
 	<span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>) {
 		<span class="kw">let</span> <span class="ident">codes</span> <span class="op">=</span> <span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">status</span>() {
-			<span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote</span><span class="macro">!</span>(#<span class="ident">code</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">&lt;</span>#<span class="ident">krate</span>::<span class="ident">NoContent</span> <span class="kw">as</span> #<span class="ident">krate</span>::<span class="ident">ResponseSchema</span><span class="op">&gt;</span>::<span class="ident">schema</span>(#<span class="ident">krate</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>::<span class="ident">NO_CONTENT</span>)),
+			<span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote</span><span class="macro">!</span> {
+				#<span class="ident">code</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">&lt;</span>::<span class="ident">gotham_restful</span>::<span class="ident">NoContent</span> <span class="kw">as</span> ::<span class="ident">gotham_restful</span>::<span class="ident">ResponseSchema</span><span class="op">&gt;</span>::<span class="ident">schema</span>(
+					::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>::<span class="ident">NO_CONTENT</span>
+				)
+			},
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// we would&#39;ve errored before if from_ty was not set</span>
 				<span class="kw">let</span> <span class="ident">from_ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">from_ty</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">1</span>;
-				<span class="macro">quote</span><span class="macro">!</span>(<span class="ident">code</span> <span class="kw">if</span> <span class="op">&lt;</span>#<span class="ident">from_ty</span> <span class="kw">as</span> #<span class="ident">krate</span>::<span class="ident">IntoResponseError</span><span class="op">&gt;</span>::<span class="ident">status_codes</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">&lt;</span>#<span class="ident">from_ty</span> <span class="kw">as</span> #<span class="ident">krate</span>::<span class="ident">IntoResponseError</span><span class="op">&gt;</span>::<span class="ident">schema</span>(<span class="ident">code</span>))
+				<span class="macro">quote</span><span class="macro">!</span> {
+					<span class="ident">code</span> <span class="kw">if</span> <span class="op">&lt;</span>#<span class="ident">from_ty</span> <span class="kw">as</span> ::<span class="ident">gotham_restful</span>::<span class="ident">IntoResponseError</span><span class="op">&gt;</span>::<span class="ident">status_codes</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="op">&lt;</span>#<span class="ident">from_ty</span> <span class="kw">as</span> ::<span class="ident">gotham_restful</span>::<span class="ident">IntoResponseError</span><span class="op">&gt;</span>::<span class="ident">schema</span>(<span class="ident">code</span>)
+					}
+				}
 			}
 		});
 		<span class="prelude-val">Some</span>(<span class="macro">quote</span><span class="macro">!</span> {
-			<span class="kw">fn</span> <span class="ident">schema</span>(<span class="ident">code</span>: #<span class="ident">krate</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> #<span class="ident">krate</span>::<span class="ident">private</span>::<span class="ident">OpenapiSchema</span> {
+			<span class="kw">fn</span> <span class="ident">schema</span>(<span class="ident">code</span>: ::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">gotham_restful</span>::<span class="ident">private</span>::<span class="ident">OpenapiSchema</span> {
 				<span class="kw">match</span> <span class="ident">code</span> {
 					#(#<span class="ident">codes</span>,)<span class="op">*</span>
 					<span class="ident">code</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid status code {}&quot;</span>, <span class="ident">code</span>)
@@ -729,18 +717,18 @@
 	<span class="kw">let</span> <span class="ident">were</span> <span class="op">=</span> <span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">variant</span>.<span class="ident">were</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 	<span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> <span class="ident">variants</span>
 		.<span class="ident">into_iter</span>()
-		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">variant</span>.<span class="ident">into_match_arm</span>(<span class="kw-2">&amp;</span><span class="ident">krate</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>))
+		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">variant</span>.<span class="ident">into_match_arm</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>))
 		.<span class="ident">collect_to_result</span>()<span class="question-mark">?</span>;
 
 	<span class="prelude-val">Ok</span>(<span class="macro">quote</span><span class="macro">!</span> {
 		#<span class="ident">display_impl</span>
 
-		<span class="kw">impl</span> #<span class="ident">generics</span> #<span class="ident">krate</span>::<span class="ident">IntoResponseError</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">generics</span>
+		<span class="kw">impl</span> #<span class="ident">generics</span> ::<span class="ident">gotham_restful</span>::<span class="ident">IntoResponseError</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">generics</span>
 		<span class="kw">where</span> #( #<span class="ident">were</span> ),<span class="op">*</span>
 		{
-			<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> #<span class="ident">krate</span>::<span class="ident">private</span>::<span class="ident">serde_json</span>::<span class="ident">Error</span>;
+			<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ::<span class="ident">gotham_restful</span>::<span class="ident">private</span>::<span class="ident">serde_json</span>::<span class="ident">Error</span>;
 
-			<span class="kw">fn</span> <span class="ident">into_response_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>#<span class="ident">krate</span>::<span class="ident">Response</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span>
+			<span class="kw">fn</span> <span class="ident">into_response_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>::<span class="ident">gotham_restful</span>::<span class="ident">Response</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span>
 			{
 				<span class="kw">match</span> <span class="self">self</span> {
 					#( #<span class="ident">variants</span> ),<span class="op">*</span>

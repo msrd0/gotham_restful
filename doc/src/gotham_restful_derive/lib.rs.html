@@ -124,12 +124,6 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
@@ -137,7 +131,6 @@
 
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
 <span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_macro_input</span>::<span class="ident">ParseMacroInput</span>, <span class="ident">DeriveInput</span>, <span class="prelude-ty">Result</span>};
 
 <span class="kw">mod</span> <span class="ident">util</span>;
@@ -182,11 +175,6 @@
 	<span class="ident">I</span>: <span class="ident">ParseMacroInput</span>
 {
 	<span class="ident">print_tokens</span>(<span class="ident">expand</span>(<span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">attrs</span>), <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span>)).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_compile_error</span>()))
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">krate</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream2</span> {
-	<span class="macro">quote</span><span class="macro">!</span>(::<span class="ident">gotham_restful</span>)
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">FromBody</span>)]</span>

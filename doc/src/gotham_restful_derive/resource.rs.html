@@ -63,19 +63,8 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">endpoint</span>::<span class="ident">endpoint_ident</span>,
-	<span class="ident">util</span>::{<span class="ident">CollectToResult</span>, <span class="ident">PathEndsWith</span>}
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">endpoint</span>::<span class="ident">endpoint_ident</span>, <span class="ident">util</span>::<span class="ident">CollectToResult</span>};
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">TokenStream</span>};
 <span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>;
@@ -98,13 +87,12 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand_resource</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">krate</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">krate</span>();
 	<span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
 
 	<span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="ident">input</span>
 		.<span class="ident">attrs</span>
 		.<span class="ident">into_iter</span>()
-		.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;resource&quot;</span>))
+		.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;resource&quot;</span>))
 		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">syn</span>::<span class="ident">parse2</span>(<span class="ident">attr</span>.<span class="ident">tokens</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span>: <span class="ident">MethodList</span><span class="op">|</span> <span class="ident">m</span>.<span class="number">0</span>.<span class="ident">into_iter</span>()))
 		.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">list</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">list</span> {
 			<span class="prelude-val">Ok</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">iter</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">method</span><span class="op">|</span> {
@@ -116,10 +104,8 @@
 		.<span class="ident">collect_to_result</span>()<span class="question-mark">?</span>;
 
 	<span class="kw">let</span> <span class="ident">non_openapi_impl</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> {
-		<span class="kw">impl</span> #<span class="ident">krate</span>::<span class="ident">Resource</span> <span class="kw">for</span> #<span class="ident">ident</span>
-		{
-			<span class="kw">fn</span> <span class="ident">setup</span><span class="op">&lt;</span><span class="ident">D</span> : #<span class="ident">krate</span>::<span class="ident">DrawResourceRoutes</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">route</span> : <span class="ident">D</span>)
-			{
+		<span class="kw">impl</span> ::<span class="ident">gotham_restful</span>::<span class="ident">Resource</span> <span class="kw">for</span> #<span class="ident">ident</span> {
+			<span class="kw">fn</span> <span class="ident">setup</span><span class="op">&lt;</span><span class="ident">D</span>: ::<span class="ident">gotham_restful</span>::<span class="ident">DrawResourceRoutes</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">route</span>: <span class="ident">D</span>) {
 				#(#<span class="ident">methods</span>)<span class="op">*</span>
 			}
 		}
@@ -128,10 +114,8 @@
 		<span class="prelude-val">None</span>
 	} <span class="kw">else</span> {
 		<span class="prelude-val">Some</span>(<span class="macro">quote</span><span class="macro">!</span> {
-			<span class="kw">impl</span> #<span class="ident">krate</span>::<span class="ident">ResourceWithSchema</span> <span class="kw">for</span> #<span class="ident">ident</span>
-			{
-				<span class="kw">fn</span> <span class="ident">setup</span><span class="op">&lt;</span><span class="ident">D</span> : #<span class="ident">krate</span>::<span class="ident">DrawResourceRoutesWithSchema</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">route</span> : <span class="ident">D</span>)
-				{
+			<span class="kw">impl</span> ::<span class="ident">gotham_restful</span>::<span class="ident">ResourceWithSchema</span> <span class="kw">for</span> #<span class="ident">ident</span> {
+				<span class="kw">fn</span> <span class="ident">setup</span><span class="op">&lt;</span><span class="ident">D</span>: ::<span class="ident">gotham_restful</span>::<span class="ident">DrawResourceRoutesWithSchema</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">route</span>: <span class="ident">D</span>) {
 					#(#<span class="ident">methods</span>)<span class="op">*</span>
 				}
 			}

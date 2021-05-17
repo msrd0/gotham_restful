@@ -653,9 +653,8 @@
 <span id="650">650</span>
 <span id="651">651</span>
 <span id="652">652</span>
-<span id="653">653</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">CollectToResult</span>, <span class="ident">ExpectLit</span>, <span class="ident">PathEndsWith</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">CollectToResult</span>, <span class="ident">ExpectLit</span>};
 <span class="kw">use</span> <span class="ident">once_cell</span>::<span class="ident">sync</span>::<span class="ident">Lazy</span>;
 <span class="kw">use</span> <span class="ident">paste</span>::<span class="ident">paste</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>};
@@ -994,14 +993,13 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">expand_operation_id</span>(<span class="ident">operation_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LitStr</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
-	<span class="kw">match</span> <span class="ident">operation_id</span> {
-		<span class="prelude-val">Some</span>(<span class="ident">operation_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="macro">quote</span><span class="macro">!</span> {
-			<span class="kw">fn</span> <span class="ident">operation_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-				<span class="prelude-val">Some</span>(#<span class="ident">operation_id</span>.<span class="ident">to_string</span>())
+	<span class="ident">operation_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">operation_id</span><span class="op">|</span> {
+		<span class="macro">quote</span><span class="macro">!</span> {
+			<span class="kw">fn</span> <span class="ident">operation_id</span>() <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">String</span><span class="op">&gt;</span> {
+				<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span>::<span class="prelude-val">Some</span>(::<span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">String</span>::<span class="ident">from</span>(#<span class="ident">operation_id</span>))
 			}
-		}),
-		<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
-	}
+		}
+	})
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>))]</span>
@@ -1041,19 +1039,19 @@
 	<span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">attrs</span> {
 		<span class="kw">match</span> <span class="ident">meta</span> {
 			<span class="ident">NestedMeta</span>::<span class="ident">Meta</span>(<span class="ident">Meta</span>::<span class="ident">NameValue</span>(<span class="ident">kv</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;debug&quot;</span>) {
+				<span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;debug&quot;</span>) {
 					<span class="ident">debug</span> <span class="op">=</span> <span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_bool</span>()<span class="question-mark">?</span>.<span class="ident">value</span>;
-				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;operation_id&quot;</span>) {
+				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;operation_id&quot;</span>) {
 					<span class="ident">operation_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_str</span>()<span class="question-mark">?</span>);
-				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;wants_auth&quot;</span>) {
+				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;wants_auth&quot;</span>) {
 					<span class="ident">wants_auth</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_bool</span>()<span class="question-mark">?</span>);
-				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;method&quot;</span>) {
+				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;method&quot;</span>) {
 					<span class="ident">ty</span>.<span class="ident">set_method</span>(<span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">span</span>(), <span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_str</span>()<span class="question-mark">?</span>.<span class="ident">parse_with</span>(<span class="ident">Expr</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;uri&quot;</span>) {
+				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;uri&quot;</span>) {
 					<span class="ident">ty</span>.<span class="ident">set_uri</span>(<span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">span</span>(), <span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_str</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;params&quot;</span>) {
+				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;params&quot;</span>) {
 					<span class="ident">ty</span>.<span class="ident">set_params</span>(<span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">span</span>(), <span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_bool</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;body&quot;</span>) {
+				} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;body&quot;</span>) {
 					<span class="ident">ty</span>.<span class="ident">set_body</span>(<span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">span</span>(), <span class="ident">kv</span>.<span class="ident">lit</span>.<span class="ident">expect_bool</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 				} <span class="kw">else</span> {
 					<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">kv</span>.<span class="ident">path</span>.<span class="ident">span</span>(), <span class="string">&quot;Unknown attribute&quot;</span>));
@@ -1281,7 +1279,7 @@
 					<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> ::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">state</span>::<span class="ident">State</span>,
 					<span class="ident">placeholders</span>: <span class="self">Self</span>::<span class="ident">Placeholders</span>,
 					<span class="ident">params</span>: <span class="self">Self</span>::<span class="ident">Params</span>,
-					<span class="ident">body</span>: ::<span class="ident">std</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Body</span><span class="op">&gt;</span>
+					<span class="ident">body</span>: ::<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Body</span><span class="op">&gt;</span>
 				) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">gotham_restful</span>::<span class="ident">private</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
 					#<span class="ident">handle_content</span>
 				}
