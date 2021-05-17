@@ -3,10 +3,12 @@ use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody}
 use gotham::hyper::StatusCode;
 use indexmap::IndexMap;
 use mime::Mime;
-use openapi_type::OpenapiSchema;
-use openapiv3::{
-	MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
-	RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode as OAStatusCode, Type
+use openapi_type::{
+	openapi::{
+		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
+		RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode as OAStatusCode, Type
+	},
+	OpenapiSchema
 };
 use std::collections::HashMap;
 
@@ -79,6 +81,7 @@ impl OperationParams {
 pub(crate) struct OperationDescription {
 	operation_id: Option<String>,
 	description: Option<String>,
+
 	accepted_types: Option<Vec<Mime>>,
 	responses: HashMap<StatusCode, ReferenceOr<Schema>>,
 	params: OperationParams,
@@ -97,6 +100,7 @@ impl OperationDescription {
 		Self {
 			operation_id,
 			description: E::description(),
+
 			accepted_types: E::Output::accepted_types(),
 			responses,
 			params: Default::default(),

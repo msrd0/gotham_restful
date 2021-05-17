@@ -13,7 +13,7 @@ use gotham::hyper::{
 };
 use mime::Mime;
 #[cfg(feature = "openapi")]
-use openapiv3::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
+use openapi_type::openapi::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde_json::error::Error as SerdeJsonError;
 use std::{convert::Infallible, fmt::Display, pin::Pin};
 
@@ -149,7 +149,7 @@ where
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapiv3::AnySchema;
+		use openapi_type::openapi::AnySchema;
 
 		match code {
 			StatusCode::OK => <Raw<T> as ResponseSchema>::schema(code),

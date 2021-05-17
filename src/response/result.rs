@@ -58,7 +58,7 @@ where
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapiv3::{AnySchema, SchemaKind};
+		use openapi_type::openapi::{AnySchema, SchemaKind};
 
 		match code {
 			StatusCode::OK => R::schema(),

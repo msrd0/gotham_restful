@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 mod util {
 	include!("util/mod.rs");
 }
-use util::{test_get_response, test_openapi_response};
+use util::test_openapi_response;
 
 const IMAGE_RESPONSE : &[u8] = b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUA/wA0XsCoAAAAAXRSTlN/gFy0ywAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=";
 
@@ -37,7 +37,7 @@ fn get_image(_id: u64) -> Raw<&'static [u8]> {
 	Raw::new(IMAGE_RESPONSE, "image/png;base64".parse().unwrap())
 }
 
-#[change(operation_id = "setImage")]
+#[update(operation_id = "setImage")]
 fn set_image(_id: u64, _image: Image) {}
 
 #[derive(Resource)]
@@ -118,10 +118,11 @@ fn openapi_specification() {
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
 	let server = TestServer::new(build_router(chain, pipelines, |router| {
 		router.with_openapi(info, |mut router| {
-			router.resource::<ImageResource>("img");
+			// the leading slash tests that the spec doesn't contain '//img' nonsense
+			router.resource::<ImageResource>("/img");
 			router.resource::<SecretResource>("secret");
 			router.resource::<CustomResource>("custom");
-			router.get_openapi("openapi");
+			router.openapi_spec("openapi");
 		});
 	}))
 	.unwrap();

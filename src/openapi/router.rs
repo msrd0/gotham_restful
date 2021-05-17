@@ -1,6 +1,6 @@
 use super::{
 	builder::OpenapiBuilder,
-	handler::{OpenapiHandler, SwaggerUiHandler},
+	handler::{OpenapiDocHandler, OpenapiSpecHandler},
 	operation::OperationDescription
 };
 use crate::{routing::*, EndpointWithSchema, ResourceWithSchema, ResponseSchema};
@@ -14,10 +14,13 @@ use openapi_type::OpenapiType;
 use regex::{Captures, Regex};
 use std::{collections::HashMap, panic::RefUnwindSafe};
 
-/// This trait adds the `get_openapi` and `swagger_ui` method to an OpenAPI-aware router.
+/// This trait adds the `openapi_spec` and `openapi_doc` method to an OpenAPI-aware router.
 pub trait GetOpenapi {
-	fn get_openapi(&mut self, path: &str);
-	fn swagger_ui(&mut self, path: &str);
+	/// Register a GET route to `path` that returns the OpenAPI specification in JSON format.
+	fn openapi_spec(&mut self, path: &str);
+
+	/// Register a GET route to `path` that returns the OpenAPI documentation in HTML format.
+	fn openapi_doc(&mut self, path: &str);
 }
 
 #[derive(Debug)]
@@ -56,16 +59,16 @@ macro_rules! implOpenapiRouter {
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn get_openapi(&mut self, path: &str) {
+			fn openapi_spec(&mut self, path: &str) {
 				self.router
 					.get(path)
-					.to_new_handler(OpenapiHandler::new(self.openapi_builder.openapi.clone()));
+					.to_new_handler(OpenapiSpecHandler::new(self.openapi_builder.openapi.clone()));
 			}
 
-			fn swagger_ui(&mut self, path: &str) {
+			fn openapi_doc(&mut self, path: &str) {
 				self.router
 					.get(path)
-					.to_new_handler(SwaggerUiHandler::new(self.openapi_builder.openapi.clone()));
+					.to_new_handler(OpenapiDocHandler::new(self.openapi_builder.openapi.clone()));
 			}
 		}
 
@@ -74,7 +77,10 @@ macro_rules! implOpenapiRouter {
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn resource<R: ResourceWithSchema>(&mut self, path: &str) {
+			fn resource<R: ResourceWithSchema>(&mut self, mut path: &str) {
+				if path.starts_with('/') {
+					path = &path[1..];
+				}
 				R::setup((self, path));
 			}
 		}

@@ -111,7 +111,7 @@ where
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapiv3::{AnySchema, SchemaKind};
+		use openapi_type::openapi::{AnySchema, SchemaKind};
 
 		match code {
 			StatusCode::NO_CONTENT => <NoContent as ResponseSchema>::schema(code),

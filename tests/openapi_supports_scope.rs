@@ -33,7 +33,7 @@ fn openapi_supports_scope() {
 	};
 	let server = TestServer::new(build_simple_router(|router| {
 		router.with_openapi(info, |mut router| {
-			router.get_openapi("openapi");
+			router.openapi_spec("openapi");
 			router.resource::<FooResource>("foo1");
 			router.scope("/bar", |router| {
 				router.resource::<FooResource>("foo2");

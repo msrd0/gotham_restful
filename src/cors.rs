@@ -193,8 +193,7 @@ If you are using the [Resource](crate::Resource) type (which is the recommended 
 have to call this method. However, if you are writing your own handler method, you might want to
 call this after your request to add the required CORS headers.
 
-For further information on CORS, read
-[https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+For further information on CORS, read <https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>.
 */
 pub fn handle_cors(state: &State, res: &mut Response<Body>) {
 	let config = CorsConfig::try_borrow_from(state);

@@ -34,10 +34,10 @@ Assuming you assign `/foobar` to your resource, the following pre-defined endpoi
 | read          | id                 | GET       | /foobar/:id    |
 | search        | query              | GET       | /foobar/search |
 | create        | body               | POST      | /foobar        |
-| change_all    | body               | PUT       | /foobar        |
-| change        | id, body           | PUT       | /foobar/:id    |
-| remove_all    |                    | DELETE    | /foobar        |
-| remove        | id                 | DELETE    | /foobar/:id    |
+| update_all    | body               | PUT       | /foobar        |
+| update        | id, body           | PUT       | /foobar/:id    |
+| delete_all    |                    | DELETE    | /foobar        |
+| delete        | id                 | DELETE    | /foobar/:id    |
 
 Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
 simple example looks like this:
@@ -285,7 +285,7 @@ carefully both as a binary as well as a library author to avoid unwanted suprise
 In order to automatically create an openapi specification, gotham-restful needs knowledge over
 all routes and the types returned. `serde` does a great job at serialization but doesn't give
 enough type information, so all types used in the router need to implement
-`OpenapiType`[openapi_type::OpenapiType]. This can be derived for almoust any type and there
+[`OpenapiType`](openapi_type::OpenapiType). This can be derived for almoust any type and there
 should be no need to implement it manually. A simple example looks like this:
 
 ```rust
@@ -312,23 +312,25 @@ fn main() {
 		};
 		route.with_openapi(info, |mut route| {
 			route.resource::<FooResource>("foo");
-			route.get_openapi("openapi");
+			route.openapi_spec("openapi");
+			route.openapi_doc("/");
 		});
 	}));
 }
 ```
 
-Above example adds the resource as before, but adds another endpoint that we specified as `/openapi`.
-It will return the generated openapi specification in JSON format. This allows you to easily write
-clients in different languages without worying to exactly replicate your api in each of those
-languages.
+Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`.
+The first one will return the generated openapi specification in JSON format, allowing you to easily
+generate clients in different languages without worying to exactly replicate your api in each of those
+languages. The second one will return documentation in HTML format, so you can easily view your
+api and share it with other people.
 
 However, please note that by default, the `without-openapi` feature of this crate is enabled.
-Disabling it in favour of the `openapi` feature will add an additional type bound,
-[`OpenapiType`][openapi_type::OpenapiType], on some of the types in [`Endpoint`] and related
-traits. This means that some code might only compile on either feature, but not on both. If you
-are writing a library that uses gotham-restful, it is strongly recommended to pass both features
-through and conditionally enable the openapi code, like this:
+Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements
+to some of the traits and types in this crate, for example instead of [`Endpoint`] you now have to
+implement [`EndpointWithSchema`]. This means that some code might only compile on either feature, but not
+on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both
+features through and conditionally enable the openapi code, like this:
 
 ```rust
 #[derive(Deserialize, Serialize)]
@@ -336,17 +338,7 @@ through and conditionally enable the openapi code, like this:
 struct Foo;
 ```
 
-## Examples
-
-This readme and the crate documentation contain some of example. In addition to that, there is
-a collection of code in the [example] directory that might help you. Any help writing more
-examples is highly appreciated.
-
-
  [diesel]: https://diesel.rs/
- [example]: https://gitlab.com/msrd0/gotham-restful/tree/master/example
- [gotham]: https://gotham.rs/
- [serde_json]: https://github.com/serde-rs/json#serde-json----
  [`State`]: gotham::state::State
 
 ## Versioning

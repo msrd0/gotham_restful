@@ -105,7 +105,7 @@ where
 	}
 
 	fn schema(code: StatusCode) -> OpenapiSchema {
-		use openapiv3::{AnySchema, SchemaKind};
+		use openapi_type::openapi::{AnySchema, SchemaKind};
 
 		match code {
 			StatusCode::SEE_OTHER => <Redirect as ResponseSchema>::schema(code),
