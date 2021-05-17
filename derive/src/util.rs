@@ -1,6 +1,6 @@
 use proc_macro2::{Delimiter, TokenStream, TokenTree};
 use std::iter;
-use syn::{Error, Lit, LitBool, LitStr, Path, Result};
+use syn::{Error, Lit, LitBool, LitStr, Result};
 
 pub(crate) trait CollectToResult {
 	type Item;
@@ -48,16 +48,6 @@ impl ExpectLit for Lit {
 			Self::Str(str) => Ok(str),
 			_ => Err(Error::new(self.span(), "Expected string literal"))
 		}
-	}
-}
-
-pub(crate) trait PathEndsWith {
-	fn ends_with(&self, s: &str) -> bool;
-}
-
-impl PathEndsWith for Path {
-	fn ends_with(&self, s: &str) -> bool {
-		self.segments.last().map(|segment| segment.ident.to_string()).as_deref() == Some(s)
 	}
 }
 

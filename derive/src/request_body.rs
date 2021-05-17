@@ -25,15 +25,11 @@ fn impl_openapi_type(_ident: &Ident, _generics: &Generics) -> TokenStream {
 
 #[cfg(feature = "openapi")]
 fn impl_openapi_type(ident: &Ident, generics: &Generics) -> TokenStream {
-	let krate = super::krate();
-	let openapi = quote!(#krate::private::openapi);
-
+	let openapi = quote!(::gotham_restful::private::openapi);
 	quote! {
-		impl #generics #krate::private::OpenapiType for #ident #generics
-		{
-			fn schema() -> #krate::private::OpenapiSchema
-			{
-				#krate::private::OpenapiSchema::new(
+		impl #generics ::gotham_restful::private::OpenapiType for #ident #generics {
+			fn schema() -> ::gotham_restful::private::OpenapiSchema {
+				::gotham_restful::private::OpenapiSchema::new(
 					#openapi::SchemaKind::Type(
 						#openapi::Type::String(
 							#openapi::StringType {
@@ -51,7 +47,6 @@ fn impl_openapi_type(ident: &Ident, generics: &Generics) -> TokenStream {
 }
 
 pub fn expand_request_body(input: DeriveInput) -> Result<TokenStream> {
-	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 
@@ -83,11 +78,10 @@ pub fn expand_request_body(input: DeriveInput) -> Result<TokenStream> {
 	let impl_openapi_type = impl_openapi_type(&ident, &generics);
 
 	Ok(quote! {
-		impl #generics #krate::RequestBody for #ident #generics
-		where #ident #generics : #krate::FromBody
+		impl #generics ::gotham_restful::RequestBody for #ident #generics
+		where #ident #generics : ::gotham_restful::FromBody
 		{
-			fn supported_types() -> Option<Vec<#krate::Mime>>
-			{
+			fn supported_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::Mime>> {
 				#types
 			}
 		}

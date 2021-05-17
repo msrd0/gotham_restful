@@ -4,7 +4,6 @@
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::quote;
 use syn::{parse_macro_input, parse_macro_input::ParseMacroInput, DeriveInput, Result};
 
 mod util;
@@ -49,11 +48,6 @@ where
 	I: ParseMacroInput
 {
 	print_tokens(expand(parse_macro_input!(attrs), parse_macro_input!(item)).unwrap_or_else(|err| err.to_compile_error()))
-}
-
-#[inline]
-fn krate() -> TokenStream2 {
-	quote!(::gotham_restful)
 }
 
 #[proc_macro_derive(FromBody)]

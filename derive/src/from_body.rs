@@ -37,7 +37,6 @@ impl ParsedFields {
 }
 
 pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
-	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 
@@ -64,12 +63,12 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 		let body_ty = &body_field.1;
 		where_clause = quote! {
 			#where_clause
-			#body_ty : for<'a> From<&'a [u8]>,
+			#body_ty: for<'a> From<&'a [u8]>,
 		};
 		block = quote! {
 			#block
-			let #body_ident : &[u8] = &#body_ident;
-			let #body_ident : #body_ty = #body_ident.into();
+			let #body_ident: &[u8] = &#body_ident;
+			let #body_ident: #body_ty = #body_ident.into();
 		};
 	}
 
@@ -78,11 +77,11 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 		let type_ty = &type_field.1;
 		where_clause = quote! {
 			#where_clause
-			#type_ty : From<#krate::Mime>,
+			#type_ty: From<::gotham_restful::Mime>,
 		};
 		block = quote! {
 			#block
-			let #type_ident : #type_ty = #type_ident.into();
+			let #type_ident: #type_ty = #type_ident.into();
 		};
 	}
 
@@ -91,11 +90,11 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 		let field_ty = &field.1;
 		where_clause = quote! {
 			#where_clause
-			#field_ty : Default,
+			#field_ty: ::std::default::Default,
 		};
 		block = quote! {
 			#block
-			let #field_ident : #field_ty = Default::default();
+			let #field_ident: #field_ty = Default::default();
 		};
 	}
 
@@ -107,15 +106,18 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 	};
 
 	Ok(quote! {
-		impl #generics #krate::FromBody for #ident #generics
+		impl #generics ::gotham_restful::FromBody for #ident #generics
 		where #where_clause
 		{
 			type Err = ::std::convert::Infallible;
 
-			fn from_body(#body_ident : #krate::gotham::hyper::body::Bytes, #type_ident : #krate::Mime) -> Result<Self, ::std::convert::Infallible>
+			fn from_body(
+				#body_ident: ::gotham_restful::gotham::hyper::body::Bytes,
+				#type_ident: ::gotham_restful::Mime
+			) -> ::std::result::Result<Self, ::std::convert::Infallible>
 			{
 				#block
-				Ok(#ctor)
+				::std::result::Result::Ok(#ctor)
 			}
 		}
 	})

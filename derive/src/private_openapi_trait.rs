@@ -1,4 +1,4 @@
-use crate::util::{remove_parens, CollectToResult, PathEndsWith};
+use crate::util::{remove_parens, CollectToResult};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::{
@@ -21,16 +21,16 @@ impl TraitItemAttrs {
 		let mut other = Vec::new();
 
 		for attr in attrs {
-			if attr.path.ends_with("openapi_only") {
+			if attr.path.is_ident("openapi_only") {
 				openapi_only = true;
-			} else if attr.path.ends_with("openapi_bound") {
+			} else if attr.path.is_ident("openapi_bound") {
 				let attr_arg: LitStr = syn::parse2(remove_parens(attr.tokens))?;
 				let predicate = attr_arg.parse_with(WherePredicate::parse)?;
 				openapi_bound.push(match predicate {
 					WherePredicate::Type(ty) => ty,
 					_ => return Err(Error::new(predicate.span(), "Expected type bound"))
 				});
-			} else if attr.path.ends_with("non_openapi_bound") {
+			} else if attr.path.is_ident("non_openapi_bound") {
 				let attr_arg: LitStr = syn::parse2(remove_parens(attr.tokens))?;
 				let predicate = attr_arg.parse_with(WherePredicate::parse)?;
 				non_openapi_bound.push(match predicate {
