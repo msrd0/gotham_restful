@@ -62,7 +62,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@1.52.0
+      - uses: dtolnay/rust-toolchain
+        with:
+          toolchain: "1.52.1"
       - uses: actions/cache@v2
         with:
           path: |
