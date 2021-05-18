@@ -23,7 +23,11 @@ function percentDecode (encoded: string): string {
 export function initRedoc(percentEncodedSpec: string) {	
 	const cb = () => {
 		const spec = JSON.parse(percentDecode(percentEncodedSpec));
-		Redoc.init(spec, {
+		
+		// https://github.com/Redocly/redoc#redoc-options-object
+		const options = {
+			expandResponses: "200",
+			onlyRequiredInSamples: true,
 			theme: {
 				typography: {
 					fontFamily: '"Open Sans",sans-serif',
@@ -35,12 +39,13 @@ export function initRedoc(percentEncodedSpec: string) {
 						fontFamily: '"Source Code Pro",monospace'
 					}
 				},
-				menu: {
+				sidebar: {
 					backgroundColor: '#262a2b',
 					textColor: '#fafafa'
 				}
 			}
-		}, document.getElementById('redoc'));
+		};
+		Redoc.init(spec, options, document.getElementById('redoc'));
 	};
 	
 	const s = document.createElement('script');
