@@ -14,7 +14,7 @@ categories = ["web-programming", "web-programming::http-server"]
 license = "Apache-2.0"
 readme = "crates-io.md"
 repository = "https://github.com/msrd0/gotham_restful"
-include = ["src/**/*", "LICENSE", "crates-io.md"]
+include = ["/src/**/*.rs", "/src/openapi/handler/script.min.js", "/LICENSE", "/crates-io.md"]
 
 [dependencies]
 futures-core = "0.3.7"
