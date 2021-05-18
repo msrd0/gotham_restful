@@ -7,6 +7,16 @@ on:
   pull_request:
 
 jobs:
+  webpack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: cd src/openapi/handler && npm install && npm run webpack
+      - run: git diff --exit-code src/openapi/handler
+  
   test:
     strategy:
       fail-fast: false

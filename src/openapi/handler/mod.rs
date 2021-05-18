@@ -18,7 +18,7 @@ use indexmap::IndexMap;
 use mime::{APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN};
 use openapi_type::openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
 use parking_lot::RwLock;
-use percent_encoding::{utf8_percent_encode, AsciiSet, NON_ALPHANUMERIC};
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use sha2::{Digest, Sha256};
 use std::{io::Write, panic::RefUnwindSafe, pin::Pin, sync::Arc};
 
@@ -138,36 +138,12 @@ impl NewHandler for OpenapiDocHandler {
 	}
 }
 
-// https://tc39.es/ecma262/#prod-uriReserved
-const URI: &AsciiSet = &NON_ALPHANUMERIC
-	// reserved
-	.remove(b';')
-	.remove(b'/')
-	.remove(b'?')
-	.remove(b':')
-	.remove(b'@')
-	.remove(b'&')
-	.remove(b'=')
-	.remove(b'+')
-	.remove(b'$')
-	.remove(b',')
-	// unescaped
-	.remove(b'-')
-	.remove(b'_')
-	.remove(b'.')
-	.remove(b'!')
-	.remove(b'~')
-	.remove(b'*')
-	.remove(b'\'')
-	.remove(b'(')
-	.remove(b')');
-
 fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Response<Body>, HandlerError> {
 	let spec = openapi_string(state, openapi)?;
 	let script = format!(
-		r#"const SPEC = "{}";{}"#,
-		utf8_percent_encode(&spec, URI),
-		include_str!("script.js").replace("\n", "")
+		r#"(()=>{{{}gotham_restful.initRedoc("{}")}})()"#,
+		include_str!("script.min.js"),
+		utf8_percent_encode(&spec, NON_ALPHANUMERIC)
 	);
 	let mut script_hash = Sha256::new();
 	script_hash.update(&script);
