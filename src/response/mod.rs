@@ -193,7 +193,10 @@ impl<R: IntoResponse + ResponseSchema> IntoResponseWithSchema for R {}
 #[derive(Debug, Serialize)]
 #[cfg_attr(feature = "openapi", derive(OpenapiType))]
 pub(crate) struct ResourceError {
+	/// This is always `true` and can be used to detect an error response without looking at the
+	/// HTTP status code.
 	error: bool,
+	/// The error message.
 	message: String
 }
 
