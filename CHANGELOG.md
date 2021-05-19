@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
  - Rename endpoint macro `change` to `update` and `remove` to `delete`
  - All endpoints with a known operation verb (like `read` or `update`) now have an auto-generated operation id (`openapi` feature only)
  - Endpoint macros now place the rustdoc into the operation's description (`openapi` feature only)
- - Update `openapi_type` crate to 0.2.0
+ - Update `openapi_type` crate to 0.2
  - Replace swagger-ui with redoc and a semi-dark theme (`openapi` feature only)
  - Rename `get_openapi` to `openapi_spec` and `swagger_ui` to `openapi_doc` (that now serves redoc)
 
