@@ -59,12 +59,13 @@ impl IntoResponse for Redirect {
 
 #[cfg(feature = "openapi")]
 impl ResponseSchema for Redirect {
-	fn default_status() -> StatusCode {
-		StatusCode::SEE_OTHER
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::SEE_OTHER]
 	}
 
-	fn schema() -> OpenapiSchema {
-		<NoContent as ResponseSchema>::schema()
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::SEE_OTHER);
+		<NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT)
 	}
 }
 
@@ -99,12 +100,17 @@ where
 	E: Display + IntoResponseError,
 	<E as IntoResponseError>::Err: StdError + Sync
 {
-	fn default_status() -> StatusCode {
-		Redirect::default_status()
+	fn status_codes() -> Vec<StatusCode> {
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::SEE_OTHER);
+		status_codes
 	}
 
-	fn schema() -> OpenapiSchema {
-		<Redirect as ResponseSchema>::schema()
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		match code {
+			StatusCode::SEE_OTHER => <Redirect as ResponseSchema>::schema(StatusCode::SEE_OTHER),
+			code => E::schema(code)
+		}
 	}
 }
 
@@ -120,7 +126,7 @@ mod test {
 	struct MsgError;
 
 	#[test]
-	fn rediect_has_redirect_response() {
+	fn redirect_response() {
 		let redir = Redirect {
 			to: "http://localhost/foo".to_owned()
 		};
@@ -132,6 +138,9 @@ mod test {
 			Some("http://localhost/foo")
 		);
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(Redirect::status_codes(), vec![StatusCode::SEE_OTHER]);
 	}
 
 	#[test]
@@ -147,5 +156,11 @@ mod test {
 			Some("http://localhost/foo")
 		);
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(<Result<Redirect, MsgError>>::status_codes(), vec![
+			StatusCode::INTERNAL_SERVER_ERROR,
+			StatusCode::SEE_OTHER
+		]);
 	}
 }

@@ -3,7 +3,7 @@ use super::{handle_error, IntoResponse, ResourceError};
 use crate::ResponseSchema;
 use crate::{Response, ResponseBody, Success};
 #[cfg(feature = "openapi")]
-use openapi_type::OpenapiSchema;
+use openapi_type::{OpenapiSchema, OpenapiType};
 
 use futures_core::future::Future;
 use gotham::hyper::StatusCode;
@@ -14,6 +14,12 @@ pub trait IntoResponseError {
 	type Err: Display + Send + 'static;
 
 	fn into_response_error(self) -> Result<Response, Self::Err>;
+
+	#[cfg(feature = "openapi")]
+	fn status_codes() -> Vec<StatusCode>;
+
+	#[cfg(feature = "openapi")]
+	fn schema(code: StatusCode) -> OpenapiSchema;
 }
 
 impl<E: Error> IntoResponseError for E {
@@ -25,6 +31,17 @@ impl<E: Error> IntoResponseError for E {
 			StatusCode::INTERNAL_SERVER_ERROR,
 			serde_json::to_string(&err)?
 		))
+	}
+
+	#[cfg(feature = "openapi")]
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::INTERNAL_SERVER_ERROR]
+	}
+
+	#[cfg(feature = "openapi")]
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::INTERNAL_SERVER_ERROR);
+		ResourceError::schema()
 	}
 }
 
@@ -53,8 +70,17 @@ where
 	R: ResponseBody,
 	E: Display + IntoResponseError<Err = serde_json::Error>
 {
-	fn schema() -> OpenapiSchema {
-		R::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::OK);
+		status_codes
+	}
+
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		match code {
+			StatusCode::OK => R::schema(),
+			code => E::schema(code)
+		}
 	}
 }
 

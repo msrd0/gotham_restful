@@ -6,3 +6,4 @@
 Cargo.lock
 cobertura.xml
 tarpaulin-report.html
+node_modules/

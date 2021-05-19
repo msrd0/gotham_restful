@@ -118,7 +118,8 @@ fn openapi_specification() {
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
 	let server = TestServer::new(build_router(chain, pipelines, |router| {
 		router.with_openapi(info, |mut router| {
-			router.resource::<ImageResource>("img");
+			// the leading slash tests that the spec doesn't contain '//img' nonsense
+			router.resource::<ImageResource>("/img");
 			router.resource::<SecretResource>("secret");
 			router.resource::<CustomResource>("custom");
 			router.openapi_spec("openapi");

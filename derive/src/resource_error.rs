@@ -161,33 +161,26 @@ impl ErrorVariant {
 
 		let fields_pat = self.fields_pat();
 		Ok(quote! {
-			#enum_ident::#ident #fields_pat => write!(#formatter_ident, #display #(, #params = #params)*)
+			#enum_ident::#ident #fields_pat => ::std::write!(#formatter_ident, #display #(, #params = #params)*)
 		})
 	}
 
-	fn into_match_arm(self, krate: &TokenStream, enum_ident: &Ident) -> Result<TokenStream> {
-		let ident = &self.ident;
-		let fields_pat = self.fields_pat();
-		let status = self.status.map(|status| {
+	fn status(&self) -> Option<TokenStream> {
+		self.status.as_ref().map(|status| {
 			// the status might be relative to StatusCode, so let's fix that
 			if status.leading_colon.is_none() && status.segments.len() < 2 {
 				let status_ident = status.segments.first().cloned().unwrap_or_else(|| path_segment("OK"));
-				Path {
-					leading_colon: Some(Default::default()),
-					segments: vec![
-						path_segment("gotham_restful"),
-						path_segment("gotham"),
-						path_segment("hyper"),
-						path_segment("StatusCode"),
-						status_ident,
-					]
-					.into_iter()
-					.collect()
-				}
+				quote!(::gotham_restful::gotham::hyper::StatusCode::#status_ident)
 			} else {
-				status
+				quote!(::gotham_restful::gotham::hyper::StatusCode::from(#status))
 			}
-		});
+		})
+	}
+
+	fn into_match_arm(self, enum_ident: &Ident) -> Result<TokenStream> {
+		let ident = &self.ident;
+		let fields_pat = self.fields_pat();
+		let status = self.status();
 
 		// the response will come directly from the from_ty if present
 		let res = match (self.from_ty, status) {
@@ -196,10 +189,10 @@ impl ErrorVariant {
 				quote!(#from_field.into_response_error())
 			},
 			(Some(_), Some(_)) => return Err(Error::new(ident.span(), "When #[from] is used, #[status] must not be used!")),
-			(None, Some(status)) => quote!(Ok(#krate::Response::new(
-				{ #status }.into(),
-				#krate::gotham::hyper::Body::empty(),
-				None
+			(None, Some(status)) => quote!(::std::result::Result::Ok(::gotham_restful::Response::new(
+				#status,
+				::gotham_restful::gotham::hyper::Body::empty(),
+				::core::option::Option::None
 			))),
 			(None, None) => return Err(Error::new(ident.span(), "Missing #[status(code)] for this variant"))
 		};
@@ -215,7 +208,6 @@ impl ErrorVariant {
 }
 
 pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
-	let krate = super::krate();
 	let ident = input.ident;
 	let generics = input.generics;
 
@@ -246,8 +238,7 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 			impl #generics ::std::fmt::Display for #ident #generics
 			where #( #were ),*
 			{
-				fn fmt(&self, #formatter_ident: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result
-				{
+				fn fmt(&self, #formatter_ident: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
 					match self {
 						#( #match_arms ),*
 					}
@@ -292,8 +283,7 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 			impl #generics ::std::convert::From<#from_ty> for #ident #generics
 			where #( #fields_where ),*
 			{
-				fn from(#from_ident : #from_ty) -> Self
-				{
+				fn from(#from_ident: #from_ty) -> Self {
 					#( #fields_let )*
 					Self::#var_ident #fields_pat
 				}
@@ -301,26 +291,78 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		});
 	}
 
+	let status_codes = if cfg!(feature = "openapi") {
+		let codes = variants.iter().map(|v| match v.status() {
+			Some(code) => quote!(status_codes.push(#code);),
+			None => {
+				// we would've errored before if from_ty was not set
+				let from_ty = &v.from_ty.as_ref().unwrap().1;
+				quote!(status_codes.extend(<#from_ty as ::gotham_restful::IntoResponseError>::status_codes());)
+			}
+		});
+		Some(quote! {
+			fn status_codes() -> ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> {
+				let mut status_codes = <::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode>>::new();
+				#(#codes)*
+				status_codes
+			}
+		})
+	} else {
+		None
+	};
+
+	let schema = if cfg!(feature = "openapi") {
+		let codes = variants.iter().map(|v| match v.status() {
+			Some(code) => quote! {
+				#code => <::gotham_restful::NoContent as ::gotham_restful::ResponseSchema>::schema(
+					::gotham_restful::gotham::hyper::StatusCode::NO_CONTENT
+				)
+			},
+			None => {
+				// we would've errored before if from_ty was not set
+				let from_ty = &v.from_ty.as_ref().unwrap().1;
+				quote! {
+					code if <#from_ty as ::gotham_restful::IntoResponseError>::status_codes().contains(&code) => {
+						<#from_ty as ::gotham_restful::IntoResponseError>::schema(code)
+					}
+				}
+			}
+		});
+		Some(quote! {
+			fn schema(code: ::gotham_restful::gotham::hyper::StatusCode) -> ::gotham_restful::private::OpenapiSchema {
+				match code {
+					#(#codes,)*
+					code => panic!("Invalid status code {}", code)
+				}
+			}
+		})
+	} else {
+		None
+	};
+
 	let were = variants.iter().filter_map(|variant| variant.were()).collect::<Vec<_>>();
 	let variants = variants
 		.into_iter()
-		.map(|variant| variant.into_match_arm(&krate, &ident))
+		.map(|variant| variant.into_match_arm(&ident))
 		.collect_to_result()?;
 
 	Ok(quote! {
 		#display_impl
 
-		impl #generics #krate::IntoResponseError for #ident #generics
+		impl #generics ::gotham_restful::IntoResponseError for #ident #generics
 		where #( #were ),*
 		{
-			type Err = #krate::private::serde_json::Error;
+			type Err = ::gotham_restful::private::serde_json::Error;
 
-			fn into_response_error(self) -> Result<#krate::Response, Self::Err>
+			fn into_response_error(self) -> ::std::result::Result<::gotham_restful::Response, Self::Err>
 			{
 				match self {
 					#( #variants ),*
 				}
 			}
+
+			#status_codes
+			#schema
 		}
 
 		#( #from_impls )*

@@ -1,14 +1,16 @@
 use super::SECURITY_NAME;
-use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody, ResponseSchema};
+use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody};
+use gotham::hyper::StatusCode;
 use indexmap::IndexMap;
 use mime::Mime;
 use openapi_type::{
 	openapi::{
 		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
-		RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode, Type
+		RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode as OAStatusCode, Type
 	},
 	OpenapiSchema
 };
+use std::collections::HashMap;
 
 fn new_parameter_data(name: String, required: bool, schema: ReferenceOr<Box<Schema>>) -> ParameterData {
 	ParameterData {
@@ -79,9 +81,9 @@ impl OperationParams {
 pub(crate) struct OperationDescription {
 	operation_id: Option<String>,
 	description: Option<String>,
-	default_status: gotham::hyper::StatusCode,
+
 	accepted_types: Option<Vec<Mime>>,
-	schema: ReferenceOr<Schema>,
+	responses: HashMap<StatusCode, ReferenceOr<Schema>>,
 	params: OperationParams,
 	body_schema: Option<ReferenceOr<Schema>>,
 	supported_types: Option<Vec<Mime>>,
@@ -91,16 +93,16 @@ pub(crate) struct OperationDescription {
 impl OperationDescription {
 	/// Create a new operation description for the given endpoint type and schema. If the endpoint
 	/// does not specify an operation id, the path is used to generate one.
-	pub(crate) fn new<E: EndpointWithSchema>(schema: ReferenceOr<Schema>, path: &str) -> Self {
+	pub(crate) fn new<E: EndpointWithSchema>(responses: HashMap<StatusCode, ReferenceOr<Schema>>, path: &str) -> Self {
 		let operation_id = E::operation_id().or_else(|| {
 			E::operation_verb().map(|verb| format!("{}_{}", verb, path.replace("/", "_").trim_start_matches('_')))
 		});
 		Self {
 			operation_id,
 			description: E::description(),
-			default_status: E::Output::default_status(),
+
 			accepted_types: E::Output::accepted_types(),
-			schema,
+			responses,
 			params: Default::default(),
 			body_schema: None,
 			supported_types: None,
@@ -134,39 +136,31 @@ impl OperationDescription {
 
 	pub(crate) fn into_operation(self) -> Operation {
 		// this is unfortunately neccessary to prevent rust from complaining about partially moving self
-		let (
-			operation_id,
-			description,
-			default_status,
-			accepted_types,
-			schema,
-			params,
-			body_schema,
-			supported_types,
-			requires_auth
-		) = (
+		let (operation_id, description, accepted_types, responses, params, body_schema, supported_types, requires_auth) = (
 			self.operation_id,
 			self.description,
-			self.default_status,
 			self.accepted_types,
-			self.schema,
+			self.responses,
 			self.params,
 			self.body_schema,
 			self.supported_types,
 			self.requires_auth
 		);
 
-		let content = Self::schema_to_content(accepted_types.or_all_types(), schema);
-
-		let mut responses: IndexMap<StatusCode, ReferenceOr<Response>> = IndexMap::new();
-		responses.insert(
-			StatusCode::Code(default_status.as_u16()),
-			Item(Response {
-				description: default_status.canonical_reason().map(|d| d.to_string()).unwrap_or_default(),
-				content,
-				..Default::default()
+		let responses: IndexMap<OAStatusCode, ReferenceOr<Response>> = responses
+			.into_iter()
+			.map(|(code, schema)| {
+				let content = Self::schema_to_content(accepted_types.clone().or_all_types(), schema);
+				(
+					OAStatusCode::Code(code.as_u16()),
+					Item(Response {
+						description: code.canonical_reason().map(|d| d.to_string()).unwrap_or_default(),
+						content,
+						..Default::default()
+					})
+				)
 			})
-		);
+			.collect();
 
 		let request_body = body_schema.map(|schema| {
 			Item(OARequestBody {
@@ -208,7 +202,7 @@ mod test {
 	#[test]
 	fn no_content_schema_to_content() {
 		let types = NoContent::accepted_types();
-		let schema = <NoContent as ResponseSchema>::schema();
+		let schema = <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT);
 		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
 		assert!(content.is_empty());
 	}
@@ -216,7 +210,7 @@ mod test {
 	#[test]
 	fn raw_schema_to_content() {
 		let types = Raw::<&str>::accepted_types();
-		let schema = <Raw<&str> as ResponseSchema>::schema();
+		let schema = <Raw<&str> as ResponseSchema>::schema(StatusCode::OK);
 		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();

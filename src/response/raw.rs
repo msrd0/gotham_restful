@@ -117,7 +117,8 @@ impl<T: Into<Body>> ResponseSchema for Raw<T>
 where
 	Self: Send
 {
-	fn schema() -> OpenapiSchema {
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::OK);
 		<Self as OpenapiType>::schema()
 	}
 }
@@ -143,8 +144,17 @@ where
 	Raw<T>: IntoResponseWithSchema,
 	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
-	fn schema() -> OpenapiSchema {
-		<Raw<T> as ResponseSchema>::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::OK);
+		status_codes
+	}
+
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		match code {
+			StatusCode::OK => <Raw<T> as ResponseSchema>::schema(StatusCode::OK),
+			code => E::schema(code)
+		}
 	}
 }
 
@@ -153,6 +163,11 @@ mod test {
 	use super::*;
 	use futures_executor::block_on;
 	use mime::TEXT_PLAIN;
+	use thiserror::Error;
+
+	#[derive(Debug, Default, Error)]
+	#[error("An Error")]
+	struct MsgError;
 
 	#[test]
 	fn raw_response() {
@@ -162,5 +177,24 @@ mod test {
 		assert_eq!(res.status, StatusCode::OK);
 		assert_eq!(res.mime, Some(TEXT_PLAIN));
 		assert_eq!(res.full_body().unwrap(), msg.as_bytes());
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(<Raw<String>>::status_codes(), vec![StatusCode::OK]);
+	}
+
+	#[test]
+	fn raw_result() {
+		let msg = "Test";
+		let raw: Result<Raw<_>, MsgError> = Ok(Raw::new(msg, TEXT_PLAIN));
+		let res = block_on(raw.into_response()).expect("didn't expect error response");
+		assert_eq!(res.status, StatusCode::OK);
+		assert_eq!(res.mime, Some(TEXT_PLAIN));
+		assert_eq!(res.full_body().unwrap(), msg.as_bytes());
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(<Result<Raw<String>, MsgError>>::status_codes(), vec![
+			StatusCode::INTERNAL_SERVER_ERROR,
+			StatusCode::OK
+		]);
 	}
 }

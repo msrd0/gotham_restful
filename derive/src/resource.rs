@@ -1,7 +1,4 @@
-use crate::{
-	endpoint::endpoint_ident,
-	util::{CollectToResult, PathEndsWith}
-};
+use crate::{endpoint::endpoint_ident, util::CollectToResult};
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::iter;
@@ -24,13 +21,12 @@ impl Parse for MethodList {
 }
 
 pub fn expand_resource(input: DeriveInput) -> Result<TokenStream> {
-	let krate = super::krate();
 	let ident = input.ident;
 
 	let methods = input
 		.attrs
 		.into_iter()
-		.filter(|attr| attr.path.ends_with("resource"))
+		.filter(|attr| attr.path.is_ident("resource"))
 		.map(|attr| syn::parse2(attr.tokens).map(|m: MethodList| m.0.into_iter()))
 		.flat_map(|list| match list {
 			Ok(iter) => Box::new(iter.map(|method| {
@@ -42,10 +38,8 @@ pub fn expand_resource(input: DeriveInput) -> Result<TokenStream> {
 		.collect_to_result()?;
 
 	let non_openapi_impl = quote! {
-		impl #krate::Resource for #ident
-		{
-			fn setup<D : #krate::DrawResourceRoutes>(mut route : D)
-			{
+		impl ::gotham_restful::Resource for #ident {
+			fn setup<D: ::gotham_restful::DrawResourceRoutes>(mut route: D) {
 				#(#methods)*
 			}
 		}
@@ -54,10 +48,8 @@ pub fn expand_resource(input: DeriveInput) -> Result<TokenStream> {
 		None
 	} else {
 		Some(quote! {
-			impl #krate::ResourceWithSchema for #ident
-			{
-				fn setup<D : #krate::DrawResourceRoutesWithSchema>(mut route : D)
-				{
+			impl ::gotham_restful::ResourceWithSchema for #ident {
+				fn setup<D: ::gotham_restful::DrawResourceRoutesWithSchema>(mut route: D) {
 					#(#methods)*
 				}
 			}

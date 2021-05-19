@@ -72,14 +72,14 @@ impl IntoResponse for NoContent {
 
 #[cfg(feature = "openapi")]
 impl ResponseSchema for NoContent {
-	/// Returns the schema of the `()` type.
-	fn schema() -> OpenapiSchema {
-		<()>::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::NO_CONTENT]
 	}
 
-	/// This will always be a _204 No Content_
-	fn default_status() -> StatusCode {
-		StatusCode::NO_CONTENT
+	/// Returns the schema of the `()` type.
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		assert_eq!(code, StatusCode::NO_CONTENT);
+		<()>::schema()
 	}
 }
 
@@ -106,13 +106,17 @@ impl<E> ResponseSchema for Result<NoContent, E>
 where
 	E: Display + IntoResponseError<Err = serde_json::Error>
 {
-	fn schema() -> OpenapiSchema {
-		<NoContent as ResponseSchema>::schema()
+	fn status_codes() -> Vec<StatusCode> {
+		let mut status_codes = E::status_codes();
+		status_codes.push(StatusCode::NO_CONTENT);
+		status_codes
 	}
 
-	#[cfg(feature = "openapi")]
-	fn default_status() -> StatusCode {
-		NoContent::default_status()
+	fn schema(code: StatusCode) -> OpenapiSchema {
+		match code {
+			StatusCode::NO_CONTENT => <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT),
+			code => E::schema(code)
+		}
 	}
 }
 
@@ -136,7 +140,7 @@ mod test {
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
 
 		#[cfg(feature = "openapi")]
-		assert_eq!(NoContent::default_status(), StatusCode::NO_CONTENT);
+		assert_eq!(NoContent::status_codes(), vec![StatusCode::NO_CONTENT]);
 	}
 
 	#[test]
@@ -146,6 +150,12 @@ mod test {
 		assert_eq!(res.status, StatusCode::NO_CONTENT);
 		assert_eq!(res.mime, None);
 		assert_eq!(res.full_body().unwrap(), &[] as &[u8]);
+
+		#[cfg(feature = "openapi")]
+		assert_eq!(<Result<NoContent, MsgError>>::status_codes(), vec![
+			StatusCode::INTERNAL_SERVER_ERROR,
+			StatusCode::NO_CONTENT
+		]);
 	}
 
 	#[test]

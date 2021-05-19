@@ -1,4 +1,4 @@
-use crate::util::{CollectToResult, ExpectLit, PathEndsWith};
+use crate::util::{CollectToResult, ExpectLit};
 use once_cell::sync::Lazy;
 use paste::paste;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -337,14 +337,13 @@ fn expand_operation_verb(_: TokenStream) -> Option<TokenStream> {
 
 #[cfg(feature = "openapi")]
 fn expand_operation_id(operation_id: Option<LitStr>) -> Option<TokenStream> {
-	match operation_id {
-		Some(operation_id) => Some(quote! {
-			fn operation_id() -> Option<String> {
-				Some(#operation_id.to_string())
+	operation_id.map(|operation_id| {
+		quote! {
+			fn operation_id() -> ::core::option::Option<::std::string::String> {
+				core::option::Option::Some(::std::string::String::from(#operation_id))
 			}
-		}),
-		None => None
-	}
+		}
+	})
 }
 
 #[cfg(not(feature = "openapi"))]
@@ -384,19 +383,19 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	for meta in attrs {
 		match meta {
 			NestedMeta::Meta(Meta::NameValue(kv)) => {
-				if kv.path.ends_with("debug") {
+				if kv.path.is_ident("debug") {
 					debug = kv.lit.expect_bool()?.value;
-				} else if kv.path.ends_with("operation_id") {
+				} else if kv.path.is_ident("operation_id") {
 					operation_id = Some(kv.lit.expect_str()?);
-				} else if kv.path.ends_with("wants_auth") {
+				} else if kv.path.is_ident("wants_auth") {
 					wants_auth = Some(kv.lit.expect_bool()?);
-				} else if kv.path.ends_with("method") {
+				} else if kv.path.is_ident("method") {
 					ty.set_method(kv.path.span(), kv.lit.expect_str()?.parse_with(Expr::parse)?)?;
-				} else if kv.path.ends_with("uri") {
+				} else if kv.path.is_ident("uri") {
 					ty.set_uri(kv.path.span(), kv.lit.expect_str()?)?;
-				} else if kv.path.ends_with("params") {
+				} else if kv.path.is_ident("params") {
 					ty.set_params(kv.path.span(), kv.lit.expect_bool()?)?;
-				} else if kv.path.ends_with("body") {
+				} else if kv.path.is_ident("body") {
 					ty.set_body(kv.path.span(), kv.lit.expect_bool()?)?;
 				} else {
 					return Err(Error::new(kv.path.span(), "Unknown attribute"));
@@ -624,7 +623,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					state: &'a mut ::gotham_restful::gotham::state::State,
 					placeholders: Self::Placeholders,
 					params: Self::Params,
-					body: ::std::option::Option<Self::Body>
+					body: ::core::option::Option<Self::Body>
 				) -> ::gotham_restful::private::BoxFuture<'a, Self::Output> {
 					#handle_content
 				}

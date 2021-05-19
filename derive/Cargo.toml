@@ -2,7 +2,7 @@
 
 [package]
 name = "gotham_restful_derive"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 description = "Derive macros for gotham_restful"
@@ -15,12 +15,12 @@ workspace = ".."
 proc-macro = true
 
 [dependencies]
-once_cell = "1.5"
+once_cell = "1.7"
 paste = "1.0"
-proc-macro2 = "1.0.13"
-quote = "1.0.6"
-regex = "1.4"
-syn = { version = "1.0.22", features = ["full"] }
+proc-macro2 = "1.0"
+quote = "1.0"
+regex = "1.5"
+syn = { version = "1.0", features = ["full"] }
 
 [features]
 default = []

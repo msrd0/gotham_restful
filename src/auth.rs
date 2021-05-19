@@ -249,7 +249,7 @@ where
 		// validate the token
 		let data: Data = match jsonwebtoken::decode(&token, &DecodingKey::from_secret(&secret), &self.validation) {
 			Ok(data) => data.claims,
-			Err(e) => match dbg!(e.into_kind()) {
+			Err(e) => match e.into_kind() {
 				ErrorKind::ExpiredSignature => return AuthStatus::Expired,
 				_ => return AuthStatus::Invalid
 			}

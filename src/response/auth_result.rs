@@ -77,7 +77,7 @@ mod private {
 
 impl<E, F> From<F> for AuthErrorOrOther<E>
 where
-	// TODO https://gitlab.com/msrd0/gotham-restful/-/issues/20
+	// TODO https://github.com/msrd0/gotham_restful/issues/20
 	F: private::Sealed + Into<E>
 {
 	fn from(err: F) -> Self {

@@ -218,7 +218,10 @@ macro_rules! implDrawResourceRoutes {
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
 		{
-			fn resource<R: Resource>(&mut self, path: &str) {
+			fn resource<R: Resource>(&mut self, mut path: &str) {
+				if path.starts_with('/') {
+					path = &path[1..];
+				}
 				R::setup((self, path));
 			}
 		}

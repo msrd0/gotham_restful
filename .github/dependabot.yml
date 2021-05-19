@@ -10,3 +10,13 @@ updates:
       - dependencies
     reviewers:
       - "msrd0"
+  - package-ecosystem: npm
+    directory: "src/openapi/handler"
+    schedule:
+      interval: daily
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+    labels:
+      - dependencies
+    reviewers:
+      - "msrd0"
