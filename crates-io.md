@@ -61,6 +61,7 @@ fn read(id: u64) -> Success<Foo> {
 }
 ```
 
+
 ### Custom Endpoints
 
 Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that of the pre-defined endpoints, but you need to give it more context:
@@ -84,6 +85,7 @@ fn custom_endpoint(path: CustomPath) -> Success<String> {
 	path.name.into()
 }
 ```
+
 
 ## Arguments
 
@@ -119,6 +121,7 @@ fn create(body : RawImage) -> Raw<Vec<u8>> {
 }
 ```
 
+
 ## Custom HTTP Headers
 
 You can read request headers from the state as you would in any other gotham handler, and specify custom response headers using [Response::header][__link7].
@@ -139,6 +142,7 @@ async fn read_all(state: &mut State) -> NoContent {
 	res
 }
 ```
+
 
 ## Features
 
@@ -198,6 +202,7 @@ fn main() {
 }
 ```
 
+
 ### CORS Feature
 
 The cors feature allows an easy usage of this web server from other origins. By default, only the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired configuration as a middleware.
@@ -228,6 +233,7 @@ fn main() {
 	}));
 }
 ```
+
 The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`][__link8] for an example.
 
 
@@ -267,6 +273,7 @@ fn main() {
 }
 ```
 
+
 ### OpenAPI Feature
 
 The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section carefully both as a binary as well as a library author to avoid unwanted suprises.
@@ -304,6 +311,7 @@ fn main() {
 	}));
 }
 ```
+
 Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`. The first one will return the generated openapi specification in JSON format, allowing you to easily generate clients in different languages without worying to exactly replicate your api in each of those languages. The second one will return documentation in HTML format, so you can easily view your api and share it with other people.
 
 However, please note that by default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements to some of the traits and types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both features through and conditionally enable the openapi code, like this:
@@ -314,6 +322,7 @@ However, please note that by default, the `without-openapi` feature of this crat
 #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
 struct Foo;
 ```
+
 
 
 ## Versioning
@@ -343,14 +352,14 @@ limitations under the License.
  [__link0]: https://crates.io/crates/gotham/0.6.0
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::state::State
- [__link11]: https://docs.rs/openapi_type/0.2.0/openapi_type/?search=openapi_type::OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.3.0/gotham_restful/?search=gotham_restful::endpoint::Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.3.0/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
+ [__link11]: https://docs.rs/openapi_type/0.2.1/openapi_type/?search=openapi_type::OpenapiType
+ [__link12]: https://docs.rs/gotham_restful/0.4.0/gotham_restful/?search=gotham_restful::endpoint::Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.4.0/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
- [__link3]: https://docs.rs/gotham_restful/0.3.0/gotham_restful/?search=gotham_restful::types::RequestBody
+ [__link3]: https://docs.rs/gotham_restful/0.4.0/gotham_restful/?search=gotham_restful::types::RequestBody
  [__link4]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::state::State
  [__link6]: https://crates.io/crates/serde_json/1.0.64
- [__link7]: https://docs.rs/gotham_restful/0.3.0/gotham_restful/?search=gotham_restful::response::Response::header
- [__link8]: https://docs.rs/gotham_restful/0.3.0/gotham_restful/?search=gotham_restful::cors::CorsRoute
+ [__link7]: https://docs.rs/gotham_restful/0.4.0/gotham_restful/?search=gotham_restful::response::Response::header
+ [__link8]: https://docs.rs/gotham_restful/0.4.0/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/
