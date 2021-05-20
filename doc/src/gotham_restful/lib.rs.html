@@ -1045,7 +1045,7 @@ struct Foo;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">routing</span>::{<span class="ident">DrawResourceRoutesWithSchema</span>, <span class="ident">DrawResourcesWithSchema</span>, <span class="ident">WithOpenapi</span>};
 
 <span class="kw">mod</span> <span class="ident">types</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">FromBody</span>, <span class="ident">RequestBody</span>, <span class="ident">ResponseBody</span>};
 
 <span class="doccomment">/// This trait must be implemented for every resource. It allows you to register the different</span>
 <span class="doccomment">/// endpoints that can be handled by this resource to be registered with the underlying router.</span>
