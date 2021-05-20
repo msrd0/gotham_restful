@@ -1,5 +1,5 @@
 use super::{handle_error, IntoResponse, IntoResponseError};
-use crate::{FromBody, RequestBody, ResourceType, Response};
+use crate::{types::ResourceType, FromBody, RequestBody, Response};
 #[cfg(feature = "openapi")]
 use crate::{IntoResponseWithSchema, ResponseSchema};
 #[cfg(feature = "openapi")]

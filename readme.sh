@@ -14,7 +14,7 @@ for readme in README crates-io
 do
 	output=$readme.md
 	[ $check == y ] && output=$(mktemp)
-	cargo readme -t $readme.tpl -o $output
+	cargo doc2readme -t $readme.j2 -o $output
 	if [ $check == y ]
 	then
 		diff $readme.md $output || ok=1
