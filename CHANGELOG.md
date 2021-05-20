@@ -5,6 +5,13 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.4.1] - 2021-05-20
+### Changed
+ - The readme is now extracted using [cargo-doc2readme] to support doc links
+
+### Removed
+ - `dbg!` call inside the auth checking code
+
 ## [0.4.0] - 2021-05-19
 ### Changed
  - Rename endpoint macro `change` to `update` and `remove` to `delete`
@@ -21,3 +28,5 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Previous releases
 Previous releases were hosted on GitLab. Please see https://gitlab.com/msrd0/gotham-restful/-/blob/master/CHANGELOG.md
+
+ [cargo-doc2readme]: https://github.com/msrd0/cargo-doc2readme

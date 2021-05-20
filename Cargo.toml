@@ -5,7 +5,7 @@ members = [".", "./derive"]
 
 [package]
 name = "gotham_restful"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 description = "RESTful additions for the gotham web framework"
