@@ -1001,7 +1001,7 @@
 	<span class="ident">operation_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">operation_id</span><span class="op">|</span> {
 		<span class="macro">quote</span><span class="macro">!</span> {
 			<span class="kw">fn</span> <span class="ident">operation_id</span>() <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">String</span><span class="op">&gt;</span> {
-				<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span>::<span class="prelude-val">Some</span>(::<span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">String</span>::<span class="ident">from</span>(#<span class="ident">operation_id</span>))
+				::<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span>::<span class="prelude-val">Some</span>(::<span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">String</span>::<span class="ident">from</span>(#<span class="ident">operation_id</span>))
 			}
 		}
 	})
@@ -1019,7 +1019,7 @@
 	});
 
 	<span class="macro">quote</span><span class="macro">!</span> {
-		<span class="kw">fn</span> <span class="ident">wants_auth</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+		<span class="kw">fn</span> <span class="ident">wants_auth</span>() <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">primitive</span>::<span class="ident">bool</span> {
 			#<span class="ident">wants_auth</span>
 		}
 	}
