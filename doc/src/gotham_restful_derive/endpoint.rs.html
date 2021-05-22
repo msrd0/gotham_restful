@@ -653,6 +653,11 @@
 <span id="650">650</span>
 <span id="651">651</span>
 <span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">CollectToResult</span>, <span class="ident">ExpectLit</span>};
 <span class="kw">use</span> <span class="ident">once_cell</span>::<span class="ident">sync</span>::<span class="ident">Lazy</span>;
@@ -980,7 +985,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">expand_operation_verb</span>(<span class="ident">operation_verb</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
 	<span class="prelude-val">Some</span>(<span class="macro">quote</span><span class="macro">!</span> {
-		<span class="kw">fn</span> <span class="ident">operation_verb</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">operation_verb</span>() <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> ::<span class="ident">core</span>::<span class="ident">primitive</span>::<span class="ident">str</span><span class="op">&gt;</span> {
 			#<span class="ident">operation_verb</span>
 		}
 	})
@@ -1187,9 +1192,14 @@
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state_block</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span>();
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">ty</span>.<span class="ident">is_auth_status</span>()) {
 			<span class="kw">let</span> <span class="ident">auth_ty</span> <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">ty</span>.<span class="ident">quote_ty</span>();
+			<span class="kw">let</span> <span class="ident">auth_borrow</span> <span class="op">=</span> <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">auth_ty</span>.<span class="ident">span</span>() <span class="op">=</span><span class="op">&gt;</span>
+				<span class="op">&lt;</span>#<span class="ident">auth_ty</span> <span class="kw">as</span> ::<span class="ident">core</span>::<span class="ident">clone</span>::<span class="ident">Clone</span><span class="op">&gt;</span>::<span class="ident">clone</span>(
+					<span class="op">&lt;</span>#<span class="ident">auth_ty</span> <span class="kw">as</span> ::<span class="ident">gotham_restful</span>::<span class="ident">gotham</span>::<span class="ident">state</span>::<span class="ident">FromState</span><span class="op">&gt;</span>::<span class="ident">borrow_from</span>(<span class="ident">state</span>)
+				)
+			};
 			<span class="ident">state_block</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> {
 				#<span class="ident">state_block</span>
-				<span class="kw">let</span> <span class="ident">auth</span>: #<span class="ident">auth_ty</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">borrow</span>::<span class="op">&lt;</span>#<span class="ident">auth_ty</span><span class="op">&gt;</span>().<span class="ident">clone</span>();
+				<span class="kw">let</span> <span class="ident">auth</span>: #<span class="ident">auth_ty</span> <span class="op">=</span> #<span class="ident">auth_borrow</span>;
 			}
 		}
 
