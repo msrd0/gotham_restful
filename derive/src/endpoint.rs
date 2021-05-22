@@ -324,7 +324,7 @@ fn interpret_arg(_index: usize, arg: &PatType) -> Result<HandlerArg> {
 #[cfg(feature = "openapi")]
 fn expand_operation_verb(operation_verb: TokenStream) -> Option<TokenStream> {
 	Some(quote! {
-		fn operation_verb() -> Option<&'static str> {
+		fn operation_verb() -> ::core::option::Option<&'static ::core::primitive::str> {
 			#operation_verb
 		}
 	})
@@ -531,9 +531,14 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		let mut state_block = quote!();
 		if let Some(arg) = args.iter().find(|arg| arg.ty.is_auth_status()) {
 			let auth_ty = arg.ty.quote_ty();
+			let auth_borrow = quote_spanned! { auth_ty.span() =>
+				<#auth_ty as ::core::clone::Clone>::clone(
+					<#auth_ty as ::gotham_restful::gotham::state::FromState>::borrow_from(state)
+				)
+			};
 			state_block = quote! {
 				#state_block
-				let auth: #auth_ty = state.borrow::<#auth_ty>().clone();
+				let auth: #auth_ty = #auth_borrow;
 			}
 		}
 
