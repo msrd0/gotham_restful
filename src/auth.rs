@@ -143,7 +143,7 @@ fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
 }
 
 fn main() {
-	let auth : AuthMiddleware<AuthData, _> = AuthMiddleware::new(
+	let auth: AuthMiddleware<AuthData, _> = AuthMiddleware::new(
 		AuthSource::AuthorizationHeader,
 		AuthValidation::default(),
 		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
