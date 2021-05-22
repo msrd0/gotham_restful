@@ -340,7 +340,7 @@ fn expand_operation_id(operation_id: Option<LitStr>) -> Option<TokenStream> {
 	operation_id.map(|operation_id| {
 		quote! {
 			fn operation_id() -> ::core::option::Option<::std::string::String> {
-				core::option::Option::Some(::std::string::String::from(#operation_id))
+				::core::option::Option::Some(::std::string::String::from(#operation_id))
 			}
 		}
 	})
@@ -358,7 +358,7 @@ fn expand_wants_auth(wants_auth: Option<LitBool>, default: bool) -> TokenStream 
 	});
 
 	quote! {
-		fn wants_auth() -> bool {
+		fn wants_auth() -> ::core::primitive::bool {
 			#wants_auth
 		}
 	}
