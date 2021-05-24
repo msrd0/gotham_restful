@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.4.2] - 2021-05-24
+### Changed
+ - Improved error message when `T` does not implement `Clone` in `AuthStatus<T>` (`auth` feature only)
+ - Set viewport in ReDoc HTML so that it can be viewed on mobile devices (`openapi` feature only)
+
 ## [0.4.1] - 2021-05-20
 ### Changed
  - The readme is now extracted using [cargo-doc2readme] to support doc links

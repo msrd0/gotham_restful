@@ -353,13 +353,13 @@ limitations under the License.
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::state::State
  [__link11]: https://docs.rs/openapi_type/0.2.1/openapi_type/?search=openapi_type::OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.4.1/gotham_restful/?search=gotham_restful::endpoint::Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.4.1/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
+ [__link12]: https://docs.rs/gotham_restful/0.4.2/gotham_restful/?search=gotham_restful::endpoint::Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.4.2/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
- [__link3]: https://docs.rs/gotham_restful/0.4.1/gotham_restful/?search=gotham_restful::types::RequestBody
+ [__link3]: https://docs.rs/gotham_restful/0.4.2/gotham_restful/?search=gotham_restful::types::RequestBody
  [__link4]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::state::State
  [__link6]: https://crates.io/crates/serde_json/1.0.64
- [__link7]: https://docs.rs/gotham_restful/0.4.1/gotham_restful/?search=gotham_restful::response::Response::header
- [__link8]: https://docs.rs/gotham_restful/0.4.1/gotham_restful/?search=gotham_restful::cors::CorsRoute
+ [__link7]: https://docs.rs/gotham_restful/0.4.2/gotham_restful/?search=gotham_restful::response::Response::header
+ [__link8]: https://docs.rs/gotham_restful/0.4.2/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/
