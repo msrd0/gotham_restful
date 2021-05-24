@@ -158,7 +158,11 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 	let mut buf = Vec::<u8>::new();
 	write!(
 		buf,
-		r#"<!DOCTYPE HTML><html><body style="margin:0"><div id="spec" style="display:none">{}</div><div id="redoc"></div><script>{}</script></body></html>"#,
+		r#"<!DOCTYPE HTML><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>"#
+	)?;
+	write!(
+		buf,
+		r#"<body style="margin:0"><div id="spec" style="display:none">{}</div><div id="redoc"></div><script>{}</script></body></html>"#,
 		encoded_spec, script
 	)?;
 
