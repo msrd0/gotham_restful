@@ -1,11 +1,9 @@
 {
+	"extends": "@tsconfig/recommended/tsconfig.json",
 	"compilerOptions": {
-		"noImplicitAny": true,
-		"module": "commonjs",
-		"target": "es5",
-		"esModuleInterop": true,
-		"strict": true,
-		"preserveConstEnums": true,
-		"moduleResolution": "node"
-	}
+		"moduleResolution": "node",
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true
+	},
+	"exclude": ["node_modules"]
 }
