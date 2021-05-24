@@ -3,7 +3,7 @@ declare var Redoc: any;
 const REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.53/bundles/redoc.standalone.js";
 const REDOC_SRI = "FAbK/5MuJ1fv6AUK+Cjrnnx8lj5Ym7TJmxv7Lli/o44Dlm5z/bF5UDQin+INTbR77xU2r5+gm7OKPG1blrBCZA==";
 
-function percentDecode (encoded: string): string {
+function percentDecode(encoded: string): string {
 	let decoded = "";
 	for (let i = 0; i < encoded.length; i++) {
 		if (encoded[i] === '%') {
@@ -20,7 +20,7 @@ function percentDecode (encoded: string): string {
 	return decoded;
 }
 
-export function initRedoc(percentEncodedSpec: string) {	
+function initRedoc(percentEncodedSpec: string) {	
 	const cb = () => {
 		const spec = JSON.parse(percentDecode(percentEncodedSpec));
 		
@@ -55,3 +55,5 @@ export function initRedoc(percentEncodedSpec: string) {
 	s.onload = cb;
 	document.head.appendChild(s);
 }
+
+export default initRedoc;

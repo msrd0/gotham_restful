@@ -141,7 +141,7 @@ impl NewHandler for OpenapiDocHandler {
 fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Response<Body>, HandlerError> {
 	let spec = openapi_string(state, openapi)?;
 	let script = format!(
-		r#"(()=>{{{}gotham_restful.initRedoc("{}")}})()"#,
+		r#"(()=>{{{}gotham_restful("{}")}})()"#,
 		include_str!("script.min.js"),
 		utf8_percent_encode(&spec, NON_ALPHANUMERIC)
 	);

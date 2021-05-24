@@ -20,7 +20,8 @@ const cfg: webpack.Configuration = {
 		path: path.resolve(__dirname),
 		library: {
 			name: 'gotham_restful',
-			type: 'var'
+			type: 'var',
+			export: 'default'
 		}
 	}
 };
