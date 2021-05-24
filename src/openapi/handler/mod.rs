@@ -15,7 +15,7 @@ use gotham::{
 	state::State
 };
 use indexmap::IndexMap;
-use mime::{APPLICATION_JSON, TEXT_HTML, TEXT_PLAIN};
+use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8};
 use openapi_type::openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
 use parking_lot::RwLock;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -80,7 +80,7 @@ fn create_openapi_response(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Res
 		},
 		Err(e) => {
 			error!("Unable to handle OpenAPI request due to error: {}", e);
-			create_response(state, StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN, "")
+			create_response(state, StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN_UTF_8, "")
 		}
 	}
 }
@@ -150,14 +150,9 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 	let script_hash = base64::encode(script_hash.finalize());
 
 	let mut buf = Vec::<u8>::new();
-	write!(buf, r#"<!DOCTYPE HTML><html><head><meta charset="UTF-8"/>"#)?;
 	write!(
 		buf,
-		r#"<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Source+Code+Pro:300,400,700&display=swap"/>"#
-	)?;
-	write!(
-		buf,
-		r#"</head><body style="margin:0"><div id="redoc"></div><script>{}</script></body></html>"#,
+		r#"<!DOCTYPE HTML><html><body style="margin:0"><div id="redoc"></div><script>{}</script></body></html>"#,
 		script
 	)?;
 
@@ -174,7 +169,7 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 		return Ok(res);
 	}
 
-	let mut res = create_response(state, StatusCode::OK, TEXT_HTML, buf);
+	let mut res = create_response(state, StatusCode::OK, TEXT_HTML_UTF_8, buf);
 	let headers = res.headers_mut();
 	headers.insert(CACHE_CONTROL, HeaderValue::from_static("public,max-age=2592000"));
 	headers.insert(

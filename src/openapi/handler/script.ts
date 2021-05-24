@@ -21,9 +21,8 @@ function percentDecode(encoded: string): string {
 }
 
 function initRedoc(percentEncodedSpec: string) {	
+	const spec = JSON.parse(percentDecode(percentEncodedSpec));
 	const cb = () => {
-		const spec = JSON.parse(percentDecode(percentEncodedSpec));
-		
 		// https://github.com/Redocly/redoc#redoc-options-object
 		const options = {
 			expandResponses: "200",
@@ -48,12 +47,19 @@ function initRedoc(percentEncodedSpec: string) {
 		Redoc.init(spec, options, document.getElementById('redoc'));
 	};
 	
-	const s = document.createElement('script');
-	s.setAttribute('src', REDOC_URL);
-	s.setAttribute('integrity', 'sha512-' + REDOC_SRI);
-	s.setAttribute('crossorigin', 'anonymous');
+	const head = document.head;
+	
+	const l = document.createElement("link");
+	l.rel = "stylesheet";
+	l.href = "https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Source+Code+Pro:300,400,700&display=swap";
+	head.appendChild(l);
+	
+	const s = document.createElement("script");
+	s.src = REDOC_URL;
+	s.integrity = `sha512-${REDOC_SRI}`;
+	s.crossOrigin = "anonymous";
 	s.onload = cb;
-	document.head.appendChild(s);
+	head.appendChild(s);
 }
 
 export default initRedoc;
