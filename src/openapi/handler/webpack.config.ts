@@ -17,12 +17,7 @@ const cfg: webpack.Configuration = {
 	},
 	output: {
 		filename: 'script.min.js',
-		path: path.resolve(__dirname),
-		library: {
-			name: 'gotham_restful',
-			type: 'var',
-			export: 'default'
-		}
+		path: path.resolve(__dirname)
 	}
 };
 

@@ -1,5 +1,6 @@
 #![cfg_attr(not(feature = "auth"), allow(unused_imports))]
 use super::SECURITY_NAME;
+use either::Either;
 use futures_util::{future, future::FutureExt};
 use gotham::{
 	anyhow,
@@ -18,9 +19,8 @@ use indexmap::IndexMap;
 use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8};
 use openapi_type::openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
 use parking_lot::RwLock;
-use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use sha2::{Digest, Sha256};
-use std::{io::Write, panic::RefUnwindSafe, pin::Pin, sync::Arc};
+use std::{io::Write, iter, panic::RefUnwindSafe, pin::Pin, sync::Arc};
 
 #[cfg(feature = "auth")]
 fn get_security(state: &State) -> IndexMap<String, ReferenceOr<SecurityScheme>> {
@@ -140,11 +140,17 @@ impl NewHandler for OpenapiDocHandler {
 
 fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Response<Body>, HandlerError> {
 	let spec = openapi_string(state, openapi)?;
-	let script = format!(
-		r#"(()=>{{{}gotham_restful("{}")}})()"#,
-		include_str!("script.min.js"),
-		utf8_percent_encode(&spec, NON_ALPHANUMERIC)
-	);
+	let encoded_spec = spec
+		.chars()
+		.flat_map(|c| match c {
+			'&' => Either::Left("&amp;".chars()),
+			'<' => Either::Left("&lt;".chars()),
+			'>' => Either::Left("&gt;".chars()),
+			c => Either::Right(iter::once(c))
+		})
+		.collect::<String>();
+
+	let script = include_str!("script.min.js");
 	let mut script_hash = Sha256::new();
 	script_hash.update(&script);
 	let script_hash = base64::encode(script_hash.finalize());
@@ -152,8 +158,8 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 	let mut buf = Vec::<u8>::new();
 	write!(
 		buf,
-		r#"<!DOCTYPE HTML><html><body style="margin:0"><div id="redoc"></div><script>{}</script></body></html>"#,
-		script
+		r#"<!DOCTYPE HTML><html><body style="margin:0"><div id="spec" style="display:none">{}</div><div id="redoc"></div><script>{}</script></body></html>"#,
+		encoded_spec, script
 	)?;
 
 	let mut etag = Sha256::new();
@@ -180,7 +186,7 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 		).parse().unwrap()
 	);
 	headers.insert(ETAG, etag.parse().unwrap());
-	headers.insert(REFERRER_POLICY, HeaderValue::from_static("strict-origin-when-cross-origin"));
+	headers.insert(REFERRER_POLICY, HeaderValue::from_static("no-referrer"));
 	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
 	Ok(res)
 }

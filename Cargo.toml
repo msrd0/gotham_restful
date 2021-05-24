@@ -31,13 +31,13 @@ thiserror = "1.0"
 # non-feature optional dependencies
 base64 = { version = "0.13.0", optional = true }
 cookie = { version = "0.15", optional = true }
+either = { version = "1.6", optional = true }
 gotham_middleware_diesel = { version = "0.3.0", optional = true }
 indexmap = { version = "1.6", optional = true }
 jsonwebtoken = { version = "7.2", optional = true }
 once_cell = { version = "1.7", optional = true }
 openapi_type = { version = "0.2.1", optional = true }
 parking_lot = { version = "0.11.1", optional = true }
-percent-encoding = { version = "2.1", optional = true }
 regex = { version = "1.5", optional = true }
 sha2 = { version = "0.9.5", optional = true }
 
@@ -62,7 +62,7 @@ errorlog = []
 
 # These features are exclusive - https://github.com/msrd0/gotham_restful/issues/4
 without-openapi = []
-openapi = ["gotham_restful_derive/openapi", "base64", "indexmap", "once_cell", "openapi_type", "parking_lot", "percent-encoding", "regex", "sha2"]
+openapi = ["gotham_restful_derive/openapi", "base64", "either", "indexmap", "once_cell", "openapi_type", "parking_lot", "regex", "sha2"]
 
 [package.metadata.docs.rs]
 no-default-features = true
