@@ -6,6 +6,7 @@
 		"webpack": "npx webpack --mode production --config webpack.config.ts"
 	},
 	"devDependencies": {
+		"@types/node": "^15.6.0",
 		"@types/webpack": "^5.28.0",
 		"ts-loader": "^9.2.2",
 		"ts-node": "^10.0.0",
