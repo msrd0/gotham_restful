@@ -1,9 +1,9 @@
 use super::SECURITY_NAME;
 use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody};
 use gotham::hyper::StatusCode;
-use indexmap::IndexMap;
 use mime::Mime;
 use openapi_type::{
+	indexmap::IndexMap,
 	openapi::{
 		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
 		RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode as OAStatusCode, Type

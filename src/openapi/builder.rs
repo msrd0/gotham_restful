@@ -1,5 +1,5 @@
-use indexmap::IndexMap;
 use openapi_type::{
+	indexmap::IndexMap,
 	openapi::{
 		self, Components, OpenAPI, PathItem, ReferenceOr,
 		ReferenceOr::{Item, Reference},

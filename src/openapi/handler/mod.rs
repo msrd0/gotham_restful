@@ -15,9 +15,11 @@ use gotham::{
 	},
 	state::State
 };
-use indexmap::IndexMap;
 use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8};
-use openapi_type::openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme};
+use openapi_type::{
+	indexmap::IndexMap,
+	openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}
+};
 use parking_lot::RwLock;
 use sha2::{Digest, Sha256};
 use std::{io::Write, iter, panic::RefUnwindSafe, pin::Pin, sync::Arc};
