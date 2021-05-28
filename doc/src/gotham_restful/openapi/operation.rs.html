@@ -224,9 +224,9 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">SECURITY_NAME</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">response</span>::<span class="ident">OrAllTypes</span>, <span class="ident">EndpointWithSchema</span>, <span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::<span class="ident">hyper</span>::<span class="ident">StatusCode</span>;
-<span class="kw">use</span> <span class="ident">indexmap</span>::<span class="ident">IndexMap</span>;
 <span class="kw">use</span> <span class="ident">mime</span>::<span class="ident">Mime</span>;
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{
+	<span class="ident">indexmap</span>::<span class="ident">IndexMap</span>,
 	<span class="ident">openapi</span>::{
 		<span class="ident">MediaType</span>, <span class="ident">Operation</span>, <span class="ident">Parameter</span>, <span class="ident">ParameterData</span>, <span class="ident">ParameterSchemaOrContent</span>, <span class="ident">ReferenceOr</span>, <span class="ident">ReferenceOr</span>::<span class="ident">Item</span>,
 		<span class="ident">RequestBody</span> <span class="kw">as</span> <span class="ident">OARequestBody</span>, <span class="ident">Response</span>, <span class="ident">Responses</span>, <span class="ident">Schema</span>, <span class="ident">SchemaKind</span>, <span class="ident">StatusCode</span> <span class="kw">as</span> <span class="ident">OAStatusCode</span>, <span class="ident">Type</span>

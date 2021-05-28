@@ -206,6 +206,8 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_imports</span>))]</span>
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">SECURITY_NAME</span>;
@@ -224,9 +226,11 @@
 	},
 	<span class="ident">state</span>::<span class="ident">State</span>
 };
-<span class="kw">use</span> <span class="ident">indexmap</span>::<span class="ident">IndexMap</span>;
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="ident">APPLICATION_JSON</span>, <span class="ident">TEXT_HTML_UTF_8</span>, <span class="ident">TEXT_PLAIN_UTF_8</span>};
-<span class="kw">use</span> <span class="ident">openapi_type</span>::<span class="ident">openapi</span>::{<span class="ident">APIKeyLocation</span>, <span class="ident">OpenAPI</span>, <span class="ident">ReferenceOr</span>, <span class="ident">SecurityScheme</span>};
+<span class="kw">use</span> <span class="ident">openapi_type</span>::{
+	<span class="ident">indexmap</span>::<span class="ident">IndexMap</span>,
+	<span class="ident">openapi</span>::{<span class="ident">APIKeyLocation</span>, <span class="ident">OpenAPI</span>, <span class="ident">ReferenceOr</span>, <span class="ident">SecurityScheme</span>}
+};
 <span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">RwLock</span>;
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>::<span class="ident">Write</span>, <span class="ident">iter</span>, <span class="ident">panic</span>::<span class="ident">RefUnwindSafe</span>, <span class="ident">pin</span>::<span class="ident">Pin</span>, <span class="ident">sync</span>::<span class="ident">Arc</span>};
