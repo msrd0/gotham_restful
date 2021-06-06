@@ -9,9 +9,8 @@ use gotham::{
 	pipeline::chain::PipelineHandleChain,
 	router::builder::*
 };
-use once_cell::sync::Lazy;
+use lazy_regex::regex_replace_all;
 use openapi_type::OpenapiType;
-use regex::{Captures, Regex};
 use std::{collections::HashMap, panic::RefUnwindSafe};
 
 /// This trait adds the `openapi_spec` and `openapi_doc` method to an OpenAPI-aware router.
@@ -108,14 +107,9 @@ macro_rules! implOpenapiRouter {
 					descr.set_body::<E::Body>(body_schema);
 				}
 
-				static URI_PLACEHOLDER_REGEX: Lazy<Regex> =
-					Lazy::new(|| Regex::new(r#"(?P<prefix>^|/):(?P<name>[^/]+)(?P<suffix>/|$)"#).unwrap());
 				let uri: &str = &E::uri();
-				let uri = URI_PLACEHOLDER_REGEX.replace_all(uri, |captures: &Captures<'_>| {
-					format!(
-						"{}{{{}}}{}",
-						&captures["prefix"], &captures["name"], &captures["suffix"]
-					)
+				let uri = regex_replace_all!(r#"(^|/):([^/]+)(/|$)"#, uri, |_, prefix, name, suffix| {
+					format!("{}{{{}}}{}", prefix, name, suffix)
 				});
 				if !uri.is_empty() {
 					path = format!("{}/{}", path, uri);
