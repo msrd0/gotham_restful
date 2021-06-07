@@ -1,9 +1,8 @@
 use crate::util::{CollectToResult, ExpectLit};
-use once_cell::sync::Lazy;
+use lazy_regex::regex_is_match;
 use paste::paste;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote, quote_spanned, ToTokens};
-use regex::Regex;
 use std::str::FromStr;
 use syn::{
 	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, Expr, FnArg, ItemFn, LitBool, LitStr, Meta, NestedMeta,
@@ -83,8 +82,6 @@ impl FromStr for EndpointType {
 	}
 }
 
-static URI_PLACEHOLDER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(^|/):(?P<name>[^/]+)(/|$)"#).unwrap());
-
 impl EndpointType {
 	fn http_method(&self) -> Option<TokenStream> {
 		let hyper_method = quote!(::gotham_restful::gotham::hyper::Method);
@@ -134,7 +131,7 @@ impl EndpointType {
 			Self::Custom { uri, .. } => LitBool {
 				value: uri
 					.as_ref()
-					.map(|uri| URI_PLACEHOLDER_REGEX.is_match(&uri.value()))
+					.map(|uri| regex_is_match!(r#"(^|/):[^/]+(/|$)"#, &uri.value()))
 					.unwrap_or(false),
 				span: Span::call_site()
 			}
