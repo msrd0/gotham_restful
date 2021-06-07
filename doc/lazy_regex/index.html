@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Use the  [regex!] macro to build regexes:"><meta name="keywords" content="rust, rustlang, rust-lang, lazy_regex"><title>lazy_regex - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../lazy_regex/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate lazy_regex</p><div class="block version"><p>Version 2.2.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all lazy_regex's items</p></a><div class="block items"><ul><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="lazy_regex" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">lazy_regex</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/lazy_regex/lib.rs.html#1-156" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Use the  <a href="../lazy_regex/macro.regex.html" title="regex!">regex!</a> macro to build regexes:</p>
+<ul>
+<li>they’re checked at compile time</li>
+<li>they’re wrapped in <code>once_cell</code> lazy static initializers so that they’re compiled only once</li>
+<li>they can hold flags as suffix: <code>let case_insensitive_regex = regex!(&quot;ab*&quot;i);</code></li>
+<li>regex creation is less verbose</li>
+</ul>
+<p>This macro returns references to normal instances of <a href="../lazy_regex/struct.Regex.html" title="regex::Regex">regex::Regex</a> so all the usual features are available.</p>
+<p>You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:</p>
+<ul>
+<li><a href="../lazy_regex/macro.regex_is_match.html" title="regex_is_match!">regex_is_match!</a></li>
+<li><a href="../lazy_regex/macro.regex_find.html" title="regex_find!">regex_find!</a></li>
+<li><a href="../lazy_regex/macro.regex_captures.html" title="regex_captures!">regex_captures!</a></li>
+<li><a href="../lazy_regex/macro.regex_replace.html" title="regex_replace!">regex_replace!</a></li>
+<li><a href="../lazy_regex/macro.regex_replace_all.html" title="regex_replace_all!">regex_replace_all!</a></li>
+</ul>
+<p>Some structs of the regex crate are reexported to ease dependency managment.</p>
+<h1 id="build-regexes" class="section-header"><a href="#build-regexes">Build Regexes</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">lazy_regex</span>::<span class="ident">regex</span>;
+
+<span class="comment">// build a simple regex</span>
+<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro">regex</span><span class="macro">!</span>(<span class="string">&quot;sa+$&quot;</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">is_match</span>(<span class="string">&quot;Saa&quot;</span>), <span class="bool-val">false</span>);
+
+<span class="comment">// build a regex with flag(s)</span>
+<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro">regex</span><span class="macro">!</span>(<span class="string">&quot;sa+$&quot;i</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">is_match</span>(<span class="string">&quot;Saa&quot;</span>), <span class="bool-val">true</span>);
+
+<span class="comment">// you can use a raw literal</span>
+<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro">regex</span><span class="macro">!</span>(<span class="string">r#&quot;^&quot;+$&quot;#</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">is_match</span>(<span class="string">&quot;\&quot;\&quot;&quot;</span>), <span class="bool-val">true</span>);
+
+<span class="comment">// or a raw literal with flag(s)</span>
+<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro">regex</span><span class="macro">!</span>(<span class="string">r#&quot;^\s*(&quot;[a-t]*&quot;\s*)+$&quot;#i</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">is_match</span>(<span class="string">r#&quot; &quot;Aristote&quot; &quot;Platon&quot; &quot;#</span>), <span class="bool-val">true</span>);
+
+<span class="comment">// there&#39;s no problem using the multiline definition syntax</span>
+<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro">regex</span><span class="macro">!</span>(<span class="string">r#&quot;(?x)
+    (?P&lt;name&gt;\w+)
+    -
+    (?P&lt;version&gt;[0-9.]+)
+&quot;#</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">find</span>(<span class="string">&quot;This is lazy_regex-2.2!&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="string">&quot;lazy_regex-2.2&quot;</span>);
+<span class="comment">// (look at the regex_captures! macro to easily extract the groups)</span>
+
+<span class="comment">// this line wouldn&#39;t compile because the regex is invalid:</span>
+<span class="comment">// let r = regex!(&quot;(unclosed&quot;);</span>
+</pre></div>
+<p>Supported regex flags: <code>i</code>, <code>m</code>, <code>s</code>, <code>x</code>, <code>U</code>.</p>
+<p>See <a href="../lazy_regex/struct.RegexBuilder.html" title="regex::RegexBuilder">regex::RegexBuilder</a>.</p>
+<h1 id="test-a-match" class="section-header"><a href="#test-a-match">Test a match</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">lazy_regex</span>::<span class="ident">regex_is_match</span>;
+
+<span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="macro">regex_is_match</span><span class="macro">!</span>(<span class="string">&quot;[ab]+&quot;</span>, <span class="string">&quot;car&quot;</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">b</span>, <span class="bool-val">true</span>);</pre></div>
+<p>doc: <a href="../lazy_regex/macro.regex_is_match.html" title="regex_is_match!">regex_is_match!</a></p>
+<h1 id="extract-a-value" class="section-header"><a href="#extract-a-value">Extract a value</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">lazy_regex</span>::<span class="ident">regex_find</span>;
+
+<span class="kw">let</span> <span class="ident">f_word</span> <span class="op">=</span> <span class="macro">regex_find</span><span class="macro">!</span>(<span class="string">r#&quot;\bf\w+\b&quot;#</span>, <span class="string">&quot;The fox jumps.&quot;</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">f_word</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;fox&quot;</span>));</pre></div>
+<p>doc: <a href="../lazy_regex/macro.regex_find.html" title="regex_find!">regex_find!</a></p>
+<h1 id="capture" class="section-header"><a href="#capture">Capture</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">lazy_regex</span>::<span class="ident">regex_captures</span>;
+
+<span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">letter</span>) <span class="op">=</span> <span class="macro">regex_captures</span><span class="macro">!</span>(<span class="string">&quot;([a-z])[0-9]+&quot;i</span>, <span class="string">&quot;form A42&quot;</span>).<span class="ident">unwrap</span>();
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">letter</span>, <span class="string">&quot;A&quot;</span>);
+
+<span class="kw">let</span> (<span class="ident">whole</span>, <span class="ident">name</span>, <span class="ident">version</span>) <span class="op">=</span> <span class="macro">regex_captures</span><span class="macro">!</span>(
+    <span class="string">r#&quot;(\w+)-([0-9.]+)&quot;#</span>, <span class="comment">// a literal regex</span>
+    <span class="string">&quot;This is lazy_regex-2.0!&quot;</span>, <span class="comment">// any expression</span>
+).<span class="ident">unwrap</span>();
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">whole</span>, <span class="string">&quot;lazy_regex-2.0&quot;</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">name</span>, <span class="string">&quot;lazy_regex&quot;</span>);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">version</span>, <span class="string">&quot;2.0&quot;</span>);</pre></div>
+<p>There’s no limit to the size of the tuple.
+It’s checked at compile time to ensure you have the right number of capturing groups.</p>
+<p>You receive <code>&quot;&quot;</code> for optional groups with no value.</p>
+<p>doc: <a href="../lazy_regex/macro.regex_captures.html" title="regex_captures!">regex_captures!</a></p>
+<h1 id="replace-with-captured-groups" class="section-header"><a href="#replace-with-captured-groups">Replace with captured groups</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">lazy_regex</span>::<span class="ident">regex_replace_all</span>;
+
+<span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;Foo8 fuu3&quot;</span>;
+<span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="macro">regex_replace_all</span><span class="macro">!</span>(
+    <span class="string">r#&quot;\bf(\w+)(\d)&quot;#i</span>,
+    <span class="ident">text</span>,
+    <span class="op">|</span><span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">digit</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;F&lt;{}&gt;{}&quot;</span>, <span class="ident">name</span>, <span class="ident">digit</span>),
+);
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">text</span>, <span class="string">&quot;F&lt;oo&gt;8 F&lt;uu&gt;3&quot;</span>);</pre></div>
+<p>The number of arguments given to the closure is checked at compilation time to match the number of groups in the regular expression.</p>
+<p>doc: <a href="../lazy_regex/macro.regex_replace.html" title="regex_replace!">regex_replace!</a> and <a href="../lazy_regex/macro.regex_replace_all.html" title="regex_replace_all!">regex_replace_all!</a></p>
+<h1 id="shared-lazy-static" class="section-header"><a href="#shared-lazy-static">Shared lazy static</a></h1>
+<p>When a regular expression is used in several functions, you sometimes don’t want
+to repeat it but have a shared static instance.</p>
+<p>The <a href="../lazy_regex/macro.regex.html" title="regex!">regex!</a> macro, while being backed by a lazy static regex, returns a reference.</p>
+<p>If you want to have a shared lazy static regex, use the <a href="../lazy_regex/macro.lazy_regex.html" title="lazy_regex!">lazy_regex!</a> macro:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">lazy_regex</span>::<span class="kw-2">*</span>;
+
+<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">GLOBAL_REX</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">lazy_regex</span><span class="macro">!</span>(<span class="string">&quot;^ab+$&quot;i</span>);</pre></div>
+<p>Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.</p>
+<p>doc: <a href="../lazy_regex/macro.lazy_regex.html" title="lazy_regex!">lazy_regex!</a></p>
+</div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<table><tr class="module-item"><td><a class="macro" href="macro.lazy_regex.html" title="lazy_regex::lazy_regex macro">lazy_regex</a></td><td class="docblock-short"><p>Return an instance of <code>once_cell::sync::Lazy&lt;regex::Regex&gt;</code> that
+you can use in a public static declaration.</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.regex.html" title="lazy_regex::regex macro">regex</a></td><td class="docblock-short"><p>Return a lazy static Regex checked at compilation time and
+built at first use.</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.regex_captures.html" title="lazy_regex::regex_captures macro">regex_captures</a></td><td class="docblock-short"><p>Extract captured groups as a tuple of &amp;str.</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.regex_find.html" title="lazy_regex::regex_find macro">regex_find</a></td><td class="docblock-short"><p>Extract the leftmost match of the regex in the
+second argument, as a &amp;str</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.regex_is_match.html" title="lazy_regex::regex_is_match macro">regex_is_match</a></td><td class="docblock-short"><p>Test whether an expression matches a lazy static
+regular expression (the regex is checked at compile
+time)</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.regex_replace.html" title="lazy_regex::regex_replace macro">regex_replace</a></td><td class="docblock-short"><p>Replaces the leftmost match in the second argument
+with the value returned by the closure given as third argument.</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.regex_replace_all.html" title="lazy_regex::regex_replace_all macro">regex_replace_all</a></td><td class="docblock-short"><p>Replaces all non-overlapping matches in the second argument
+with the value returned by the closure given as third argument.</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Captures.html" title="lazy_regex::Captures struct">Captures</a></td><td class="docblock-short"><p>Captures represents a group of captured strings for a single match.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Lazy.html" title="lazy_regex::Lazy struct">Lazy</a></td><td class="docblock-short"><p>A value which is initialized on the first access.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Regex.html" title="lazy_regex::Regex struct">Regex</a></td><td class="docblock-short"><p>A compiled regular expression for matching Unicode strings.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RegexBuilder.html" title="lazy_regex::RegexBuilder struct">RegexBuilder</a></td><td class="docblock-short"><p>A configurable builder for a regular expression.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="lazy_regex" data-search-js="../search-index.js"></div>
+    <script src="../main.js"></script></body></html>
