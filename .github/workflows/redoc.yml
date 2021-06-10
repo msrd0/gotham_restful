@@ -5,10 +5,13 @@ on:
     - cron: '0 4 * * *'
 
 jobs:
-  swagger_ui:
+  redoc:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       
       - name: Get ReDoc Version
         id: redoc-version
@@ -18,9 +21,11 @@ jobs:
         run: |
           url="https://cdn.jsdelivr.net/npm/redoc@${{ steps.redoc-version.outputs.version }}/bundles/redoc.standalone.js"
           sri="$(wget -qO- "$url" | sha512sum | awk '{print $1}' | fold -b2 | while read line; do printf "\x$line"; done | base64 -w0)"
-          sed -i src/openapi/handler/script.ts \
+          cd src/openapi/handler
+          sed -i script.ts \
               -e "s|REDOC_URL =[^;]*;|REDOC_URL = \"$url\";|" \
               -e "s|REDOC_SRI =[^;]*;|REDOC_SRI = \"$sri\";|"
+          npm run webpack
       
       - uses: tibdex/github-app-token@v1
         id: generate-token
