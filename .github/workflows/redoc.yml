@@ -25,6 +25,7 @@ jobs:
           sed -i script.ts \
               -e "s|REDOC_URL =[^;]*;|REDOC_URL = \"$url\";|" \
               -e "s|REDOC_SRI =[^;]*;|REDOC_SRI = \"$sri\";|"
+          npm install
           npm run webpack
       
       - uses: tibdex/github-app-token@v1
