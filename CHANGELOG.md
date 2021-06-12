@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.4.3] - 2021-06-12
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.54](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.54),
+   which, among other changes, reduces the file size
+
+### Changed
+ - Use the `lazy-regex` crate for all regular expressions
+
 ## [0.4.2] - 2021-05-24
 ### Changed
  - Improved error message when `T` does not implement `Clone` in `AuthStatus<T>` (`auth` feature only)
