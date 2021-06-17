@@ -385,7 +385,7 @@ with <a href="../../../tokio/sync/mpsc/struct.Sender.html#method.reserve"><code>
     <span class="kw">let</span> <span class="ident">permit</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">reserve</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
     <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">tx</span>.<span class="ident">capacity</span>(), <span class="number">4</span>);
 
-    <span class="comment">// Sending and receiving a value increases the caapcity by one.</span>
+    <span class="comment">// Sending and receiving a value increases the capacity by one.</span>
     <span class="ident">permit</span>.<span class="ident">send</span>(());
     <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
     <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">tx</span>.<span class="ident">capacity</span>(), <span class="number">5</span>);

@@ -72,7 +72,7 @@ the spawned task. For example:</p>
 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">join</span>.<span class="kw">await</span><span class="question-mark">?</span>;
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>, <span class="string">&quot;hello world!&quot;</span>);</pre></div>
 <p>Again, like <code>std::thread</code>’s <a href="https://doc.rust-lang.org/nightly/std/thread/struct.JoinHandle.html"><code>JoinHandle</code> type</a>, if the spawned
-task panics, awaiting its <code>JoinHandle</code> will return a <a href="../../tokio/task/struct.JoinError.html"><code>JoinError</code></a>`. For
+task panics, awaiting its <code>JoinHandle</code> will return a <a href="../../tokio/task/struct.JoinError.html"><code>JoinError</code></a>. For
 example:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
