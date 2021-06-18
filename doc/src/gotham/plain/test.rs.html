@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gotham-0.6.0/src/plain/test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -401,28 +401,28 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! See the `TestServer` type for example usage.</span>
 
-<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">Uri</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{<span class="self">self</span>, <span class="ident">IpAddr</span>, <span class="ident">SocketAddr</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">panic</span>::<span class="ident">UnwindSafe</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
+<span class="kw">use</span> <span class="ident">http::Uri</span>;
+<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="self">self</span>, <span class="ident">IpAddr</span>, <span class="ident">SocketAddr</span>};
+<span class="kw">use</span> <span class="ident">std::panic::UnwindSafe</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>};
+<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">info</span>;
+<span class="kw">use</span> <span class="ident">log::info</span>;
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">client</span>::<span class="ident">Client</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">net</span>::<span class="ident">TcpListener</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">runtime</span>::<span class="ident">Runtime</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
+<span class="kw">use</span> <span class="ident">futures::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">hyper::client::Client</span>;
+<span class="kw">use</span> <span class="ident">tokio::net::TcpListener</span>;
+<span class="kw">use</span> <span class="ident">tokio::runtime::Runtime</span>;
+<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
 
-<span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">service</span>::<span class="ident">Service</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">net</span>::<span class="ident">TcpStream</span>;
+<span class="kw">use</span> <span class="ident">hyper::service::Service</span>;
+<span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">handler</span>::<span class="ident">NewHandler</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::handler::NewHandler</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">test</span>::{<span class="self">self</span>, <span class="ident">TestClient</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::test</span>::{<span class="self">self</span>, <span class="ident">TestClient</span>};
 
 <span class="kw">struct</span> <span class="ident">TestServerData</span> {
     <span class="ident">addr</span>: <span class="ident">SocketAddr</span>,
@@ -468,11 +468,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">test</span>::<span class="ident">Server</span> <span class="kw">for</span> <span class="ident">TestServer</span> {
+<span class="kw">impl</span> <span class="ident">test::Server</span> <span class="kw">for</span> <span class="ident">TestServer</span> {
     <span class="kw">fn</span> <span class="ident">request_expiry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sleep</span> {
         <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">runtime</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">enter</span>();
-        <span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">timeout</span>))
+        <span class="ident">sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">timeout</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">run_future</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">O</span>
@@ -493,37 +493,37 @@
     <span class="doccomment">/// for each connection.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Timeout will be set to 10 seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">NH</span>: <span class="ident">NewHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">new_handler</span>: <span class="ident">NH</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TestServer</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">NH</span>: <span class="ident">NewHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">new_handler</span>: <span class="ident">NH</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="ident">TestServer</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">NH</span>::<span class="ident">Instance</span>: <span class="ident">UnwindSafe</span>,
+        <span class="ident">NH::Instance</span>: <span class="ident">UnwindSafe</span>,
     {
-        <span class="ident">TestServer</span>::<span class="ident">with_timeout</span>(<span class="ident">new_handler</span>, <span class="number">10</span>)
+        <span class="ident">TestServer::with_timeout</span>(<span class="ident">new_handler</span>, <span class="number">10</span>)
     }
 
     <span class="doccomment">/// Sets the request timeout to `timeout` seconds and returns a new `TestServer`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timeout</span><span class="op">&lt;</span><span class="ident">NH</span>: <span class="ident">NewHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
         <span class="ident">new_handler</span>: <span class="ident">NH</span>,
         <span class="ident">timeout</span>: <span class="ident">u64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TestServer</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="ident">TestServer</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">NH</span>::<span class="ident">Instance</span>: <span class="ident">UnwindSafe</span>,
+        <span class="ident">NH::Instance</span>: <span class="ident">UnwindSafe</span>,
     {
-        <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime</span>::<span class="ident">new</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime::new</span>()<span class="question-mark">?</span>;
         <span class="comment">// TODO: Fix this into an async flow</span>
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">TcpListener</span>::<span class="ident">bind</span>(<span class="string">&quot;127.0.0.1:0&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>()<span class="question-mark">?</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">TcpListener::bind</span>(<span class="string">&quot;127.0.0.1:0&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>()<span class="question-mark">?</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">local_addr</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">service_stream</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">bind_server</span>(<span class="ident">listener</span>, <span class="ident">new_handler</span>, <span class="ident">future</span>::<span class="ident">ok</span>);
+        <span class="kw">let</span> <span class="ident">service_stream</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::bind_server</span>(<span class="ident">listener</span>, <span class="ident">new_handler</span>, <span class="ident">future::ok</span>);
         <span class="ident">runtime</span>.<span class="ident">spawn</span>(<span class="ident">service_stream</span>); <span class="comment">// Ignore the result</span>
 
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">TestServerData</span> {
             <span class="ident">addr</span>,
             <span class="ident">timeout</span>,
-            <span class="ident">runtime</span>: <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">runtime</span>),
+            <span class="ident">runtime</span>: <span class="ident">RwLock::new</span>(<span class="ident">runtime</span>),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">TestServer</span> {
-            <span class="ident">data</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">data</span>),
+            <span class="ident">data</span>: <span class="ident">Arc::new</span>(<span class="ident">data</span>),
         })
     }
 
@@ -531,7 +531,7 @@
     <span class="doccomment">/// the server will see a default socket address of `127.0.0.1:10000` as the source address for</span>
     <span class="doccomment">/// the connection.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestClient</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">TestConnect</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">client_with_address</span>(<span class="ident">SocketAddr</span>::<span class="ident">new</span>(<span class="ident">IpAddr</span>::<span class="ident">from</span>([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]), <span class="number">10000</span>))
+        <span class="self">self</span>.<span class="ident">client_with_address</span>(<span class="ident">SocketAddr::new</span>(<span class="ident">IpAddr::from</span>([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]), <span class="number">10000</span>))
     }
 
     <span class="doccomment">/// Spawns the given future on the `TestServer`&#39;s internal runtime.</span>
@@ -553,19 +553,19 @@
     <span class="doccomment">/// `client_addr` can be any valid `SocketAddr`, and need not be contactable.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_with_address</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">client_addr</span>: <span class="ident">net</span>::<span class="ident">SocketAddr</span>,
+        <span class="ident">client_addr</span>: <span class="ident">net::SocketAddr</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestClient</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">TestConnect</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">try_client_with_address</span>(<span class="ident">client_addr</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">try_client_with_address</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_client_addr</span>: <span class="ident">net</span>::<span class="ident">SocketAddr</span>,
+        <span class="ident">_client_addr</span>: <span class="ident">net::SocketAddr</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestClient</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">TestConnect</span><span class="op">&gt;</span> {
         <span class="comment">// We&#39;re creating a private TCP-based pipe here. Bind to an ephemeral port, connect to</span>
         <span class="comment">// it and then immediately discard the listener.</span>
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>().<span class="ident">build</span>(<span class="ident">TestConnect</span> {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::builder</span>().<span class="ident">build</span>(<span class="ident">TestConnect</span> {
             <span class="ident">addr</span>: <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">addr</span>,
         });
 
@@ -585,17 +585,17 @@
 
 <span class="kw">impl</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestConnect</span> {
     <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">TcpStream</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">tokio::io::Error</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span>
-        <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Response</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+        <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Response</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(()).<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_req</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Future</span> {
-        <span class="ident">TcpStream</span>::<span class="ident">connect</span>(<span class="self">self</span>.<span class="ident">addr</span>)
-            .<span class="ident">inspect</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Client TcpStream connected: {:?}&quot;</span>, <span class="ident">s</span>))
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_req</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Future</span> {
+        <span class="ident">TcpStream::connect</span>(<span class="self">self</span>.<span class="ident">addr</span>)
+            .<span class="ident">inspect</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">info!</span>(<span class="string">&quot;Client TcpStream connected: {:?}&quot;</span>, <span class="ident">s</span>))
             .<span class="ident">boxed</span>()
     }
 }
@@ -604,16 +604,16 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">header</span>::<span class="ident">CONTENT_LENGTH</span>;
+    <span class="kw">use</span> <span class="ident">hyper::header::CONTENT_LENGTH</span>;
     <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">body</span>, <span class="ident">Body</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>, <span class="ident">Uri</span>};
     <span class="kw">use</span> <span class="ident">mime</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::{<span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>};
+    <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>};
 
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">handler</span>::{<span class="ident">Handler</span>, <span class="ident">HandlerFuture</span>, <span class="ident">NewHandler</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">helpers</span>::<span class="ident">http</span>::<span class="ident">response</span>::<span class="ident">create_response</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">state</span>::{<span class="ident">client_addr</span>, <span class="ident">FromState</span>, <span class="ident">State</span>};
-    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">CONTENT_TYPE</span>;
-    <span class="kw">use</span> <span class="ident">log</span>::<span class="ident">info</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::handler</span>::{<span class="ident">Handler</span>, <span class="ident">HandlerFuture</span>, <span class="ident">NewHandler</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::helpers::http::response::create_response</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::state</span>::{<span class="ident">client_addr</span>, <span class="ident">FromState</span>, <span class="ident">State</span>};
+    <span class="kw">use</span> <span class="ident">http::header::CONTENT_TYPE</span>;
+    <span class="kw">use</span> <span class="ident">log::info</span>;
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
     <span class="kw">struct</span> <span class="ident">TestHandler</span> {
@@ -622,37 +622,37 @@
 
     <span class="kw">impl</span> <span class="ident">Handler</span> <span class="kw">for</span> <span class="ident">TestHandler</span> {
         <span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Uri</span>::<span class="ident">borrow_from</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>).<span class="ident">path</span>().<span class="ident">to_owned</span>();
+            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Uri::borrow_from</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>).<span class="ident">path</span>().<span class="ident">to_owned</span>();
             <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">as_str</span>() {
                 <span class="string">&quot;/&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;TestHandler responding to /&quot;</span>);
-                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                        .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
+                    <span class="macro">info!</span>(<span class="string">&quot;TestHandler responding to /&quot;</span>);
+                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
                         .<span class="ident">body</span>(<span class="self">self</span>.<span class="ident">response</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
                         .<span class="ident">unwrap</span>();
 
-                    <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">boxed</span>()
+                    <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">boxed</span>()
                 }
                 <span class="string">&quot;/timeout&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="comment">// TODO: What is this supposed to return?  It previously returned nothing which isn&#39;t a timeout</span>
-                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                        .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">REQUEST_TIMEOUT</span>)
-                        .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">default</span>())
+                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                        .<span class="ident">status</span>(<span class="ident">StatusCode::REQUEST_TIMEOUT</span>)
+                        .<span class="ident">body</span>(<span class="ident">Body::default</span>())
                         .<span class="ident">unwrap</span>();
 
-                    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;TestHandler responding to /timeout&quot;</span>);
-                    <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">boxed</span>()
+                    <span class="macro">info!</span>(<span class="string">&quot;TestHandler responding to /timeout&quot;</span>);
+                    <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">boxed</span>()
                 }
                 <span class="string">&quot;/myaddr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;TestHandler responding to /myaddr&quot;</span>);
-                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                        .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
-                        .<span class="ident">body</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">client_addr</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>).<span class="ident">unwrap</span>()).<span class="ident">into</span>())
+                    <span class="macro">info!</span>(<span class="string">&quot;TestHandler responding to /myaddr&quot;</span>);
+                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                        .<span class="ident">body</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">client_addr</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>).<span class="ident">unwrap</span>()).<span class="ident">into</span>())
                         .<span class="ident">unwrap</span>();
 
-                    <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">boxed</span>()
+                    <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">boxed</span>()
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
             }
         }
     }
@@ -660,33 +660,33 @@
     <span class="kw">impl</span> <span class="ident">NewHandler</span> <span class="kw">for</span> <span class="ident">TestHandler</span> {
         <span class="kw">type</span> <span class="ident">Instance</span> <span class="op">=</span> <span class="self">Self</span>;
 
-        <span class="kw">fn</span> <span class="ident">new_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">new_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">clone</span>())
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">serves_requests</span>() {
-        <span class="kw">let</span> <span class="ident">ticks</span> <span class="op">=</span> <span class="ident">SystemTime</span>::<span class="ident">now</span>()
+        <span class="kw">let</span> <span class="ident">ticks</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>()
             .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
             .<span class="ident">unwrap</span>()
             .<span class="ident">as_secs</span>();
         <span class="kw">let</span> <span class="ident">new_service</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">TestHandler</span> {
-                <span class="ident">response</span>: <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;time: {}&quot;</span>, <span class="ident">ticks</span>),
+                <span class="ident">response</span>: <span class="macro">format!</span>(<span class="string">&quot;time: {}&quot;</span>, <span class="ident">ticks</span>),
             })
         };
 
-        <span class="kw">let</span> <span class="ident">test_server</span> <span class="op">=</span> <span class="ident">TestServer</span>::<span class="ident">new</span>(<span class="ident">new_service</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">test_server</span> <span class="op">=</span> <span class="ident">TestServer::new</span>(<span class="ident">new_service</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">test_server</span>
             .<span class="ident">client</span>()
             .<span class="ident">get</span>(<span class="string">&quot;http://localhost/&quot;</span>)
             .<span class="ident">perform</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">read_utf8_body</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;time: {}&quot;</span>, <span class="ident">ticks</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>, <span class="macro">format!</span>(<span class="string">&quot;time: {}&quot;</span>, <span class="ident">ticks</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -699,7 +699,7 @@
             })
         };
 
-        <span class="kw">let</span> <span class="ident">test_server</span> <span class="op">=</span> <span class="ident">TestServer</span>::<span class="ident">with_timeout</span>(<span class="ident">new_service</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">test_server</span> <span class="op">=</span> <span class="ident">TestServer::with_timeout</span>(<span class="ident">new_service</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">test_server</span>
             .<span class="ident">client</span>()
@@ -710,26 +710,26 @@
             <span class="ident">e</span> @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">e</span>.<span class="ident">unwrap</span>();
             }
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected timeout, but was Ok(_)&quot;</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;expected timeout, but was Ok(_)&quot;</span>),
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">ignore</span>]</span> <span class="comment">// We trade using the mainline server setup code for this behavior.</span>
     <span class="kw">fn</span> <span class="ident">sets_client_addr</span>() {
-        <span class="kw">let</span> <span class="ident">ticks</span> <span class="op">=</span> <span class="ident">SystemTime</span>::<span class="ident">now</span>()
+        <span class="kw">let</span> <span class="ident">ticks</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>()
             .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
             .<span class="ident">unwrap</span>()
             .<span class="ident">as_secs</span>();
 
         <span class="kw">let</span> <span class="ident">new_service</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">TestHandler</span> {
-                <span class="ident">response</span>: <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;time: {}&quot;</span>, <span class="ident">ticks</span>),
+                <span class="ident">response</span>: <span class="macro">format!</span>(<span class="string">&quot;time: {}&quot;</span>, <span class="ident">ticks</span>),
             })
         };
 
         <span class="kw">let</span> <span class="ident">client_addr</span> <span class="op">=</span> <span class="string">&quot;9.8.7.6:58901&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">test_server</span> <span class="op">=</span> <span class="ident">TestServer</span>::<span class="ident">new</span>(<span class="ident">new_service</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">test_server</span> <span class="op">=</span> <span class="ident">TestServer::new</span>(<span class="ident">new_service</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">test_server</span>
             .<span class="ident">client_with_address</span>(<span class="ident">client_addr</span>)
@@ -737,61 +737,61 @@
             .<span class="ident">perform</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">read_body</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">received_addr</span>: <span class="ident">net</span>::<span class="ident">SocketAddr</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>).<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">received_addr</span>, <span class="ident">client_addr</span>);
+        <span class="kw">let</span> <span class="ident">received_addr</span>: <span class="ident">net::SocketAddr</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">buf</span>).<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">received_addr</span>, <span class="ident">client_addr</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">async_echo</span>() {
         <span class="kw">fn</span> <span class="ident">handler</span>(<span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">Body</span>::<span class="ident">take_from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>))
+            <span class="ident">body::to_bytes</span>(<span class="ident">Body::take_from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>))
                 .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">full_body</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">full_body</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="ident">resp_data</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">to_vec</span>();
                         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span>
-                            <span class="ident">create_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode</span>::<span class="ident">OK</span>, <span class="ident">mime</span>::<span class="ident">TEXT_PLAIN</span>, <span class="ident">resp_data</span>);
-                        <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">res</span>))
+                            <span class="ident">create_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode::OK</span>, <span class="ident">mime::TEXT_PLAIN</span>, <span class="ident">resp_data</span>);
+                        <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">res</span>))
                     }
 
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future</span>::<span class="ident">err</span>((<span class="ident">state</span>, <span class="ident">e</span>.<span class="ident">into</span>())),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future::err</span>((<span class="ident">state</span>, <span class="ident">e</span>.<span class="ident">into</span>())),
                 })
                 .<span class="ident">boxed</span>()
         }
 
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">TestServer</span>::<span class="ident">new</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">handler</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">TestServer::new</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">handler</span>)).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">client</span>();
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">&quot;This text should get reflected back to us. Even this fancy piece of unicode: \
                     \u{3044}\u{308d}\u{306f}\u{306b}\u{307b}&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">client</span>
-            .<span class="ident">post</span>(<span class="string">&quot;http://host/echo&quot;</span>, <span class="ident">data</span>, <span class="ident">mime</span>::<span class="ident">TEXT_PLAIN</span>)
+            .<span class="ident">post</span>(<span class="string">&quot;http://host/echo&quot;</span>, <span class="ident">data</span>, <span class="ident">mime::TEXT_PLAIN</span>)
             .<span class="ident">perform</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;request successful&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
 
         {
             <span class="kw">let</span> <span class="ident">mime</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="ident">CONTENT_TYPE</span>).<span class="ident">expect</span>(<span class="string">&quot;ContentType&quot;</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">mime</span>, <span class="ident">mime</span>::<span class="ident">TEXT_PLAIN</span>.<span class="ident">as_ref</span>());
+            <span class="macro">assert_eq!</span>(<span class="ident">mime</span>, <span class="ident">mime::TEXT_PLAIN</span>.<span class="ident">as_ref</span>());
         }
 
         <span class="kw">let</span> <span class="ident">content_length</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">content_length</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="ident">CONTENT_LENGTH</span>).<span class="ident">expect</span>(<span class="string">&quot;ContentLength&quot;</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content_length</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">data</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>()));
+            <span class="macro">assert_eq!</span>(<span class="ident">content_length</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">data</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>()));
             <span class="ident">content_length</span>.<span class="ident">clone</span>()
         };
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span>
-            <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">res</span>.<span class="ident">read_body</span>().<span class="ident">expect</span>(<span class="string">&quot;readable response&quot;</span>)).<span class="ident">expect</span>(<span class="string">&quot;UTF8 response&quot;</span>);
+            <span class="ident">String::from_utf8</span>(<span class="ident">res</span>.<span class="ident">read_body</span>().<span class="ident">expect</span>(<span class="string">&quot;readable response&quot;</span>)).<span class="ident">expect</span>(<span class="string">&quot;UTF8 response&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content_length</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">buf</span>.<span class="ident">len</span>()));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">buf</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content_length</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">buf</span>.<span class="ident">len</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">buf</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

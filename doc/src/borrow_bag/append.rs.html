@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/borrow-bag-1.1.0/src/append.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>append.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../borrow_bag/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../borrow_bag/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
@@ -92,7 +92,7 @@
 <span id="89">89</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">handle</span>::{<span class="ident">new_handle</span>, <span class="ident">Handle</span>, <span class="ident">Skip</span>, <span class="ident">Take</span>};
-<span class="kw">use</span> <span class="ident">lookup</span>::<span class="ident">Lookup</span>;
+<span class="kw">use</span> <span class="ident">lookup::Lookup</span>;
 
 <span class="doccomment">/// Describes the result of appending `T` to the borrow-bag. This is useful in specifying the</span>
 <span class="doccomment">/// return type when creating/modifying a `BorrowBag` in a function.</span>
@@ -114,7 +114,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The resulting `BorrowBag` type parameter after adding an element of type `T`.</span>
-    <span class="kw">type</span> <span class="ident">Output</span>: <span class="ident">PrefixedWith</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Lookup</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span>::<span class="ident">Navigator</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Output</span>: <span class="ident">PrefixedWith</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Lookup</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span><span class="ident">::Navigator</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// A type describing how to borrow the `T` which is added.</span>
     <span class="doccomment">///</span>
@@ -123,7 +123,7 @@
     <span class="kw">type</span> <span class="ident">Navigator</span>;
 
     <span class="doccomment">/// Append the element, returning a new collection and a handle to borrow the element back.</span>
-    <span class="kw">fn</span> <span class="ident">append</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">Output</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span>::<span class="ident">Navigator</span><span class="op">&gt;</span>);
+    <span class="kw">fn</span> <span class="ident">append</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::Output</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span><span class="ident">::Navigator</span><span class="op">&gt;</span>);
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">U</span>, <span class="ident">V</span>)
@@ -131,12 +131,12 @@
     <span class="ident">V</span>: <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 {
     <span class="comment">// We&#39;re mid-list. Return the head and append to the tail.</span>
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> (<span class="ident">U</span>, <span class="op">&lt;</span><span class="ident">V</span> <span class="kw">as</span> <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>);
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> (<span class="ident">U</span>, <span class="op">&lt;</span><span class="ident">V</span> <span class="kw">as</span> <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>);
 
     <span class="comment">// We&#39;re mid-list. Skip this element and navigate again in the tail.</span>
-    <span class="kw">type</span> <span class="ident">Navigator</span> <span class="op">=</span> (<span class="ident">Skip</span>, <span class="op">&lt;</span><span class="ident">V</span> <span class="kw">as</span> <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Navigator</span>);
+    <span class="kw">type</span> <span class="ident">Navigator</span> <span class="op">=</span> (<span class="ident">Skip</span>, <span class="op">&lt;</span><span class="ident">V</span> <span class="kw">as</span> <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Navigator</span>);
 
-    <span class="kw">fn</span> <span class="ident">append</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">Output</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span>::<span class="ident">Navigator</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">append</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::Output</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span><span class="ident">::Navigator</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">u</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>;
         ((<span class="ident">u</span>, <span class="ident">v</span>.<span class="ident">append</span>(<span class="ident">t</span>).<span class="number">0</span>), <span class="ident">new_handle</span>())
     }
@@ -149,7 +149,7 @@
     <span class="comment">// We&#39;re adding our `T` here, so we take this element on navigation.</span>
     <span class="kw">type</span> <span class="ident">Navigator</span> <span class="op">=</span> <span class="ident">Take</span>;
 
-    <span class="kw">fn</span> <span class="ident">append</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">Output</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span>::<span class="ident">Navigator</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">append</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::Output</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span><span class="ident">::Navigator</span><span class="op">&gt;</span>) {
         ((<span class="ident">t</span>, ()), <span class="ident">new_handle</span>())
     }
 }
@@ -175,11 +175,11 @@
         <span class="kw">let</span> (<span class="ident">list</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">append</span>(<span class="number">2u8</span>);
         <span class="kw">let</span> (<span class="ident">list</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">append</span>(<span class="number">3u8</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">list</span>.<span class="number">0</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="ident">list</span>.<span class="number">1</span>).<span class="number">0</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(((<span class="ident">list</span>.<span class="number">1</span>).<span class="number">1</span>).<span class="number">0</span>, <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">list</span>.<span class="number">0</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>((<span class="ident">list</span>.<span class="number">1</span>).<span class="number">0</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(((<span class="ident">list</span>.<span class="number">1</span>).<span class="number">1</span>).<span class="number">0</span>, <span class="number">3</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="borrow_bag" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="borrow_bag" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

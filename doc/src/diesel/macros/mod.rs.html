@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/diesel-1.4.7/src/macros/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../diesel/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../diesel/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1236,7 +1236,7 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">__diesel_column</span> {
+<span class="macro">macro_rules!</span> <span class="ident">__diesel_column</span> {
     (
         <span class="ident">table</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>,
         <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>:<span class="ident">ident</span>,
@@ -1249,15 +1249,15 @@
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">QueryId</span>, <span class="ident">Default</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>;
 
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">expression</span>::<span class="ident">Expression</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {
+        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::expression::Expression</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {
             <span class="kw">type</span> <span class="ident">SqlType</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span>;
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::<span class="ident">QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> <span class="kw">where</span>
-            <span class="ident">DB</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">backend</span>::<span class="ident">Backend</span>,
-            <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span> <span class="kw">as</span> <span class="ident">QuerySource</span><span class="op">&gt;</span>::<span class="ident">FromClause</span>: <span class="ident">QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>,
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder::QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> <span class="kw">where</span>
+            <span class="ident">DB</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::backend::Backend</span>,
+            <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span> <span class="kw">as</span> <span class="ident">QuerySource</span><span class="op">&gt;</span><span class="ident">::FromClause</span>: <span class="ident">QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>,
         {
-            <span class="kw">fn</span> <span class="ident">walk_ast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">out</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::<span class="ident">AstPass</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">result</span>::<span class="ident">QueryResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">walk_ast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">out</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder::AstPass</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::result::QueryResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">from_clause</span>().<span class="ident">walk_ast</span>(<span class="ident">out</span>.<span class="ident">reborrow</span>())<span class="question-mark">?</span>;
                 <span class="ident">out</span>.<span class="ident">push_sql</span>(<span class="string">&quot;.&quot;</span>);
                 <span class="ident">out</span>.<span class="ident">push_identifier</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_name</span>)
@@ -1301,27 +1301,27 @@
         {
         }
 
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">expression</span>::<span class="ident">NonAggregate</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {}
+        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::expression::NonAggregate</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {}
 
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">Column</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {
+        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::Column</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {
             <span class="kw">type</span> <span class="ident">Table</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>;
 
             <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_name</span>;
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">EqAll</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> <span class="kw">where</span>
-            <span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">expression</span>::<span class="ident">AsExpression</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span><span class="op">&gt;</span>,
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">dsl</span>::<span class="ident">Eq</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>, <span class="ident">T</span><span class="op">&gt;</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Expression</span><span class="op">&lt;</span><span class="ident">SqlType</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">sql_types</span>::<span class="ident">Bool</span><span class="op">&gt;</span>,
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::EqAll</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> <span class="kw">where</span>
+            <span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::expression::AsExpression</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span><span class="op">&gt;</span>,
+            <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::dsl::Eq</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>, <span class="ident">T</span><span class="op">&gt;</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::Expression</span><span class="op">&lt;</span><span class="ident">SqlType</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::sql_types::Bool</span><span class="op">&gt;</span>,
         {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">dsl</span>::<span class="ident">Eq</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::dsl::Eq</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">T</span><span class="op">&gt;</span>;
 
-            <span class="kw">fn</span> <span class="ident">eq_all</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Output</span> {
-                <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">expression</span>::<span class="ident">operators</span>::<span class="ident">Eq</span>::<span class="ident">new</span>(<span class="self">self</span>, <span class="ident">rhs</span>.<span class="ident">as_expression</span>())
+            <span class="kw">fn</span> <span class="ident">eq_all</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+                <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::expression::operators::Eq::new</span>(<span class="self">self</span>, <span class="ident">rhs</span>.<span class="ident">as_expression</span>())
             }
         }
 
-        <span class="macro">__diesel_generate_ops_impls_if_numeric</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span>);
-        <span class="macro">__diesel_generate_ops_impls_if_date_time</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span>);
+        <span class="macro">__diesel_generate_ops_impls_if_numeric!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span>);
+        <span class="macro">__diesel_generate_ops_impls_if_date_time!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Type</span>)<span class="kw-2">*</span>);
     }
 }
 
@@ -1495,9 +1495,9 @@
 <span class="doccomment">/// pub type BoxedQuery&lt;&#39;a, DB, ST = SqlType&gt; = BoxedSelectStatement&lt;&#39;a, ST, table, DB&gt;;</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">table</span> {
+<span class="macro">macro_rules!</span> <span class="ident">table</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> [],
             <span class="ident">meta</span> <span class="op">=</span> [],
@@ -1511,9 +1511,9 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">__diesel_invalid_table_syntax</span> {
+<span class="macro">macro_rules!</span> <span class="ident">__diesel_invalid_table_syntax</span> {
     () <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">compile_error</span><span class="macro">!</span>(
+        <span class="macro">compile_error!</span>(
             <span class="string">&quot;Invalid `table!` syntax. Please see the `table!` macro docs for more info.&quot;</span>
         );
     };
@@ -1521,14 +1521,14 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">__diesel_parse_table</span> {
+<span class="macro">macro_rules!</span> <span class="ident">__diesel_parse_table</span> {
     <span class="comment">// Found an import</span>
     (
         <span class="ident">tokens</span> <span class="op">=</span> [<span class="kw">use</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">import</span>:<span class="ident">tt</span>)::<span class="op">+</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>],
         <span class="ident">imports</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>)<span class="op">*</span> <span class="kw">use</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">import</span>)::<span class="op">+</span>;],
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="op">*</span>
@@ -1543,7 +1543,7 @@
         <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignore</span>:<span class="ident">tt</span>,
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>,
             <span class="ident">meta</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>,
@@ -1559,7 +1559,7 @@
         <span class="ident">meta</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>,
             <span class="ident">meta</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="op">*</span> #<span class="macro-nonterminal">$</span><span class="macro-nonterminal">new_meta</span>],
@@ -1577,7 +1577,7 @@
         <span class="ident">schema</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignore</span>:<span class="ident">tt</span>,
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>,
             <span class="ident">meta</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>,
@@ -1597,7 +1597,7 @@
         <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignore</span>:<span class="ident">tt</span>,
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>,
             <span class="ident">meta</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>,
@@ -1618,7 +1618,7 @@
         <span class="ident">primary_key</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignore</span>:<span class="ident">tt</span>,
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>],
             <span class="ident">imports</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>,
             <span class="ident">meta</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>,
@@ -1636,9 +1636,9 @@
         <span class="ident">imports</span> <span class="op">=</span> [],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [{$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">columns</span>)<span class="kw-2">*</span>}],
-            <span class="ident">imports</span> <span class="op">=</span> [<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">sql_types</span>::<span class="kw-2">*</span>;],
+            <span class="ident">imports</span> <span class="op">=</span> [<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::sql_types</span>::<span class="kw-2">*</span>;],
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="op">*</span>
         }
     };
@@ -1652,11 +1652,11 @@
         <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>,
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_table</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_table!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [{$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">columns</span>)<span class="kw-2">*</span>}],
             <span class="ident">imports</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>,
             <span class="ident">meta</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>,
-            <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>),
+            <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>),
             <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="op">*</span>
         }
@@ -1667,7 +1667,7 @@
         <span class="ident">tokens</span> <span class="op">=</span> [{$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">columns</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_columns</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_columns!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">columns</span>)<span class="kw-2">*</span>],
             <span class="ident">table</span> <span class="op">=</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="op">*</span> },
             <span class="ident">columns</span> <span class="op">=</span> [],
@@ -1676,13 +1676,13 @@
 
     <span class="comment">// Invalid syntax</span>
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_invalid_table_syntax</span><span class="macro">!</span>();
+        <span class="macro">__diesel_invalid_table_syntax!</span>();
     }
 }
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">__diesel_parse_columns</span> {
+<span class="macro">macro_rules!</span> <span class="ident">__diesel_parse_columns</span> {
     <span class="comment">// No column being parsed, start a new one.</span>
     <span class="comment">// Attempt to capture the type as separate tokens if at all possible.</span>
     (
@@ -1693,11 +1693,11 @@
         ],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_columns</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_columns!</span> {
             <span class="ident">current_column</span> <span class="op">=</span> {
                 <span class="ident">unchecked_meta</span> <span class="op">=</span> [$(#<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="kw-2">*</span>],
                 <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
-                <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>),
+                <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>),
                 <span class="ident">ty</span> <span class="op">=</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)::<span class="op">*</span> $(<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_params</span>)::<span class="kw-2">*</span><span class="op">&gt;</span>)<span class="kw-2">*</span>),
                 <span class="ident">meta</span> <span class="op">=</span> [],
             },
@@ -1715,11 +1715,11 @@
         ],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_columns</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_columns!</span> {
             <span class="ident">current_column</span> <span class="op">=</span> {
                 <span class="ident">unchecked_meta</span> <span class="op">=</span> [$(#<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="kw-2">*</span>],
                 <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
-                <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>),
+                <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>),
                 <span class="ident">ty</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>),
                 <span class="ident">meta</span> <span class="op">=</span> [],
             },
@@ -1739,7 +1739,7 @@
         },
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_columns</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_columns!</span> {
             <span class="ident">current_column</span> <span class="op">=</span> {
                 <span class="ident">unchecked_meta</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="kw-2">*</span>],
                 <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
@@ -1762,7 +1762,7 @@
         },
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_columns</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_columns!</span> {
             <span class="ident">current_column</span> <span class="op">=</span> {
                 <span class="ident">unchecked_meta</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">unchecked_meta</span>)<span class="kw-2">*</span>],
                 <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
@@ -1786,7 +1786,7 @@
         <span class="ident">columns</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">columns</span>:<span class="ident">tt</span>,)<span class="kw-2">*</span>],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_parse_columns</span><span class="macro">!</span> {
+        <span class="macro">__diesel_parse_columns!</span> {
             <span class="ident">tokens</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>,
             <span class="ident">table</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>,
             <span class="ident">columns</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">columns</span>,)<span class="op">*</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">current_column</span>)<span class="op">*</span> },],
@@ -1799,18 +1799,18 @@
         <span class="ident">tokens</span> <span class="op">=</span> [],
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span>
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_table_impl</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>);
+        <span class="macro">__diesel_table_impl!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>);
     };
 
     <span class="comment">// Invalid syntax</span>
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">__diesel_invalid_table_syntax</span><span class="macro">!</span>();
+        <span class="macro">__diesel_invalid_table_syntax!</span>();
     }
 }
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">__diesel_table_impl</span> {
+<span class="macro">macro_rules!</span> <span class="ident">__diesel_table_impl</span> {
     (
         <span class="ident">table</span> <span class="op">=</span> {
             <span class="ident">imports</span> <span class="op">=</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>],
@@ -1835,37 +1835,37 @@
                 <span class="ident">Table</span>,
                 <span class="ident">JoinTo</span>,
             };
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">associations</span>::<span class="ident">HasTable</span>;
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">insertable</span>::<span class="ident">Insertable</span>;
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::<span class="kw-2">*</span>;
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::<span class="ident">nodes</span>::<span class="ident">Identifier</span>;
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::{<span class="ident">AppearsInFromClause</span>, <span class="ident">Once</span>, <span class="ident">Never</span>};
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">joins</span>::{<span class="ident">Join</span>, <span class="ident">JoinOn</span>};
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::associations::HasTable</span>;
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::insertable::Insertable</span>;
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder</span>::<span class="kw-2">*</span>;
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder::nodes::Identifier</span>;
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source</span>::{<span class="ident">AppearsInFromClause</span>, <span class="ident">Once</span>, <span class="ident">Never</span>};
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::joins</span>::{<span class="ident">Join</span>, <span class="ident">JoinOn</span>};
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">columns</span>::<span class="kw-2">*</span>;
+            <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::columns</span>::<span class="kw-2">*</span>;
 
             <span class="doccomment">/// Re-exports all of the columns of this table, as well as the</span>
             <span class="doccomment">/// table struct renamed to the module name. This is meant to be</span>
             <span class="doccomment">/// glob imported for functions which only deal with one table.</span>
             <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dsl</span> {
-                $(<span class="macro">static_cond</span><span class="macro">!</span> {
+                $(<span class="macro">static_cond!</span> {
                     <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span> <span class="op">=</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span> {
-                        <span class="macro">compile_error</span><span class="macro">!</span>(<span class="macro">concat</span><span class="macro">!</span>(
+                        <span class="macro">compile_error!</span>(<span class="macro">concat!</span>(
                             <span class="string">&quot;Column `&quot;</span>,
-                            <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>),
+                            <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>),
                             <span class="string">&quot;` cannot be named the same as its table.\n \
                             You may use `#[sql_name = \&quot;&quot;</span>,
-                            <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>),
+                            <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>),
                             <span class="string">&quot;\&quot;]` to reference the table&#39;s `&quot;</span>,
-                            <span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>),
+                            <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>),
                             <span class="string">&quot;` column. \n \
                             See the documentation of the `table!` macro for details`\n&quot;</span>
                         ));
                     } <span class="kw">else</span> {
-                        <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">columns</span>::{<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>};
+                        <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::columns</span>::{<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>};
                     }
                 })<span class="op">+</span>
-                <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">table</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span>;
+                <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::table</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span>;
             }
 
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>, <span class="ident">dead_code</span>)]</span>
@@ -1896,14 +1896,14 @@
             <span class="doccomment">/// Helper type for representing a boxed query from this table</span>
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BoxedQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">DB</span>, <span class="ident">ST</span> <span class="op">=</span> <span class="ident">SqlType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ST</span>, <span class="ident">table</span>, <span class="ident">DB</span><span class="op">&gt;</span>;
 
-            <span class="macro">__diesel_table_query_source_impl</span><span class="macro">!</span>(<span class="ident">table</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_name</span>);
+            <span class="macro">__diesel_table_query_source_impl!</span>(<span class="ident">table</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_name</span>);
 
             <span class="kw">impl</span> <span class="ident">AsQuery</span> <span class="kw">for</span> <span class="ident">table</span> {
                 <span class="kw">type</span> <span class="ident">SqlType</span> <span class="op">=</span> <span class="ident">SqlType</span>;
                 <span class="kw">type</span> <span class="ident">Query</span> <span class="op">=</span> <span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 
-                <span class="kw">fn</span> <span class="ident">as_query</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Query</span> {
-                    <span class="ident">SelectStatement</span>::<span class="ident">simple</span>(<span class="self">self</span>)
+                <span class="kw">fn</span> <span class="ident">as_query</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Query</span> {
+                    <span class="ident">SelectStatement::simple</span>(<span class="self">self</span>)
                 }
             }
 
@@ -1911,11 +1911,11 @@
                 <span class="kw">type</span> <span class="ident">PrimaryKey</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">primary_key</span>;
                 <span class="kw">type</span> <span class="ident">AllColumns</span> <span class="op">=</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>,)<span class="op">+</span>);
 
-                <span class="kw">fn</span> <span class="ident">primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">PrimaryKey</span> {
+                <span class="kw">fn</span> <span class="ident">primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::PrimaryKey</span> {
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">primary_key</span>
                 }
 
-                <span class="kw">fn</span> <span class="ident">all_columns</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">AllColumns</span> {
+                <span class="kw">fn</span> <span class="ident">all_columns</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::AllColumns</span> {
                     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>,)<span class="op">+</span>)
                 }
             }
@@ -1923,15 +1923,15 @@
             <span class="kw">impl</span> <span class="ident">HasTable</span> <span class="kw">for</span> <span class="ident">table</span> {
                 <span class="kw">type</span> <span class="ident">Table</span> <span class="op">=</span> <span class="self">Self</span>;
 
-                <span class="kw">fn</span> <span class="ident">table</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Table</span> {
+                <span class="kw">fn</span> <span class="ident">table</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Table</span> {
                     <span class="ident">table</span>
                 }
             }
 
             <span class="kw">impl</span> <span class="ident">IntoUpdateTarget</span> <span class="kw">for</span> <span class="ident">table</span> {
-                <span class="kw">type</span> <span class="ident">WhereClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">AsQuery</span><span class="op">&gt;</span>::<span class="ident">Query</span> <span class="kw">as</span> <span class="ident">IntoUpdateTarget</span><span class="op">&gt;</span>::<span class="ident">WhereClause</span>;
+                <span class="kw">type</span> <span class="ident">WhereClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">AsQuery</span><span class="op">&gt;</span><span class="ident">::Query</span> <span class="kw">as</span> <span class="ident">IntoUpdateTarget</span><span class="op">&gt;</span><span class="ident">::WhereClause</span>;
 
-                <span class="kw">fn</span> <span class="ident">into_update_target</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UpdateTarget</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Table</span>, <span class="self">Self</span>::<span class="ident">WhereClause</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">into_update_target</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UpdateTarget</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Table</span>, <span class="self">Self</span><span class="ident">::WhereClause</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">as_query</span>().<span class="ident">into_update_target</span>()
                 }
             }
@@ -1948,10 +1948,10 @@
                 <span class="ident">Join</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span>, <span class="ident">Kind</span><span class="op">&gt;</span>: <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span>,
             {
                 <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="ident">Join</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span>, <span class="ident">Kind</span><span class="op">&gt;</span>;
-                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Join</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span>, <span class="ident">Kind</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">OnClause</span>;
+                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Join</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span>, <span class="ident">Kind</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::OnClause</span>;
 
-                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">Join</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span>, <span class="ident">Kind</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">FromClause</span>, <span class="self">Self</span>::<span class="ident">OnClause</span>) {
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">Join</span>::<span class="ident">join_target</span>(<span class="ident">table</span>);
+                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">Join</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span>, <span class="ident">Kind</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::FromClause</span>, <span class="self">Self</span><span class="ident">::OnClause</span>) {
+                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">Join::join_target</span>(<span class="ident">table</span>);
                     (<span class="ident">rhs</span>, <span class="ident">on_clause</span>)
                 }
             }
@@ -1960,10 +1960,10 @@
                 <span class="ident">JoinOn</span><span class="op">&lt;</span><span class="ident">Join</span>, <span class="ident">On</span><span class="op">&gt;</span>: <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span>,
             {
                 <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="ident">JoinOn</span><span class="op">&lt;</span><span class="ident">Join</span>, <span class="ident">On</span><span class="op">&gt;</span>;
-                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">JoinOn</span><span class="op">&lt;</span><span class="ident">Join</span>, <span class="ident">On</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">OnClause</span>;
+                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">JoinOn</span><span class="op">&lt;</span><span class="ident">Join</span>, <span class="ident">On</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::OnClause</span>;
 
-                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">JoinOn</span><span class="op">&lt;</span><span class="ident">Join</span>, <span class="ident">On</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">FromClause</span>, <span class="self">Self</span>::<span class="ident">OnClause</span>) {
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">JoinOn</span>::<span class="ident">join_target</span>(<span class="ident">table</span>);
+                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">JoinOn</span><span class="op">&lt;</span><span class="ident">Join</span>, <span class="ident">On</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::FromClause</span>, <span class="self">Self</span><span class="ident">::OnClause</span>) {
+                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">JoinOn::join_target</span>(<span class="ident">table</span>);
                     (<span class="ident">rhs</span>, <span class="ident">on_clause</span>)
                 }
             }
@@ -1972,10 +1972,10 @@
                 <span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">D</span>, <span class="ident">W</span>, <span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">Of</span>, <span class="ident">G</span><span class="op">&gt;</span>: <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span>,
             {
                 <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">D</span>, <span class="ident">W</span>, <span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">Of</span>, <span class="ident">G</span><span class="op">&gt;</span>;
-                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">D</span>, <span class="ident">W</span>, <span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">Of</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">OnClause</span>;
+                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">D</span>, <span class="ident">W</span>, <span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">Of</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::OnClause</span>;
 
-                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">D</span>, <span class="ident">W</span>, <span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">Of</span>, <span class="ident">G</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">FromClause</span>, <span class="self">Self</span>::<span class="ident">OnClause</span>) {
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">SelectStatement</span>::<span class="ident">join_target</span>(<span class="ident">table</span>);
+                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">SelectStatement</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">D</span>, <span class="ident">W</span>, <span class="ident">O</span>, <span class="ident">L</span>, <span class="ident">Of</span>, <span class="ident">G</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::FromClause</span>, <span class="self">Self</span><span class="ident">::OnClause</span>) {
+                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">SelectStatement::join_target</span>(<span class="ident">table</span>);
                     (<span class="ident">rhs</span>, <span class="ident">on_clause</span>)
                 }
             }
@@ -1984,9 +1984,9 @@
                 <span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QS</span>, <span class="ident">ST</span>, <span class="ident">DB</span><span class="op">&gt;</span>: <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span>,
             {
                 <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QS</span>, <span class="ident">ST</span>, <span class="ident">DB</span><span class="op">&gt;</span>;
-                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QS</span>, <span class="ident">ST</span>, <span class="ident">DB</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">OnClause</span>;
-                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QS</span>, <span class="ident">ST</span>, <span class="ident">DB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">FromClause</span>, <span class="self">Self</span>::<span class="ident">OnClause</span>) {
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">BoxedSelectStatement</span>::<span class="ident">join_target</span>(<span class="ident">table</span>);
+                <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QS</span>, <span class="ident">ST</span>, <span class="ident">DB</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">JoinTo</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::OnClause</span>;
+                <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="ident">BoxedSelectStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QS</span>, <span class="ident">ST</span>, <span class="ident">DB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::FromClause</span>, <span class="self">Self</span><span class="ident">::OnClause</span>) {
+                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">on_clause</span>) <span class="op">=</span> <span class="ident">BoxedSelectStatement::join_target</span>(<span class="ident">table</span>);
                     (<span class="ident">rhs</span>, <span class="ident">on_clause</span>)
                 }
             }
@@ -1995,11 +1995,11 @@
             <span class="comment">// but Rust tries to recurse for no reason</span>
             <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">table</span>
             <span class="kw">where</span>
-                <span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">AsQuery</span><span class="op">&gt;</span>::<span class="ident">Query</span>: <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+                <span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">AsQuery</span><span class="op">&gt;</span><span class="ident">::Query</span>: <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
             {
-                <span class="kw">type</span> <span class="ident">Values</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">AsQuery</span><span class="op">&gt;</span>::<span class="ident">Query</span> <span class="kw">as</span> <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Values</span>;
+                <span class="kw">type</span> <span class="ident">Values</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">AsQuery</span><span class="op">&gt;</span><span class="ident">::Query</span> <span class="kw">as</span> <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Values</span>;
 
-                <span class="kw">fn</span> <span class="ident">values</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Values</span> {
+                <span class="kw">fn</span> <span class="ident">values</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Values</span> {
                     <span class="self">self</span>.<span class="ident">as_query</span>().<span class="ident">values</span>()
                 }
             }
@@ -2008,22 +2008,22 @@
             <span class="kw">where</span>
                 <span class="ident">table</span>: <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
             {
-                <span class="kw">type</span> <span class="ident">Values</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Values</span>;
+                <span class="kw">type</span> <span class="ident">Values</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">Insertable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Values</span>;
 
-                <span class="kw">fn</span> <span class="ident">values</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Values</span> {
+                <span class="kw">fn</span> <span class="ident">values</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Values</span> {
                     (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">values</span>()
                 }
             }
 
             <span class="doccomment">/// Contains all of the columns of this table</span>
             <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">columns</span> {
-                <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">table</span>;
+                <span class="kw">use</span> <span class="kw">super</span><span class="ident">::table</span>;
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">Expression</span>, <span class="ident">SelectableExpression</span>, <span class="ident">AppearsOnTable</span>, <span class="ident">QuerySource</span>};
-                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">backend</span>::<span class="ident">Backend</span>;
-                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::{<span class="ident">QueryFragment</span>, <span class="ident">AstPass</span>, <span class="ident">SelectStatement</span>};
-                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">joins</span>::{<span class="ident">Join</span>, <span class="ident">JoinOn</span>, <span class="ident">Inner</span>, <span class="ident">LeftOuter</span>};
-                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::{<span class="ident">AppearsInFromClause</span>, <span class="ident">Once</span>, <span class="ident">Never</span>};
-                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">result</span>::<span class="ident">QueryResult</span>;
+                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::backend::Backend</span>;
+                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder</span>::{<span class="ident">QueryFragment</span>, <span class="ident">AstPass</span>, <span class="ident">SelectStatement</span>};
+                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::joins</span>::{<span class="ident">Join</span>, <span class="ident">JoinOn</span>, <span class="ident">Inner</span>, <span class="ident">LeftOuter</span>};
+                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source</span>::{<span class="ident">AppearsInFromClause</span>, <span class="ident">Once</span>, <span class="ident">Never</span>};
+                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::result::QueryResult</span>;
                 $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">imports</span>)<span class="op">*</span>
 
                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">dead_code</span>)]</span>
@@ -2039,7 +2039,7 @@
                 }
 
                 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">DB</span>: <span class="ident">Backend</span><span class="op">&gt;</span> <span class="ident">QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">star</span> <span class="kw">where</span>
-                    <span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">QuerySource</span><span class="op">&gt;</span>::<span class="ident">FromClause</span>: <span class="ident">QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>,
+                    <span class="op">&lt;</span><span class="ident">table</span> <span class="kw">as</span> <span class="ident">QuerySource</span><span class="op">&gt;</span><span class="ident">::FromClause</span>: <span class="ident">QueryFragment</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>,
                 {
                     <span class="kw">fn</span> <span class="ident">walk_ast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">out</span>: <span class="ident">AstPass</span><span class="op">&lt;</span><span class="ident">DB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
                         <span class="ident">table</span>.<span class="ident">from_clause</span>().<span class="ident">walk_ast</span>(<span class="ident">out</span>.<span class="ident">reborrow</span>())<span class="question-mark">?</span>;
@@ -2054,7 +2054,7 @@
                 <span class="kw">impl</span> <span class="ident">AppearsOnTable</span><span class="op">&lt;</span><span class="ident">table</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">star</span> {
                 }
 
-                $(<span class="macro">__diesel_column</span><span class="macro">!</span> {
+                $(<span class="macro">__diesel_column!</span> {
                     <span class="ident">table</span> <span class="op">=</span> <span class="ident">table</span>,
                     <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_name</span>,
                     <span class="ident">sql_name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">column_sql_name</span>,
@@ -2068,41 +2068,41 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">__diesel_table_query_source_impl</span> {
+<span class="macro">macro_rules!</span> <span class="ident">__diesel_table_query_source_impl</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_struct</span>:<span class="ident">ident</span>, <span class="ident">public</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span> <span class="ident">QuerySource</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_struct</span> {
             <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="ident">Identifier</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">DefaultSelection</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Table</span><span class="op">&gt;</span>::<span class="ident">AllColumns</span>;
+            <span class="kw">type</span> <span class="ident">DefaultSelection</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Table</span><span class="op">&gt;</span><span class="ident">::AllColumns</span>;
 
-            <span class="kw">fn</span> <span class="ident">from_clause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">FromClause</span> {
+            <span class="kw">fn</span> <span class="ident">from_clause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::FromClause</span> {
                 <span class="ident">Identifier</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">default_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">DefaultSelection</span> {
-                <span class="self">Self</span>::<span class="ident">all_columns</span>()
+            <span class="kw">fn</span> <span class="ident">default_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::DefaultSelection</span> {
+                <span class="self">Self</span><span class="ident">::all_columns</span>()
             }
         }
     };
 
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_struct</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span> <span class="ident">QuerySource</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_struct</span> {
-            <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::<span class="ident">nodes</span>::<span class="ident">InfixNode</span><span class="op">&lt;</span>
+            <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder::nodes::InfixNode</span><span class="op">&lt;</span>
                 <span class="lifetime">&#39;static</span>,
                 <span class="ident">Identifier</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
                 <span class="ident">Identifier</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
             <span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">DefaultSelection</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Table</span><span class="op">&gt;</span>::<span class="ident">AllColumns</span>;
+            <span class="kw">type</span> <span class="ident">DefaultSelection</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Table</span><span class="op">&gt;</span><span class="ident">::AllColumns</span>;
 
-            <span class="kw">fn</span> <span class="ident">from_clause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">FromClause</span> {
-                <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_builder</span>::<span class="ident">nodes</span>::<span class="ident">InfixNode</span>::<span class="ident">new</span>(
-                    <span class="ident">Identifier</span>(<span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema_name</span>)),
+            <span class="kw">fn</span> <span class="ident">from_clause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::FromClause</span> {
+                <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_builder::nodes::InfixNode::new</span>(
+                    <span class="ident">Identifier</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema_name</span>)),
                     <span class="ident">Identifier</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table_name</span>),
                     <span class="string">&quot;.&quot;</span>,
                 )
             }
 
-            <span class="kw">fn</span> <span class="ident">default_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">DefaultSelection</span> {
-                <span class="self">Self</span>::<span class="ident">all_columns</span>()
+            <span class="kw">fn</span> <span class="ident">default_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::DefaultSelection</span> {
+                <span class="self">Self</span><span class="ident">::all_columns</span>()
             }
         }
     };
@@ -2173,25 +2173,25 @@
 <span class="doccomment">/// post JOIN users ON posts.user_id = users.id</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">joinable</span> {
+<span class="macro">macro_rules!</span> <span class="ident">joinable</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>:<span class="ident">ident</span>)::<span class="op">*</span> <span class="op">-</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">ident</span>)::<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">source</span>:<span class="ident">ident</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">joinable_inner</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> ::<span class="ident">table</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> ::<span class="ident">table</span> : ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> ::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">source</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> ::<span class="ident">table</span>));
-        <span class="macro">joinable_inner</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> ::<span class="ident">table</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> ::<span class="ident">table</span> : ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> ::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">source</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> ::<span class="ident">table</span>));
+        <span class="macro">joinable_inner!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> <span class="ident">::table</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> <span class="ident">::table</span> : ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> ::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">source</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> <span class="ident">::table</span>));
+        <span class="macro">joinable_inner!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> <span class="ident">::table</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> <span class="ident">::table</span> : ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>)::<span class="op">*</span> ::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">source</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)::<span class="op">*</span> <span class="ident">::table</span>));
     }
 }
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">joinable_inner</span> {
+<span class="macro">macro_rules!</span> <span class="ident">joinable_inner</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_table</span>:<span class="ident">path</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table</span>:<span class="ident">path</span> : (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">foreign_key</span>:<span class="ident">path</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span>:<span class="ident">path</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">joinable_inner</span><span class="macro">!</span>(
+        <span class="macro">joinable_inner!</span>(
             <span class="ident">left_table_ty</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_table</span>,
             <span class="ident">right_table_ty</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table</span>,
             <span class="ident">right_table_expr</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table</span>,
             <span class="ident">foreign_key</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">foreign_key</span>,
-            <span class="ident">primary_key_ty</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">Table</span><span class="op">&gt;</span>::<span class="ident">PrimaryKey</span>,
+            <span class="ident">primary_key_ty</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::Table</span><span class="op">&gt;</span><span class="ident">::PrimaryKey</span>,
             <span class="ident">primary_key_expr</span> <span class="op">=</span>
-                <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">Table</span><span class="op">&gt;</span>::<span class="ident">primary_key</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span>),
+                <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::Table</span><span class="op">&gt;</span><span class="ident">::primary_key</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent_table</span>),
         );
     };
 
@@ -2203,14 +2203,14 @@
         <span class="ident">primary_key_ty</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">primary_key_ty</span>:<span class="ident">ty</span>,
         <span class="ident">primary_key_expr</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">primary_key_expr</span>:<span class="ident">expr</span>,
     ) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">JoinTo</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table_ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_table_ty</span> {
+        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::JoinTo</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table_ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_table_ty</span> {
             <span class="kw">type</span> <span class="ident">FromClause</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table_ty</span>;
-            <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">dsl</span>::<span class="ident">Eq</span><span class="op">&lt;</span>
-                <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">expression</span>::<span class="ident">nullable</span>::<span class="ident">Nullable</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">foreign_key</span><span class="op">&gt;</span>,
-                <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">expression</span>::<span class="ident">nullable</span>::<span class="ident">Nullable</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">primary_key_ty</span><span class="op">&gt;</span>,
+            <span class="kw">type</span> <span class="ident">OnClause</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::dsl::Eq</span><span class="op">&lt;</span>
+                <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::expression::nullable::Nullable</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">foreign_key</span><span class="op">&gt;</span>,
+                <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::expression::nullable::Nullable</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">primary_key_ty</span><span class="op">&gt;</span>,
             <span class="op">&gt;</span>;
 
-            <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table_ty</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>::<span class="ident">FromClause</span>, <span class="self">Self</span>::<span class="ident">OnClause</span>) {
+            <span class="kw">fn</span> <span class="ident">join_target</span>(<span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_table_ty</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::FromClause</span>, <span class="self">Self</span><span class="ident">::OnClause</span>) {
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">ExpressionMethods</span>, <span class="ident">NullableExpressionMethods</span>};
 
                 (
@@ -2250,22 +2250,22 @@
 <span class="doccomment">/// allow_tables_to_appear_in_same_query!(posts, users);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">allow_tables_to_appear_in_same_query</span> {
+<span class="macro">macro_rules!</span> <span class="ident">allow_tables_to_appear_in_same_query</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_mod</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod</span>:<span class="ident">ident</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
-            <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">AppearsInFromClause</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_mod</span>::<span class="ident">table</span><span class="op">&gt;</span>
-                <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod</span>::<span class="ident">table</span>
+            <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::AppearsInFromClause</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_mod::table</span><span class="op">&gt;</span>
+                <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod::table</span>
             {
-                <span class="kw">type</span> <span class="ident">Count</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">Never</span>;
+                <span class="kw">type</span> <span class="ident">Count</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::Never</span>;
             }
 
-            <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">AppearsInFromClause</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod</span>::<span class="ident">table</span><span class="op">&gt;</span>
-                <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_mod</span>::<span class="ident">table</span>
+            <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::AppearsInFromClause</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod::table</span><span class="op">&gt;</span>
+                <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left_mod::table</span>
             {
-                <span class="kw">type</span> <span class="ident">Count</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">query_source</span>::<span class="ident">Never</span>;
+                <span class="kw">type</span> <span class="ident">Count</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::query_source::Never</span>;
             }
         )<span class="op">+</span>
-        <span class="macro">allow_tables_to_appear_in_same_query</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod</span>,)<span class="op">+</span>);
+        <span class="macro">allow_tables_to_appear_in_same_query!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">right_mod</span>,)<span class="op">+</span>);
     };
 
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">last_table</span>:<span class="ident">ident</span>,) <span class="op">=</span><span class="op">&gt;</span> {};
@@ -2277,11 +2277,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is used by `FromSql` implementations.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">not_none</span> {
+<span class="macro">macro_rules!</span> <span class="ident">not_none</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span> {
             <span class="prelude-val">Some</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">result</span>::<span class="ident">UnexpectedNullError</span>)),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::result::UnexpectedNullError</span>)),
         }
     };
 }
@@ -2303,7 +2303,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">table</span><span class="macro">!</span> {
+    <span class="macro">table!</span> {
         <span class="ident">foo</span>.<span class="ident">bars</span> {
             <span class="ident">id</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Integer</span>,
             <span class="ident">baz</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Text</span>,
@@ -2315,9 +2315,9 @@
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MyCustomType</span>;
     }
 
-    <span class="macro">table</span><span class="macro">!</span> {
+    <span class="macro">table!</span> {
         <span class="kw">use</span> <span class="ident">sql_types</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">macros</span>::<span class="ident">tests</span>::<span class="ident">my_types</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">macros::tests::my_types</span>::<span class="kw-2">*</span>;
 
         <span class="ident">table_with_custom_types</span> {
             <span class="ident">id</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Integer</span>,
@@ -2325,9 +2325,9 @@
         }
     }
 
-    <span class="macro">table</span><span class="macro">!</span> {
+    <span class="macro">table!</span> {
         <span class="kw">use</span> <span class="ident">sql_types</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">macros</span>::<span class="ident">tests</span>::<span class="ident">my_types</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">macros::tests::my_types</span>::<span class="kw-2">*</span>;
 
         <span class="doccomment">/// Table documentation</span>
         <span class="doccomment">///</span>
@@ -2344,21 +2344,21 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgres&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_with_custom_schema</span>() {
-        <span class="kw">use</span> <span class="ident">pg</span>::<span class="ident">Pg</span>;
+        <span class="kw">use</span> <span class="ident">pg::Pg</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span> <span class="string">r#&quot;SELECT &quot;foo&quot;.&quot;bars&quot;.&quot;baz&quot; FROM &quot;foo&quot;.&quot;bars&quot; -- binds: []&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            <span class="kw-2">&amp;</span>::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Pg</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bars</span>::<span class="ident">table</span>.<span class="ident">select</span>(<span class="ident">bars</span>::<span class="ident">baz</span>)).<span class="ident">to_string</span>()
+            <span class="kw-2">&amp;</span><span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Pg</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bars::table</span>.<span class="ident">select</span>(<span class="ident">bars::baz</span>)).<span class="ident">to_string</span>()
         );
     }
 
-    <span class="macro">table</span><span class="macro">!</span> {
+    <span class="macro">table!</span> {
         <span class="kw">use</span> <span class="ident">sql_types</span>;
         <span class="kw">use</span> <span class="ident">sql_types</span>::<span class="kw-2">*</span>;
 
         <span class="ident">table_with_arbitrarily_complex_types</span> {
-            <span class="ident">id</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sql_types</span>::<span class="ident">Integer</span>,
-            <span class="ident">qualified_nullable</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sql_types</span>::<span class="ident">Nullable</span><span class="op">&lt;</span><span class="ident">sql_types</span>::<span class="ident">Integer</span><span class="op">&gt;</span>,
+            <span class="ident">id</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sql_types::Integer</span>,
+            <span class="ident">qualified_nullable</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sql_types::Nullable</span><span class="op">&lt;</span><span class="ident">sql_types::Integer</span><span class="op">&gt;</span>,
             <span class="ident">deeply_nested_type</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nullable</span><span class="op">&lt;</span><span class="ident">Integer</span><span class="op">&gt;</span><span class="op">&gt;</span>,
             <span class="comment">// This actually should work, but there appears to be a rustc bug</span>
             <span class="comment">// on the `AsExpression` bound for `EqAll` when the ty param is a projection</span>
@@ -2367,7 +2367,7 @@
         }
     }
 
-    <span class="macro">table</span><span class="macro">!</span>(
+    <span class="macro">table!</span>(
         <span class="ident">foo</span> {
             <span class="doccomment">/// Column doc</span>
             <span class="ident">id</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Integer</span>,
@@ -2385,40 +2385,40 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgres&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_with_column_renaming_postgres</span>() {
-        <span class="kw">use</span> <span class="ident">pg</span>::<span class="ident">Pg</span>;
+        <span class="kw">use</span> <span class="ident">pg::Pg</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span>
             <span class="string">r#&quot;SELECT &quot;foo&quot;.&quot;id&quot;, &quot;foo&quot;.&quot;type&quot;, &quot;foo&quot;.&quot;bleh&quot; FROM &quot;foo&quot; WHERE &quot;foo&quot;.&quot;type&quot; = $1 -- binds: [1]&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            ::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Pg</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">foo</span>::<span class="ident">table</span>.<span class="ident">filter</span>(<span class="ident">foo</span>::<span class="ident">mytype</span>.<span class="ident">eq</span>(<span class="number">1</span>))).<span class="ident">to_string</span>()
+            <span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Pg</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">foo::table</span>.<span class="ident">filter</span>(<span class="ident">foo::mytype</span>.<span class="ident">eq</span>(<span class="number">1</span>))).<span class="ident">to_string</span>()
         );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_with_column_renaming_mysql</span>() {
-        <span class="kw">use</span> <span class="ident">mysql</span>::<span class="ident">Mysql</span>;
+        <span class="kw">use</span> <span class="ident">mysql::Mysql</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span>
             <span class="string">r#&quot;SELECT `foo`.`id`, `foo`.`type`, `foo`.`bleh` FROM `foo` WHERE `foo`.`type` = ? -- binds: [1]&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            ::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Mysql</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">foo</span>::<span class="ident">table</span>.<span class="ident">filter</span>(<span class="ident">foo</span>::<span class="ident">mytype</span>.<span class="ident">eq</span>(<span class="number">1</span>))).<span class="ident">to_string</span>()
+            <span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Mysql</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">foo::table</span>.<span class="ident">filter</span>(<span class="ident">foo::mytype</span>.<span class="ident">eq</span>(<span class="number">1</span>))).<span class="ident">to_string</span>()
         );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_with_column_renaming_sqlite</span>() {
-        <span class="kw">use</span> <span class="ident">sqlite</span>::<span class="ident">Sqlite</span>;
+        <span class="kw">use</span> <span class="ident">sqlite::Sqlite</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span>
             <span class="string">r#&quot;SELECT `foo`.`id`, `foo`.`type`, `foo`.`bleh` FROM `foo` WHERE `foo`.`type` = ? -- binds: [1]&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            ::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">foo</span>::<span class="ident">table</span>.<span class="ident">filter</span>(<span class="ident">foo</span>::<span class="ident">mytype</span>.<span class="ident">eq</span>(<span class="number">1</span>))).<span class="ident">to_string</span>()
+            <span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">foo::table</span>.<span class="ident">filter</span>(<span class="ident">foo::mytype</span>.<span class="ident">eq</span>(<span class="number">1</span>))).<span class="ident">to_string</span>()
         );
     }
 
-    <span class="macro">table</span><span class="macro">!</span>(
+    <span class="macro">table!</span>(
         <span class="kw">use</span> <span class="ident">sql_types</span>::<span class="kw-2">*</span>;
 
         <span class="doccomment">/// Some documentation</span>
@@ -2432,36 +2432,36 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgres&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_renaming_postgres</span>() {
-        <span class="kw">use</span> <span class="ident">pg</span>::<span class="ident">Pg</span>;
+        <span class="kw">use</span> <span class="ident">pg::Pg</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span> <span class="string">r#&quot;SELECT &quot;mod&quot;.&quot;id&quot; FROM &quot;mod&quot; -- binds: []&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            ::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Pg</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bar</span>::<span class="ident">table</span>.<span class="ident">select</span>(<span class="ident">bar</span>::<span class="ident">id</span>)).<span class="ident">to_string</span>()
+            <span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Pg</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bar::table</span>.<span class="ident">select</span>(<span class="ident">bar::id</span>)).<span class="ident">to_string</span>()
         );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_renaming_mysql</span>() {
-        <span class="kw">use</span> <span class="ident">mysql</span>::<span class="ident">Mysql</span>;
+        <span class="kw">use</span> <span class="ident">mysql::Mysql</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span> <span class="string">r#&quot;SELECT `mod`.`id` FROM `mod` -- binds: []&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            ::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Mysql</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bar</span>::<span class="ident">table</span>.<span class="ident">select</span>(<span class="ident">bar</span>::<span class="ident">id</span>)).<span class="ident">to_string</span>()
+            <span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Mysql</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bar::table</span>.<span class="ident">select</span>(<span class="ident">bar::id</span>)).<span class="ident">to_string</span>()
         );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">table_renaming_sqlite</span>() {
-        <span class="kw">use</span> <span class="ident">sqlite</span>::<span class="ident">Sqlite</span>;
+        <span class="kw">use</span> <span class="ident">sqlite::Sqlite</span>;
         <span class="kw">let</span> <span class="ident">expected_sql</span> <span class="op">=</span> <span class="string">r#&quot;SELECT `mod`.`id` FROM `mod` -- binds: []&quot;#</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">expected_sql</span>,
-            ::<span class="ident">debug_query</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bar</span>::<span class="ident">table</span>.<span class="ident">select</span>(<span class="ident">bar</span>::<span class="ident">id</span>)).<span class="ident">to_string</span>()
+            <span class="ident">::debug_query</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bar::table</span>.<span class="ident">select</span>(<span class="ident">bar::id</span>)).<span class="ident">to_string</span>()
         );
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="diesel" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="diesel" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

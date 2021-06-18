@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/borrow-bag-1.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../borrow_bag/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../borrow_bag/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -133,7 +133,7 @@
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>, <span class="ident">deprecated</span>)]</span>
 <span class="comment">// Stricter requirements once we get to pull request stage, all warnings must be resolved.</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ci&quot;</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">should_implement_trait</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">warnings</span>))))]</span>
 <span class="comment">// TODO: Remove this when it&#39;s a hard error by default (error E0446).</span>
 <span class="comment">// See Rust issue #34537 &lt;https://github.com/rust-lang/rust/issues/34537&gt;</span>
@@ -143,9 +143,9 @@
 <span class="kw">mod</span> <span class="ident">handle</span>;
 <span class="kw">mod</span> <span class="ident">lookup</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">append</span>::<span class="ident">Append</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handle</span>::<span class="ident">Handle</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lookup</span>::<span class="ident">Lookup</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">append::Append</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handle::Handle</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lookup::Lookup</span>;
 
 <span class="doccomment">/// `BorrowBag` allows the storage of any value using `add(T)`, and returns a `Handle` which can be</span>
 <span class="doccomment">/// used to borrow the value back later. As the `BorrowBag` is add-only, `Handle` values remain</span>
@@ -218,11 +218,11 @@
     <span class="doccomment">/// ```</span>
     <span class="comment">// This isn&#39;t add like +..</span>
     <span class="comment">// Consider renaming this method?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BorrowBag</span><span class="op">&lt;</span><span class="ident">V</span>::<span class="ident">Output</span><span class="op">&gt;</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>::<span class="ident">Navigator</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BorrowBag</span><span class="op">&lt;</span><span class="ident">V::Output</span><span class="op">&gt;</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V::Navigator</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">Append</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> (<span class="ident">v</span>, <span class="ident">handle</span>) <span class="op">=</span> <span class="ident">Append</span>::<span class="ident">append</span>(<span class="self">self</span>.<span class="ident">v</span>, <span class="ident">t</span>);
+        <span class="kw">let</span> (<span class="ident">v</span>, <span class="ident">handle</span>) <span class="op">=</span> <span class="ident">Append::append</span>(<span class="self">self</span>.<span class="ident">v</span>, <span class="ident">t</span>);
         (<span class="ident">BorrowBag</span> { <span class="ident">v</span> }, <span class="ident">handle</span>)
     }
 
@@ -241,9 +241,9 @@
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">Lookup</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span>,
     {
-        <span class="ident">Lookup</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span>::<span class="ident">get_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">v</span>)
+        <span class="ident">Lookup</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="ident">::get_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">v</span>)
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="borrow_bag" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="borrow_bag" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

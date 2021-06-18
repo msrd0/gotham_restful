@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../gotham_restful/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../gotham_restful/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -531,7 +531,7 @@
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 <span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
 <span class="comment">// can we have a lint for spaces in doc comments please?</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">tabs_in_doc_comments</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::tabs_in_doc_comments</span>))]</span>
 <span class="comment">// intra-doc links only fully work when OpenAPI is enabled</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>), <span class="ident">allow</span>(<span class="ident">broken_intra_doc_links</span>))]</span>
@@ -962,10 +962,10 @@ struct Foo;
 */</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;without-openapi&quot;</span>))]</span>
-<span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;The &#39;openapi&#39; and &#39;without-openapi&#39; features cannot be combined&quot;</span>);
+<span class="macro">compile_error!</span>(<span class="string">&quot;The &#39;openapi&#39; and &#39;without-openapi&#39; features cannot be combined&quot;</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;without-openapi&quot;</span>)))]</span>
-<span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;Either the &#39;openapi&#39; or &#39;without-openapi&#39; feature needs to be enabled&quot;</span>);
+<span class="macro">compile_error!</span>(<span class="string">&quot;Either the &#39;openapi&#39; or &#39;without-openapi&#39; feature needs to be enabled&quot;</span>);
 
 <span class="comment">// weird proc macro issue</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">gotham_restful</span>;
@@ -986,23 +986,23 @@ struct Foo;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gotham</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mime</span>::<span class="ident">Mime</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mime::Mime</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gotham_restful_derive</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Not public API</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">private</span> {
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">routing</span>::<span class="ident">PathExtractor</span> <span class="kw">as</span> <span class="ident">IdPlaceholder</span>;
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::routing::PathExtractor</span> <span class="kw">as</span> <span class="ident">IdPlaceholder</span>;
 
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_util</span>::<span class="ident">future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 
 	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_json</span>;
 
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;database&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gotham_middleware_diesel</span>::<span class="ident">Repo</span>;
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gotham_middleware_diesel::Repo</span>;
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">indexmap</span>::<span class="ident">IndexMap</span>, <span class="ident">openapi</span>, <span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">indexmap::IndexMap</span>, <span class="ident">openapi</span>, <span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>)]</span>
@@ -1018,16 +1018,16 @@ struct Foo;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">openapi</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapi</span>::{<span class="ident">builder</span>::<span class="ident">OpenapiInfo</span>, <span class="ident">router</span>::<span class="ident">GetOpenapi</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">openapi</span>::{<span class="ident">builder::OpenapiInfo</span>, <span class="ident">router::GetOpenapi</span>};
 
 <span class="kw">mod</span> <span class="ident">endpoint</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">endpoint</span>::<span class="ident">EndpointWithSchema</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">endpoint::EndpointWithSchema</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">endpoint</span>::{<span class="ident">Endpoint</span>, <span class="ident">NoopExtractor</span>};
 
 <span class="kw">mod</span> <span class="ident">response</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">response</span>::{
-	<span class="ident">AuthError</span>, <span class="ident">AuthError</span>::<span class="ident">Forbidden</span>, <span class="ident">AuthErrorOrOther</span>, <span class="ident">AuthResult</span>, <span class="ident">AuthSuccess</span>, <span class="ident">IntoResponse</span>, <span class="ident">IntoResponseError</span>, <span class="ident">NoContent</span>,
+	<span class="ident">AuthError</span>, <span class="ident">AuthError::Forbidden</span>, <span class="ident">AuthErrorOrOther</span>, <span class="ident">AuthResult</span>, <span class="ident">AuthSuccess</span>, <span class="ident">IntoResponse</span>, <span class="ident">IntoResponseError</span>, <span class="ident">NoContent</span>,
 	<span class="ident">Raw</span>, <span class="ident">Redirect</span>, <span class="ident">Response</span>, <span class="ident">Success</span>
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
@@ -1053,5 +1053,5 @@ struct Foo;
 	<span class="kw">fn</span> <span class="ident">setup</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">route</span>: <span class="ident">D</span>);
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

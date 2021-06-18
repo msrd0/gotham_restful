@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/diesel-1.4.7/src/query_dsl/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../diesel/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../diesel/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1372,12 +1372,12 @@
 <span class="doccomment">//! [`QueryDsl`]: trait.QueryDsl.html</span>
 <span class="doccomment">//! [`RunQueryDsl`]: trait.RunQueryDsl.html</span>
 
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">Backend</span>;
-<span class="kw">use</span> <span class="ident">connection</span>::<span class="ident">Connection</span>;
-<span class="kw">use</span> <span class="ident">expression</span>::<span class="ident">count</span>::<span class="ident">CountStar</span>;
-<span class="kw">use</span> <span class="ident">expression</span>::<span class="ident">Expression</span>;
+<span class="kw">use</span> <span class="ident">backend::Backend</span>;
+<span class="kw">use</span> <span class="ident">connection::Connection</span>;
+<span class="kw">use</span> <span class="ident">expression::count::CountStar</span>;
+<span class="kw">use</span> <span class="ident">expression::Expression</span>;
 <span class="kw">use</span> <span class="ident">helper_types</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">query_builder</span>::<span class="ident">locking_clause</span> <span class="kw">as</span> <span class="ident">lock</span>;
+<span class="kw">use</span> <span class="ident">query_builder::locking_clause</span> <span class="kw">as</span> <span class="ident">lock</span>;
 <span class="kw">use</span> <span class="ident">query_source</span>::{<span class="ident">joins</span>, <span class="ident">Table</span>};
 <span class="kw">use</span> <span class="ident">result</span>::{<span class="ident">first_or_not_found</span>, <span class="ident">QueryResult</span>};
 
@@ -1402,13 +1402,13 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">select_dsl</span>;
 <span class="kw">mod</span> <span class="ident">single_value_dsl</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">belonging_to_dsl</span>::<span class="ident">BelongingToDsl</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::belonging_to_dsl::BelongingToDsl</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">group_by_dsl</span>::<span class="ident">GroupByDsl</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">join_dsl</span>::{<span class="ident">InternalJoinDsl</span>, <span class="ident">JoinOnDsl</span>, <span class="ident">JoinWithImplicitOnClause</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::group_by_dsl::GroupByDsl</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::join_dsl</span>::{<span class="ident">InternalJoinDsl</span>, <span class="ident">JoinOnDsl</span>, <span class="ident">JoinWithImplicitOnClause</span>};
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">load_dsl</span>::<span class="ident">LoadQuery</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">save_changes_dsl</span>::{<span class="ident">SaveChangesDsl</span>, <span class="ident">UpdateAndFetchResults</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::load_dsl::LoadQuery</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::save_changes_dsl</span>::{<span class="ident">SaveChangesDsl</span>, <span class="ident">UpdateAndFetchResults</span>};
 
 <span class="doccomment">/// The traits used by `QueryDsl`.</span>
 <span class="doccomment">///</span>
@@ -1417,21 +1417,21 @@
 <span class="doccomment">/// However, generic code may need to include a where clause that references</span>
 <span class="doccomment">/// these traits.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">methods</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">boxed_dsl</span>::<span class="ident">BoxedDsl</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">distinct_dsl</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::boxed_dsl::BoxedDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::distinct_dsl</span>::<span class="kw-2">*</span>;
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">filter_dsl</span>::<span class="kw-2">*</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">limit_dsl</span>::<span class="ident">LimitDsl</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">load_dsl</span>::{<span class="ident">ExecuteDsl</span>, <span class="ident">LoadQuery</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::filter_dsl</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::limit_dsl::LimitDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::load_dsl</span>::{<span class="ident">ExecuteDsl</span>, <span class="ident">LoadQuery</span>};
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-deprecated&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">locking_dsl</span>::<span class="ident">ForUpdateDsl</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">locking_dsl</span>::{<span class="ident">LockingDsl</span>, <span class="ident">ModifyLockDsl</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">nullable_select_dsl</span>::<span class="ident">SelectNullableDsl</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">offset_dsl</span>::<span class="ident">OffsetDsl</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">order_dsl</span>::{<span class="ident">OrderDsl</span>, <span class="ident">ThenOrderDsl</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">select_dsl</span>::<span class="ident">SelectDsl</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">single_value_dsl</span>::<span class="ident">SingleValueDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::locking_dsl::ForUpdateDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::locking_dsl</span>::{<span class="ident">LockingDsl</span>, <span class="ident">ModifyLockDsl</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::nullable_select_dsl::SelectNullableDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::offset_dsl::OffsetDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::order_dsl</span>::{<span class="ident">OrderDsl</span>, <span class="ident">ThenOrderDsl</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::select_dsl::SelectDsl</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::single_value_dsl::SingleValueDsl</span>;
 }
 
 <span class="doccomment">/// Methods used to construct select statements.</span>
@@ -1469,9 +1469,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">distinct</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Distinct</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">DistinctDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::DistinctDsl</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">DistinctDsl</span>::<span class="ident">distinct</span>(<span class="self">self</span>)
+        <span class="ident">methods::DistinctDsl::distinct</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Adds the `DISTINCT ON` clause to a query.</span>
@@ -1525,9 +1525,9 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgres&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">distinct_on</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">expr</span>: <span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DistinctOn</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Expr</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">DistinctOnDsl</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::DistinctOnDsl</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">DistinctOnDsl</span>::<span class="ident">distinct_on</span>(<span class="self">self</span>, <span class="ident">expr</span>)
+        <span class="ident">methods::DistinctOnDsl::distinct_on</span>(<span class="self">self</span>, <span class="ident">expr</span>)
     }
 
     <span class="comment">// FIXME: Needs usage example and doc rewrite</span>
@@ -1648,9 +1648,9 @@
     <span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">selection</span>: <span class="ident">Selection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Select</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Selection</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Selection</span>: <span class="ident">Expression</span>,
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">SelectDsl</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::SelectDsl</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">SelectDsl</span>::<span class="ident">select</span>(<span class="self">self</span>, <span class="ident">selection</span>)
+        <span class="ident">methods::SelectDsl::select</span>(<span class="self">self</span>, <span class="ident">selection</span>)
     }
 
     <span class="doccomment">/// Get the count of a query. This is equivalent to `.select(count_star())`</span>
@@ -1670,11 +1670,11 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Select</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">CountStar</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">SelectDsl</span><span class="op">&lt;</span><span class="ident">CountStar</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::SelectDsl</span><span class="op">&lt;</span><span class="ident">CountStar</span><span class="op">&gt;</span>,
     {
-        <span class="kw">use</span> <span class="ident">dsl</span>::<span class="ident">count_star</span>;
+        <span class="kw">use</span> <span class="ident">dsl::count_star</span>;
 
-        <span class="ident">QueryDsl</span>::<span class="ident">select</span>(<span class="self">self</span>, <span class="ident">count_star</span>())
+        <span class="ident">QueryDsl::select</span>(<span class="self">self</span>, <span class="ident">count_star</span>())
     }
 
     <span class="doccomment">/// Join two tables using a SQL `INNER JOIN`.</span>
@@ -1786,11 +1786,11 @@
     <span class="doccomment">/// assert_eq!(Ok(expected_data), data);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">inner_join</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">inner_join</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">JoinWithImplicitOnClause</span><span class="op">&lt;</span><span class="ident">Rhs</span>, <span class="ident">joins</span>::<span class="ident">Inner</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">JoinWithImplicitOnClause</span><span class="op">&lt;</span><span class="ident">Rhs</span>, <span class="ident">joins::Inner</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">join_with_implicit_on_clause</span>(<span class="ident">rhs</span>, <span class="ident">joins</span>::<span class="ident">Inner</span>)
+        <span class="self">self</span>.<span class="ident">join_with_implicit_on_clause</span>(<span class="ident">rhs</span>, <span class="ident">joins::Inner</span>)
     }
 
     <span class="doccomment">/// Join two tables using a SQL `LEFT OUTER JOIN`.</span>
@@ -1799,19 +1799,19 @@
     <span class="doccomment">/// instead. See [`inner_join`] for usage examples.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`inner_join`]: #method.inner_join</span>
-    <span class="kw">fn</span> <span class="ident">left_outer_join</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">left_outer_join</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">JoinWithImplicitOnClause</span><span class="op">&lt;</span><span class="ident">Rhs</span>, <span class="ident">joins</span>::<span class="ident">LeftOuter</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">JoinWithImplicitOnClause</span><span class="op">&lt;</span><span class="ident">Rhs</span>, <span class="ident">joins::LeftOuter</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">join_with_implicit_on_clause</span>(<span class="ident">rhs</span>, <span class="ident">joins</span>::<span class="ident">LeftOuter</span>)
+        <span class="self">self</span>.<span class="ident">join_with_implicit_on_clause</span>(<span class="ident">rhs</span>, <span class="ident">joins::LeftOuter</span>)
     }
 
     <span class="doccomment">/// Alias for [`left_outer_join`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`left_outer_join`]: #method.left_outer_join</span>
-    <span class="kw">fn</span> <span class="ident">left_join</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">left_join</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">JoinWithImplicitOnClause</span><span class="op">&lt;</span><span class="ident">Rhs</span>, <span class="ident">joins</span>::<span class="ident">LeftOuter</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">JoinWithImplicitOnClause</span><span class="op">&lt;</span><span class="ident">Rhs</span>, <span class="ident">joins::LeftOuter</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">left_outer_join</span>(<span class="ident">rhs</span>)
     }
@@ -1839,9 +1839,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">Predicate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Predicate</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">FilterDsl</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::FilterDsl</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">FilterDsl</span>::<span class="ident">filter</span>(<span class="self">self</span>, <span class="ident">predicate</span>)
+        <span class="ident">methods::FilterDsl::filter</span>(<span class="self">self</span>, <span class="ident">predicate</span>)
     }
 
     <span class="doccomment">/// Adds to the `WHERE` clause of a query using `OR`</span>
@@ -1888,9 +1888,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">or_filter</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">Predicate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OrFilter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Predicate</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">OrFilterDsl</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::OrFilterDsl</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">OrFilterDsl</span>::<span class="ident">or_filter</span>(<span class="self">self</span>, <span class="ident">predicate</span>)
+        <span class="ident">methods::OrFilterDsl::or_filter</span>(<span class="self">self</span>, <span class="ident">predicate</span>)
     }
 
     <span class="doccomment">/// Attempts to find a single record from the given table by primary key.</span>
@@ -1914,9 +1914,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">find</span><span class="op">&lt;</span><span class="ident">PK</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">id</span>: <span class="ident">PK</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Find</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">PK</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">FindDsl</span><span class="op">&lt;</span><span class="ident">PK</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::FindDsl</span><span class="op">&lt;</span><span class="ident">PK</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">FindDsl</span>::<span class="ident">find</span>(<span class="self">self</span>, <span class="ident">id</span>)
+        <span class="ident">methods::FindDsl::find</span>(<span class="self">self</span>, <span class="ident">id</span>)
     }
 
     <span class="doccomment">/// Sets the order clause of a query.</span>
@@ -1977,18 +1977,18 @@
     <span class="kw">fn</span> <span class="ident">order</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">expr</span>: <span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Expr</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Expr</span>: <span class="ident">Expression</span>,
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">OrderDsl</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::OrderDsl</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">OrderDsl</span>::<span class="ident">order</span>(<span class="self">self</span>, <span class="ident">expr</span>)
+        <span class="ident">methods::OrderDsl::order</span>(<span class="self">self</span>, <span class="ident">expr</span>)
     }
 
     <span class="doccomment">/// Alias for `order`</span>
     <span class="kw">fn</span> <span class="ident">order_by</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">expr</span>: <span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Expr</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Expr</span>: <span class="ident">Expression</span>,
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">OrderDsl</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::OrderDsl</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
     {
-        <span class="ident">QueryDsl</span>::<span class="ident">order</span>(<span class="self">self</span>, <span class="ident">expr</span>)
+        <span class="ident">QueryDsl::order</span>(<span class="self">self</span>, <span class="ident">expr</span>)
     }
 
     <span class="doccomment">/// Appends to the `ORDER BY` clause of this SQL query.</span>
@@ -2039,9 +2039,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">then_order_by</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Order</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ThenOrderBy</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Order</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">ThenOrderDsl</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::ThenOrderDsl</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">ThenOrderDsl</span>::<span class="ident">then_order_by</span>(<span class="self">self</span>, <span class="ident">order</span>)
+        <span class="ident">methods::ThenOrderDsl::then_order_by</span>(<span class="self">self</span>, <span class="ident">order</span>)
     }
 
     <span class="doccomment">/// Sets the limit clause of the query.</span>
@@ -2089,9 +2089,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">limit</span>(<span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Limit</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">LimitDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::LimitDsl</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">LimitDsl</span>::<span class="ident">limit</span>(<span class="self">self</span>, <span class="ident">limit</span>)
+        <span class="ident">methods::LimitDsl::limit</span>(<span class="self">self</span>, <span class="ident">limit</span>)
     }
 
     <span class="doccomment">/// Sets the offset clause of the query.</span>
@@ -2141,9 +2141,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">offset</span>(<span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Offset</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">OffsetDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::OffsetDsl</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">OffsetDsl</span>::<span class="ident">offset</span>(<span class="self">self</span>, <span class="ident">offset</span>)
+        <span class="ident">methods::OffsetDsl::offset</span>(<span class="self">self</span>, <span class="ident">offset</span>)
     }
 
     <span class="doccomment">/// Adds `FOR UPDATE` to the end of the select statement.</span>
@@ -2165,9 +2165,9 @@
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="kw">fn</span> <span class="ident">for_update</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForUpdate</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">ForUpdateDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::ForUpdateDsl</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">ForUpdateDsl</span>::<span class="ident">for_update</span>(<span class="self">self</span>)
+        <span class="ident">methods::ForUpdateDsl::for_update</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Adds `FOR UPDATE` to the end of the select statement.</span>
@@ -2188,9 +2188,9 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-deprecated&quot;</span>))]</span>
     <span class="kw">fn</span> <span class="ident">for_update</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForUpdate</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">LockingDsl</span><span class="op">&lt;</span><span class="ident">lock</span>::<span class="ident">ForUpdate</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::LockingDsl</span><span class="op">&lt;</span><span class="ident">lock::ForUpdate</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">LockingDsl</span>::<span class="ident">with_lock</span>(<span class="self">self</span>, <span class="ident">lock</span>::<span class="ident">ForUpdate</span>)
+        <span class="ident">methods::LockingDsl::with_lock</span>(<span class="self">self</span>, <span class="ident">lock::ForUpdate</span>)
     }
 
     <span class="doccomment">/// Adds `FOR NO KEY UPDATE` to the end of the select statement.</span>
@@ -2211,9 +2211,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">for_no_key_update</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForNoKeyUpdate</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">LockingDsl</span><span class="op">&lt;</span><span class="ident">lock</span>::<span class="ident">ForNoKeyUpdate</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::LockingDsl</span><span class="op">&lt;</span><span class="ident">lock::ForNoKeyUpdate</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">LockingDsl</span>::<span class="ident">with_lock</span>(<span class="self">self</span>, <span class="ident">lock</span>::<span class="ident">ForNoKeyUpdate</span>)
+        <span class="ident">methods::LockingDsl::with_lock</span>(<span class="self">self</span>, <span class="ident">lock::ForNoKeyUpdate</span>)
     }
 
     <span class="doccomment">/// Adds `FOR SHARE` to the end of the select statement.</span>
@@ -2233,9 +2233,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">for_share</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForShare</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">LockingDsl</span><span class="op">&lt;</span><span class="ident">lock</span>::<span class="ident">ForShare</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::LockingDsl</span><span class="op">&lt;</span><span class="ident">lock::ForShare</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">LockingDsl</span>::<span class="ident">with_lock</span>(<span class="self">self</span>, <span class="ident">lock</span>::<span class="ident">ForShare</span>)
+        <span class="ident">methods::LockingDsl::with_lock</span>(<span class="self">self</span>, <span class="ident">lock::ForShare</span>)
     }
 
     <span class="doccomment">/// Adds `FOR KEY SHARE` to the end of the select statement.</span>
@@ -2256,9 +2256,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">for_key_share</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ForKeyShare</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">LockingDsl</span><span class="op">&lt;</span><span class="ident">lock</span>::<span class="ident">ForKeyShare</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::LockingDsl</span><span class="op">&lt;</span><span class="ident">lock::ForKeyShare</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">LockingDsl</span>::<span class="ident">with_lock</span>(<span class="self">self</span>, <span class="ident">lock</span>::<span class="ident">ForKeyShare</span>)
+        <span class="ident">methods::LockingDsl::with_lock</span>(<span class="self">self</span>, <span class="ident">lock::ForKeyShare</span>)
     }
 
     <span class="doccomment">/// Adds `SKIP LOCKED` to the end of a `FOR UPDATE` clause.</span>
@@ -2273,9 +2273,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">skip_locked</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SkipLocked</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">ModifyLockDsl</span><span class="op">&lt;</span><span class="ident">lock</span>::<span class="ident">SkipLocked</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::ModifyLockDsl</span><span class="op">&lt;</span><span class="ident">lock::SkipLocked</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">ModifyLockDsl</span>::<span class="ident">modify_lock</span>(<span class="self">self</span>, <span class="ident">lock</span>::<span class="ident">SkipLocked</span>)
+        <span class="ident">methods::ModifyLockDsl::modify_lock</span>(<span class="self">self</span>, <span class="ident">lock::SkipLocked</span>)
     }
 
     <span class="doccomment">/// Adds `NOWAIT` to the end of a `FOR UPDATE` clause.</span>
@@ -2290,9 +2290,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">no_wait</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NoWait</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">ModifyLockDsl</span><span class="op">&lt;</span><span class="ident">lock</span>::<span class="ident">NoWait</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::ModifyLockDsl</span><span class="op">&lt;</span><span class="ident">lock::NoWait</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">ModifyLockDsl</span>::<span class="ident">modify_lock</span>(<span class="self">self</span>, <span class="ident">lock</span>::<span class="ident">NoWait</span>)
+        <span class="ident">methods::ModifyLockDsl::modify_lock</span>(<span class="self">self</span>, <span class="ident">lock::NoWait</span>)
     }
 
     <span class="doccomment">/// Boxes the pieces of a query into a single type.</span>
@@ -2357,9 +2357,9 @@
     <span class="kw">fn</span> <span class="ident">into_boxed</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">DB</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntoBoxed</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span>, <span class="ident">DB</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">DB</span>: <span class="ident">Backend</span>,
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">BoxedDsl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">DB</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::BoxedDsl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">DB</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">BoxedDsl</span>::<span class="ident">internal_into_boxed</span>(<span class="self">self</span>)
+        <span class="ident">methods::BoxedDsl::internal_into_boxed</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Wraps this select statement in parenthesis, allowing it to be used</span>
@@ -2402,9 +2402,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">single_value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SingleValue</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">SingleValueDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::SingleValueDsl</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">SingleValueDsl</span>::<span class="ident">single_value</span>(<span class="self">self</span>)
+        <span class="ident">methods::SingleValueDsl::single_value</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Coerce the SQL type of the select clause to it&#39;s nullable equivalent.</span>
@@ -2443,9 +2443,9 @@
     <span class="doccomment">/// # }</span>
     <span class="kw">fn</span> <span class="ident">nullable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NullableSelect</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">SelectNullableDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::SelectNullableDsl</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">SelectNullableDsl</span>::<span class="ident">nullable</span>(<span class="self">self</span>)
+        <span class="ident">methods::SelectNullableDsl::nullable</span>(<span class="self">self</span>)
     }
 }
 
@@ -2491,9 +2491,9 @@
     <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Conn</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Conn</span>: <span class="ident">Connection</span>,
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">ExecuteDsl</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">methods::ExecuteDsl</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">ExecuteDsl</span>::<span class="ident">execute</span>(<span class="self">self</span>, <span class="ident">conn</span>)
+        <span class="ident">methods::ExecuteDsl::execute</span>(<span class="self">self</span>, <span class="ident">conn</span>)
     }
 
     <span class="doccomment">/// Executes the given query, returning a `Vec` with the returned rows.</span>
@@ -2698,10 +2698,10 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">first</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Conn</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">methods</span>::<span class="ident">LimitDsl</span>,
+        <span class="self">Self</span>: <span class="ident">methods::LimitDsl</span>,
         <span class="ident">Limit</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>: <span class="ident">LoadQuery</span><span class="op">&lt;</span><span class="ident">Conn</span>, <span class="ident">U</span><span class="op">&gt;</span>,
     {
-        <span class="ident">methods</span>::<span class="ident">LimitDsl</span>::<span class="ident">limit</span>(<span class="self">self</span>, <span class="number">1</span>).<span class="ident">get_result</span>(<span class="ident">conn</span>)
+        <span class="ident">methods::LimitDsl::limit</span>(<span class="self">self</span>, <span class="number">1</span>).<span class="ident">get_result</span>(<span class="ident">conn</span>)
     }
 }
 
@@ -2713,5 +2713,5 @@
 <span class="comment">// part of their query is wrong.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Conn</span><span class="op">&gt;</span> <span class="ident">RunQueryDsl</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Table</span> {}
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="diesel" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="diesel" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

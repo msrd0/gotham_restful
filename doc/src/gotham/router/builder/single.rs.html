@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gotham-0.6.0/src/router/builder/single.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>single.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -683,26 +683,26 @@
 <span id="680">680</span>
 <span id="681">681</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">Body</span>;
+<span class="kw">use</span> <span class="ident">hyper::Body</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">panic</span>::<span class="ident">RefUnwindSafe</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
+<span class="kw">use</span> <span class="ident">std::panic::RefUnwindSafe</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">extractor</span>::{<span class="ident">PathExtractor</span>, <span class="ident">QueryStringExtractor</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">handler</span>::<span class="ident">assets</span>::{<span class="ident">DirHandler</span>, <span class="ident">FileHandler</span>, <span class="ident">FileOptions</span>, <span class="ident">FilePathExtractor</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">handler</span>::{
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::extractor</span>::{<span class="ident">PathExtractor</span>, <span class="ident">QueryStringExtractor</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::handler::assets</span>::{<span class="ident">DirHandler</span>, <span class="ident">FileHandler</span>, <span class="ident">FileOptions</span>, <span class="ident">FilePathExtractor</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::handler</span>::{
     <span class="ident">Handler</span>, <span class="ident">HandlerError</span>, <span class="ident">HandlerFuture</span>, <span class="ident">HandlerResult</span>, <span class="ident">IntoResponse</span>, <span class="ident">NewHandler</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">pipeline</span>::<span class="ident">chain</span>::<span class="ident">PipelineHandleChain</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">builder</span>::{
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::pipeline::chain::PipelineHandleChain</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::builder</span>::{
     <span class="ident">ExtendRouteMatcher</span>, <span class="ident">ReplacePathExtractor</span>, <span class="ident">ReplaceQueryStringExtractor</span>, <span class="ident">SingleRouteBuilder</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">route</span>::<span class="ident">dispatch</span>::<span class="ident">DispatcherImpl</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">route</span>::<span class="ident">matcher</span>::<span class="ident">RouteMatcher</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">route</span>::{<span class="ident">Delegation</span>, <span class="ident">Extractors</span>, <span class="ident">RouteImpl</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">state</span>::<span class="ident">State</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">future</span>::<span class="ident">Future</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">FutureExt</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::route::dispatch::DispatcherImpl</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::route::matcher::RouteMatcher</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::route</span>::{<span class="ident">Delegation</span>, <span class="ident">Extractors</span>, <span class="ident">RouteImpl</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::state::State</span>;
+<span class="kw">use</span> <span class="ident">core::future::Future</span>;
+<span class="kw">use</span> <span class="ident">futures::FutureExt</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HandlerMarker</span> {
     <span class="kw">fn</span> <span class="ident">call_and_wrap</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span>;
@@ -710,15 +710,15 @@
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsyncHandlerFn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Res</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
-    <span class="kw">type</span> <span class="ident">Fut</span>: <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Res</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Fut</span>;
+    <span class="kw">type</span> <span class="ident">Fut</span>: <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Res</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Fut</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Fut</span>, <span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">AsyncHandlerFn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fut</span>,
     <span class="ident">R</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">Fut</span>: <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="ident">Fut</span>: <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">type</span> <span class="ident">Res</span> <span class="op">=</span> <span class="ident">R</span>;
     <span class="kw">type</span> <span class="ident">Fut</span> <span class="op">=</span> <span class="ident">Fut</span>;
@@ -1052,11 +1052,11 @@
     <span class="kw">fn</span> <span class="ident">to_dir</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">options</span>: <span class="ident">P</span>)
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">ReplacePathExtractor</span><span class="op">&lt;</span><span class="ident">FilePathExtractor</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sized</span>,
-        <span class="self">Self</span>::<span class="ident">Output</span>: <span class="ident">DefineSingleRoute</span>,
+        <span class="self">Self</span><span class="ident">::Output</span>: <span class="ident">DefineSingleRoute</span>,
         <span class="ident">FileOptions</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">with_path_extractor</span>::<span class="op">&lt;</span><span class="ident">FilePathExtractor</span><span class="op">&gt;</span>()
-            .<span class="ident">to_new_handler</span>(<span class="ident">DirHandler</span>::<span class="ident">new</span>(<span class="ident">options</span>));
+            .<span class="ident">to_new_handler</span>(<span class="ident">DirHandler::new</span>(<span class="ident">options</span>));
     }
 
     <span class="doccomment">/// Directs the route to serve a single static file from the given path.</span>
@@ -1100,7 +1100,7 @@
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">FileOptions</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">to_new_handler</span>(<span class="ident">FileHandler</span>::<span class="ident">new</span>(<span class="ident">options</span>));
+        <span class="self">self</span>.<span class="ident">to_new_handler</span>(<span class="ident">FileHandler::new</span>(<span class="ident">options</span>));
     }
 
     <span class="doccomment">/// Applies a `PathExtractor` type to the current route, to extract path parameters into</span>
@@ -1166,11 +1166,11 @@
     <span class="doccomment">/// #   assert_eq!(response.status(), StatusCode::ACCEPTED);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">with_path_extractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplacePathExtractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">with_path_extractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplacePathExtractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
     <span class="kw">where</span>
         <span class="ident">NPE</span>: <span class="ident">PathExtractor</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="self">Self</span>: <span class="ident">ReplacePathExtractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span>,
-        <span class="self">Self</span>::<span class="ident">Output</span>: <span class="ident">DefineSingleRoute</span>;
+        <span class="self">Self</span><span class="ident">::Output</span>: <span class="ident">DefineSingleRoute</span>;
 
     <span class="doccomment">/// Applies a `QueryStringExtractor` type to the current route, to extract query parameters into</span>
     <span class="doccomment">/// `State` with the given type.</span>
@@ -1236,11 +1236,11 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">with_query_string_extractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplaceQueryStringExtractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplaceQueryStringExtractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
     <span class="kw">where</span>
         <span class="ident">NQSE</span>: <span class="ident">QueryStringExtractor</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="self">Self</span>: <span class="ident">ReplaceQueryStringExtractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span>,
-        <span class="self">Self</span>::<span class="ident">Output</span>: <span class="ident">DefineSingleRoute</span>;
+        <span class="self">Self</span><span class="ident">::Output</span>: <span class="ident">DefineSingleRoute</span>;
 
     <span class="doccomment">/// Adds additional `RouteMatcher` requirements to the current route.</span>
     <span class="doccomment">///</span>
@@ -1288,11 +1288,11 @@
     <span class="doccomment">/// #   assert_eq!(response.status(), StatusCode::NOT_ACCEPTABLE);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">add_route_matcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">matcher</span>: <span class="ident">NRM</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ExtendRouteMatcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">add_route_matcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">matcher</span>: <span class="ident">NRM</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ExtendRouteMatcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
     <span class="kw">where</span>
         <span class="ident">NRM</span>: <span class="ident">RouteMatcher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="self">Self</span>: <span class="ident">ExtendRouteMatcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span>,
-        <span class="self">Self</span>::<span class="ident">Output</span>: <span class="ident">DefineSingleRoute</span>;
+        <span class="self">Self</span><span class="ident">::Output</span>: <span class="ident">DefineSingleRoute</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">C</span>, <span class="ident">P</span>, <span class="ident">PE</span>, <span class="ident">QSE</span><span class="op">&gt;</span> <span class="ident">DefineSingleRoute</span> <span class="kw">for</span> <span class="ident">SingleRouteBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">C</span>, <span class="ident">P</span>, <span class="ident">PE</span>, <span class="ident">QSE</span><span class="op">&gt;</span>
@@ -1331,17 +1331,17 @@
     <span class="kw">where</span>
         <span class="ident">NH</span>: <span class="ident">NewHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">DispatcherImpl</span>::<span class="ident">new</span>(<span class="ident">new_handler</span>, <span class="self">self</span>.<span class="ident">pipeline_chain</span>, <span class="self">self</span>.<span class="ident">pipelines</span>);
-        <span class="kw">let</span> <span class="ident">route</span>: <span class="ident">RouteImpl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">PE</span>, <span class="ident">QSE</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RouteImpl</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">DispatcherImpl::new</span>(<span class="ident">new_handler</span>, <span class="self">self</span>.<span class="ident">pipeline_chain</span>, <span class="self">self</span>.<span class="ident">pipelines</span>);
+        <span class="kw">let</span> <span class="ident">route</span>: <span class="ident">RouteImpl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">PE</span>, <span class="ident">QSE</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RouteImpl::new</span>(
             <span class="self">self</span>.<span class="ident">matcher</span>,
-            <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">dispatcher</span>),
-            <span class="ident">Extractors</span>::<span class="ident">new</span>(),
-            <span class="ident">Delegation</span>::<span class="ident">Internal</span>,
+            <span class="ident">Box::new</span>(<span class="ident">dispatcher</span>),
+            <span class="ident">Extractors::new</span>(),
+            <span class="ident">Delegation::Internal</span>,
         );
-        <span class="self">self</span>.<span class="ident">node_builder</span>.<span class="ident">add_route</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">route</span>));
+        <span class="self">self</span>.<span class="ident">node_builder</span>.<span class="ident">add_route</span>(<span class="ident">Box::new</span>(<span class="ident">route</span>));
     }
 
-    <span class="kw">fn</span> <span class="ident">with_path_extractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplacePathExtractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">with_path_extractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplacePathExtractor</span><span class="op">&lt;</span><span class="ident">NPE</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
     <span class="kw">where</span>
         <span class="ident">NPE</span>: <span class="ident">PathExtractor</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1350,14 +1350,14 @@
 
     <span class="kw">fn</span> <span class="ident">with_query_string_extractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplaceQueryStringExtractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ReplaceQueryStringExtractor</span><span class="op">&lt;</span><span class="ident">NQSE</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
     <span class="kw">where</span>
         <span class="ident">NQSE</span>: <span class="ident">QueryStringExtractor</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">replace_query_string_extractor</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">add_route_matcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">matcher</span>: <span class="ident">NRM</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ExtendRouteMatcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>
+    <span class="kw">fn</span> <span class="ident">add_route_matcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">matcher</span>: <span class="ident">NRM</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ExtendRouteMatcher</span><span class="op">&lt;</span><span class="ident">NRM</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
     <span class="kw">where</span>
         <span class="ident">NRM</span>: <span class="ident">RouteMatcher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1365,5 +1365,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham" data-search-js="../../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>

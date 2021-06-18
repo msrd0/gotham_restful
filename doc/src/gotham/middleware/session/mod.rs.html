@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gotham-0.6.0/src/middleware/session/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1231,34 +1231,34 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Defines a session middleware with a pluggable backend.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">panic</span>::<span class="ident">RefUnwindSafe</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">PoisonError</span>};
+<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
+<span class="kw">use</span> <span class="ident">std::panic::RefUnwindSafe</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">PoisonError</span>};
 
 <span class="kw">use</span> <span class="ident">base64</span>;
 <span class="kw">use</span> <span class="ident">bincode</span>;
 <span class="kw">use</span> <span class="ident">cookie</span>::{<span class="ident">Cookie</span>, <span class="ident">CookieJar</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">header</span>::<span class="ident">SET_COOKIE</span>;
+<span class="kw">use</span> <span class="ident">futures::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">hyper::header::SET_COOKIE</span>;
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>};
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">error</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">RngCore</span>;
+<span class="kw">use</span> <span class="ident">rand::RngCore</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">cookie</span>::<span class="ident">CookieParser</span>;
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::cookie::CookieParser</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Middleware</span>, <span class="ident">NewMiddleware</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">handler</span>::{<span class="ident">HandlerError</span>, <span class="ident">HandlerFuture</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">helpers</span>::<span class="ident">http</span>::<span class="ident">response</span>::<span class="ident">create_empty_response</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">state</span>::{<span class="self">self</span>, <span class="ident">FromState</span>, <span class="ident">State</span>, <span class="ident">StateData</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::handler</span>::{<span class="ident">HandlerError</span>, <span class="ident">HandlerFuture</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::helpers::http::response::create_empty_response</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::state</span>::{<span class="self">self</span>, <span class="ident">FromState</span>, <span class="ident">State</span>, <span class="ident">StateData</span>};
 
 <span class="kw">mod</span> <span class="ident">backend</span>;
 <span class="kw">mod</span> <span class="ident">rng</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">backend</span>::<span class="ident">memory</span>::<span class="ident">MemoryBackend</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">backend</span>::{<span class="ident">Backend</span>, <span class="ident">NewBackend</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::backend::memory::MemoryBackend</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::backend</span>::{<span class="ident">Backend</span>, <span class="ident">NewBackend</span>};
 
 <span class="kw">const</span> <span class="ident">SECURE_COOKIE_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;__Secure-&quot;</span>;
 <span class="kw">const</span> <span class="ident">HOST_COOKIE_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;__Host-&quot;</span>;
@@ -1321,7 +1321,7 @@
             <span class="ident">name</span>: <span class="string">&quot;_gotham_session&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">secure</span>: <span class="bool-val">true</span>,
             <span class="ident">http_only</span>: <span class="bool-val">true</span>,
-            <span class="ident">same_site</span>: <span class="ident">SameSiteEnforcement</span>::<span class="ident">Lax</span>,
+            <span class="ident">same_site</span>: <span class="ident">SameSiteEnforcement::Lax</span>,
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">path</span>: <span class="string">&quot;/&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -1331,7 +1331,7 @@
 <span class="kw">impl</span> <span class="ident">SessionCookieConfig</span> {
     <span class="kw">fn</span> <span class="ident">to_cookie_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="comment">// Ensure this is always enough to prevent re-allocs</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cookie_value</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">with_capacity</span>(<span class="number">255</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cookie_value</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">255</span>);
 
         <span class="ident">cookie_value</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>);
         <span class="ident">cookie_value</span>.<span class="ident">push</span>(<span class="string">&#39;=&#39;</span>);
@@ -1346,9 +1346,9 @@
         }
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">same_site</span> {
-            <span class="ident">SameSiteEnforcement</span>::<span class="ident">Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cookie_value</span>.<span class="ident">push_str</span>(<span class="string">&quot;; SameSite=Strict&quot;</span>),
-            <span class="ident">SameSiteEnforcement</span>::<span class="ident">Lax</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cookie_value</span>.<span class="ident">push_str</span>(<span class="string">&quot;; SameSite=Lax&quot;</span>),
-            <span class="ident">SameSiteEnforcement</span>::<span class="ident">Disabled</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="ident">SameSiteEnforcement::Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cookie_value</span>.<span class="ident">push_str</span>(<span class="string">&quot;; SameSite=Strict&quot;</span>),
+            <span class="ident">SameSiteEnforcement::Lax</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cookie_value</span>.<span class="ident">push_str</span>(<span class="string">&quot;; SameSite=Lax&quot;</span>),
+            <span class="ident">SameSiteEnforcement::Disabled</span> <span class="op">=</span><span class="op">&gt;</span> (),
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">domain</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">domain</span> {
@@ -1403,7 +1403,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">warn_overriding_attrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="macro">warn</span><span class="macro">!</span>(
+        <span class="macro">warn!</span>(
             <span class="string">&quot;{} prefix is used for cookie but {} attribute is not set correctly! This will be overridden. Cookie is: {:?}&quot;</span>,
             <span class="ident">prefix</span>, <span class="ident">attribute</span>, <span class="self">self</span>
         )
@@ -1532,14 +1532,14 @@
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Backend</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">SessionDataState</span>::<span class="ident">Dirty</span>; <span class="comment">// Always persist a new session</span>
-        <span class="kw">let</span> <span class="ident">cookie_state</span> <span class="op">=</span> <span class="ident">SessionCookieState</span>::<span class="ident">New</span>;
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">SessionDataState::Dirty</span>; <span class="comment">// Always persist a new session</span>
+        <span class="kw">let</span> <span class="ident">cookie_state</span> <span class="op">=</span> <span class="ident">SessionCookieState::New</span>;
         <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">random_identifier</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">middleware</span>.<span class="ident">backend</span>);
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">T::default</span>();
+        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">middleware</span>.<span class="ident">backend</span>);
         <span class="kw">let</span> <span class="ident">cookie_config</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">cookie_config</span>.<span class="ident">clone</span>();
 
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot; no existing session, assigning new identifier ({})&quot;</span>,
             <span class="ident">identifier</span>.<span class="ident">value</span>
         );
@@ -1563,17 +1563,17 @@
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Backend</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">cookie_state</span> <span class="op">=</span> <span class="ident">SessionCookieState</span>::<span class="ident">Existing</span>;
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">SessionDataState</span>::<span class="ident">Clean</span>;
+        <span class="kw">let</span> <span class="ident">cookie_state</span> <span class="op">=</span> <span class="ident">SessionCookieState::Existing</span>;
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">SessionDataState::Clean</span>;
 
         <span class="kw">match</span> <span class="ident">val</span> {
             <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>[..]) {
+                <span class="kw">match</span> <span class="ident">bincode::deserialize</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>[..]) {
                     <span class="prelude-val">Ok</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">middleware</span>.<span class="ident">backend</span>);
+                        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">middleware</span>.<span class="ident">backend</span>);
                         <span class="kw">let</span> <span class="ident">cookie_config</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">cookie_config</span>.<span class="ident">clone</span>();
 
-                        <span class="macro">trace</span><span class="macro">!</span>(
+                        <span class="macro">trace!</span>(
                             <span class="string">&quot; successfully deserialized session data ({})&quot;</span>,
                             <span class="ident">identifier</span>.<span class="ident">value</span>
                         );
@@ -1590,15 +1590,15 @@
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="comment">// This is most likely caused by the application changing their session</span>
                         <span class="comment">// struct but the backend not being purged of sessions.</span>
-                        <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="macro">warn!</span>(
                             <span class="string">&quot; failed to deserialize session data ({}), falling back to new session&quot;</span>,
                             <span class="ident">identifier</span>.<span class="ident">value</span>
                         );
-                        <span class="ident">SessionData</span>::<span class="ident">new</span>(<span class="ident">middleware</span>)
+                        <span class="ident">SessionData::new</span>(<span class="ident">middleware</span>)
                     }
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionData</span>::<span class="ident">new</span>(<span class="ident">middleware</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionData::new</span>(<span class="ident">middleware</span>),
         }
     }
 }
@@ -1624,7 +1624,7 @@
     <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Serialize</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">SessionDataState</span>::<span class="ident">Dirty</span>;
+        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">SessionDataState::Dirty</span>;
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">value</span>
     }
 }
@@ -1693,7 +1693,7 @@
     <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Serialize</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="ident">new_backend</span>: <span class="ident">B</span>,
-    <span class="ident">identifier_rng</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">rng</span>::<span class="ident">SessionIdentifierRng</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">identifier_rng</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">rng::SessionIdentifierRng</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">cookie_config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SessionCookieConfig</span><span class="op">&gt;</span>,
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SessionTypePhantom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -1707,7 +1707,7 @@
     <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Serialize</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="ident">backend</span>: <span class="ident">B</span>,
-    <span class="ident">identifier_rng</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">rng</span>::<span class="ident">SessionIdentifierRng</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">identifier_rng</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">rng::SessionIdentifierRng</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">cookie_config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SessionCookieConfig</span><span class="op">&gt;</span>,
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
@@ -1717,9 +1717,9 @@
     <span class="ident">B</span>: <span class="ident">NewBackend</span>,
     <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Serialize</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Instance</span> <span class="op">=</span> <span class="ident">SessionMiddleware</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Instance</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Instance</span> <span class="op">=</span> <span class="ident">SessionMiddleware</span><span class="op">&lt;</span><span class="ident">B::Instance</span>, <span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">new_middleware</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Instance</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new_middleware</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Instance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">new_backend</span>
             .<span class="ident">new_backend</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">backend</span><span class="op">|</span> <span class="ident">SessionMiddleware</span> {
@@ -1748,7 +1748,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NewSessionMiddleware</span><span class="op">&lt;</span><span class="ident">MemoryBackend</span>, ()<span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NewSessionMiddleware</span><span class="op">&lt;</span><span class="ident">MemoryBackend</span>, ()<span class="op">&gt;</span> {
-        <span class="ident">NewSessionMiddleware</span>::<span class="ident">new</span>(<span class="ident">MemoryBackend</span>::<span class="ident">default</span>())
+        <span class="ident">NewSessionMiddleware::new</span>(<span class="ident">MemoryBackend::default</span>())
     }
 }
 
@@ -1761,8 +1761,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">b</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NewSessionMiddleware</span><span class="op">&lt;</span><span class="ident">B</span>, ()<span class="op">&gt;</span> {
         <span class="ident">NewSessionMiddleware</span> {
             <span class="ident">new_backend</span>: <span class="ident">b</span>,
-            <span class="ident">identifier_rng</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">rng</span>::<span class="ident">session_identifier_rng</span>())),
-            <span class="ident">cookie_config</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">SessionCookieConfig</span>::<span class="ident">default</span>()),
+            <span class="ident">identifier_rng</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">rng::session_identifier_rng</span>())),
+            <span class="ident">cookie_config</span>: <span class="ident">Arc::new</span>(<span class="ident">SessionCookieConfig::default</span>()),
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
         }
     }
@@ -1778,7 +1778,7 @@
         <span class="ident">cookie_config</span>: <span class="ident">SessionCookieConfig</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NewSessionMiddleware</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">NewSessionMiddleware</span> {
-            <span class="ident">cookie_config</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">cookie_config</span>.<span class="ident">validate_prefix</span>()),
+            <span class="ident">cookie_config</span>: <span class="ident">Arc::new</span>(<span class="ident">cookie_config</span>.<span class="ident">validate_prefix</span>()),
             ..<span class="self">self</span>
         }
     }
@@ -1948,7 +1948,7 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_cross_site_usage</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NewSessionMiddleware</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cookie_config</span> <span class="op">=</span> <span class="ident">SessionCookieConfig</span> {
-            <span class="ident">same_site</span>: <span class="ident">SameSiteEnforcement</span>::<span class="ident">Disabled</span>,
+            <span class="ident">same_site</span>: <span class="ident">SameSiteEnforcement::Disabled</span>,
             ..(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cookie_config</span>).<span class="ident">clone</span>()
         };
         <span class="self">self</span>.<span class="ident">rebuild_new_session_middleware</span>(<span class="ident">cookie_config</span>)
@@ -1984,7 +1984,7 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_strict_same_site_enforcement</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NewSessionMiddleware</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cookie_config</span> <span class="op">=</span> <span class="ident">SessionCookieConfig</span> {
-            <span class="ident">same_site</span>: <span class="ident">SameSiteEnforcement</span>::<span class="ident">Strict</span>,
+            <span class="ident">same_site</span>: <span class="ident">SameSiteEnforcement::Strict</span>,
             ..(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cookie_config</span>).<span class="ident">clone</span>()
         };
         <span class="self">self</span>.<span class="ident">rebuild_new_session_middleware</span>(<span class="ident">cookie_config</span>)
@@ -2033,22 +2033,22 @@
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
         <span class="comment">// cookies might have been parsed already by middleware</span>
-        <span class="kw">let</span> <span class="ident">cookies</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">try_borrow_from</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
-            .<span class="ident">map</span>(<span class="ident">ToOwned</span>::<span class="ident">to_owned</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">CookieParser</span>::<span class="ident">from_state</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>));
+        <span class="kw">let</span> <span class="ident">cookies</span> <span class="op">=</span> <span class="ident">CookieJar::try_borrow_from</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
+            .<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">CookieParser::from_state</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>));
 
         <span class="kw">let</span> <span class="ident">session_identifier</span> <span class="op">=</span> <span class="ident">cookies</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cookie_config</span>.<span class="ident">name</span>)
-            .<span class="ident">map</span>(<span class="ident">Cookie</span>::<span class="ident">value</span>)
+            .<span class="ident">map</span>(<span class="ident">Cookie::value</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">SessionIdentifier</span> {
                 <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">to_owned</span>(),
             });
 
         <span class="kw">match</span> <span class="ident">session_identifier</span> {
             <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="macro">trace!</span>(
                     <span class="string">&quot;[{}] SessionIdentifier {} found in cookie from user-agent&quot;</span>,
-                    <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+                    <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
                     <span class="ident">id</span>.<span class="ident">value</span>
                 );
 
@@ -2060,9 +2060,9 @@
                     .<span class="ident">boxed</span>()
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="macro">trace!</span>(
                     <span class="string">&quot;[{}] No SessionIdentifier found in cookie from user-agent&quot;</span>,
-                    <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+                    <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
                 );
 
                 <span class="self">self</span>.<span class="ident">new_session</span>(<span class="ident">state</span>)
@@ -2085,11 +2085,11 @@
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">identifier_rng</span>.<span class="ident">lock</span>() {
             <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">rng</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rng</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PoisonError</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;identifier_rng lock poisoned. Rng panicked?&quot;</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">PoisonError</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;identifier_rng lock poisoned. Rng panicked?&quot;</span>),
         };
 
         <span class="ident">SessionIdentifier</span> {
-            <span class="ident">value</span>: <span class="ident">base64</span>::<span class="ident">encode_config</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..], <span class="ident">base64</span>::<span class="ident">URL_SAFE_NO_PAD</span>),
+            <span class="ident">value</span>: <span class="ident">base64::encode_config</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..], <span class="ident">base64::URL_SAFE_NO_PAD</span>),
         }
     }
 }
@@ -2102,36 +2102,36 @@
 {
     <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">try_take</span>::<span class="op">&lt;</span><span class="ident">SessionDropData</span><span class="op">&gt;</span>() {
         <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session_drop_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(
+            <span class="macro">trace!</span>(
                 <span class="string">&quot;[{}] SessionDropData found in state, removing session cookie from user agent&quot;</span>,
-                <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
+                <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
             );
             <span class="ident">reset_cookie</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">response</span>, <span class="ident">session_drop_data</span>);
-            <span class="kw">return</span> <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">right_future</span>();
+            <span class="kw">return</span> <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">right_future</span>();
         }
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(
+            <span class="macro">trace!</span>(
                 <span class="string">&quot;[{}] SessionDropData is not present, retaining session cookie&quot;</span>,
-                <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
+                <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
             );
         }
     }
 
     <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">try_take</span>::<span class="op">&lt;</span><span class="ident">SessionData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
         <span class="prelude-val">Some</span>(<span class="ident">session_data</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SessionCookieState</span>::<span class="ident">New</span> <span class="op">=</span> <span class="ident">session_data</span>.<span class="ident">cookie_state</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SessionCookieState::New</span> <span class="op">=</span> <span class="ident">session_data</span>.<span class="ident">cookie_state</span> {
                 <span class="ident">send_cookie</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">response</span>, <span class="kw-2">&amp;</span><span class="ident">session_data</span>);
             }
 
             <span class="kw">match</span> <span class="ident">session_data</span>.<span class="ident">state</span> {
-                <span class="ident">SessionDataState</span>::<span class="ident">Dirty</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">SessionDataState::Dirty</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="ident">write_session</span>(<span class="ident">state</span>, <span class="ident">response</span>, <span class="ident">session_data</span>).<span class="ident">left_future</span>()
                 }
-                <span class="ident">SessionDataState</span>::<span class="ident">Clean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">right_future</span>(),
+                <span class="ident">SessionDataState::Clean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">right_future</span>(),
             }
         }
         <span class="comment">// Session was discarded with `SessionData::discard`, or otherwise removed</span>
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">right_future</span>(),
+        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>)).<span class="ident">right_future</span>(),
     }
 }
 
@@ -2149,7 +2149,7 @@
     <span class="kw">let</span> <span class="ident">cookie_string</span> <span class="op">=</span> <span class="ident">session_drop_data</span>
         .<span class="ident">cookie_config</span>
         .<span class="ident">to_cookie_string</span>(<span class="string">&quot;discarded&quot;</span>);
-    <span class="kw">let</span> <span class="ident">cookie_string</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(
+    <span class="kw">let</span> <span class="ident">cookie_string</span> <span class="op">=</span> <span class="macro">format!</span>(
         <span class="string">&quot;{}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0&quot;</span>,
         <span class="ident">cookie_string</span>
     );
@@ -2170,18 +2170,18 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Serialize</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">session_data</span>.<span class="ident">value</span>) {
+    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">session_data</span>.<span class="ident">value</span>) {
         <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>,
         <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="macro">error</span><span class="macro">!</span>(
+            <span class="macro">error!</span>(
                 <span class="string">&quot;[{}] failed to serialize session: {:?}&quot;</span>,
-                <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+                <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
                 <span class="ident">e</span>
             );
 
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode</span>::<span class="ident">INTERNAL_SERVER_ERROR</span>);
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>);
 
-            <span class="kw">return</span> <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>));
+            <span class="kw">return</span> <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>));
         }
     };
 
@@ -2194,18 +2194,18 @@
 
     <span class="kw">match</span> <span class="ident">result</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(
+            <span class="macro">trace!</span>(
                 <span class="string">&quot;[{}] persisted session ({}) successfully&quot;</span>,
-                <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+                <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
                 <span class="ident">identifier</span>.<span class="ident">value</span>
             );
 
-            <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>))
+            <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>))
         }
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode</span>::<span class="ident">INTERNAL_SERVER_ERROR</span>);
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>);
 
-            <span class="ident">future</span>::<span class="ident">ok</span>((<span class="ident">state</span>, <span class="ident">response</span>))
+            <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">response</span>))
         }
     }
 }
@@ -2223,32 +2223,32 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">State</span>, (<span class="ident">State</span>, <span class="ident">HandlerError</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">result</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="macro">trace!</span>(
                     <span class="string">&quot;[{}] got response for session ({}) from backend, data located: {}&quot;</span>,
-                    <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+                    <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
                     <span class="ident">identifier</span>.<span class="ident">value</span>,
                     <span class="ident">v</span>.<span class="ident">is_some</span>()
                 );
 
-                <span class="kw">let</span> <span class="ident">session_data</span> <span class="op">=</span> <span class="ident">SessionData</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">construct</span>(<span class="self">self</span>, <span class="ident">identifier</span>, <span class="ident">v</span>);
+                <span class="kw">let</span> <span class="ident">session_data</span> <span class="op">=</span> <span class="ident">SessionData</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::construct</span>(<span class="self">self</span>, <span class="ident">identifier</span>, <span class="ident">v</span>);
 
                 <span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">session_data</span>);
-                <span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">state</span>)
+                <span class="ident">future::ok</span>(<span class="ident">state</span>)
             }
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">error</span><span class="macro">!</span>(
+                <span class="macro">error!</span>(
                     <span class="string">&quot;[{}] failed to retrieve session ({}) from backend: {:?}&quot;</span>,
-                    <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+                    <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
                     <span class="ident">identifier</span>.<span class="ident">value</span>,
                     <span class="ident">e</span>
                 );
 
-                <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
-                    <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
-                    <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;backend failed to return session: {:?}&quot;</span>, <span class="ident">e</span>),
+                <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">io::Error::new</span>(
+                    <span class="ident">io::ErrorKind::Other</span>,
+                    <span class="macro">format!</span>(<span class="string">&quot;backend failed to return session: {:?}&quot;</span>, <span class="ident">e</span>),
                 );
 
-                <span class="ident">future</span>::<span class="ident">err</span>((<span class="ident">state</span>, <span class="ident">e</span>.<span class="ident">into</span>()))
+                <span class="ident">future::err</span>((<span class="ident">state</span>, <span class="ident">e</span>.<span class="ident">into</span>()))
             }
         }
     }
@@ -2257,30 +2257,30 @@
         <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">State</span>, (<span class="ident">State</span>, <span class="ident">HandlerError</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">session_data</span> <span class="op">=</span> <span class="ident">SessionData</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="self">self</span>);
+        <span class="kw">let</span> <span class="ident">session_data</span> <span class="op">=</span> <span class="ident">SessionData</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="self">self</span>);
 
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;[{}] created new session ({})&quot;</span>,
-            <span class="ident">state</span>::<span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
+            <span class="ident">state::request_id</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>),
             <span class="ident">session_data</span>.<span class="ident">identifier</span>.<span class="ident">value</span>
         );
 
         <span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">session_data</span>);
 
-        <span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">state</span>)
+        <span class="ident">future::ok</span>(<span class="ident">state</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">cookie</span>::<span class="ident">Cookie</span>;
-    <span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">COOKIE</span>};
+    <span class="kw">use</span> <span class="ident">cookie::Cookie</span>;
+    <span class="kw">use</span> <span class="ident">hyper::header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">COOKIE</span>};
     <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Response</span>, <span class="ident">StatusCode</span>};
     <span class="kw">use</span> <span class="ident">rand</span>;
     <span class="kw">use</span> <span class="ident">serde_derive</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
+    <span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
+    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
     <span class="kw">struct</span> <span class="ident">TestSession</span> {
@@ -2289,8 +2289,8 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">new_session</span>() {
-        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend</span>::<span class="ident">new</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware</span>::<span class="ident">new</span>(<span class="ident">backend</span>).<span class="ident">with_session_type</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware::new</span>(<span class="ident">backend</span>).<span class="ident">with_session_type</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>();
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
 
         <span class="comment">// Identifier generation is functioning as expected</span>
@@ -2298,21 +2298,21 @@
         <span class="comment">// 64 -&gt; 512 bits = (85 * 6 + 2)</span>
         <span class="comment">// Without padding that requires 86 base64 characters to represent.</span>
         <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">random_identifier</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
         <span class="kw">let</span> <span class="ident">identifier2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">random_identifier</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">identifier2</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
-        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">identifier</span>, <span class="ident">identifier2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">identifier2</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
+        <span class="macro">assert_ne!</span>(<span class="ident">identifier</span>, <span class="ident">identifier2</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">name</span>, <span class="string">&quot;_gotham_session&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">secure</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">http_only</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">same_site</span>, <span class="ident">SameSiteEnforcement</span>::<span class="ident">Lax</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">path</span>, <span class="string">&quot;/&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">domain</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">name</span>, <span class="string">&quot;_gotham_session&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">secure</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">http_only</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">same_site</span>, <span class="ident">SameSiteEnforcement::Lax</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">path</span>, <span class="string">&quot;/&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">domain</span>.<span class="ident">is_none</span>());
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">to_cookie_string</span>(<span class="kw-2">&amp;</span><span class="ident">identifier</span>.<span class="ident">value</span>),
-            <span class="macro">format</span><span class="macro">!</span>(
+            <span class="macro">format!</span>(
                 <span class="string">&quot;_gotham_session={}; Secure; HttpOnly; SameSite=Lax; Path=/&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">identifier</span>.<span class="ident">value</span>
             )
@@ -2321,20 +2321,20 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">enforce_secure_cookie_prefix_attributes</span>() {
-        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend</span>::<span class="ident">new</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware</span>::<span class="ident">new</span>(<span class="ident">backend</span>.<span class="ident">clone</span>())
+        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware::new</span>(<span class="ident">backend</span>.<span class="ident">clone</span>())
             .<span class="ident">with_cookie_name</span>(<span class="string">&quot;__Secure-my_session&quot;</span>)
             .<span class="ident">insecure</span>()
             .<span class="ident">with_session_type</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">secure</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">secure</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">enforce_host_cookie_prefix_attributes</span>() {
-        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend</span>::<span class="ident">new</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware</span>::<span class="ident">new</span>(<span class="ident">backend</span>.<span class="ident">clone</span>())
+        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware::new</span>(<span class="ident">backend</span>.<span class="ident">clone</span>())
             .<span class="ident">with_cookie_name</span>(<span class="string">&quot;__Host-my_session&quot;</span>)
             .<span class="ident">insecure</span>()
             .<span class="ident">with_cookie_domain</span>(<span class="string">&quot;example.com&quot;</span>)
@@ -2342,15 +2342,15 @@
             .<span class="ident">with_session_type</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">secure</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">domain</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">path</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;/&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">secure</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">domain</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">path</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;/&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">new_session_custom_settings</span>() {
-        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend</span>::<span class="ident">new</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware</span>::<span class="ident">new</span>(<span class="ident">backend</span>.<span class="ident">clone</span>())
+        <span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">MemoryBackend::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware::new</span>(<span class="ident">backend</span>.<span class="ident">clone</span>())
             .<span class="ident">with_cookie_name</span>(<span class="string">&quot;_my_session&quot;</span>)
             .<span class="ident">with_cookie_domain</span>(<span class="string">&quot;example.com&quot;</span>)
             .<span class="ident">with_strict_same_site_enforcement</span>()
@@ -2360,17 +2360,17 @@
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">random_identifier</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">to_cookie_string</span>(<span class="kw-2">&amp;</span><span class="ident">identifier</span>.<span class="ident">value</span>),
-            <span class="macro">format</span><span class="macro">!</span>(
+            <span class="macro">format!</span>(
                 <span class="string">&quot;_my_session={}; HttpOnly; SameSite=Strict; Domain=example.com; Path=/myapp&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">identifier</span>.<span class="ident">value</span>
             )
         );
 
-        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware</span>::<span class="ident">new</span>(<span class="ident">backend</span>)
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware::new</span>(<span class="ident">backend</span>)
             .<span class="ident">with_cookie_name</span>(<span class="string">&quot;x_session&quot;</span>)
             .<span class="ident">with_cookie_path</span>(<span class="string">&quot;/xapp&quot;</span>)
             .<span class="ident">allow_cross_site_usage</span>()
@@ -2378,11 +2378,11 @@
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">random_identifier</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">m</span>.<span class="ident">cookie_config</span>.<span class="ident">to_cookie_string</span>(<span class="kw-2">&amp;</span><span class="ident">identifier</span>.<span class="ident">value</span>),
-            <span class="macro">format</span><span class="macro">!</span>(
+            <span class="macro">format!</span>(
                 <span class="string">&quot;x_session={}; Secure; HttpOnly; Path=/xapp&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">identifier</span>.<span class="ident">value</span>
             )
@@ -2391,24 +2391,24 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">existing_session</span>() {
-        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware</span>::<span class="ident">default</span>().<span class="ident">with_session_type</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">NewSessionMiddleware::default</span>().<span class="ident">with_session_type</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>();
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">random_identifier</span>();
         <span class="comment">// 64 -&gt; 512 bits = (85 * 6 + 2)</span>
         <span class="comment">// Without padding that requires 86 base64 characters to represent.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">len</span>(), <span class="number">86</span>);
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">TestSession</span> {
-            <span class="ident">val</span>: <span class="ident">rand</span>::<span class="ident">random</span>(),
+            <span class="ident">val</span>: <span class="ident">rand::random</span>(),
         };
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>).<span class="ident">unwrap</span>();
 
         <span class="ident">m</span>.<span class="ident">backend</span>
             .<span class="ident">persist_session</span>(<span class="ident">identifier</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">bytes</span>)
             .<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">received</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>));
+        <span class="kw">let</span> <span class="ident">received</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="prelude-val">None</span>));
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">received</span>.<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span><span class="op">|</span> {
@@ -2418,44 +2418,44 @@
                 <span class="ident">session_data</span>.<span class="ident">val</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
 
-            <span class="ident">future</span>::<span class="ident">ok</span>((
+            <span class="ident">future::ok</span>((
                 <span class="ident">state</span>,
-                <span class="ident">Response</span>::<span class="ident">builder</span>()
-                    .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>)
-                    .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+                <span class="ident">Response::builder</span>()
+                    .<span class="ident">status</span>(<span class="ident">StatusCode::ACCEPTED</span>)
+                    .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                     .<span class="ident">unwrap</span>(),
             ))
             .<span class="ident">boxed</span>()
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="ident">Cookie</span>::<span class="ident">build</span>(<span class="string">&quot;_gotham_session&quot;</span>, <span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">finish</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
+        <span class="kw">let</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="ident">Cookie::build</span>(<span class="string">&quot;_gotham_session&quot;</span>, <span class="ident">identifier</span>.<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">finish</span>();
         <span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">COOKIE</span>, <span class="ident">cookie</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
         <span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">call</span>(<span class="ident">state</span>, <span class="ident">handler</span>);
-        <span class="kw">match</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">r</span>) {
+        <span class="kw">match</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">r</span>) {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">received</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">guard</span> {
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">value</span>, <span class="ident">session</span>.<span class="ident">val</span>);
+                    <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="ident">session</span>.<span class="ident">val</span>);
                 } <span class="kw">else</span> {
-                    <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;no session data&quot;</span>);
+                    <span class="macro">panic!</span>(<span class="string">&quot;no session data&quot;</span>);
                 }
             }
-            <span class="prelude-val">Err</span>((<span class="kw">_</span>, <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;error: {:?}&quot;</span>, <span class="ident">e</span>),
+            <span class="prelude-val">Err</span>((<span class="kw">_</span>, <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;error: {:?}&quot;</span>, <span class="ident">e</span>),
         }
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nm</span>.<span class="ident">new_middleware</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">m</span>.<span class="ident">backend</span>.<span class="ident">read_session</span>(<span class="ident">identifier</span>))
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">m</span>.<span class="ident">backend</span>.<span class="ident">read_session</span>(<span class="ident">identifier</span>))
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..]).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>::<span class="op">&lt;</span><span class="ident">TestSession</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..]).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">updated</span>.<span class="ident">val</span>, <span class="ident">session</span>.<span class="ident">val</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">updated</span>.<span class="ident">val</span>, <span class="ident">session</span>.<span class="ident">val</span> <span class="op">+</span> <span class="number">1</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham" data-search-js="../../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>

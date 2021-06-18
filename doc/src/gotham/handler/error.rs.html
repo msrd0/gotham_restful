@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gotham-0.6.0/src/handler/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -285,38 +285,38 @@
 <span id="282">282</span>
 <span id="283">283</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FusedFuture</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">futures::future::FusedFuture</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>};
+<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
 
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>};
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">handler</span>::<span class="ident">IntoResponse</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">helpers</span>::<span class="ident">http</span>::<span class="ident">response</span>::<span class="ident">create_empty_response</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">state</span>::{<span class="ident">request_id</span>, <span class="ident">State</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::handler::IntoResponse</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::helpers::http::response::create_empty_response</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::state</span>::{<span class="ident">request_id</span>, <span class="ident">State</span>};
 
 <span class="doccomment">/// Describes an error which occurred during handler execution, and allows the creation of a HTTP</span>
 <span class="doccomment">/// `Response`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HandlerError</span> {
     <span class="ident">status_code</span>: <span class="ident">StatusCode</span>,
-    <span class="ident">cause</span>: <span class="ident">anyhow</span>::<span class="ident">Error</span>,
+    <span class="ident">cause</span>: <span class="ident">anyhow::Error</span>,
 }
 
 <span class="doccomment">/// Convert a generic `anyhow::Error` into a `HandlerError`, similar as you would a concrete error</span>
 <span class="doccomment">/// type with `into_handler_error()`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandlerError</span>
 <span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
+    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
 {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandlerError</span> {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; converting Error to HandlerError: {}&quot;</span>, <span class="ident">error</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot; converting Error to HandlerError: {}&quot;</span>, <span class="ident">error</span>);
 
         <span class="ident">HandlerError</span> {
-            <span class="ident">status_code</span>: <span class="ident">StatusCode</span>::<span class="ident">INTERNAL_SERVER_ERROR</span>,
+            <span class="ident">status_code</span>: <span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>,
             <span class="ident">cause</span>: <span class="ident">error</span>.<span class="ident">into</span>(),
         }
     }
@@ -388,7 +388,7 @@
 
 <span class="kw">impl</span> <span class="ident">IntoResponse</span> <span class="kw">for</span> <span class="ident">HandlerError</span> {
     <span class="kw">fn</span> <span class="ident">into_response</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(
+        <span class="macro">debug!</span>(
             <span class="string">&quot;[{}] HandlerError generating {} {} response: {}&quot;</span>,
             <span class="ident">request_id</span>(<span class="ident">state</span>),
             <span class="self">self</span>.<span class="ident">status_code</span>.<span class="ident">as_u16</span>(),
@@ -433,11 +433,11 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">MapHandlerError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
+    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
 {
     <span class="kw">fn</span> <span class="ident">map_err_with_status</span>(<span class="self">self</span>, <span class="ident">status_code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; converting Error to HandlerError: {}&quot;</span>, <span class="ident">err</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot; converting Error to HandlerError: {}&quot;</span>, <span class="ident">err</span>);
             <span class="ident">HandlerError</span> {
                 <span class="ident">status_code</span>,
                 <span class="ident">cause</span>: <span class="ident">err</span>.<span class="ident">into</span>(),
@@ -447,7 +447,7 @@
 }
 
 <span class="comment">// The future for `map_err_with_status`.</span>
-<span class="attribute">#[<span class="ident">pin_project</span>::<span class="ident">pin_project</span>(<span class="ident">project</span> <span class="op">=</span> <span class="ident">MapErrWithStatusProj</span>, <span class="ident">project_replace</span> <span class="op">=</span> <span class="ident">MapErrWithStatusProjOwn</span>)]</span>
+<span class="attribute">#[<span class="ident">pin_project::pin_project</span>(<span class="ident">project</span> <span class="op">=</span> <span class="ident">MapErrWithStatusProj</span>, <span class="ident">project_replace</span> <span class="op">=</span> <span class="ident">MapErrWithStatusProjOwn</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MapErrWithStatus</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
@@ -461,43 +461,43 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">MapErrWithStatus</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">status</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">Incomplete</span> { <span class="ident">future</span>, <span class="ident">status</span> }
+        <span class="self">Self</span><span class="ident">::Incomplete</span> { <span class="ident">future</span>, <span class="ident">status</span> }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FusedFuture</span> <span class="kw">for</span> <span class="ident">MapErrWithStatus</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
+    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
 {
     <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches</span><span class="macro">!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">Complete</span>)
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::Complete</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">MapErrWithStatus</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
+    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>() {
-            <span class="ident">MapErrWithStatusProj</span>::<span class="ident">Incomplete</span> { <span class="ident">future</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MapErrWithStatusProj::Incomplete</span> { <span class="ident">future</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                    <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="ident">output</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>,
-                    <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>,
+                    <span class="ident">Poll::Ready</span>(<span class="ident">output</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>,
+                    <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
                 };
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">project_replace</span>(<span class="ident">MapErrWithStatus</span>::<span class="ident">Complete</span>) {
-                    <span class="ident">MapErrWithStatusProjOwn</span>::<span class="ident">Incomplete</span> { <span class="ident">status</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="ident">output</span>.<span class="ident">map_err_with_status</span>(<span class="ident">status</span>))
+                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">project_replace</span>(<span class="ident">MapErrWithStatus::Complete</span>) {
+                    <span class="ident">MapErrWithStatusProjOwn::Incomplete</span> { <span class="ident">status</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Poll::Ready</span>(<span class="ident">output</span>.<span class="ident">map_err_with_status</span>(<span class="ident">status</span>))
                     }
-                    <span class="ident">MapErrWithStatusProjOwn</span>::<span class="ident">Complete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                    <span class="ident">MapErrWithStatusProjOwn::Complete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
                 }
             }
-            <span class="ident">MapErrWithStatusProj</span>::<span class="ident">Complete</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;MapErrWithStatus must not be polled after it returned `Poll::Ready`&quot;</span>)
+            <span class="ident">MapErrWithStatusProj::Complete</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">panic!</span>(<span class="string">&quot;MapErrWithStatus must not be polled after it returned `Poll::Ready`&quot;</span>)
             }
         }
     }
@@ -537,19 +537,19 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">MapHandlerErrorFuture</span> <span class="kw">for</span> <span class="ident">F</span>
 <span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
+    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">anyhow::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Display</span>,
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">fn</span> <span class="ident">map_err_with_status</span>(<span class="self">self</span>, <span class="ident">status_code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MapErrWithStatus</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">MapErrWithStatus</span>::<span class="ident">new</span>(<span class="self">self</span>, <span class="ident">status_code</span>)
+        <span class="ident">MapErrWithStatus::new</span>(<span class="self">self</span>, <span class="ident">status_code</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-    <span class="kw">use</span> <span class="ident">thiserror</span>::<span class="ident">Error</span>;
+    <span class="kw">use</span> <span class="ident">std::io</span>;
+    <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Dummy Error&quot;</span>)]</span>
@@ -562,12 +562,12 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_error_downcast</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">error_prone</span>().<span class="ident">unwrap_err</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_ref</span>::<span class="op">&lt;</span><span class="ident">DummyError</span><span class="op">&gt;</span>().<span class="ident">is_some</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_mut</span>::<span class="op">&lt;</span><span class="ident">DummyError</span><span class="op">&gt;</span>().<span class="ident">is_some</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_ref</span>::<span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_mut</span>::<span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_ref</span>::<span class="op">&lt;</span><span class="ident">DummyError</span><span class="op">&gt;</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_mut</span>::<span class="op">&lt;</span><span class="ident">DummyError</span><span class="op">&gt;</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_ref</span>::<span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">err</span>.<span class="ident">downcast_cause_mut</span>::<span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

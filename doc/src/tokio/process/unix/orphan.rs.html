@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.7.0/src/process/unix/orphan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>orphan.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -322,19 +322,19 @@
 <span id="319">319</span>
 <span id="320">320</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">loom</span>::<span class="ident">sync</span>::{<span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">signal</span>::<span class="ident">unix</span>::<span class="ident">driver</span>::<span class="ident">Handle</span> <span class="kw">as</span> <span class="ident">SignalHandle</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">signal</span>::<span class="ident">unix</span>::{<span class="ident">signal_with_handle</span>, <span class="ident">SignalKind</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sync</span>::<span class="ident">watch</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">ExitStatus</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::loom::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::signal::unix::driver::Handle</span> <span class="kw">as</span> <span class="ident">SignalHandle</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::signal::unix</span>::{<span class="ident">signal_with_handle</span>, <span class="ident">SignalKind</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::sync::watch</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use</span> <span class="ident">std::process::ExitStatus</span>;
 
 <span class="doccomment">/// An interface for waiting on a process to exit.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Wait</span> {
     <span class="doccomment">/// Get the identifier for this process or diagnostics.</span>
     <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
     <span class="doccomment">/// Try waiting for a process to exit in a non-blocking manner.</span>
-    <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Wait</span><span class="op">&gt;</span> <span class="ident">Wait</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
@@ -342,7 +342,7 @@
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">id</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">try_wait</span>()
     }
 }
@@ -362,15 +362,15 @@
 <span class="doccomment">/// An implementation of `OrphanQueue`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OrphanQueueImpl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">sigchild</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">watch</span>::<span class="ident">Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">sigchild</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">watch::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">queue</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OrphanQueueImpl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">sigchild</span>: <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>),
-            <span class="ident">queue</span>: <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()),
+            <span class="ident">sigchild</span>: <span class="ident">Mutex::new</span>(<span class="prelude-val">None</span>),
+            <span class="ident">queue</span>: <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>()),
         }
     }
 
@@ -397,7 +397,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">sigchild_guard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sigchild</span>.<span class="ident">try_lock</span>() {
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">sigchild_guard</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">sigchild</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">sigchild</span>.<span class="ident">try_has_changed</span>().<span class="ident">and_then</span>(<span class="prelude-ty">Result</span>::<span class="ident">ok</span>).<span class="ident">is_some</span>() {
+                    <span class="kw">if</span> <span class="ident">sigchild</span>.<span class="ident">try_has_changed</span>().<span class="ident">and_then</span>(<span class="ident">Result::ok</span>).<span class="ident">is_some</span>() {
                         <span class="ident">drain_orphan_queue</span>(<span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">lock</span>());
                     }
                 }
@@ -411,7 +411,7 @@
                         <span class="comment">// means that the signal driver isn&#39;t running, in</span>
                         <span class="comment">// which case there isn&#39;t anything we can</span>
                         <span class="comment">// register/initialize here, so we can try again later</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">sigchild</span>) <span class="op">=</span> <span class="ident">signal_with_handle</span>(<span class="ident">SignalKind</span>::<span class="ident">child</span>(), <span class="kw-2">&amp;</span><span class="ident">handle</span>) {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">sigchild</span>) <span class="op">=</span> <span class="ident">signal_with_handle</span>(<span class="ident">SignalKind::child</span>(), <span class="kw-2">&amp;</span><span class="ident">handle</span>) {
                             <span class="kw-2">*</span><span class="ident">sigchild_guard</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">sigchild</span>);
                             <span class="ident">drain_orphan_queue</span>(<span class="ident">queue</span>);
                         }
@@ -444,14 +444,14 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">loom</span>)))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">io</span>::<span class="ident">driver</span>::<span class="ident">Driver</span> <span class="kw">as</span> <span class="ident">IoDriver</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">signal</span>::<span class="ident">unix</span>::<span class="ident">driver</span>::{<span class="ident">Driver</span> <span class="kw">as</span> <span class="ident">SignalDriver</span>, <span class="ident">Handle</span> <span class="kw">as</span> <span class="ident">SignalHandle</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sync</span>::<span class="ident">watch</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::{<span class="ident">Cell</span>, <span class="ident">RefCell</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">unix</span>::<span class="ident">process</span>::<span class="ident">ExitStatusExt</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">ExitStatus</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::io::driver::Driver</span> <span class="kw">as</span> <span class="ident">IoDriver</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::signal::unix::driver</span>::{<span class="ident">Driver</span> <span class="kw">as</span> <span class="ident">SignalDriver</span>, <span class="ident">Handle</span> <span class="kw">as</span> <span class="ident">SignalHandle</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::sync::watch</span>;
+    <span class="kw">use</span> <span class="ident">std::cell</span>::{<span class="ident">Cell</span>, <span class="ident">RefCell</span>};
+    <span class="kw">use</span> <span class="ident">std::io</span>;
+    <span class="kw">use</span> <span class="ident">std::os::unix::process::ExitStatusExt</span>;
+    <span class="kw">use</span> <span class="ident">std::process::ExitStatus</span>;
+    <span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MockQueue</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">all_enqueued</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -460,7 +460,7 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">MockQueue</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
             <span class="self">Self</span> {
-                <span class="ident">all_enqueued</span>: <span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()),
+                <span class="ident">all_enqueued</span>: <span class="ident">RefCell::new</span>(<span class="ident">Vec::new</span>()),
             }
         }
     }
@@ -480,7 +480,7 @@
     <span class="kw">impl</span> <span class="ident">MockWait</span> {
         <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_wait_until_status</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
             <span class="self">Self</span> {
-                <span class="ident">total_waits</span>: <span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">Cell</span>::<span class="ident">new</span>(<span class="number">0</span>)),
+                <span class="ident">total_waits</span>: <span class="ident">Rc::new</span>(<span class="ident">Cell::new</span>(<span class="number">0</span>)),
                 <span class="ident">num_wait_until_status</span>,
                 <span class="ident">return_err</span>: <span class="bool-val">false</span>,
             }
@@ -488,7 +488,7 @@
 
         <span class="kw">fn</span> <span class="ident">with_err</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
             <span class="self">Self</span> {
-                <span class="ident">total_waits</span>: <span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">Cell</span>::<span class="ident">new</span>(<span class="number">0</span>)),
+                <span class="ident">total_waits</span>: <span class="ident">Rc::new</span>(<span class="ident">Cell::new</span>(<span class="number">0</span>)),
                 <span class="ident">num_wait_until_status</span>: <span class="number">0</span>,
                 <span class="ident">return_err</span>: <span class="bool-val">true</span>,
             }
@@ -500,14 +500,14 @@
             <span class="number">42</span>
         }
 
-        <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">waits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_waits</span>.<span class="ident">get</span>();
 
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">num_wait_until_status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">waits</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">return_err</span> {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ExitStatus</span>::<span class="ident">from_raw</span>(<span class="number">0</span>)))
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ExitStatus::from_raw</span>(<span class="number">0</span>)))
                 } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;mock err&quot;</span>))
+                    <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;mock err&quot;</span>))
                 }
             } <span class="kw">else</span> {
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
@@ -520,44 +520,44 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">drain_attempts_a_single_reap_of_all_queued_orphans</span>() {
-        <span class="kw">let</span> <span class="ident">first_orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">second_orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">third_orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">fourth_orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">with_err</span>();
+        <span class="kw">let</span> <span class="ident">first_orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">second_orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">third_orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">fourth_orphan</span> <span class="op">=</span> <span class="ident">MockWait::with_err</span>();
 
         <span class="kw">let</span> <span class="ident">first_waits</span> <span class="op">=</span> <span class="ident">first_orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">second_waits</span> <span class="op">=</span> <span class="ident">second_orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">third_waits</span> <span class="op">=</span> <span class="ident">third_orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">fourth_waits</span> <span class="op">=</span> <span class="ident">fourth_orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
 
-        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl::new</span>();
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">first_orphan</span>);
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">third_orphan</span>);
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">second_orphan</span>);
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">fourth_orphan</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">4</span>);
 
         <span class="ident">drain_orphan_queue</span>(<span class="ident">orphanage</span>.<span class="ident">queue</span>.<span class="ident">lock</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">first_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">second_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">third_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">fourth_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">first_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">second_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">third_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">fourth_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
 
         <span class="ident">drain_orphan_queue</span>(<span class="ident">orphanage</span>.<span class="ident">queue</span>.<span class="ident">lock</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">first_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">second_waits</span>.<span class="ident">get</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">third_waits</span>.<span class="ident">get</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">fourth_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">first_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">second_waits</span>.<span class="ident">get</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">third_waits</span>.<span class="ident">get</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">fourth_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
 
         <span class="ident">drain_orphan_queue</span>(<span class="ident">orphanage</span>.<span class="ident">queue</span>.<span class="ident">lock</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">first_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">second_waits</span>.<span class="ident">get</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">third_waits</span>.<span class="ident">get</span>(), <span class="number">3</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">fourth_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">orphanage</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">first_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">second_waits</span>.<span class="ident">get</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">third_waits</span>.<span class="ident">get</span>(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">fourth_waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
 
         <span class="comment">// Safe to reap when empty</span>
         <span class="ident">drain_orphan_queue</span>(<span class="ident">orphanage</span>.<span class="ident">queue</span>.<span class="ident">lock</span>());
@@ -565,83 +565,83 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">no_reap_if_no_signal_received</span>() {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">watch</span>::<span class="ident">channel</span>(());
+        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">watch::channel</span>(());
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">SignalHandle</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">SignalHandle::default</span>();
 
-        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl::new</span>();
         <span class="kw-2">*</span><span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rx</span>);
 
-        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">waits</span> <span class="op">=</span> <span class="ident">orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">orphan</span>);
 
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
 
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
 
         <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">1</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">no_reap_if_signal_lock_held</span>() {
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">SignalHandle</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">SignalHandle::default</span>();
 
-        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl::new</span>();
         <span class="kw">let</span> <span class="ident">signal_guard</span> <span class="op">=</span> <span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>();
 
-        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">waits</span> <span class="op">=</span> <span class="ident">orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">orphan</span>);
 
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
 
         <span class="ident">drop</span>(<span class="ident">signal_guard</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">does_not_register_signal_if_queue_empty</span>() {
-        <span class="kw">let</span> <span class="ident">signal_driver</span> <span class="op">=</span> <span class="ident">IoDriver</span>::<span class="ident">new</span>().<span class="ident">and_then</span>(<span class="ident">SignalDriver</span>::<span class="ident">new</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">signal_driver</span> <span class="op">=</span> <span class="ident">IoDriver::new</span>().<span class="ident">and_then</span>(<span class="ident">SignalDriver::new</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">signal_driver</span>.<span class="ident">handle</span>();
 
-        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl</span>::<span class="ident">new</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>()); <span class="comment">// Sanity</span>
+        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl::new</span>();
+        <span class="macro">assert!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>()); <span class="comment">// Sanity</span>
 
         <span class="comment">// No register when queue empty</span>
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>());
 
-        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">waits</span> <span class="op">=</span> <span class="ident">orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">orphan</span>);
 
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_some</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">1</span>); <span class="comment">// Eager reap when registering listener</span>
+        <span class="macro">assert!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">1</span>); <span class="comment">// Eager reap when registering listener</span>
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">does_nothing_if_signal_could_not_be_registered</span>() {
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">SignalHandle</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">SignalHandle::default</span>();
 
-        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl</span>::<span class="ident">new</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>());
+        <span class="kw">let</span> <span class="ident">orphanage</span> <span class="op">=</span> <span class="ident">OrphanQueueImpl::new</span>();
+        <span class="macro">assert!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>());
 
-        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">orphan</span> <span class="op">=</span> <span class="ident">MockWait::new</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">waits</span> <span class="op">=</span> <span class="ident">orphan</span>.<span class="ident">total_waits</span>.<span class="ident">clone</span>();
         <span class="ident">orphanage</span>.<span class="ident">push_orphan</span>(<span class="ident">orphan</span>);
 
         <span class="comment">// Signal handler has &quot;gone away&quot;, nothing to register or reap</span>
         <span class="ident">orphanage</span>.<span class="ident">reap_orphans</span>(<span class="kw-2">&amp;</span><span class="ident">handle</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="ident">orphanage</span>.<span class="ident">sigchild</span>.<span class="ident">lock</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">waits</span>.<span class="ident">get</span>(), <span class="number">0</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-search-js="../../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>

@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gotham-0.6.0/src/router/builder/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../gotham/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -654,29 +654,29 @@
 <span class="kw">mod</span> <span class="ident">modify</span>;
 <span class="kw">mod</span> <span class="ident">single</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">panic</span>::<span class="ident">RefUnwindSafe</span>;
+<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">std::panic::RefUnwindSafe</span>;
 
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">StatusCode</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">extractor</span>::{
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::extractor</span>::{
     <span class="ident">NoopPathExtractor</span>, <span class="ident">NoopQueryStringExtractor</span>, <span class="ident">PathExtractor</span>, <span class="ident">QueryStringExtractor</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">pipeline</span>::<span class="ident">chain</span>::<span class="ident">PipelineHandleChain</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">pipeline</span>::<span class="ident">set</span>::{<span class="ident">finalize_pipeline_set</span>, <span class="ident">new_pipeline_set</span>, <span class="ident">PipelineSet</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">response</span>::<span class="ident">extender</span>::<span class="ident">ResponseExtender</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">response</span>::<span class="ident">finalizer</span>::<span class="ident">ResponseFinalizerBuilder</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">route</span>::<span class="ident">dispatch</span>::<span class="ident">DispatcherImpl</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">route</span>::<span class="ident">matcher</span>::{<span class="ident">AndRouteMatcher</span>, <span class="ident">RouteMatcher</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">route</span>::{<span class="ident">Delegation</span>, <span class="ident">Extractors</span>, <span class="ident">RouteImpl</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">tree</span>::<span class="ident">node</span>::<span class="ident">Node</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">tree</span>::<span class="ident">Tree</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">Router</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::pipeline::chain::PipelineHandleChain</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::pipeline::set</span>::{<span class="ident">finalize_pipeline_set</span>, <span class="ident">new_pipeline_set</span>, <span class="ident">PipelineSet</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::response::extender::ResponseExtender</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::response::finalizer::ResponseFinalizerBuilder</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::route::dispatch::DispatcherImpl</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::route::matcher</span>::{<span class="ident">AndRouteMatcher</span>, <span class="ident">RouteMatcher</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::route</span>::{<span class="ident">Delegation</span>, <span class="ident">Extractors</span>, <span class="ident">RouteImpl</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::tree::node::Node</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::tree::Tree</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::Router</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">associated</span>::{<span class="ident">AssociatedRouteBuilder</span>, <span class="ident">AssociatedSingleRouteBuilder</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">draw</span>::<span class="ident">DrawRoutes</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">modify</span>::{<span class="ident">ExtendRouteMatcher</span>, <span class="ident">ReplacePathExtractor</span>, <span class="ident">ReplaceQueryStringExtractor</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">single</span>::<span class="ident">DefineSingleRoute</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::associated</span>::{<span class="ident">AssociatedRouteBuilder</span>, <span class="ident">AssociatedSingleRouteBuilder</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::draw::DrawRoutes</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::modify</span>::{<span class="ident">ExtendRouteMatcher</span>, <span class="ident">ReplacePathExtractor</span>, <span class="ident">ReplaceQueryStringExtractor</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::single::DefineSingleRoute</span>;
 
 <span class="doccomment">/// Builds a `Router` using the provided closure. Routes are defined using the `RouterBuilder`</span>
 <span class="doccomment">/// value passed to the closure, and the `Router` is constructed before returning.</span>
@@ -737,14 +737,14 @@
     <span class="ident">P</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RouterBuilder</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>),
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree</span> <span class="op">=</span> <span class="ident">Tree</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree</span> <span class="op">=</span> <span class="ident">Tree::new</span>();
 
     <span class="kw">let</span> <span class="ident">response_finalizer</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">RouterBuilder</span> {
             <span class="ident">node_builder</span>: <span class="ident">tree</span>.<span class="ident">borrow_root_mut</span>(),
             <span class="ident">pipeline_chain</span>,
             <span class="ident">pipelines</span>,
-            <span class="ident">response_finalizer_builder</span>: <span class="ident">ResponseFinalizerBuilder</span>::<span class="ident">internal_new</span>(),
+            <span class="ident">response_finalizer_builder</span>: <span class="ident">ResponseFinalizerBuilder::internal_new</span>(),
         };
 
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>);
@@ -752,7 +752,7 @@
         <span class="ident">builder</span>.<span class="ident">response_finalizer_builder</span>.<span class="ident">finalize</span>()
     };
 
-    <span class="ident">Router</span>::<span class="ident">internal_new</span>(<span class="ident">tree</span>, <span class="ident">response_finalizer</span>)
+    <span class="ident">Router::internal_new</span>(<span class="ident">tree</span>, <span class="ident">response_finalizer</span>)
 }
 
 <span class="doccomment">/// Builds a `Router` with **no** middleware using the provided closure. Routes are defined using</span>
@@ -869,7 +869,7 @@
         <span class="ident">E</span>: <span class="ident">ResponseExtender</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">response_finalizer_builder</span>
-            .<span class="ident">add</span>(<span class="ident">status_code</span>, <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">extender</span>))
+            .<span class="ident">add</span>(<span class="ident">status_code</span>, <span class="ident">Box::new</span>(<span class="ident">extender</span>))
     }
 }
 
@@ -909,15 +909,15 @@
 {
     <span class="doccomment">/// Directs the delegated route to the given `Router`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_router</span>(<span class="self">self</span>, <span class="ident">router</span>: <span class="ident">Router</span>) {
-        <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">DispatcherImpl</span>::<span class="ident">new</span>(<span class="ident">router</span>, <span class="self">self</span>.<span class="ident">pipeline_chain</span>, <span class="self">self</span>.<span class="ident">pipelines</span>);
-        <span class="kw">let</span> <span class="ident">route</span>: <span class="ident">DelegatedRoute</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DelegatedRoute</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">DispatcherImpl::new</span>(<span class="ident">router</span>, <span class="self">self</span>.<span class="ident">pipeline_chain</span>, <span class="self">self</span>.<span class="ident">pipelines</span>);
+        <span class="kw">let</span> <span class="ident">route</span>: <span class="ident">DelegatedRoute</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DelegatedRoute::new</span>(
             <span class="self">self</span>.<span class="ident">matcher</span>,
-            <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">dispatcher</span>),
-            <span class="ident">Extractors</span>::<span class="ident">new</span>(),
-            <span class="ident">Delegation</span>::<span class="ident">External</span>,
+            <span class="ident">Box::new</span>(<span class="ident">dispatcher</span>),
+            <span class="ident">Extractors::new</span>(),
+            <span class="ident">Delegation::External</span>,
         );
 
-        <span class="self">self</span>.<span class="ident">node_builder</span>.<span class="ident">add_route</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">route</span>));
+        <span class="self">self</span>.<span class="ident">node_builder</span>.<span class="ident">add_route</span>(<span class="ident">Box::new</span>(<span class="ident">route</span>));
     }
 
     <span class="doccomment">/// Adds additional `RouteMatcher` requirements to the current delegate.</span>
@@ -926,7 +926,7 @@
         <span class="ident">matcher</span>: <span class="ident">NM</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DelegateRouteBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">AndRouteMatcher</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">NM</span><span class="op">&gt;</span>, <span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> {
         <span class="ident">DelegateRouteBuilder</span> {
-            <span class="ident">matcher</span>: <span class="ident">AndRouteMatcher</span>::<span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">NM</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">matcher</span>, <span class="ident">matcher</span>),
+            <span class="ident">matcher</span>: <span class="ident">AndRouteMatcher</span>::<span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">NM</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="self">self</span>.<span class="ident">matcher</span>, <span class="ident">matcher</span>),
             <span class="ident">node_builder</span>: <span class="self">self</span>.<span class="ident">node_builder</span>,
             <span class="ident">pipeline_chain</span>: <span class="self">self</span>.<span class="ident">pipeline_chain</span>,
             <span class="ident">pipelines</span>: <span class="self">self</span>.<span class="ident">pipelines</span>,
@@ -981,16 +981,16 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">hyper</span>::<span class="ident">service</span>::<span class="ident">Service</span>;
+    <span class="kw">use</span> <span class="ident">hyper::service::Service</span>;
     <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">body</span>, <span class="ident">Body</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>};
-    <span class="kw">use</span> <span class="ident">serde_derive</span>::<span class="ident">Deserialize</span>;
+    <span class="kw">use</span> <span class="ident">serde_derive::Deserialize</span>;
 
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">middleware</span>::<span class="ident">cookie</span>::<span class="ident">CookieParser</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">middleware</span>::<span class="ident">session</span>::<span class="ident">NewSessionMiddleware</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">pipeline</span>::<span class="ident">new_pipeline</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">router</span>::<span class="ident">response</span>::<span class="ident">extender</span>::<span class="ident">StaticResponseExtender</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">service</span>::<span class="ident">GothamService</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">state</span>::{<span class="ident">State</span>, <span class="ident">StateData</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::middleware::cookie::CookieParser</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::middleware::session::NewSessionMiddleware</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::pipeline::new_pipeline</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::router::response::extender::StaticResponseExtender</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::service::GothamService</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::state</span>::{<span class="ident">State</span>, <span class="ident">StateData</span>};
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
     <span class="kw">struct</span> <span class="ident">SalutationParams</span> {
@@ -1022,9 +1022,9 @@
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
             (
                 <span class="ident">state</span>,
-                <span class="ident">Response</span>::<span class="ident">builder</span>()
-                    .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
-                    .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+                <span class="ident">Response::builder</span>()
+                    .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                    .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                     .<span class="ident">unwrap</span>(),
             )
         }
@@ -1032,33 +1032,33 @@
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">literal</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
             (
                 <span class="ident">state</span>,
-                <span class="ident">Response</span>::<span class="ident">builder</span>()
-                    .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">CREATED</span>)
-                    .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+                <span class="ident">Response::builder</span>()
+                    .<span class="ident">status</span>(<span class="ident">StatusCode::CREATED</span>)
+                    .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                     .<span class="ident">unwrap</span>(),
             )
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hello</span>(<span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
             <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take</span>::<span class="op">&lt;</span><span class="ident">SalutationParams</span><span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
-                .<span class="ident">body</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Hello, {}!&quot;</span>, <span class="ident">params</span>.<span class="ident">name</span>).<span class="ident">into</span>())
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">body</span>(<span class="macro">format!</span>(<span class="string">&quot;Hello, {}!&quot;</span>, <span class="ident">params</span>.<span class="ident">name</span>).<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">globbed</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
                 .<span class="ident">body</span>(<span class="string">&quot;Globbed&quot;</span>.<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delegated</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
                 .<span class="ident">body</span>(<span class="string">&quot;Delegated&quot;</span>.<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
@@ -1066,25 +1066,25 @@
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">goodbye</span>(<span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
             <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take</span>::<span class="op">&lt;</span><span class="ident">SalutationParams</span><span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
-                .<span class="ident">body</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Goodbye, {}!&quot;</span>, <span class="ident">params</span>.<span class="ident">name</span>).<span class="ident">into</span>())
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">body</span>(<span class="macro">format!</span>(<span class="string">&quot;Goodbye, {}!&quot;</span>, <span class="ident">params</span>.<span class="ident">name</span>).<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
             <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">take</span>::<span class="op">&lt;</span><span class="ident">AddParams</span><span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
-                .<span class="ident">body</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} + {} = {}&quot;</span>, <span class="ident">params</span>.<span class="ident">x</span>, <span class="ident">params</span>.<span class="ident">y</span>, <span class="ident">params</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">params</span>.<span class="ident">y</span>,).<span class="ident">into</span>())
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">body</span>(<span class="macro">format!</span>(<span class="string">&quot;{} + {} = {}&quot;</span>, <span class="ident">params</span>.<span class="ident">x</span>, <span class="ident">params</span>.<span class="ident">y</span>, <span class="ident">params</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">params</span>.<span class="ident">y</span>,).<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trailing_slash</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
                 .<span class="ident">body</span>(<span class="string">&quot;Trailing slash!&quot;</span>.<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
@@ -1094,33 +1094,33 @@
     <span class="kw">mod</span> <span class="ident">resource</span> {
         <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">CREATED</span>)
-                .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::CREATED</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">destroy</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>)
-                .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::ACCEPTED</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">show</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">OK</span>)
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
                 .<span class="ident">body</span>(<span class="string">&quot;It&#39;s a resource.&quot;</span>.<span class="ident">into</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response</span>::<span class="ident">builder</span>()
-                .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>)
-                .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::ACCEPTED</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                 .<span class="ident">unwrap</span>();
             (<span class="ident">state</span>, <span class="ident">response</span>)
         }
@@ -1131,9 +1131,9 @@
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">submit</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
             (
                 <span class="ident">state</span>,
-                <span class="ident">Response</span>::<span class="ident">builder</span>()
-                    .<span class="ident">status</span>(<span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>)
-                    .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+                <span class="ident">Response::builder</span>()
+                    .<span class="ident">status</span>(<span class="ident">StatusCode::ACCEPTED</span>)
+                    .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                     .<span class="ident">unwrap</span>(),
             )
         }
@@ -1145,7 +1145,7 @@
         <span class="kw">let</span> (<span class="ident">pipelines</span>, <span class="ident">default</span>) <span class="op">=</span> <span class="ident">pipelines</span>.<span class="ident">add</span>(
             <span class="ident">new_pipeline</span>()
                 .<span class="ident">add</span>(<span class="ident">CookieParser</span>)
-                .<span class="ident">add</span>(<span class="ident">NewSessionMiddleware</span>::<span class="ident">default</span>())
+                .<span class="ident">add</span>(<span class="ident">NewSessionMiddleware::default</span>())
                 .<span class="ident">build</span>(),
         );
 
@@ -1154,144 +1154,144 @@
         <span class="kw">let</span> <span class="ident">default_pipeline_chain</span> <span class="op">=</span> (<span class="ident">default</span>, ());
 
         <span class="kw">let</span> <span class="ident">delegated_router</span> <span class="op">=</span> <span class="ident">build_simple_router</span>(<span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
-            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">&quot;/b&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">delegated</span>);
+            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">&quot;/b&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome::delegated</span>);
         });
 
         <span class="kw">let</span> <span class="ident">router</span> <span class="op">=</span> <span class="ident">build_router</span>(<span class="ident">default_pipeline_chain</span>, <span class="ident">pipelines</span>, <span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
-            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">index</span>);
+            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome::index</span>);
 
             <span class="ident">route</span>
                 .<span class="ident">get</span>(<span class="string">&quot;/hello/:name&quot;</span>)
                 .<span class="ident">with_path_extractor</span>::<span class="op">&lt;</span><span class="ident">SalutationParams</span><span class="op">&gt;</span>()
-                .<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">hello</span>);
+                .<span class="ident">to</span>(<span class="ident">welcome::hello</span>);
 
             <span class="ident">route</span>
                 .<span class="ident">get</span>(<span class="string">&quot;/hello/:name/*&quot;</span>)
                 .<span class="ident">with_path_extractor</span>::<span class="op">&lt;</span><span class="ident">SalutationParams</span><span class="op">&gt;</span>()
-                .<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">globbed</span>);
+                .<span class="ident">to</span>(<span class="ident">welcome::globbed</span>);
 
             <span class="ident">route</span>
                 .<span class="ident">get</span>(<span class="string">&quot;/goodbye/:name:[a-zA-Z]+&quot;</span>)
                 .<span class="ident">with_path_extractor</span>::<span class="op">&lt;</span><span class="ident">SalutationParams</span><span class="op">&gt;</span>()
-                .<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">goodbye</span>);
+                .<span class="ident">to</span>(<span class="ident">welcome::goodbye</span>);
 
             <span class="ident">route</span>
                 .<span class="ident">get</span>(<span class="string">&quot;/add&quot;</span>)
                 .<span class="ident">with_query_string_extractor</span>::<span class="op">&lt;</span><span class="ident">AddParams</span><span class="op">&gt;</span>()
-                .<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">add</span>);
+                .<span class="ident">to</span>(<span class="ident">welcome::add</span>);
 
-            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">r&quot;/literal/\:param/\*&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">literal</span>);
+            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">r&quot;/literal/\:param/\*&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome::literal</span>);
 
             <span class="ident">route</span>.<span class="ident">scope</span>(<span class="string">&quot;/api&quot;</span>, <span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
-                <span class="ident">route</span>.<span class="ident">post</span>(<span class="string">&quot;/submit&quot;</span>).<span class="ident">to</span>(<span class="ident">api</span>::<span class="ident">submit</span>);
+                <span class="ident">route</span>.<span class="ident">post</span>(<span class="string">&quot;/submit&quot;</span>).<span class="ident">to</span>(<span class="ident">api::submit</span>);
             });
 
             <span class="ident">route</span>.<span class="ident">associate</span>(<span class="string">&quot;/resource&quot;</span>, <span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
-                <span class="ident">route</span>.<span class="ident">post</span>().<span class="ident">to</span>(<span class="ident">resource</span>::<span class="ident">create</span>);
-                <span class="ident">route</span>.<span class="ident">patch</span>().<span class="ident">to</span>(<span class="ident">resource</span>::<span class="ident">update</span>);
-                <span class="ident">route</span>.<span class="ident">delete</span>().<span class="ident">to</span>(<span class="ident">resource</span>::<span class="ident">destroy</span>);
-                <span class="ident">route</span>.<span class="ident">get_or_head</span>().<span class="ident">to</span>(<span class="ident">resource</span>::<span class="ident">show</span>);
+                <span class="ident">route</span>.<span class="ident">post</span>().<span class="ident">to</span>(<span class="ident">resource::create</span>);
+                <span class="ident">route</span>.<span class="ident">patch</span>().<span class="ident">to</span>(<span class="ident">resource::update</span>);
+                <span class="ident">route</span>.<span class="ident">delete</span>().<span class="ident">to</span>(<span class="ident">resource::destroy</span>);
+                <span class="ident">route</span>.<span class="ident">get_or_head</span>().<span class="ident">to</span>(<span class="ident">resource::show</span>);
             });
 
             <span class="ident">route</span>.<span class="ident">delegate</span>(<span class="string">&quot;/delegated&quot;</span>).<span class="ident">to_router</span>(<span class="ident">delegated_router</span>);
 
-            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">&quot;/trailing-slash/&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome</span>::<span class="ident">trailing_slash</span>);
+            <span class="ident">route</span>.<span class="ident">get</span>(<span class="string">&quot;/trailing-slash/&quot;</span>).<span class="ident">to</span>(<span class="ident">welcome::trailing_slash</span>);
         });
 
-        <span class="kw">let</span> <span class="ident">new_service</span> <span class="op">=</span> <span class="ident">GothamService</span>::<span class="ident">new</span>(<span class="ident">router</span>);
+        <span class="kw">let</span> <span class="ident">new_service</span> <span class="op">=</span> <span class="ident">GothamService::new</span>(<span class="ident">router</span>);
 
         <span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">req</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">service</span> <span class="op">=</span> <span class="ident">new_service</span>.<span class="ident">connect</span>(<span class="string">&quot;127.0.0.1:10000&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
-            <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>)).<span class="ident">unwrap</span>()
+            <span class="ident">futures::executor::block_on</span>(<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>)).<span class="ident">unwrap</span>()
         };
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">post</span>(<span class="string">&quot;/api/submit&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::post</span>(<span class="string">&quot;/api/submit&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::ACCEPTED</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/hello/world&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/hello/world&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">body::to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">to_vec</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;Hello, world!&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">String::from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;Hello, world!&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(
-            <span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/hello/world/more/path/here/handled/by/glob&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+            <span class="ident">Request::get</span>(<span class="string">&quot;/hello/world/more/path/here/handled/by/glob&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                 .<span class="ident">unwrap</span>(),
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">body::to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">to_vec</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;Globbed&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">String::from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;Globbed&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/delegated/b&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/delegated/b&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">body::to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">to_vec</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;Delegated&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">String::from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;Delegated&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/goodbye/world&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/goodbye/world&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">body::to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">to_vec</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="kw-2">&amp;</span><span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">&amp;</span><span class="ident">String::from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(),
             <span class="string">&quot;Goodbye, world!&quot;</span>
         );
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/goodbye/9875&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">NOT_FOUND</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/goodbye/9875&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::NOT_FOUND</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(
-            <span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/literal/:param/*&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+            <span class="ident">Request::get</span>(<span class="string">&quot;/literal/:param/*&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                 .<span class="ident">unwrap</span>(),
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">CREATED</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::CREATED</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/literal/a/b&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">NOT_FOUND</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/literal/a/b&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::NOT_FOUND</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/add?x=16&amp;y=71&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/add?x=16&amp;y=71&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">body::to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">to_vec</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;16 + 71 = 87&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">String::from_utf8</span>(<span class="ident">response_bytes</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;16 + 71 = 87&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">post</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">CREATED</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::post</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::CREATED</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">patch</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::patch</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::ACCEPTED</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">delete</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">ACCEPTED</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::delete</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::ACCEPTED</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">body</span>::<span class="ident">to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/resource&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response_bytes</span> <span class="op">=</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">body::to_bytes</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">to_vec</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">response_bytes</span>[..], <span class="string">b&quot;It&#39;s a resource.&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">response_bytes</span>[..], <span class="string">b&quot;It&#39;s a resource.&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(
-            <span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/trailing-slash/&quot;</span>)
-                .<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>())
+            <span class="ident">Request::get</span>(<span class="string">&quot;/trailing-slash/&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
                 .<span class="ident">unwrap</span>(),
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request</span>::<span class="ident">get</span>(<span class="string">&quot;/trailing-slash&quot;</span>).<span class="ident">body</span>(<span class="ident">Body</span>::<span class="ident">empty</span>()).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode</span>::<span class="ident">OK</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">call</span>(<span class="ident">Request::get</span>(<span class="string">&quot;/trailing-slash&quot;</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham" data-search-js="../../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>
