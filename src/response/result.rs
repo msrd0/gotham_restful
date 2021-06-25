@@ -6,9 +6,9 @@ use crate::{Response, ResponseBody, Success};
 use openapi_type::{OpenapiSchema, OpenapiType};
 
 use futures_core::future::Future;
-use gotham::hyper::StatusCode;
+use gotham::{anyhow::Error, hyper::StatusCode};
 use mime::{Mime, APPLICATION_JSON};
-use std::{error::Error, fmt::Display, pin::Pin};
+use std::{fmt::Display, pin::Pin};
 
 pub trait IntoResponseError {
 	type Err: Display + Send + 'static;
@@ -22,11 +22,15 @@ pub trait IntoResponseError {
 	fn schema(code: StatusCode) -> OpenapiSchema;
 }
 
-impl<E: Error> IntoResponseError for E {
+impl<E> IntoResponseError for E
+where
+	E: Into<Error>
+{
 	type Err = serde_json::Error;
 
 	fn into_response_error(self) -> Result<Response, Self::Err> {
-		let err: ResourceError = self.into();
+		let err: Error = self.into();
+		let err: ResourceError = err.into();
 		Ok(Response::json(
 			StatusCode::INTERNAL_SERVER_ERROR,
 			serde_json::to_string(&err)?
