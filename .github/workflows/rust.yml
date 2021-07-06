@@ -165,10 +165,10 @@ jobs:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-doc }}
-      - run: cargo doc --no-default-features --features full
+          key: ${{ runner.os }}-cargo-doc
+      - run: cargo doc --no-default-features --features full --no-deps
         env:
-          RUSTDOCFLAGS: "--cfg gotham_restful_deny_warnings"
+          RUSTDOCFLAGS: "--default-theme ayu --cfg gotham_restful_deny_warnings"
       - run: tar cfJ rustdoc.tar.xz target/doc/
       - uses: actions/upload-artifact@v2
         with:
