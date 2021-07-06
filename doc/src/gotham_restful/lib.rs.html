@@ -526,15 +526,21 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">unreachable_pub</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 <span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="comment">// can we have a lint for spaces in doc comments please?</span>
+<span class="comment">// deny warnings in CI</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">gotham_restful_deny_warnings</span>, <span class="ident">allow</span>(<span class="ident">renamed_and_removed_lints</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">gotham_restful_deny_warnings</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
+<span class="comment">// clippy doesn&#39;t like our code style</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::tabs_in_doc_comments</span>))]</span>
 <span class="comment">// intra-doc links only fully work when OpenAPI is enabled</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>), <span class="ident">allow</span>(<span class="ident">broken_intra_doc_links</span>))]</span>
+
 <span class="doccomment">/*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
