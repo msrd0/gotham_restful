@@ -56,6 +56,7 @@ jobs:
           echo "\$ cargo test $features"
           cargo test $features
         env:
+          RUSTFLAGS: "--cfg gotham_restful_deny_warnings"
           RUST_BACKTRACE: 1
   
   test-trybuild:
@@ -166,6 +167,8 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-doc }}
       - run: cargo doc --no-default-features --features full
+        env:
+          RUSTDOCFLAGS: "--cfg gotham_restful_deny_warnings"
       - run: tar cfJ rustdoc.tar.xz target/doc/
       - uses: actions/upload-artifact@v2
         with:
