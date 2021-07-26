@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: cargo
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
       time: "06:00"
       timezone: "Europe/Amsterdam"
     labels:
@@ -13,7 +13,7 @@ updates:
   - package-ecosystem: npm
     directory: "src/openapi/handler"
     schedule:
-      interval: daily
+      interval: weekly
       time: "06:00"
       timezone: "Europe/Amsterdam"
     labels:
