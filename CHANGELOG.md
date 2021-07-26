@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.4.5] - 2021-07-26
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.55](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.55)
+
 ## [0.4.4] - 2021-06-25
 ### Changed
  - The `IntoResponseError` trait is now implemented for all errors that can be converted to `anyhow::Error`, not just `std::error::Error`
