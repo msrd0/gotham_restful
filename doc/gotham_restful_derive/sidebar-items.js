@@ -1,1 +1,0 @@
-initSidebarItems({"attr":[["create",""],["delete",""],["delete_all",""],["endpoint",""],["read",""],["read_all",""],["search",""],["update",""],["update_all",""]],"derive":[["FromBody",""],["RequestBody",""],["Resource",""],["ResourceError",""]]});

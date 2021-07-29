@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["ErrorKind","The specific type of an error."]],"struct":[["Error","An error that can occur when encoding/decoding JWTs"]],"type":[["Result","A type alias for `Result<T, jsonwebtoken::Error>`."]]});

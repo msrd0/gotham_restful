@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["extender","Defines functionality for extending a Response."],["finalizer","Defines functionality for finalizing a `Response` after all pipelines, middlewares, handlers and internal extenders have completed."]]});

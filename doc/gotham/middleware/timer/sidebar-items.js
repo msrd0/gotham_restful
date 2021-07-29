@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["RequestTimer","Middleware binding to attach request execution times inside headers."]]});

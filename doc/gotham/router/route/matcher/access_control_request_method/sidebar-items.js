@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["AccessControlRequestMethodMatcher","A route matcher that checks whether the value of the `Access-Control-Request-Method` header matches the defined value."]]});

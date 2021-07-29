@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["IntervalDsl","A DSL added to integers and `f64` to construct PostgreSQL intervals."]]});

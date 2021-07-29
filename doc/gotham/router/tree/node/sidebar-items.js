@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Node","A recursive member of `Tree`, representative of segment(s) in a request path."]]});

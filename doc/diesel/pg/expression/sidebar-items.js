@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["dsl","PostgreSQL specific expression DSL methods."],["extensions","This module contains extensions that are added to core types to aid in building expressions. These traits are not exported by default. The are also re-exported in `diesel::dsl`"]]});

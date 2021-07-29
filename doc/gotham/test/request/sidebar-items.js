@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["TestRequest","Builder API for constructing `Server` requests. When the request is built, `RequestBuilder::perform` will issue the request and provide access to the response."]]});
