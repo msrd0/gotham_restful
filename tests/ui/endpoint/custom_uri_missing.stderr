@@ -4,7 +4,7 @@ error: Missing `uri` attribute (e.g. `#[endpoint(uri = "custom_endpoint")]`)
 8 | #[endpoint(method = "gotham_restful::gotham::hyper::Method::GET")]
   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   |
-  = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
+  = note: this error originates in the attribute macro `endpoint` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
  --> $DIR/custom_uri_missing.rs:5:12

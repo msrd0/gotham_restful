@@ -65,13 +65,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.52.1"
+          toolchain: "1.54"
       - uses: actions/cache@v2
         with:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-1.52
+          key: ${{ runner.os }}-cargo-1.54
       - run: cargo test --no-default-features --features full --tests -- --ignored
         env:
           RUST_BACKTRACE: 1
