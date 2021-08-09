@@ -359,7 +359,7 @@ limitations under the License.
  [__link3]: https://docs.rs/gotham_restful/0.4.5/gotham_restful/?search=gotham_restful::types::RequestBody
  [__link4]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.65
+ [__link6]: https://crates.io/crates/serde_json/1.0.66
  [__link7]: https://docs.rs/gotham_restful/0.4.5/gotham_restful/?search=gotham_restful::response::Response::header
  [__link8]: https://docs.rs/gotham_restful/0.4.5/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/
