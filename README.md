@@ -7,7 +7,7 @@
 		<img alt="coverage report" src="https://msrd0.github.io/gotham_restful/coverage.svg"/>
 	</a>
 	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
-		<img alt="rustdoc" src="https://img.shields.io/badge/docs-master-blue.svg"/>
+		<img alt="rustdoc" src="https://img.shields.io/badge/docs-main-blue.svg"/>
 	</a>
     <a href="https://blog.rust-lang.org/2020/12/31/Rust-1.49.0.html">
         <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.49+-orange.svg"/>
