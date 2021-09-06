@@ -381,7 +381,7 @@ limitations under the License.
  [__link0]: https://crates.io/crates/gotham/0.6.0
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.6.0/gotham/?search=gotham::state::State
- [__link11]: https://docs.rs/openapi_type/0.2.2/openapi_type/?search=openapi_type::OpenapiType
+ [__link11]: https://docs.rs/openapi_type/0.2.3/openapi_type/?search=openapi_type::OpenapiType
  [__link12]: https://docs.rs/gotham_restful/0.4.5/gotham_restful/?search=gotham_restful::endpoint::Endpoint
  [__link13]: https://docs.rs/gotham_restful/0.4.5/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
