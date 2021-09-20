@@ -7,7 +7,7 @@
 	},
 	"devDependencies": {
 		"@tsconfig/recommended": "^1.0.1",
-		"@types/node": "^16.9.1",
+		"@types/node": "^16.9.4",
 		"@types/webpack": "^5.28.0",
 		"ts-loader": "^9.2.5",
 		"ts-node": "^10.2.1",
