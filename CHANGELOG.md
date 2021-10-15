@@ -5,6 +5,13 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.4.6] - 2021-10-15
+### Added
+ - Support for "dynamic" schema where the endpoint macro creates a new response type for you
+
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.57](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc57-2021-10-11)
+
 ## [0.4.5] - 2021-07-26
 ### Updated
  - The linked redoc version has been updated to [2.0.0-rc.55](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.55)
