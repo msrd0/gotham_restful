@@ -52,6 +52,30 @@ impl OrAllTypes for Option<Vec<Mime>> {
 }
 
 /// A response, used to create the final gotham response from.
+///
+/// This type is not meant to be used as the return type of endpoint handlers. While it can be
+/// freely used without the `openapi` feature, it is more complicated to use when you enable it,
+/// since this type does not store any schema information. You can attach schema information
+/// like so:
+///
+/// ```rust
+/// # #[cfg(feature = "openapi")] mod example {
+/// # use gotham::hyper::StatusCode;
+/// # use gotham_restful::*;
+/// # use openapi_type::*;
+/// fn schema(code: StatusCode) -> OpenapiSchema {
+/// 	assert_eq!(code, StatusCode::ACCEPTED);
+/// 	<()>::schema()
+/// }
+///
+/// fn status_codes() -> Vec<StatusCode> {
+/// 	vec![StatusCode::ACCEPTED]
+/// }
+///
+/// #[create(schema = "schema", status_codes = "status_codes")]
+/// fn create(body: Raw<Vec<u8>>) {}
+/// # }
+/// ```
 #[derive(Debug)]
 pub struct Response {
 	pub(crate) status: StatusCode,

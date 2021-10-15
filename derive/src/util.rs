@@ -1,4 +1,4 @@
-use proc_macro2::{Delimiter, TokenStream, TokenTree};
+use proc_macro2::{Delimiter, Ident, TokenStream, TokenTree};
 use std::iter;
 use syn::{Error, Lit, LitBool, LitStr, Result};
 
@@ -27,6 +27,16 @@ where
 				Err(errors)
 			}
 		})
+	}
+}
+
+pub(crate) trait IntoIdent {
+	fn into_ident(self) -> Ident;
+}
+
+impl IntoIdent for LitStr {
+	fn into_ident(self) -> Ident {
+		Ident::new(&self.value(), self.span())
 	}
 }
 

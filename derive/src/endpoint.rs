@@ -1,4 +1,4 @@
-use crate::util::{CollectToResult, ExpectLit};
+use crate::util::{CollectToResult, ExpectLit, IntoIdent};
 use lazy_regex::regex_is_match;
 use paste::paste;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -365,6 +365,20 @@ pub fn endpoint_ident(fn_ident: &Ident) -> Ident {
 	format_ident!("{}___gotham_restful_endpoint", fn_ident)
 }
 
+macro_rules! error_if_not_openapi {
+	($($ident:ident),*) => {
+		$(
+			#[cfg(not(feature = "openapi"))]
+			if let Some($ident) = $ident {
+				return Err(Error::new(
+					$ident.span(),
+					concat!("`", stringify!($ident), "` is only supported with the openapi feature")
+				));
+			}
+		)*
+	};
+}
+
 // clippy doesn't realize that vectors can be used in closures
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_collect))]
 fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) -> Result<TokenStream> {
@@ -376,6 +390,8 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	// parse arguments
 	let mut debug: bool = false;
 	let mut operation_id: Option<LitStr> = None;
+	let mut schema: Option<Ident> = None;
+	let mut status_codes: Option<Ident> = None;
 	let mut wants_auth: Option<LitBool> = None;
 	for meta in attrs {
 		match meta {
@@ -384,6 +400,10 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					debug = kv.lit.expect_bool()?.value;
 				} else if kv.path.is_ident("operation_id") {
 					operation_id = Some(kv.lit.expect_str()?);
+				} else if kv.path.is_ident("schema") {
+					schema = Some(kv.lit.expect_str()?.into_ident())
+				} else if kv.path.is_ident("status_codes") {
+					status_codes = Some(kv.lit.expect_str()?.into_ident())
 				} else if kv.path.is_ident("wants_auth") {
 					wants_auth = Some(kv.lit.expect_bool()?);
 				} else if kv.path.is_ident("method") {
@@ -401,11 +421,11 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 			_ => return Err(Error::new(meta.span(), "Invalid attribute syntax"))
 		}
 	}
-	#[cfg(not(feature = "openapi"))]
-	if let Some(operation_id) = operation_id {
+	error_if_not_openapi!(operation_id, schema, status_codes);
+	if schema.is_some() != status_codes.is_some() {
 		return Err(Error::new(
-			operation_id.span(),
-			"`operation_id` is only supported with the openapi feature"
+			schema.map(|s| s.span()).unwrap_or_else(|| status_codes.unwrap().span()),
+			"`schema` and `status_codes` may only be used together"
 		));
 	}
 
@@ -460,7 +480,62 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		ReturnType::Default => (quote!(::gotham_restful::NoContent), true),
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
-	let output_typedef = quote_spanned!(output_ty.span() => type Output = #output_ty;);
+	let output_struct_ident = schema
+		.as_ref()
+		.map(|schema_fn| Ident::new(&format!("{}_gotham_restful_ResponseSchema", schema_fn), Span::call_site()));
+	let output_struct = schema.map(|schema_fn| {
+		let output_struct_ident = output_struct_ident.as_ref().unwrap_or_else(|| unreachable!());
+		let status_codes_fn = status_codes.unwrap_or_else(|| unreachable!());
+		quote! {
+			#[allow(non_camel_case_types)]
+			struct #output_struct_ident(#output_ty);
+
+			impl ::core::convert::From<#output_ty> for #output_struct_ident {
+				fn from(o: #output_ty) -> Self {
+					Self(o)
+				}
+			}
+
+			impl ::gotham_restful::IntoResponse for #output_struct_ident
+			where
+				#output_ty: ::gotham_restful::IntoResponse
+			{
+				type Err = <#output_ty as ::gotham_restful::IntoResponse>::Err;
+
+				fn into_response(self) -> ::gotham_restful::private::BoxFuture<'static,
+						::core::result::Result<::gotham_restful::Response, Self::Err>>
+				{
+					::gotham_restful::IntoResponse::into_response(self.0)
+				}
+
+				fn accepted_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::Mime>> {
+					<#output_ty as ::gotham_restful::IntoResponse>::accepted_types()
+				}
+			}
+
+			impl ::gotham_restful::ResponseSchema for #output_struct_ident {
+				fn schema(
+					code: ::gotham_restful::gotham::hyper::StatusCode
+				) -> ::gotham_restful::private::OpenapiSchema
+				{
+					let schema: ::gotham_restful::private::OpenapiSchema = #schema_fn(code);
+					schema
+				}
+
+				fn status_codes() -> ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> {
+					let status_codes: ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> = #status_codes_fn();
+					status_codes
+				}
+			}
+		}
+	});
+	let (output_typedef, final_return_ty) = match output_struct_ident {
+		Some(output_struct_ident) => (quote!(type Output = #output_struct_ident;), quote!(#output_struct_ident)),
+		None => (
+			quote_spanned!(output_ty.span() => type Output = #output_ty;),
+			quote!(#output_ty)
+		)
+	};
 
 	let arg_tys = args.iter().filter(|arg| arg.ty.is_method_arg()).collect::<Vec<_>>();
 	let mut arg_ty_idx = 0;
@@ -569,7 +644,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 			#state_block
 			async move {
 				#handle_content
-			}.boxed()
+			}.map(<#final_return_ty>::from).boxed()
 		})
 	};
 	let handle_content = match expand_handle_content() {
@@ -593,6 +668,8 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 
 		#[allow(non_upper_case_globals)]
 		static #dummy_ident: () = {
+			#output_struct
+
 			impl #tr8 for #ident {
 				fn http_method() -> ::gotham_restful::gotham::hyper::Method {
 					#http_method
