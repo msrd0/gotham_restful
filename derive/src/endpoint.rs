@@ -486,6 +486,14 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	let output_struct = schema.map(|schema_fn| {
 		let output_struct_ident = output_struct_ident.as_ref().unwrap_or_else(|| unreachable!());
 		let status_codes_fn = status_codes.unwrap_or_else(|| unreachable!());
+
+		let schema_call = quote_spanned! { schema_fn.span() =>
+			let schema: ::gotham_restful::private::OpenapiSchema = #schema_fn(code);
+		};
+		let status_codes_call = quote_spanned! { status_codes_fn.span() =>
+			let status_codes: ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> = #status_codes_fn();
+		};
+
 		quote! {
 			#[allow(non_camel_case_types)]
 			struct #output_struct_ident(#output_ty);
@@ -518,12 +526,12 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					code: ::gotham_restful::gotham::hyper::StatusCode
 				) -> ::gotham_restful::private::OpenapiSchema
 				{
-					let schema: ::gotham_restful::private::OpenapiSchema = #schema_fn(code);
+					#schema_call
 					schema
 				}
 
 				fn status_codes() -> ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> {
-					let status_codes: ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> = #status_codes_fn();
+					#status_codes_call
 					status_codes
 				}
 			}

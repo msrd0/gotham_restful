@@ -1,0 +1,11 @@
+error: `schema` and `status_codes` may only be used together
+  --> tests/ui/endpoint/dynamic_schema_missing_schema.rs:14:27
+   |
+14 | #[read_all(status_codes = "status_codes")]
+   |                           ^^^^^^^^^^^^^^
+
+error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
+ --> tests/ui/endpoint/dynamic_schema_missing_schema.rs:7:12
+  |
+7 | #[resource(read_all)]
+  |            ^^^^^^^^ not found in this scope
