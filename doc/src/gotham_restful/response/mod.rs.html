@@ -294,6 +294,30 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="self">self</span>, <span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::{
@@ -349,6 +373,30 @@
 }
 
 <span class="doccomment">/// A response, used to create the final gotham response from.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is not meant to be used as the return type of endpoint handlers. While it can be</span>
+<span class="doccomment">/// freely used without the `openapi` feature, it is more complicated to use when you enable it,</span>
+<span class="doccomment">/// since this type does not store any schema information. You can attach schema information</span>
+<span class="doccomment">/// like so:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;openapi&quot;)] mod example {</span>
+<span class="doccomment">/// # use gotham::hyper::StatusCode;</span>
+<span class="doccomment">/// # use gotham_restful::*;</span>
+<span class="doccomment">/// # use openapi_type::*;</span>
+<span class="doccomment">/// fn schema(code: StatusCode) -&gt; OpenapiSchema {</span>
+<span class="doccomment">/// 	assert_eq!(code, StatusCode::ACCEPTED);</span>
+<span class="doccomment">/// 	&lt;()&gt;::schema()</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// fn status_codes() -&gt; Vec&lt;StatusCode&gt; {</span>
+<span class="doccomment">/// 	vec![StatusCode::ACCEPTED]</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[create(schema = &quot;schema&quot;, status_codes = &quot;status_codes&quot;)]</span>
+<span class="doccomment">/// fn create(body: Raw&lt;Vec&lt;u8&gt;&gt;) {}</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Response</span> {
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">status</span>: <span class="ident">StatusCode</span>,
