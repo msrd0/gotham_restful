@@ -228,7 +228,7 @@ pub fn handle_cors(state: &State, res: &mut Response<Body>) {
 /// build_simple_router(|router| {
 /// 	// The handler that needs preflight handling
 /// 	router.post("/foo").to(|state| {
-/// 		let mut res : Response<Body> = unimplemented!();
+/// 		let mut res: Response<Body> = unimplemented!();
 /// 		handle_cors(&state, &mut res);
 /// 		(state, res)
 /// 	});
