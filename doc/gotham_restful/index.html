@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to create resources with assigned endpoints that aim to be a more convenient way of creating handlers for requests."><meta name="keywords" content="rust, rustlang, rust-lang, gotham_restful"><title>gotham_restful - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" 
         data-theme="ayu"
-        data-use_system_theme="false"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../gotham_restful/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate gotham_restful</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.4.6</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all gotham_restful's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="gotham_restful" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">gotham_restful</a><button id="copy-path" onclick="copy_path(this)" title="copy path"><img src="../clipboard.svg" width="19" height="18" alt="Copy item import" title="Copy item import to clipboard"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/gotham_restful/lib.rs.html#1-528" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate is an extension to the popular <a href="https://docs.rs/gotham/0.6.0/gotham/index.html" title="gotham">gotham web framework</a> for Rust. It allows you to
+        data-use_system_theme="false"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../gotham_restful/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate gotham_restful</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.4.6</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all gotham_restful's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="gotham_restful" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">gotham_restful</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/gotham_restful/lib.rs.html#1-528" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate is an extension to the popular <a href="https://docs.rs/gotham/0.6.0/gotham/index.html" title="gotham">gotham web framework</a> for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
 for requests.</p>
 <h1 id="features" class="section-header"><a href="#features">Features</a></h1>
@@ -34,8 +34,7 @@ it is also possible to define your own endpoints.</p>
 <p>Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
 simple example looks like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="doccomment">/// Our RESTful resource.</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="doccomment">/// Our RESTful resource.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">read</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FooResource</span>;
@@ -50,13 +49,12 @@ simple example looks like this:</p>
 <span class="attribute">#[<span class="ident">read</span>]</span>
 <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Success</span><span class="op">&lt;</span><span class="ident">Foo</span><span class="op">&gt;</span> {
 	<span class="ident">Foo</span> { <span class="ident">id</span> }.<span class="ident">into</span>()
-}</pre></div>
+}</code></pre></div>
 <h2 id="custom-endpoints" class="section-header"><a href="#custom-endpoints">Custom Endpoints</a></h2>
 <p>Defining custom endpoints is done with the <code>#[endpoint]</code> macro. The syntax is similar to that
 of the pre-defined endpoints, but you need to give it more context:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">gotham_restful::gotham::hyper::Method</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">gotham_restful::gotham::hyper::Method</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">custom_endpoint</span>)]</span>
@@ -71,11 +69,11 @@ of the pre-defined endpoints, but you need to give it more context:</p>
 <span class="attribute">#[<span class="ident">endpoint</span>(<span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;custom/:name/read&quot;</span>, <span class="ident">method</span> <span class="op">=</span> <span class="string">&quot;Method::GET&quot;</span>, <span class="ident">params</span> <span class="op">=</span> <span class="bool-val">false</span>, <span class="ident">body</span> <span class="op">=</span> <span class="bool-val">false</span>)]</span>
 <span class="kw">fn</span> <span class="ident">custom_endpoint</span>(<span class="ident">path</span>: <span class="ident">CustomPath</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Success</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="ident">path</span>.<span class="ident">name</span>.<span class="ident">into</span>()
-}</pre></div>
+}</code></pre></div>
 <h1 id="arguments" class="section-header"><a href="#arguments">Arguments</a></h1>
 <p>Some endpoints require arguments. Those should be</p>
 <ul>
-<li><strong>id</strong> Should be a deserializable json-primitive like <a href="https://doc.rust-lang.org/1.55.0/std/primitive.i64.html" title="i64"><code>i64</code></a> or <a href="https://doc.rust-lang.org/1.55.0/alloc/string/struct.String.html" title="String"><code>String</code></a>.</li>
+<li><strong>id</strong> Should be a deserializable json-primitive like <a href="https://doc.rust-lang.org/1.56.0/std/primitive.i64.html" title="i64"><code>i64</code></a> or <a href="https://doc.rust-lang.org/1.56.0/alloc/string/struct.String.html" title="String"><code>String</code></a>.</li>
 <li><strong>body</strong> Should be any deserializable object, or any type implementing <a href="trait.RequestBody.html" title="RequestBody"><code>RequestBody</code></a>.</li>
 <li><strong>query</strong> Should be any deserializable object whose variables are json-primitives. It will
 however not be parsed from json, but from HTTP GET parameters like in <code>search?id=1</code>. The
@@ -89,8 +87,7 @@ improve.</p>
 <a href="https://docs.rs/serde_json/1.0.68/serde_json/index.html" title="serde_json">serde_json</a>. However, you may also use raw bodies. This is an example where the request body
 is simply returned as the response again, no json parsing involved:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">create</span>)]</span>
 <span class="kw">struct</span> <span class="ident">ImageResource</span>;
 
@@ -104,13 +101,12 @@ is simply returned as the response again, no json parsing involved:</p>
 <span class="attribute">#[<span class="ident">create</span>]</span>
 <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">body</span> : <span class="ident">RawImage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="ident">Raw::new</span>(<span class="ident">body</span>.<span class="ident">content</span>, <span class="ident">body</span>.<span class="ident">content_type</span>)
-}</pre></div>
+}</code></pre></div>
 <h1 id="custom-http-headers" class="section-header"><a href="#custom-http-headers">Custom HTTP Headers</a></h1>
 <p>You can read request headers from the state as you would in any other gotham handler, and specify
 custom response headers using <a href="struct.Response.html#method.header" title="Response::header">Response::header</a>.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">read_all</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FooResource</span>;
 
@@ -122,7 +118,7 @@ custom response headers using <a href="struct.Response.html#method.header" title
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">NoContent::default</span>();
 	<span class="ident">res</span>.<span class="ident">header</span>(<span class="ident">VARY</span>, <span class="string">&quot;accept&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
 	<span class="ident">res</span>
-}</pre></div>
+}</code></pre></div>
 <h1 id="features-1" class="section-header"><a href="#features-1">Features</a></h1>
 <p>To make life easier for common use-cases, this create offers a few features that might be helpful
 when you implement your web server.  The complete feature list is</p>
@@ -145,8 +141,7 @@ with the JWT data, hence you can use several JWT secrets and decide on the fly w
 None of this is currently supported by gotham’s own JWT middleware.</p>
 <p>A simple example that uses only a single secret looks like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">read</span>)]</span>
 <span class="kw">struct</span> <span class="ident">SecretResource</span>;
 
@@ -178,7 +173,7 @@ None of this is currently supported by gotham’s own JWT middleware.</p>
 	<span class="ident">gotham::start</span>(<span class="string">&quot;127.0.0.1:8080&quot;</span>, <span class="ident">build_router</span>(<span class="ident">chain</span>, <span class="ident">pipelines</span>, <span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
 		<span class="ident">route</span>.<span class="ident">resource</span>::<span class="op">&lt;</span><span class="ident">SecretResource</span><span class="op">&gt;</span>(<span class="string">&quot;secret&quot;</span>);
 	}));
-}</pre></div>
+}</code></pre></div>
 <h2 id="cors-feature" class="section-header"><a href="#cors-feature">CORS Feature</a></h2>
 <p>The cors feature allows an easy usage of this web server from other origins. By default, only
 the <code>Access-Control-Allow-Methods</code> header is touched. To change the behaviour, add your desired
@@ -186,8 +181,7 @@ configuration as a middleware.</p>
 <p>A simple example that allows authentication from every origin (note that <code>*</code> always disallows
 authentication), and every content type, looks like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">read_all</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FooResource</span>;
 
@@ -207,7 +201,7 @@ authentication), and every content type, looks like this:</p>
 	<span class="ident">gotham::start</span>(<span class="string">&quot;127.0.0.1:8080&quot;</span>, <span class="ident">build_router</span>(<span class="ident">chain</span>, <span class="ident">pipelines</span>, <span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
 		<span class="ident">route</span>.<span class="ident">resource</span>::<span class="op">&lt;</span><span class="ident">FooResource</span><span class="op">&gt;</span>(<span class="string">&quot;foo&quot;</span>);
 	}));
-}</pre></div>
+}</code></pre></div>
 <p>The cors feature can also be used for non-resource handlers. Take a look at <a href="cors/trait.CorsRoute.html" title="CorsRoute"><code>CorsRoute</code></a>
 for an example.</p>
 <h2 id="database-feature" class="section-header"><a href="#database-feature">Database Feature</a></h2>
@@ -217,8 +211,7 @@ to run async code while holding a database connection. If you need to combine as
 you’ll need to borrow the connection from the <a href="https://docs.rs/gotham/0.6.0/gotham/state/struct.State.html"><code>State</code></a> yourself and return a boxed future.</p>
 <p>A simple non-async example looks like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">read_all</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FooResource</span>;
 
@@ -243,7 +236,7 @@ you’ll need to borrow the connection from the <a href="https://docs.rs/gotham/
 	<span class="ident">gotham::start</span>(<span class="string">&quot;127.0.0.1:8080&quot;</span>, <span class="ident">build_router</span>(<span class="ident">chain</span>, <span class="ident">pipelines</span>, <span class="op">|</span><span class="ident">route</span><span class="op">|</span> {
 		<span class="ident">route</span>.<span class="ident">resource</span>::<span class="op">&lt;</span><span class="ident">FooResource</span><span class="op">&gt;</span>(<span class="string">&quot;foo&quot;</span>);
 	}));
-}</pre></div>
+}</code></pre></div>
 <h2 id="openapi-feature" class="section-header"><a href="#openapi-feature">OpenAPI Feature</a></h2>
 <p>The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section
 carefully both as a binary as well as a library author to avoid unwanted suprises.</p>
@@ -253,8 +246,7 @@ enough type information, so all types used in the router need to implement
 <a href="openapi_type::OpenapiType"><code>OpenapiType</code></a>. This can be derived for almoust any type and there
 should be no need to implement it manually. A simple example looks like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
 <span class="attribute">#[<span class="ident">resource</span>(<span class="ident">read_all</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FooResource</span>;
 
@@ -281,7 +273,7 @@ should be no need to implement it manually. A simple example looks like this:</p
 			<span class="ident">route</span>.<span class="ident">openapi_doc</span>(<span class="string">&quot;/&quot;</span>);
 		});
 	}));
-}</pre></div>
+}</code></pre></div>
 <p>Above example adds the resource as before, but adds two other endpoints as well: <code>/openapi</code> and <code>/</code>.
 The first one will return the generated openapi specification in JSON format, allowing you to easily
 generate clients in different languages without worying to exactly replicate your api in each of those
@@ -294,10 +286,9 @@ implement <a href="trait.EndpointWithSchema.html" title="EndpointWithSchema"><co
 on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both
 features through and conditionally enable the openapi code, like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">derive</span>(<span class="ident">openapi_type::OpenapiType</span>))]</span>
-<span class="kw">struct</span> <span class="ident">Foo</span>;</pre></div>
+<span class="kw">struct</span> <span class="ident">Foo</span>;</code></pre></div>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
 <div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="https://docs.rs/gotham/0.6.0/gotham/index.html" title="mod gotham">gotham</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use mime::<a class="struct" href="https://docs.rs/mime/0.3.16/mime/struct.Mime.html" title="struct mime::Mime">Mime</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use cors::<a class="fn" href="cors/fn.handle_cors.html" title="fn gotham_restful::cors::handle_cors">handle_cors</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use cors::<a class="struct" href="cors/struct.CorsConfig.html" title="struct gotham_restful::cors::CorsConfig">CorsConfig</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use cors::<a class="trait" href="cors/trait.CorsRoute.html" title="trait gotham_restful::cors::CorsRoute">CorsRoute</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use response::AuthError::<a class="enum" href="enum.AuthError.html" title="enum gotham_restful::AuthError">Forbidden</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
 <div class="item-table"><div class="item-left module-item"><a class="mod" href="cors/index.html" title="gotham_restful::cors mod">cors</a></div><div class="item-right docblock-short"></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
