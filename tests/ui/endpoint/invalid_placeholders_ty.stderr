@@ -4,10 +4,11 @@ error[E0277]: the trait bound `FooPlaceholders: OpenapiType` is not satisfied
 15 | fn endpoint(_: FooPlaceholders) {
    |                ^^^^^^^^^^^^^^^ the trait `OpenapiType` is not implemented for `FooPlaceholders`
    |
-  ::: src/endpoint.rs:63:21
+note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
+  --> src/endpoint.rs
    |
-63 |     #[openapi_bound("Placeholders: OpenapiType")]
-   |                     --------------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |     #[openapi_bound("Placeholders: OpenapiType")]
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: Clone` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -15,10 +16,11 @@ error[E0277]: the trait bound `FooPlaceholders: Clone` is not satisfied
 15 | fn endpoint(_: FooPlaceholders) {
    |                ^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `FooPlaceholders`
    |
-  ::: src/endpoint.rs:64:46
+note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
+  --> src/endpoint.rs
    |
-64 |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                                              ----- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |     type Placeholders: PathExtractor<Body> + Clone + Sync;
+   |                                              ^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -26,10 +28,11 @@ error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
 15 | fn endpoint(_: FooPlaceholders) {
    |                ^^^^^^^^^^^^^^^ the trait `StateData` is not implemented for `FooPlaceholders`
    |
-  ::: src/endpoint.rs:64:24
+note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
+  --> src/endpoint.rs
    |
-64 |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                        ------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |     type Placeholders: PathExtractor<Body> + Clone + Sync;
+   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -37,10 +40,11 @@ error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not s
 15 | fn endpoint(_: FooPlaceholders) {
    |                ^^^^^^^^^^^^^^^ the trait `StaticResponseExtender` is not implemented for `FooPlaceholders`
    |
-  ::: src/endpoint.rs:64:24
+note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
+  --> src/endpoint.rs
    |
-64 |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                        ------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |     type Placeholders: PathExtractor<Body> + Clone + Sync;
+   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<'de>` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -48,7 +52,8 @@ error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<
 15 | fn endpoint(_: FooPlaceholders) {
    |                ^^^^^^^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooPlaceholders`
    |
-  ::: src/endpoint.rs:64:24
+note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
+  --> src/endpoint.rs
    |
-64 |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                        ------------------- required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |     type Placeholders: PathExtractor<Body> + Clone + Sync;
+   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
