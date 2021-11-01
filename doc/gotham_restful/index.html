@@ -73,7 +73,7 @@ of the pre-defined endpoints, but you need to give it more context:</p>
 <h1 id="arguments" class="section-header"><a href="#arguments">Arguments</a></h1>
 <p>Some endpoints require arguments. Those should be</p>
 <ul>
-<li><strong>id</strong> Should be a deserializable json-primitive like <a href="https://doc.rust-lang.org/1.56.0/std/primitive.i64.html" title="i64"><code>i64</code></a> or <a href="https://doc.rust-lang.org/1.56.0/alloc/string/struct.String.html" title="String"><code>String</code></a>.</li>
+<li><strong>id</strong> Should be a deserializable json-primitive like <a href="https://doc.rust-lang.org/1.56.1/std/primitive.i64.html" title="i64"><code>i64</code></a> or <a href="https://doc.rust-lang.org/1.56.1/alloc/string/struct.String.html" title="String"><code>String</code></a>.</li>
 <li><strong>body</strong> Should be any deserializable object, or any type implementing <a href="trait.RequestBody.html" title="RequestBody"><code>RequestBody</code></a>.</li>
 <li><strong>query</strong> Should be any deserializable object whose variables are json-primitives. It will
 however not be parsed from json, but from HTTP GET parameters like in <code>search?id=1</code>. The
