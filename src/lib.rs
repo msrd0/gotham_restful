@@ -87,9 +87,8 @@ Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is si
 of the pre-defined endpoints, but you need to give it more context:
 
 ```rust,no_run
-# #[macro_use] extern crate gotham_derive;
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
+# use gotham::{router::build_simple_router, prelude::*};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 use gotham_restful::gotham::hyper::Method;
@@ -221,7 +220,7 @@ A simple example that uses only a single secret looks like this:
 # #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "auth")]
 # mod auth_feature_enabled {
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -274,7 +273,7 @@ authentication), and every content type, looks like this:
 # #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "cors")]
 # mod cors_feature_enabled {
-# use gotham::{hyper::header::*, router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{hyper::header::*, router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::*};
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -319,7 +318,7 @@ A simple non-async example looks like this:
 # #[cfg(feature = "database")]
 # mod database_feature_enabled {
 # use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_middleware_diesel::DieselMiddleware;
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
@@ -444,8 +443,6 @@ compile_error!("Either the 'openapi' or 'without-openapi' feature needs to be en
 // weird proc macro issue
 extern crate self as gotham_restful;
 
-#[macro_use]
-extern crate gotham_derive;
 #[macro_use]
 extern crate gotham_restful_derive;
 #[macro_use]

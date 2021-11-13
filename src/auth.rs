@@ -10,7 +10,8 @@ use gotham::{
 	handler::HandlerFuture,
 	hyper::header::{HeaderMap, HeaderName, AUTHORIZATION},
 	middleware::{cookie::CookieParser, Middleware, NewMiddleware},
-	state::{FromState, State}
+	prelude::*,
+	state::State
 };
 use jsonwebtoken::{errors::ErrorKind, DecodingKey};
 use serde::de::DeserializeOwned;
@@ -123,7 +124,7 @@ simply add it to your pipeline and request it inside your handler:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #

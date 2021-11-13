@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Updated
+ - gotham to 0.7
+
 ## [0.4.6] - 2021-10-15
 ### Added
  - Support for "dynamic" schema where the endpoint macro creates a new response type for you

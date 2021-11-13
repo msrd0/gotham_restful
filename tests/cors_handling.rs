@@ -1,8 +1,8 @@
 #![cfg(feature = "cors")]
 use gotham::{
 	hyper::{body::Body, client::connect::Connect, header::*, StatusCode},
-	pipeline::{new_pipeline, single::single_pipeline},
-	router::builder::*,
+	pipeline::{new_pipeline, single_pipeline},
+	router::build_router,
 	test::{Server, TestRequest, TestServer}
 };
 use gotham_restful::{
