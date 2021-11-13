@@ -259,6 +259,7 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
+<span id="260">260</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::openapi</span>::{
 	<span class="ident">builder</span>::{<span class="ident">OpenapiBuilder</span>, <span class="ident">OpenapiInfo</span>},
@@ -271,11 +272,12 @@
 	<span class="ident">handler::HandlerError</span>,
 	<span class="ident">helpers::http::response</span>::{<span class="ident">create_empty_response</span>, <span class="ident">create_response</span>},
 	<span class="ident">hyper</span>::{<span class="ident">body::to_bytes</span>, <span class="ident">header::CONTENT_TYPE</span>, <span class="ident">Body</span>, <span class="ident">HeaderMap</span>, <span class="ident">Method</span>, <span class="ident">StatusCode</span>},
-	<span class="ident">pipeline::chain::PipelineHandleChain</span>,
+	<span class="ident">pipeline::PipelineHandleChain</span>,
+	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
 	<span class="ident">router</span>::{
-		<span class="ident">builder</span>::{<span class="ident">DefineSingleRoute</span>, <span class="ident">DrawRoutes</span>, <span class="ident">RouterBuilder</span>, <span class="ident">ScopeBuilder</span>},
-		<span class="ident">non_match::RouteNonMatch</span>,
-		<span class="ident">route::matcher</span>::{<span class="ident">AcceptHeaderRouteMatcher</span>, <span class="ident">ContentTypeHeaderRouteMatcher</span>, <span class="ident">RouteMatcher</span>}
+		<span class="ident">builder</span>::{<span class="ident">RouterBuilder</span>, <span class="ident">ScopeBuilder</span>},
+		<span class="ident">route::matcher</span>::{<span class="ident">AcceptHeaderRouteMatcher</span>, <span class="ident">ContentTypeHeaderRouteMatcher</span>, <span class="ident">RouteMatcher</span>},
+		<span class="ident">RouteNonMatch</span>
 	},
 	<span class="ident">state</span>::{<span class="ident">FromState</span>, <span class="ident">State</span>}
 };

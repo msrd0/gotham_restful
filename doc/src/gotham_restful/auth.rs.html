@@ -483,6 +483,7 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
+<span id="484">484</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AuthError</span>, <span class="ident">Forbidden</span>};
 
 <span class="kw">use</span> <span class="ident">cookie::CookieJar</span>;
@@ -495,7 +496,8 @@
 	<span class="ident">handler::HandlerFuture</span>,
 	<span class="ident">hyper::header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderName</span>, <span class="ident">AUTHORIZATION</span>},
 	<span class="ident">middleware</span>::{<span class="ident">cookie::CookieParser</span>, <span class="ident">Middleware</span>, <span class="ident">NewMiddleware</span>},
-	<span class="ident">state</span>::{<span class="ident">FromState</span>, <span class="ident">State</span>}
+	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
+	<span class="ident">state::State</span>
 };
 <span class="kw">use</span> <span class="ident">jsonwebtoken</span>::{<span class="ident">errors::ErrorKind</span>, <span class="ident">DecodingKey</span>};
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
@@ -608,7 +610,7 @@ simply add it to your pipeline and request it inside your handler:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #

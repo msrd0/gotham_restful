@@ -525,9 +525,6 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">unreachable_pub</span>)]</span>
 <span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
 <span class="comment">// deny warnings in CI</span>
@@ -617,9 +614,8 @@ Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is si
 of the pre-defined endpoints, but you need to give it more context:
 
 ```rust,no_run
-# #[macro_use] extern crate gotham_derive;
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
+# use gotham::{router::build_simple_router, prelude::*};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 use gotham_restful::gotham::hyper::Method;
@@ -751,7 +747,7 @@ A simple example that uses only a single secret looks like this:
 # #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = &quot;auth&quot;)]
 # mod auth_feature_enabled {
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -804,7 +800,7 @@ authentication), and every content type, looks like this:
 # #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = &quot;cors&quot;)]
 # mod cors_feature_enabled {
-# use gotham::{hyper::header::*, router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{hyper::header::*, router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::*};
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -849,7 +845,7 @@ A simple non-async example looks like this:
 # #[cfg(feature = &quot;database&quot;)]
 # mod database_feature_enabled {
 # use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_middleware_diesel::DieselMiddleware;
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
@@ -974,8 +970,6 @@ struct Foo;
 <span class="comment">// weird proc macro issue</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">gotham_restful</span>;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">gotham_derive</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">gotham_restful_derive</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>

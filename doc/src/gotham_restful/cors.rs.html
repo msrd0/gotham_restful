@@ -297,8 +297,6 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">gotham</span>::{
 	<span class="ident">handler::HandlerFuture</span>,
 	<span class="ident">helpers::http::response::create_empty_response</span>,
@@ -311,12 +309,10 @@
 		<span class="ident">Body</span>, <span class="ident">Method</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>
 	},
 	<span class="ident">middleware::Middleware</span>,
-	<span class="ident">pipeline::chain::PipelineHandleChain</span>,
-	<span class="ident">router</span>::{
-		<span class="ident">builder</span>::{<span class="ident">DefineSingleRoute</span>, <span class="ident">DrawRoutes</span>, <span class="ident">ExtendRouteMatcher</span>},
-		<span class="ident">route::matcher::AccessControlRequestMethodMatcher</span>
-	},
-	<span class="ident">state</span>::{<span class="ident">FromState</span>, <span class="ident">State</span>}
+	<span class="ident">pipeline::PipelineHandleChain</span>,
+	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
+	<span class="ident">router</span>::{<span class="ident">builder::ExtendRouteMatcher</span>, <span class="ident">route::matcher::AccessControlRequestMethodMatcher</span>},
+	<span class="ident">state::State</span>
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">panic::RefUnwindSafe</span>, <span class="ident">pin::Pin</span>};
 
@@ -411,7 +407,7 @@ not to touch any responses, resulting in the browser&#39;s default behaviour.
 To change settings, you need to put this type into gotham&#39;s [State]:
 
 ```rust,no_run
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::Origin};
 # #[cfg_attr(feature = &quot;cargo-clippy&quot;, allow(clippy::needless_doctest_main))]
 fn main() {
@@ -430,7 +426,7 @@ This easy approach allows you to have one global cors configuration. If you pref
 configurations for different scopes, you need to register the middleware inside your routing logic:
 
 ```rust,no_run
-# use gotham::{router::builder::*, pipeline::*, pipeline::set::*, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::Origin};
 let pipelines = new_pipeline_set();
 

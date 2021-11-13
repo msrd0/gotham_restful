@@ -140,6 +140,7 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
 	<span class="ident">builder::OpenapiBuilder</span>,
 	<span class="ident">handler</span>::{<span class="ident">OpenapiDocHandler</span>, <span class="ident">OpenapiSpecHandler</span>},
@@ -148,8 +149,9 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">routing</span>::<span class="kw-2">*</span>, <span class="ident">EndpointWithSchema</span>, <span class="ident">ResourceWithSchema</span>, <span class="ident">ResponseSchema</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::{
 	<span class="ident">hyper</span>::{<span class="ident">Method</span>, <span class="ident">StatusCode</span>},
-	<span class="ident">pipeline::chain::PipelineHandleChain</span>,
-	<span class="ident">router::builder</span>::<span class="op">*</span>
+	<span class="ident">pipeline::PipelineHandleChain</span>,
+	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
+	<span class="ident">router::builder</span>::{<span class="ident">RouterBuilder</span>, <span class="ident">ScopeBuilder</span>}
 };
 <span class="kw">use</span> <span class="ident">lazy_regex::regex_replace_all</span>;
 <span class="kw">use</span> <span class="ident">openapi_type::OpenapiType</span>;
