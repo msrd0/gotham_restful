@@ -10,11 +10,12 @@ use gotham::{
 	handler::HandlerError,
 	helpers::http::response::{create_empty_response, create_response},
 	hyper::{body::to_bytes, header::CONTENT_TYPE, Body, HeaderMap, Method, StatusCode},
-	pipeline::chain::PipelineHandleChain,
+	pipeline::PipelineHandleChain,
+	prelude::*,
 	router::{
-		builder::{DefineSingleRoute, DrawRoutes, RouterBuilder, ScopeBuilder},
-		non_match::RouteNonMatch,
-		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher}
+		builder::{RouterBuilder, ScopeBuilder},
+		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher},
+		RouteNonMatch
 	},
 	state::{FromState, State}
 };

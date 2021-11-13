@@ -19,8 +19,7 @@ include = ["/src/**/*.rs", "/src/openapi/handler/script.min.js", "/LICENSE", "/c
 [dependencies]
 futures-core = "0.3.15"
 futures-util = "0.3.15"
-gotham = { version = "0.6.0", default-features = false }
-gotham_derive = "0.6.0"
+gotham = { version = "0.7.0", features = ["derive"], default-features = false }
 gotham_restful_derive = { version = "0.4.3", path = "./derive" }
 log = "0.4.8"
 mime = "0.3.16"
@@ -32,7 +31,7 @@ thiserror = "1.0"
 base64 = { version = "0.13.0", optional = true }
 cookie = { version = "0.15", optional = true }
 either = { version = "1.6", optional = true }
-gotham_middleware_diesel = { version = "0.3.0", optional = true }
+gotham_middleware_diesel = { version = "0.4.0", optional = true }
 jsonwebtoken = { version = "7.2", optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
 openapi_type = { version = "0.2.3", optional = true }
@@ -42,6 +41,7 @@ sha2 = { version = "0.9.5", optional = true }
 [dev-dependencies]
 diesel = { version = "1.4.6", features = ["postgres"] }
 futures-executor = "0.3.15"
+gotham = { version = "0.7.0", features = ["testing"], default-features = false }
 paste = "1.0"
 pretty_assertions = "1.0"
 pretty_env_logger = "0.4"

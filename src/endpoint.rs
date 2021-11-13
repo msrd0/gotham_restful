@@ -3,7 +3,7 @@ use futures_util::future::BoxFuture;
 use gotham::{
 	extractor::{PathExtractor, QueryStringExtractor},
 	hyper::{Body, Method, Response},
-	router::response::extender::StaticResponseExtender,
+	router::response::StaticResponseExtender,
 	state::{State, StateData}
 };
 #[cfg(feature = "openapi")]

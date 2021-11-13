@@ -1,9 +1,7 @@
-#[macro_use]
-extern crate gotham_derive;
-
 use gotham::{
 	hyper::{HeaderMap, Method},
-	router::builder::*,
+	prelude::*,
+	router::build_simple_router,
 	state::State,
 	test::TestServer
 };

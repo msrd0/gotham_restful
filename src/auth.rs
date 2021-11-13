@@ -10,7 +10,8 @@ use gotham::{
 	handler::HandlerFuture,
 	hyper::header::{HeaderMap, HeaderName, AUTHORIZATION},
 	middleware::{cookie::CookieParser, Middleware, NewMiddleware},
-	state::{FromState, State}
+	prelude::*,
+	state::State
 };
 use jsonwebtoken::{errors::ErrorKind, DecodingKey};
 use serde::de::DeserializeOwned;

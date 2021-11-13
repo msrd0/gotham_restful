@@ -1,7 +1,4 @@
-#[macro_use]
-extern crate gotham_derive;
-
-use gotham::{router::builder::*, test::TestServer};
+use gotham::{prelude::*, router::build_simple_router, test::TestServer};
 use gotham_restful::*;
 use mime::{APPLICATION_JSON, TEXT_PLAIN};
 #[cfg(feature = "openapi")]

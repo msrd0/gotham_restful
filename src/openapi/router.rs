@@ -6,8 +6,9 @@ use super::{
 use crate::{routing::*, EndpointWithSchema, ResourceWithSchema, ResponseSchema};
 use gotham::{
 	hyper::{Method, StatusCode},
-	pipeline::chain::PipelineHandleChain,
-	router::builder::*
+	pipeline::PipelineHandleChain,
+	prelude::*,
+	router::builder::{RouterBuilder, ScopeBuilder}
 };
 use lazy_regex::regex_replace_all;
 use openapi_type::OpenapiType;

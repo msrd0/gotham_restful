@@ -10,12 +10,10 @@ use gotham::{
 		Body, Method, Response, StatusCode
 	},
 	middleware::Middleware,
-	pipeline::chain::PipelineHandleChain,
-	router::{
-		builder::{DefineSingleRoute, DrawRoutes, ExtendRouteMatcher},
-		route::matcher::AccessControlRequestMethodMatcher
-	},
-	state::{FromState, State}
+	pipeline::PipelineHandleChain,
+	prelude::*,
+	router::{builder::ExtendRouteMatcher, route::matcher::AccessControlRequestMethodMatcher},
+	state::State
 };
 use std::{panic::RefUnwindSafe, pin::Pin};
 

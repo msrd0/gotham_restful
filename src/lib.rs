@@ -445,8 +445,6 @@ compile_error!("Either the 'openapi' or 'without-openapi' feature needs to be en
 extern crate self as gotham_restful;
 
 #[macro_use]
-extern crate gotham_derive;
-#[macro_use]
 extern crate gotham_restful_derive;
 #[macro_use]
 extern crate log;
