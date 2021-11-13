@@ -108,7 +108,7 @@ not to touch any responses, resulting in the browser's default behaviour.
 To change settings, you need to put this type into gotham's [State]:
 
 ```rust,no_run
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::Origin};
 # #[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_doctest_main))]
 fn main() {
@@ -127,7 +127,7 @@ This easy approach allows you to have one global cors configuration. If you pref
 configurations for different scopes, you need to register the middleware inside your routing logic:
 
 ```rust,no_run
-# use gotham::{router::builder::*, pipeline::*, pipeline::set::*, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::Origin};
 let pipelines = new_pipeline_set();
 

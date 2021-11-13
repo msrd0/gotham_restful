@@ -87,9 +87,8 @@ Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is si
 of the pre-defined endpoints, but you need to give it more context:
 
 ```rust,no_run
-# #[macro_use] extern crate gotham_derive;
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
+# use gotham::{router::build_simple_router, prelude::*};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 use gotham_restful::gotham::hyper::Method;
@@ -274,7 +273,7 @@ authentication), and every content type, looks like this:
 # #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "cors")]
 # mod cors_feature_enabled {
-# use gotham::{hyper::header::*, router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{hyper::header::*, router::builder::*, pipeline::*, state::State};
 # use gotham_restful::{*, cors::*};
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
