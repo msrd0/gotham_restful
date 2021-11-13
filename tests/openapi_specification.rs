@@ -1,14 +1,13 @@
 #![cfg(all(feature = "auth", feature = "openapi"))]
 
 #[macro_use]
-extern crate gotham_derive;
-#[macro_use]
 extern crate pretty_assertions;
 
 use gotham::{
 	hyper::Method,
-	pipeline::{new_pipeline, single::single_pipeline},
-	router::builder::*,
+	pipeline::{new_pipeline, single_pipeline},
+	prelude::*,
+	router::build_router,
 	test::TestServer
 };
 use gotham_restful::*;
