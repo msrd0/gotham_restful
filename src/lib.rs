@@ -220,7 +220,7 @@ A simple example that uses only a single secret looks like this:
 # #[macro_use] extern crate gotham_restful_derive;
 # #[cfg(feature = "auth")]
 # mod auth_feature_enabled {
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -318,7 +318,7 @@ A simple non-async example looks like this:
 # #[cfg(feature = "database")]
 # mod database_feature_enabled {
 # use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
-# use gotham::{router::builder::*, pipeline::{new_pipeline, single::single_pipeline}, state::State};
+# use gotham::{router::builder::*, pipeline::*, state::State};
 # use gotham_middleware_diesel::DieselMiddleware;
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
