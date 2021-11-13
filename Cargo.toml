@@ -5,7 +5,7 @@ members = [".", "./derive"]
 
 [package]
 name = "gotham_restful"
-version = "0.4.6"
+version = "0.5.0"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 rust-version = "1.51.0"

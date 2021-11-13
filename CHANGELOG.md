@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.5.0] - 2021-11-13
 ### Updated
  - gotham to 0.7
 
