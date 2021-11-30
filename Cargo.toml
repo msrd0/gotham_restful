@@ -5,7 +5,7 @@ members = [".", "./derive"]
 
 [package]
 name = "gotham_restful"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 rust-version = "1.51.0"
@@ -18,9 +18,9 @@ repository = "https://github.com/msrd0/gotham_restful"
 include = ["/src/**/*.rs", "/src/openapi/handler/script.min.js", "/LICENSE", "/crates-io.md"]
 
 [dependencies]
-futures-core = "0.3.15"
-futures-util = "0.3.15"
-gotham = { version = "0.7.0", features = ["derive"], default-features = false }
+futures-core = "0.3.18"
+futures-util = "0.3.18"
+gotham = { version = "0.7.1", features = ["derive"], default-features = false }
 gotham_restful_derive = { version = "0.4.3", path = "./derive" }
 log = "0.4.8"
 mime = "0.3.16"
