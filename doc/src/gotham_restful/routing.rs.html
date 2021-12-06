@@ -321,7 +321,7 @@
 	<span class="kw">fn</span> <span class="ident">endpoint</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">response_from</span>(<span class="ident">res</span>: <span class="ident">Response</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">gotham::hyper::Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">response_from</span>(<span class="ident">res</span>: <span class="ident">Response</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="ident">gotham::hyper::Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="ident">state</span>, <span class="ident">res</span>.<span class="ident">status</span>);
 	<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">headers_mut</span>();
 	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mime</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">mime</span> {
@@ -348,7 +348,7 @@
 	<span class="ident">r</span>
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">endpoint_handler</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endpoint</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">gotham::hyper::Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">endpoint_handler</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endpoint</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">gotham::hyper::Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">E</span>: <span class="ident">Endpoint</span>,
 	<span class="op">&lt;</span><span class="ident">E::Output</span> <span class="kw">as</span> <span class="ident">IntoResponse</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span>
@@ -357,18 +357,18 @@
 	<span class="kw">let</span> <span class="ident">placeholders</span> <span class="op">=</span> <span class="ident">E::Placeholders::take_from</span>(<span class="ident">state</span>);
 	<span class="comment">// workaround for E::Placeholders and E::Param being the same type</span>
 	<span class="comment">// when fixed remove `Clone` requirement on endpoint</span>
-	<span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E::Placeholders</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E::Params</span><span class="op">&gt;</span>() {
+	<span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E::Placeholders</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E::Params</span><span class="op">&gt;</span>() {
 		<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">placeholders</span>.<span class="ident">clone</span>());
 	}
 	<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">E::Params::take_from</span>(<span class="ident">state</span>);
 
 	<span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">E::needs_body</span>() {
-		<span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="bool-val">true</span> =&gt; {
 			<span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_bytes</span>(<span class="ident">Body::take_from</span>(<span class="ident">state</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
 			<span class="kw">let</span> <span class="ident">content_type</span>: <span class="ident">Mime</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">HeaderMap::borrow_from</span>(<span class="ident">state</span>).<span class="ident">get</span>(<span class="ident">CONTENT_TYPE</span>) {
-				<span class="prelude-val">Some</span>(<span class="ident">content_type</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">content_type</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>(),
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="prelude-val">Some</span>(<span class="ident">content_type</span>) =&gt; <span class="ident">content_type</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>(),
+				<span class="prelude-val">None</span> =&gt; {
 					<span class="macro">debug!</span>(<span class="string">&quot;Missing Content-Type: Returning 415 Response&quot;</span>);
 					<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="ident">state</span>, <span class="ident">StatusCode::UNSUPPORTED_MEDIA_TYPE</span>);
 					<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>);
@@ -376,8 +376,8 @@
 			};
 
 			<span class="kw">match</span> <span class="ident">E::Body::from_body</span>(<span class="ident">body</span>, <span class="ident">content_type</span>) {
-				<span class="prelude-val">Ok</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>),
-				<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="prelude-val">Ok</span>(<span class="ident">body</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">body</span>),
+				<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
 					<span class="macro">debug!</span>(<span class="string">&quot;Invalid Body: Returning 400 Response&quot;</span>);
 					<span class="kw">let</span> <span class="ident">error</span>: <span class="ident">ResourceError</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
 					<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">error</span>)<span class="question-mark">?</span>;
@@ -386,7 +386,7 @@
 				}
 			}
 		},
-		<span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+		<span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>
 	};
 
 	<span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">E::handle</span>(<span class="ident">state</span>, <span class="ident">placeholders</span>, <span class="ident">params</span>, <span class="ident">body</span>).<span class="kw">await</span>;
@@ -401,19 +401,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RouteMatcher</span> <span class="kw">for</span> <span class="ident">MaybeMatchAcceptHeader</span> {
-	<span class="kw">fn</span> <span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RouteNonMatch</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RouteNonMatch</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">matcher</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">matcher</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">matcher</span>.<span class="ident">is_match</span>(<span class="ident">state</span>),
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(())
+			<span class="prelude-val">Some</span>(<span class="ident">matcher</span>) =&gt; <span class="ident">matcher</span>.<span class="ident">is_match</span>(<span class="ident">state</span>),
+			<span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(())
 		}
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">MaybeMatchAcceptHeader</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">types</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">types</span>) <span class="kw">if</span> <span class="ident">types</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-			<span class="ident">types</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">types</span>
+			<span class="prelude-val">Some</span>(<span class="ident">types</span>) <span class="kw">if</span> <span class="ident">types</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">None</span>,
+			<span class="ident">types</span> =&gt; <span class="ident">types</span>
 		};
 		<span class="self">Self</span> {
 			<span class="ident">matcher</span>: <span class="ident">types</span>.<span class="ident">map</span>(<span class="ident">AcceptHeaderRouteMatcher::new</span>)
@@ -422,7 +422,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MaybeMatchAcceptHeader</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">types</span>)
 	}
 }
@@ -433,16 +433,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RouteMatcher</span> <span class="kw">for</span> <span class="ident">MaybeMatchContentTypeHeader</span> {
-	<span class="kw">fn</span> <span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RouteNonMatch</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RouteNonMatch</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">matcher</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">matcher</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">matcher</span>.<span class="ident">is_match</span>(<span class="ident">state</span>),
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(())
+			<span class="prelude-val">Some</span>(<span class="ident">matcher</span>) =&gt; <span class="ident">matcher</span>.<span class="ident">is_match</span>(<span class="ident">state</span>),
+			<span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(())
 		}
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">MaybeMatchContentTypeHeader</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> {
 			<span class="ident">matcher</span>: <span class="ident">types</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">types</span><span class="op">|</span> <span class="ident">ContentTypeHeaderRouteMatcher::new</span>(<span class="ident">types</span>).<span class="ident">allow_no_type</span>())
 		}
@@ -450,13 +450,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MaybeMatchContentTypeHeader</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">types</span>)
 	}
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">implDrawResourceRoutes</span> {
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">implType</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">implType</span>:<span class="ident">ident</span>) =&gt; {
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 		<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">WithOpenapi</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">implType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
 		<span class="kw">where</span>

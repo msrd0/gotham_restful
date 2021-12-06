@@ -186,9 +186,9 @@ error, or delegates to another error type. This type is best used with [AuthResu
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AuthError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AuthErrorOrOther</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">AuthError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">AuthError</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">match</span> <span class="ident">err</span> {
-			<span class="ident">AuthError::Forbidden</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Forbidden</span>
+			<span class="ident">AuthError::Forbidden</span> =&gt; <span class="ident"><span class="self">Self</span>::Forbidden</span>
 		}
 	}
 }
@@ -204,7 +204,7 @@ error, or delegates to another error type. This type is best used with [AuthResu
 	<span class="comment">// TODO https://github.com/msrd0/gotham_restful/issues/20</span>
 	<span class="ident">F</span>: <span class="ident">private::Sealed</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
 {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::Other</span>(<span class="ident">err</span>.<span class="ident">into</span>())
 	}
 }

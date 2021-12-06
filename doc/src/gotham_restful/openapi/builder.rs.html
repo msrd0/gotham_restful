@@ -185,7 +185,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OpenapiBuilder</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">info</span>: <span class="ident">OpenapiInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">info</span>: <span class="ident">OpenapiInfo</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> {
 			<span class="ident">openapi</span>: <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">OpenAPI</span> {
 				<span class="ident">openapi</span>: <span class="string">&quot;3.0.2&quot;</span>.<span class="ident">to_string</span>(),
@@ -209,11 +209,11 @@
 
 	<span class="doccomment">/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to</span>
 	<span class="doccomment">/// modify the path and add it back after the modification</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_path</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathItem</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_path</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PathItem</span> {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">openapi</span>.<span class="ident">write</span>();
 		<span class="kw">match</span> <span class="ident">openapi</span>.<span class="ident">paths</span>.<span class="ident">swap_remove</span>(<span class="ident">path</span>) {
-			<span class="prelude-val">Some</span>(<span class="ident">Item</span>(<span class="ident">item</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">item</span>,
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PathItem::default</span>()
+			<span class="prelude-val">Some</span>(<span class="ident">Item</span>(<span class="ident">item</span>)) =&gt; <span class="ident">item</span>,
+			<span class="kw">_</span> =&gt; <span class="ident">PathItem::default</span>()
 		}
 	}
 
@@ -227,10 +227,10 @@
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">openapi</span>.<span class="ident">write</span>();
 		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">openapi</span>.<span class="ident">components</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">comp</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="prelude-val">Some</span>(<span class="ident">comp</span>) =&gt; {
 				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>()));
 			},
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="prelude-val">None</span> =&gt; {
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comp</span> <span class="op">=</span> <span class="ident">Components::default</span>();
 				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>()));
 				<span class="ident">openapi</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">comp</span>);
@@ -248,16 +248,16 @@
 		}
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_schema</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">schema</span>: <span class="ident">OpenapiSchema</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_schema</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">schema</span>: <span class="ident">OpenapiSchema</span>) -&gt; <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">name</span>.<span class="ident">clone</span>() {
-			<span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
 				<span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Reference</span> {
 					<span class="ident">reference</span>: <span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{}&quot;</span>, <span class="ident">name</span>)
 				};
 				<span class="self">self</span>.<span class="ident">add_schema_impl</span>(<span class="ident">name</span>, <span class="ident">schema</span>);
 				<span class="ident">reference</span>
 			},
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="prelude-val">None</span> =&gt; {
 				<span class="self">self</span>.<span class="ident">add_schema_dependencies</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">schema</span>.<span class="ident">dependencies</span>);
 				<span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>())
 			}
@@ -281,7 +281,7 @@
 		<span class="ident">msgs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
 	}
 
-	<span class="kw">fn</span> <span class="ident">info</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenapiInfo</span> {
+	<span class="kw">fn</span> <span class="ident">info</span>() -&gt; <span class="ident">OpenapiInfo</span> {
 		<span class="ident">OpenapiInfo</span> {
 			<span class="ident">title</span>: <span class="string">&quot;TEST CASE&quot;</span>.<span class="ident">to_owned</span>(),
 			<span class="ident">version</span>: <span class="string">&quot;1.2.3&quot;</span>.<span class="ident">to_owned</span>(),
@@ -289,7 +289,7 @@
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">openapi</span>(<span class="ident">builder</span>: <span class="ident">OpenapiBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenAPI</span> {
+	<span class="kw">fn</span> <span class="ident">openapi</span>(<span class="ident">builder</span>: <span class="ident">OpenapiBuilder</span>) -&gt; <span class="ident">OpenAPI</span> {
 		<span class="ident">Arc::try_unwrap</span>(<span class="ident">builder</span>.<span class="ident">openapi</span>).<span class="ident">unwrap</span>().<span class="ident">into_inner</span>()
 	}
 
