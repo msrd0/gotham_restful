@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.5.2] - 2021-12-10
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.59](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc59-2021-12-09)
+
 ## [0.5.1] - 2021-11-30
 ### Updated
  - The linked redoc version has been updated to [2.0.0-rc.58](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.58)
