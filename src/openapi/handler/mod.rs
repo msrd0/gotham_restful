@@ -37,15 +37,18 @@ fn get_security(state: &State) -> IndexMap<String, ReferenceOr<SecurityScheme>> 
 	let security_scheme = match source {
 		AuthSource::Cookie(name) => SecurityScheme::APIKey {
 			location: APIKeyLocation::Cookie,
-			name: name.to_string()
+			name: name.to_string(),
+			description: None
 		},
 		AuthSource::Header(name) => SecurityScheme::APIKey {
 			location: APIKeyLocation::Header,
-			name: name.to_string()
+			name: name.to_string(),
+			description: None
 		},
 		AuthSource::AuthorizationHeader => SecurityScheme::HTTP {
 			scheme: "bearer".to_owned(),
-			bearer_format: Some("JWT".to_owned())
+			bearer_format: Some("JWT".to_owned()),
+			description: None
 		}
 	};
 

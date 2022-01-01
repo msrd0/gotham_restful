@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
+### Updated
+ - `openapi_type` crate 0.3
 
 ## [0.5.2] - 2021-12-10
 ### Updated

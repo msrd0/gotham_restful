@@ -21,6 +21,7 @@ fn new_parameter_data(name: String, required: bool, schema: ReferenceOr<Box<Sche
 		format: ParameterSchemaOrContent::Schema(schema.unbox()),
 		example: None,
 		examples: Default::default(),
+		explode: None,
 		extensions: Default::default()
 	}
 }
@@ -170,11 +171,11 @@ impl OperationDescription {
 			})
 		});
 
-		let mut security = Vec::new();
+		let mut security = None;
 		if requires_auth {
 			let mut sec = IndexMap::new();
 			sec.insert(SECURITY_NAME.to_owned(), Vec::new());
-			security.push(sec);
+			security = Some(vec![sec]);
 		}
 
 		Operation {
@@ -184,8 +185,8 @@ impl OperationDescription {
 			parameters: params.into_params(),
 			request_body,
 			responses: Responses {
-				default: None,
-				responses
+				responses,
+				..Default::default()
 			},
 			deprecated: false,
 			security,

@@ -49,7 +49,7 @@ impl OpenapiBuilder {
 	/// modify the path and add it back after the modification
 	pub(crate) fn remove_path(&mut self, path: &str) -> PathItem {
 		let mut openapi = self.openapi.write();
-		match openapi.paths.swap_remove(path) {
+		match openapi.paths.paths.swap_remove(path) {
 			Some(Item(item)) => item,
 			_ => PathItem::default()
 		}
@@ -57,7 +57,7 @@ impl OpenapiBuilder {
 
 	pub(crate) fn add_path<Path: ToString>(&mut self, path: Path, item: PathItem) {
 		let mut openapi = self.openapi.write();
-		openapi.paths.insert(path.to_string(), Item(item));
+		openapi.paths.paths.insert(path.to_string(), Item(item));
 	}
 
 	fn add_schema_impl(&mut self, name: String, mut schema: OpenapiSchema) {
