@@ -200,6 +200,8 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">handle_error</span>, <span class="ident">IntoResponse</span>, <span class="ident">IntoResponseError</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">types::ResourceType</span>, <span class="ident">FromBody</span>, <span class="ident">RequestBody</span>, <span class="ident">Response</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
@@ -209,11 +211,13 @@
 
 <span class="kw">use</span> <span class="ident">futures_core::future::Future</span>;
 <span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">future::FutureExt</span>};
-<span class="kw">use</span> <span class="ident">gotham::hyper</span>::{
-	<span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Bytes</span>},
-	<span class="ident">StatusCode</span>
+<span class="kw">use</span> <span class="ident">gotham</span>::{
+	<span class="ident">hyper</span>::{
+		<span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Bytes</span>},
+		<span class="ident">StatusCode</span>
+	},
+	<span class="ident">mime::Mime</span>
 };
-<span class="kw">use</span> <span class="ident">mime::Mime</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">openapi_type::openapi</span>::{<span class="ident">SchemaKind</span>, <span class="ident">StringFormat</span>, <span class="ident">StringType</span>, <span class="ident">Type</span>, <span class="ident">VariantOrUnknownOrEmpty</span>};
 <span class="kw">use</span> <span class="ident">serde_json::error::Error</span> <span class="kw">as</span> <span class="ident">SerdeJsonError</span>;
@@ -364,7 +368,7 @@ fn create(body : Raw&lt;Vec&lt;u8&gt;&gt;) -&gt; Raw&lt;Vec&lt;u8&gt;&gt; {
 <span class="kw">mod</span> <span class="ident">test</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
-	<span class="kw">use</span> <span class="ident">mime::TEXT_PLAIN</span>;
+	<span class="kw">use</span> <span class="ident">gotham::mime::TEXT_PLAIN</span>;
 	<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Error</span>)]</span>

@@ -169,15 +169,19 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">handle_error</span>, <span class="ident">IntoResponse</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ResponseSchema</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponseError</span>, <span class="ident">Response</span>};
 <span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">future::FutureExt</span>};
-<span class="kw">use</span> <span class="ident">gotham::hyper::header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderValue</span>, <span class="ident">IntoHeaderName</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">gotham::hyper::StatusCode</span>;
-<span class="kw">use</span> <span class="ident">mime::Mime</span>;
+<span class="kw">use</span> <span class="ident">gotham</span>::{
+	<span class="ident">hyper::header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderValue</span>, <span class="ident">IntoHeaderName</span>},
+	<span class="ident">mime::Mime</span>
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Display</span>, <span class="ident">future::Future</span>, <span class="ident">pin::Pin</span>};

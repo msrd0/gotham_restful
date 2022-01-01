@@ -324,9 +324,9 @@
 	<span class="ident">hyper</span>::{
 		<span class="ident">header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>},
 		<span class="ident">Body</span>, <span class="ident">StatusCode</span>
-	}
+	},
+	<span class="ident">mime</span>::{<span class="ident">Mime</span>, <span class="ident">APPLICATION_JSON</span>, <span class="ident">STAR_STAR</span>}
 };
-<span class="kw">use</span> <span class="ident">mime</span>::{<span class="ident">Mime</span>, <span class="ident">APPLICATION_JSON</span>, <span class="ident">STAR_STAR</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;

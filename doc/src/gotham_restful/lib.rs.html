@@ -523,8 +523,6 @@
 <span id="521">521</span>
 <span id="522">522</span>
 <span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">unreachable_pub</span>)]</span>
 <span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
 <span class="comment">// deny warnings in CI</span>
@@ -663,7 +661,7 @@ is simply returned as the response again, no json parsing involved:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
+# use gotham::{mime::{self, Mime}, router::builder::*};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -983,8 +981,6 @@ struct Foo;
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gotham</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mime::Mime</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gotham_restful_derive</span>::<span class="kw-2">*</span>;
 

@@ -219,11 +219,9 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
-<span id="220">220</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SECURITY_NAME</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">response::OrAllTypes</span>, <span class="ident">EndpointWithSchema</span>, <span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
-<span class="kw">use</span> <span class="ident">gotham::hyper::StatusCode</span>;
-<span class="kw">use</span> <span class="ident">mime::Mime</span>;
+<span class="kw">use</span> <span class="ident">gotham</span>::{<span class="ident">hyper::StatusCode</span>, <span class="ident">mime::Mime</span>};
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{
 	<span class="ident">indexmap::IndexMap</span>,
 	<span class="ident">openapi</span>::{
