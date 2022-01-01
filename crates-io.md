@@ -332,7 +332,7 @@ the MSRV (minimum supported rust version) is not considered a breaking change.
 
 ## License
 
-Copyright (C) 2020-2021 Dominic Meiser and [contributors].
+Copyright (C) 2019-2022 Dominic Meiser and [contributors].
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -359,7 +359,7 @@ limitations under the License.
  [__link3]: https://docs.rs/gotham_restful/0.5.2/gotham_restful/?search=gotham_restful::types::RequestBody
  [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.72
+ [__link6]: https://crates.io/crates/serde_json/1.0.73
  [__link7]: https://docs.rs/gotham_restful/0.5.2/gotham_restful/?search=gotham_restful::response::Response::header
  [__link8]: https://docs.rs/gotham_restful/0.5.2/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/
