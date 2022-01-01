@@ -10,6 +10,7 @@ use gotham::{
 	handler::HandlerError,
 	helpers::http::response::{create_empty_response, create_response},
 	hyper::{body::to_bytes, header::CONTENT_TYPE, Body, HeaderMap, Method, StatusCode},
+	mime::{Mime, APPLICATION_JSON},
 	pipeline::PipelineHandleChain,
 	prelude::*,
 	router::{
@@ -19,7 +20,6 @@ use gotham::{
 	},
 	state::{FromState, State}
 };
-use mime::{Mime, APPLICATION_JSON};
 #[cfg(feature = "openapi")]
 use openapi_type::OpenapiType;
 use std::{any::TypeId, panic::RefUnwindSafe};

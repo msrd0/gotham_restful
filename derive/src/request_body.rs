@@ -81,7 +81,7 @@ pub fn expand_request_body(input: DeriveInput) -> Result<TokenStream> {
 		impl #generics ::gotham_restful::RequestBody for #ident #generics
 		where #ident #generics : ::gotham_restful::FromBody
 		{
-			fn supported_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::Mime>> {
+			fn supported_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::gotham::mime::Mime>> {
 				#types
 			}
 		}

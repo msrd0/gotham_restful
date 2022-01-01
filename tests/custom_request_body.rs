@@ -1,6 +1,10 @@
-use gotham::{hyper::header::CONTENT_TYPE, router::builder::*, test::TestServer};
-use gotham_restful::*;
-use mime::TEXT_PLAIN;
+use gotham::{
+	hyper::header::CONTENT_TYPE,
+	mime::{Mime, TEXT_PLAIN},
+	router::builder::*,
+	test::TestServer
+};
+use gotham_restful::{create, DrawResources, FromBody, Raw, RequestBody, Resource};
 
 const RESPONSE: &[u8] = b"This is the only valid response.";
 

@@ -7,11 +7,13 @@ use openapi_type::{OpenapiSchema, OpenapiType};
 
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
-use gotham::hyper::{
-	body::{Body, Bytes},
-	StatusCode
+use gotham::{
+	hyper::{
+		body::{Body, Bytes},
+		StatusCode
+	},
+	mime::Mime
 };
-use mime::Mime;
 #[cfg(feature = "openapi")]
 use openapi_type::openapi::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
 use serde_json::error::Error as SerdeJsonError;
@@ -162,7 +164,7 @@ where
 mod test {
 	use super::*;
 	use futures_executor::block_on;
-	use mime::TEXT_PLAIN;
+	use gotham::mime::TEXT_PLAIN;
 	use thiserror::Error;
 
 	#[derive(Debug, Default, Error)]

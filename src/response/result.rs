@@ -6,8 +6,11 @@ use crate::{Response, ResponseBody, Success};
 use openapi_type::{OpenapiSchema, OpenapiType};
 
 use futures_core::future::Future;
-use gotham::{anyhow::Error, hyper::StatusCode};
-use mime::{Mime, APPLICATION_JSON};
+use gotham::{
+	anyhow::Error,
+	hyper::StatusCode,
+	mime::{Mime, APPLICATION_JSON}
+};
 use std::{fmt::Display, pin::Pin};
 
 pub trait IntoResponseError {

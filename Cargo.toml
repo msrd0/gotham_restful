@@ -23,7 +23,6 @@ futures-util = "0.3.18"
 gotham = { version = "0.7.1", features = ["derive"], default-features = false }
 gotham_restful_derive = { version = "0.4.3", path = "./derive" }
 log = "0.4.8"
-mime = "0.3.16"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "1.0"

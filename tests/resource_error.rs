@@ -13,9 +13,8 @@ enum Error {
 #[allow(deprecated)]
 mod resource_error {
 	use super::Error;
-	use gotham::hyper::StatusCode;
+	use gotham::{hyper::StatusCode, mime::APPLICATION_JSON};
 	use gotham_restful::IntoResponseError;
-	use mime::APPLICATION_JSON;
 
 	#[test]
 	fn io_error() {

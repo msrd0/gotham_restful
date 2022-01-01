@@ -13,9 +13,9 @@ use gotham::{
 		},
 		Body, Response, StatusCode
 	},
+	mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8},
 	state::State
 };
-use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8};
 use openapi_type::{
 	indexmap::IndexMap,
 	openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}

@@ -1,5 +1,7 @@
-use gotham::hyper::body::Bytes;
-use mime::{Mime, APPLICATION_JSON};
+use gotham::{
+	hyper::body::Bytes,
+	mime::{Mime, APPLICATION_JSON}
+};
 #[cfg(feature = "openapi")]
 use openapi_type::OpenapiType;
 use serde::{de::DeserializeOwned, Serialize};
@@ -36,8 +38,8 @@ implement this. Therefore, make sure that the first variable of your struct can 
 need to be [Default]. This is an example of such a struct:
 
 ```rust
-# #[macro_use] extern crate gotham_restful;
-# use gotham_restful::*;
+# use gotham::mime::{self, Mime};
+# use gotham_restful::{FromBody, RequestBody};
 #[derive(FromBody, RequestBody)]
 #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
 struct RawImage {
@@ -73,8 +75,8 @@ get the raw data, you can derive it for your own type. All you need is to have a
 [FromBody] and optionally a list of supported media types:
 
 ```rust
-# #[macro_use] extern crate gotham_restful;
-# use gotham_restful::*;
+# use gotham::mime::{self, Mime};
+# use gotham_restful::{FromBody, RequestBody};
 #[derive(FromBody, RequestBody)]
 #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
 struct RawImage {

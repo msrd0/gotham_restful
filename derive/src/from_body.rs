@@ -77,7 +77,7 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 		let type_ty = &type_field.1;
 		where_clause = quote! {
 			#where_clause
-			#type_ty: From<::gotham_restful::Mime>,
+			#type_ty: From<::gotham_restful::gotham::mime::Mime>,
 		};
 		block = quote! {
 			#block
@@ -113,7 +113,7 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 
 			fn from_body(
 				#body_ident: ::gotham_restful::gotham::hyper::body::Bytes,
-				#type_ident: ::gotham_restful::Mime
+				#type_ident: ::gotham_restful::gotham::mime::Mime
 			) -> ::std::result::Result<Self, ::std::convert::Infallible>
 			{
 				#block

@@ -136,7 +136,7 @@ is simply returned as the response again, no json parsing involved:
 
 ```rust,no_run
 # #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
+# use gotham::{mime::{self, Mime}, router::builder::*};
 # use gotham_restful::*;
 # use serde::{Deserialize, Serialize};
 #[derive(Resource)]
@@ -456,8 +456,6 @@ extern crate pretty_assertions;
 
 #[doc(no_inline)]
 pub use gotham;
-#[doc(no_inline)]
-pub use mime::Mime;
 
 pub use gotham_restful_derive::*;
 

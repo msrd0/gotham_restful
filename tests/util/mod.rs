@@ -3,7 +3,7 @@ use gotham::{
 	test::TestServer
 };
 use log::info;
-use mime::Mime;
+use gotham::mime::Mime;
 #[allow(unused_imports)]
 use std::{fs::File, io::{Read, Write}, str};
 

@@ -4,9 +4,9 @@ use gotham::{
 	hyper::{
 		header::{HeaderMap, HeaderName, HeaderValue},
 		Body, StatusCode
-	}
+	},
+	mime::{Mime, APPLICATION_JSON, STAR_STAR}
 };
-use mime::{Mime, APPLICATION_JSON, STAR_STAR};
 #[cfg(feature = "openapi")]
 use openapi_type::{OpenapiSchema, OpenapiType};
 use serde::Serialize;

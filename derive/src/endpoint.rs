@@ -516,7 +516,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 					::gotham_restful::IntoResponse::into_response(self.0)
 				}
 
-				fn accepted_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::Mime>> {
+				fn accepted_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::gotham::mime::Mime>> {
 					<#output_ty as ::gotham_restful::IntoResponse>::accepted_types()
 				}
 			}

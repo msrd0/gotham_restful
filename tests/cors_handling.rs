@@ -1,6 +1,7 @@
 #![cfg(feature = "cors")]
 use gotham::{
 	hyper::{body::Body, client::connect::Connect, header::*, StatusCode},
+	mime::TEXT_PLAIN,
 	pipeline::{new_pipeline, single_pipeline},
 	router::build_router,
 	test::{Server, TestRequest, TestServer}
@@ -9,7 +10,6 @@ use gotham_restful::{
 	cors::{Headers, Origin},
 	read_all, update_all, CorsConfig, DrawResources, Raw, Resource
 };
-use mime::TEXT_PLAIN;
 
 #[derive(Resource)]
 #[resource(read_all, update_all)]

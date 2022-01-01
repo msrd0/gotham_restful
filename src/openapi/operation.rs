@@ -1,7 +1,6 @@
 use super::SECURITY_NAME;
 use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody};
-use gotham::hyper::StatusCode;
-use mime::Mime;
+use gotham::{hyper::StatusCode, mime::Mime};
 use openapi_type::{
 	indexmap::IndexMap,
 	openapi::{

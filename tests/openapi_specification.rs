@@ -5,13 +5,13 @@ extern crate pretty_assertions;
 
 use gotham::{
 	hyper::Method,
+	mime::IMAGE_PNG,
 	pipeline::{new_pipeline, single_pipeline},
 	prelude::*,
 	router::build_router,
 	test::TestServer
 };
 use gotham_restful::*;
-use mime::IMAGE_PNG;
 use openapi_type::OpenapiType;
 use serde::{Deserialize, Serialize};
 

@@ -1,6 +1,10 @@
-use gotham::{prelude::*, router::build_simple_router, test::TestServer};
+use gotham::{
+	mime::{APPLICATION_JSON, TEXT_PLAIN},
+	prelude::*,
+	router::build_simple_router,
+	test::TestServer
+};
 use gotham_restful::*;
-use mime::{APPLICATION_JSON, TEXT_PLAIN};
 #[cfg(feature = "openapi")]
 use openapi_type::OpenapiType;
 use serde::Deserialize;

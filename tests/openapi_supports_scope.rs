@@ -3,9 +3,8 @@
 #[macro_use]
 extern crate pretty_assertions;
 
-use gotham::{router::builder::*, test::TestServer};
+use gotham::{mime::TEXT_PLAIN, router::builder::*, test::TestServer};
 use gotham_restful::*;
-use mime::TEXT_PLAIN;
 
 #[allow(dead_code)]
 mod util {

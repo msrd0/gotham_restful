@@ -3,11 +3,13 @@ use super::IntoResponse;
 use crate::ResponseSchema;
 use crate::{Response, ResponseBody};
 use futures_util::future::{self, FutureExt};
-use gotham::hyper::{
-	header::{HeaderMap, HeaderValue, IntoHeaderName},
-	StatusCode
+use gotham::{
+	hyper::{
+		header::{HeaderMap, HeaderValue, IntoHeaderName},
+		StatusCode
+	},
+	mime::{Mime, APPLICATION_JSON}
 };
-use mime::{Mime, APPLICATION_JSON};
 #[cfg(feature = "openapi")]
 use openapi_type::OpenapiSchema;
 use std::{fmt::Debug, future::Future, pin::Pin};
