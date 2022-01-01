@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [1.51, stable, beta]
+        toolchain: [1.56, stable, beta]
         nightly: [false]
         features: ["default", "full"]
         include:

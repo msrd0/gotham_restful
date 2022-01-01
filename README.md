@@ -9,8 +9,8 @@
 	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-main-blue.svg"/>
 	</a>
-    <a href="https://blog.rust-lang.org/2021/03/25/Rust-1.51.0.html">
-        <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.51+-orange.svg"/>
+    <a href="https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html">
+        <img alt="Minimum Rust Version" src="https://img.shields.io/badge/rustc-1.56+-orange.svg"/>
     </a>
 	<a href="https://deps.rs/repo/github/msrd0/gotham_restful">
 		<img alt="dependencies" src="https://deps.rs/repo/github/msrd0/gotham_restful/status.svg"/>
@@ -381,7 +381,7 @@ limitations under the License.
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link11]: https://docs.rs/openapi_type/0.2.3/openapi_type/?search=openapi_type::OpenapiType
+ [__link11]: https://docs.rs/openapi_type/0.3.0/openapi_type/?search=openapi_type::OpenapiType
  [__link12]: https://docs.rs/gotham_restful/0.5.2/gotham_restful/?search=gotham_restful::endpoint::Endpoint
  [__link13]: https://docs.rs/gotham_restful/0.5.2/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
