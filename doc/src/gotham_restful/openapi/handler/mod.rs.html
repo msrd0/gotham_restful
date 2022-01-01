@@ -207,6 +207,9 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_imports</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SECURITY_NAME</span>;
 <span class="kw">use</span> <span class="ident">either::Either</span>;
@@ -246,15 +249,18 @@
 	<span class="kw">let</span> <span class="ident">security_scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">source</span> {
 		<span class="ident">AuthSource::Cookie</span>(<span class="ident">name</span>) =&gt; <span class="ident">SecurityScheme::APIKey</span> {
 			<span class="ident">location</span>: <span class="ident">APIKeyLocation::Cookie</span>,
-			<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>()
+			<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+			<span class="ident">description</span>: <span class="prelude-val">None</span>
 		},
 		<span class="ident">AuthSource::Header</span>(<span class="ident">name</span>) =&gt; <span class="ident">SecurityScheme::APIKey</span> {
 			<span class="ident">location</span>: <span class="ident">APIKeyLocation::Header</span>,
-			<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>()
+			<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+			<span class="ident">description</span>: <span class="prelude-val">None</span>
 		},
 		<span class="ident">AuthSource::AuthorizationHeader</span> =&gt; <span class="ident">SecurityScheme::HTTP</span> {
 			<span class="ident">scheme</span>: <span class="string">&quot;bearer&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">bearer_format</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;JWT&quot;</span>.<span class="ident">to_owned</span>())
+			<span class="ident">bearer_format</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;JWT&quot;</span>.<span class="ident">to_owned</span>()),
+			<span class="ident">description</span>: <span class="prelude-val">None</span>
 		}
 	};
 

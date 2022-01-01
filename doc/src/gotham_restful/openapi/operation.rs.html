@@ -219,6 +219,7 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
+<span id="220">220</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SECURITY_NAME</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">response::OrAllTypes</span>, <span class="ident">EndpointWithSchema</span>, <span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
 <span class="kw">use</span> <span class="ident">gotham::hyper::StatusCode</span>;
@@ -242,6 +243,7 @@
 		<span class="ident">format</span>: <span class="ident">ParameterSchemaOrContent::Schema</span>(<span class="ident">schema</span>.<span class="ident">unbox</span>()),
 		<span class="ident">example</span>: <span class="prelude-val">None</span>,
 		<span class="ident">examples</span>: <span class="ident">Default::default</span>(),
+		<span class="ident">explode</span>: <span class="prelude-val">None</span>,
 		<span class="ident">extensions</span>: <span class="ident">Default::default</span>()
 	}
 }
@@ -391,11 +393,11 @@
 			})
 		});
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">security</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">security</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 		<span class="kw">if</span> <span class="ident">requires_auth</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sec</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
 			<span class="ident">sec</span>.<span class="ident">insert</span>(<span class="ident">SECURITY_NAME</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>());
-			<span class="ident">security</span>.<span class="ident">push</span>(<span class="ident">sec</span>);
+			<span class="ident">security</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">sec</span>]);
 		}
 
 		<span class="ident">Operation</span> {
@@ -405,8 +407,8 @@
 			<span class="ident">parameters</span>: <span class="ident">params</span>.<span class="ident">into_params</span>(),
 			<span class="ident">request_body</span>,
 			<span class="ident">responses</span>: <span class="ident">Responses</span> {
-				<span class="ident">default</span>: <span class="prelude-val">None</span>,
-				<span class="ident">responses</span>
+				<span class="ident">responses</span>,
+				..<span class="ident">Default::default</span>()
 			},
 			<span class="ident">deprecated</span>: <span class="bool-val">false</span>,
 			<span class="ident">security</span>,
