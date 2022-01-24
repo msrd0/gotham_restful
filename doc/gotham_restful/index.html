@@ -75,7 +75,7 @@ of the pre-defined endpoints, but you need to give it more context:</p>
 <h2 id="arguments" class="section-header"><a href="#arguments">Arguments</a></h2>
 <p>Some endpoints require arguments. Those should be</p>
 <ul>
-<li><strong>id</strong> Should be a deserializable json-primitive like <a href="https://doc.rust-lang.org/1.58.0/std/primitive.i64.html" title="i64"><code>i64</code></a> or <a href="https://doc.rust-lang.org/1.58.0/alloc/string/struct.String.html" title="String"><code>String</code></a>.</li>
+<li><strong>id</strong> Should be a deserializable json-primitive like <a href="https://doc.rust-lang.org/1.58.1/std/primitive.i64.html" title="i64"><code>i64</code></a> or <a href="https://doc.rust-lang.org/1.58.1/alloc/string/struct.String.html" title="String"><code>String</code></a>.</li>
 <li><strong>body</strong> Should be any deserializable object, or any type implementing <a href="trait.RequestBody.html" title="RequestBody"><code>RequestBody</code></a>.</li>
 <li><strong>query</strong> Should be any deserializable object whose variables are json-primitives. It will
 however not be parsed from json, but from HTTP GET parameters like in <code>search?id=1</code>. The
@@ -86,7 +86,7 @@ handlers, it needs to be a mutable reference until rustc’s lifetime checks acr
 improve.</p>
 <h2 id="uploads-and-downloads" class="section-header"><a href="#uploads-and-downloads">Uploads and Downloads</a></h2>
 <p>By default, every request body is parsed from json, and every respone is converted to json using
-<a href="https://docs.rs/serde_json/1.0.75/serde_json/index.html" title="serde_json">serde_json</a>. However, you may also use raw bodies. This is an example where the request body
+<a href="https://docs.rs/serde_json/1.0.78/serde_json/index.html" title="serde_json">serde_json</a>. However, you may also use raw bodies. This is an example where the request body
 is simply returned as the response again, no json parsing involved:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Resource</span>)]</span>
