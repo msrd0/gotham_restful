@@ -1,4 +1,5 @@
 use crate::util::CollectToResult;
+use either::Either;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::iter;
@@ -64,15 +65,13 @@ pub fn expand_request_body(input: DeriveInput) -> Result<TokenStream> {
 		.flat_map(|attr| {
 			let span = attr.span();
 			attr.parse_args::<MimeList>()
-				.map(|list| {
-					Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path>>>
-				})
+				.map(|list| Either::Left(list.0.into_iter().map(Ok)))
 				.unwrap_or_else(|mut err| {
 					err.combine(Error::new(
 						span,
 						"Hint: Types list should look like #[supported_types(TEXT_PLAIN, APPLICATION_JSON)]"
 					));
-					Box::new(iter::once(Err(err)))
+					Either::Right(iter::once(Err(err)))
 				})
 		})
 		.collect_to_result()?;

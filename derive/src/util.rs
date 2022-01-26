@@ -1,3 +1,4 @@
+use either::Either;
 use proc_macro2::{Delimiter, Ident, TokenStream, TokenTree};
 use std::iter;
 use syn::{Error, Lit, LitBool, LitStr, Result};
@@ -65,10 +66,10 @@ pub(crate) fn remove_parens(input: TokenStream) -> TokenStream {
 	let iter = input.into_iter().flat_map(|tt| {
 		if let TokenTree::Group(group) = &tt {
 			if group.delimiter() == Delimiter::Parenthesis {
-				return Box::new(group.stream().into_iter()) as Box<dyn Iterator<Item = TokenTree>>;
+				return Either::Left(group.stream().into_iter());
 			}
 		}
-		Box::new(iter::once(tt))
+		Either::Right(iter::once(tt))
 	});
 	iter.collect()
 }
