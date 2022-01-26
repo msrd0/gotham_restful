@@ -1,4 +1,4 @@
-error: Too few arguments
+error: Too few arguments for this endpoint handler
  --> tests/ui/endpoint/too_few_args.rs:9:4
   |
 9 | fn read() {}

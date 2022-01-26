@@ -605,7 +605,10 @@ fn expand_endpoint_type(
 			return Ok(None);
 		}
 		if arg_ty_idx >= arg_tys.len() {
-			return Err(Error::new(fun_ident.span(), "Too few arguments"));
+			return Err(Error::new(
+				fun_ident.span(),
+				"Too few arguments for this endpoint handler"
+			));
 		}
 		let ty = arg_tys[arg_ty_idx].ty.ty().unwrap();
 		arg_ty_idx += 1;
@@ -636,7 +639,10 @@ fn expand_endpoint_type(
 	let body_typedef = quote_spanned!(body_ty.span() => type Body = #body_ty;);
 
 	if arg_ty_idx < arg_tys.len() {
-		return Err(Error::new(fun_ident.span(), "Too many arguments"));
+		return Err(Error::new(
+			fun_ident.span(),
+			"Extra arguments for this endpoint handler"
+		));
 	}
 
 	let mut handle_args: Vec<TokenStream> = Vec::new();

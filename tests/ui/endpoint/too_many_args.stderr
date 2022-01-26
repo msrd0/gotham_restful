@@ -1,4 +1,4 @@
-error: Too many arguments
+error: Extra arguments for this endpoint handler
  --> tests/ui/endpoint/too_many_args.rs:9:4
   |
 9 | fn read_all(_id: u64) {}
