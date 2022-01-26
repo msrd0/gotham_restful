@@ -1,11 +1,13 @@
 error: unexpected token
- --> $DIR/custom_method_invalid_expr.rs:8:21
+ --> tests/ui/endpoint/custom_method_invalid_expr.rs:8:21
   |
 8 | #[endpoint(method = "I like pizza", uri = "custom_read")]
   |                     ^^^^^^^^^^^^^^
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/custom_method_invalid_expr.rs:5:12
+ --> tests/ui/endpoint/custom_method_invalid_expr.rs:4:10
   |
-5 | #[resource(read_all)]
-  |            ^^^^^^^^ not found in this scope
+4 | #[derive(Resource)]
+  |          ^^^^^^^^ not found in this scope
+  |
+  = note: this error originates in the derive macro `Resource` (in Nightly builds, run with -Z macro-backtrace for more info)

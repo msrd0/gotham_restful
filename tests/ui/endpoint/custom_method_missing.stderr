@@ -1,5 +1,5 @@
 error: Missing `method` attribute (e.g. `#[endpoint(method = "gotham_restful::gotham::hyper::Method::GET")]`)
- --> $DIR/custom_method_missing.rs:8:1
+ --> tests/ui/endpoint/custom_method_missing.rs:8:1
   |
 8 | #[endpoint(uri = "custom_read")]
   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -7,7 +7,9 @@ error: Missing `method` attribute (e.g. `#[endpoint(method = "gotham_restful::go
   = note: this error originates in the attribute macro `endpoint` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/custom_method_missing.rs:5:12
+ --> tests/ui/endpoint/custom_method_missing.rs:4:10
   |
-5 | #[resource(read_all)]
-  |            ^^^^^^^^ not found in this scope
+4 | #[derive(Resource)]
+  |          ^^^^^^^^ not found in this scope
+  |
+  = note: this error originates in the derive macro `Resource` (in Nightly builds, run with -Z macro-backtrace for more info)

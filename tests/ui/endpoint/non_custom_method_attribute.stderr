@@ -1,11 +1,13 @@
 error: `method` can only be used on custom endpoints
- --> $DIR/non_custom_method_attribute.rs:8:12
+ --> tests/ui/endpoint/non_custom_method_attribute.rs:8:12
   |
 8 | #[read_all(method = "gotham_restful::gotham::hyper::Method::GET")]
   |            ^^^^^^
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/non_custom_method_attribute.rs:5:12
+ --> tests/ui/endpoint/non_custom_method_attribute.rs:4:10
   |
-5 | #[resource(read_all)]
-  |            ^^^^^^^^ not found in this scope
+4 | #[derive(Resource)]
+  |          ^^^^^^^^ not found in this scope
+  |
+  = note: this error originates in the derive macro `Resource` (in Nightly builds, run with -Z macro-backtrace for more info)

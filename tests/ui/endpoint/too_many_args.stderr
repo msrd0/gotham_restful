@@ -1,11 +1,13 @@
 error: Too many arguments
- --> $DIR/too_many_args.rs:9:4
+ --> tests/ui/endpoint/too_many_args.rs:9:4
   |
 9 | fn read_all(_id: u64) {}
   |    ^^^^^^^^
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/too_many_args.rs:5:12
+ --> tests/ui/endpoint/too_many_args.rs:4:10
   |
-5 | #[resource(read_all)]
-  |            ^^^^^^^^ not found in this scope
+4 | #[derive(Resource)]
+  |          ^^^^^^^^ not found in this scope
+  |
+  = note: this error originates in the derive macro `Resource` (in Nightly builds, run with -Z macro-backtrace for more info)
