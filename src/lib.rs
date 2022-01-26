@@ -477,7 +477,9 @@ pub mod private {
 #[cfg(feature = "auth")]
 mod auth;
 #[cfg(feature = "auth")]
-pub use auth::{AuthHandler, AuthMiddleware, AuthSource, AuthStatus, AuthValidation, StaticAuthHandler};
+pub use auth::{
+	AuthHandler, AuthMiddleware, AuthSource, AuthStatus, AuthValidation, StaticAuthHandler
+};
 
 #[cfg(feature = "cors")]
 pub mod cors;
@@ -496,8 +498,8 @@ pub use endpoint::{Endpoint, NoopExtractor};
 
 mod response;
 pub use response::{
-	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponse, IntoResponseError, NoContent,
-	Raw, Redirect, Response, Success
+	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponse,
+	IntoResponseError, NoContent, Raw, Redirect, Response, Success
 };
 #[cfg(feature = "openapi")]
 pub use response::{IntoResponseWithSchema, ResponseSchema};

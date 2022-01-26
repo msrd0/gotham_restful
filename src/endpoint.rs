@@ -25,7 +25,9 @@ impl<'de> Deserialize<'de> for NoopExtractor {
 #[cfg(feature = "openapi")]
 impl OpenapiType for NoopExtractor {
 	fn schema() -> OpenapiSchema {
-		warn!("You're asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want.");
+		warn!(
+			"You're asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want."
+		);
 		<() as OpenapiType>::schema()
 	}
 }

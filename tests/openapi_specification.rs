@@ -126,5 +126,9 @@ fn openapi_specification() {
 	}))
 	.unwrap();
 
-	test_openapi_response(&server, "http://localhost/openapi", "tests/openapi_specification.json");
+	test_openapi_response(
+		&server,
+		"http://localhost/openapi",
+		"tests/openapi_specification.json"
+	);
 }

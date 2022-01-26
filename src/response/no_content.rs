@@ -91,7 +91,9 @@ where
 {
 	type Err = serde_json::Error;
 
-	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, serde_json::Error>> + Send>> {
+	fn into_response(
+		self
+	) -> Pin<Box<dyn Future<Output = Result<Response, serde_json::Error>> + Send>> {
 		match self {
 			Ok(nc) => nc.into_response(),
 			Err(e) => handle_error(e)

@@ -123,7 +123,10 @@ mod test {
 		OpenapiInfo {
 			title: "TEST CASE".to_owned(),
 			version: "1.2.3".to_owned(),
-			urls: vec!["http://localhost:1234".to_owned(), "https://example.org".to_owned()]
+			urls: vec![
+				"http://localhost:1234".to_owned(),
+				"https://example.org".to_owned(),
+			]
 		}
 	}
 

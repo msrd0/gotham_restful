@@ -54,12 +54,19 @@ pub fn expand_request_body(input: DeriveInput) -> Result<TokenStream> {
 		.attrs
 		.into_iter()
 		.filter(|attr| {
-			attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("supported_types".to_string())
+			attr.path
+				.segments
+				.iter()
+				.last()
+				.map(|segment| segment.ident.to_string())
+				== Some("supported_types".to_string())
 		})
 		.flat_map(|attr| {
 			let span = attr.span();
 			attr.parse_args::<MimeList>()
-				.map(|list| Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path>>>)
+				.map(|list| {
+					Box::new(list.0.into_iter().map(Ok)) as Box<dyn Iterator<Item = Result<Path>>>
+				})
 				.unwrap_or_else(|mut err| {
 					err.combine(Error::new(
 						span,

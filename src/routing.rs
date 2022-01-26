@@ -86,7 +86,9 @@ fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> 
 	r
 }
 
-async fn endpoint_handler<E: Endpoint>(state: &mut State) -> Result<gotham::hyper::Response<Body>, HandlerError>
+async fn endpoint_handler<E: Endpoint>(
+	state: &mut State
+) -> Result<gotham::hyper::Response<Body>, HandlerError>
 where
 	E: Endpoint,
 	<E::Output as IntoResponse>::Err: Into<HandlerError>
@@ -119,7 +121,8 @@ where
 					debug!("Invalid Body: Returning 400 Response");
 					let error: ResourceError = e.into();
 					let json = serde_json::to_string(&error)?;
-					let res = create_response(state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
+					let res =
+						create_response(state, StatusCode::BAD_REQUEST, APPLICATION_JSON, json);
 					return Ok(res);
 				}
 			}
@@ -247,7 +250,9 @@ macro_rules! implDrawResourceRoutes {
 					if E::http_method() != Method::GET {
 						assoc
 							.options()
-							.add_route_matcher(AccessControlRequestMethodMatcher::new(E::http_method()))
+							.add_route_matcher(AccessControlRequestMethodMatcher::new(
+								E::http_method()
+							))
 							.to(crate::cors::cors_preflight_handler);
 					}
 				});

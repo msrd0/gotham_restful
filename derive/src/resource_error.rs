@@ -3,8 +3,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use std::iter;
 use syn::{
-	spanned::Spanned, Attribute, Data, DeriveInput, Error, Fields, GenericParam, LitStr, Path, PathSegment, Result, Type,
-	Variant
+	spanned::Spanned, Attribute, Data, DeriveInput, Error, Fields, GenericParam, LitStr, Path,
+	PathSegment, Result, Type, Variant
 };
 
 struct ErrorVariantField {
@@ -23,13 +23,17 @@ struct ErrorVariant {
 }
 
 fn process_variant(variant: Variant) -> Result<ErrorVariant> {
-	let status =
-		match variant.attrs.iter().find(|attr| {
-			attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("status".to_string())
-		}) {
-			Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
-			None => None
-		};
+	let status = match variant.attrs.iter().find(|attr| {
+		attr.path
+			.segments
+			.iter()
+			.last()
+			.map(|segment| segment.ident.to_string())
+			== Some("status".to_string())
+	}) {
+		Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
+		None => None
+	};
 
 	let mut is_named = false;
 	let mut fields = Vec::new();
@@ -40,9 +44,9 @@ fn process_variant(variant: Variant) -> Result<ErrorVariant> {
 				let span = field.span();
 				fields.push(ErrorVariantField {
 					attrs: field.attrs,
-					ident: field
-						.ident
-						.ok_or_else(|| Error::new(span, "Missing ident for this enum variant field"))?,
+					ident: field.ident.ok_or_else(|| {
+						Error::new(span, "Missing ident for this enum variant field")
+					})?,
 					ty: field.ty
 				});
 			}
@@ -63,15 +67,23 @@ fn process_variant(variant: Variant) -> Result<ErrorVariant> {
 		.iter()
 		.enumerate()
 		.find(|(_, field)| {
-			field
-				.attrs
-				.iter()
-				.any(|attr| attr.path.segments.last().map(|segment| segment.ident.to_string()) == Some("from".to_string()))
+			field.attrs.iter().any(|attr| {
+				attr.path
+					.segments
+					.last()
+					.map(|segment| segment.ident.to_string())
+					== Some("from".to_string())
+			})
 		})
 		.map(|(i, field)| (i, field.ty.clone()));
 
 	let display = match variant.attrs.iter().find(|attr| {
-		attr.path.segments.iter().last().map(|segment| segment.ident.to_string()) == Some("display".to_string())
+		attr.path
+			.segments
+			.iter()
+			.last()
+			.map(|segment| segment.ident.to_string())
+			== Some("display".to_string())
 	}) {
 		Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
 		None => None
@@ -106,12 +118,15 @@ impl ErrorVariant {
 		}
 	}
 
-	fn to_display_match_arm(&self, formatter_ident: &Ident, enum_ident: &Ident) -> Result<TokenStream> {
+	fn to_display_match_arm(
+		&self,
+		formatter_ident: &Ident,
+		enum_ident: &Ident
+	) -> Result<TokenStream> {
 		let ident = &self.ident;
-		let display = self
-			.display
-			.as_ref()
-			.ok_or_else(|| Error::new(self.ident.span(), "Missing display string for this variant"))?;
+		let display = self.display.as_ref().ok_or_else(|| {
+			Error::new(self.ident.span(), "Missing display string for this variant")
+		})?;
 
 		// lets find all required format parameters
 		let display_str = display.value();
@@ -135,7 +150,7 @@ impl ErrorVariant {
 						return Err(Error::new(
 							display.span(),
 							"Error parsing format string: curly braces not allowed inside parameter name"
-						))
+						));
 					},
 					_ => params.push(&display_str[start..i])
 				};
@@ -169,7 +184,11 @@ impl ErrorVariant {
 		self.status.as_ref().map(|status| {
 			// the status might be relative to StatusCode, so let's fix that
 			if status.leading_colon.is_none() && status.segments.len() < 2 {
-				let status_ident = status.segments.first().cloned().unwrap_or_else(|| path_segment("OK"));
+				let status_ident = status
+					.segments
+					.first()
+					.cloned()
+					.unwrap_or_else(|| path_segment("OK"));
 				quote!(::gotham_restful::gotham::hyper::StatusCode::#status_ident)
 			} else {
 				quote!(::gotham_restful::gotham::hyper::StatusCode::from(#status))
@@ -188,13 +207,25 @@ impl ErrorVariant {
 				let from_field = &self.fields[from_index].ident;
 				quote!(#from_field.into_response_error())
 			},
-			(Some(_), Some(_)) => return Err(Error::new(ident.span(), "When #[from] is used, #[status] must not be used!")),
-			(None, Some(status)) => quote!(::std::result::Result::Ok(::gotham_restful::Response::new(
-				#status,
-				::gotham_restful::gotham::hyper::Body::empty(),
-				::core::option::Option::None
-			))),
-			(None, None) => return Err(Error::new(ident.span(), "Missing #[status(code)] for this variant"))
+			(Some(_), Some(_)) => {
+				return Err(Error::new(
+					ident.span(),
+					"When #[from] is used, #[status] must not be used!"
+				));
+			},
+			(None, Some(status)) => {
+				quote!(::std::result::Result::Ok(::gotham_restful::Response::new(
+					#status,
+					::gotham_restful::gotham::hyper::Body::empty(),
+					::core::option::Option::None
+				)))
+			},
+			(None, None) => {
+				return Err(Error::new(
+					ident.span(),
+					"Missing #[status(code)] for this variant"
+				));
+			},
 		};
 
 		Ok(quote! {
@@ -203,7 +234,9 @@ impl ErrorVariant {
 	}
 
 	fn were(&self) -> Option<TokenStream> {
-		self.from_ty.as_ref().map(|(_, ty)| quote!( #ty : ::std::error::Error ))
+		self.from_ty
+			.as_ref()
+			.map(|(_, ty)| quote!( #ty : ::std::error::Error ))
 	}
 }
 
@@ -217,7 +250,11 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		Data::Union(uni) => Err(uni.union_token.span())
 	}
 	.map_err(|span| Error::new(span, "#[derive(ResourceError)] only works for enums"))?;
-	let variants = inum.variants.into_iter().map(process_variant).collect_to_result()?;
+	let variants = inum
+		.variants
+		.into_iter()
+		.map(process_variant)
+		.collect_to_result()?;
 
 	let display_impl = if variants.iter().any(|v| v.display.is_none()) {
 		None // TODO issue warning if display is present on some but not all
@@ -340,7 +377,10 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		None
 	};
 
-	let were = variants.iter().filter_map(|variant| variant.were()).collect::<Vec<_>>();
+	let were = variants
+		.iter()
+		.filter_map(|variant| variant.were())
+		.collect::<Vec<_>>();
 	let variants = variants
 		.into_iter()
 		.map(|variant| variant.into_match_arm(&ident))

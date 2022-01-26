@@ -13,8 +13,13 @@ impl ParsedFields {
 	where
 		I: Iterator<Item = Field>
 	{
-		let fields = fields.map(|field| (field.ident.unwrap(), field.ty)).collect();
-		Self { fields, named: true }
+		let fields = fields
+			.map(|field| (field.ident.unwrap(), field.ty))
+			.collect();
+		Self {
+			fields,
+			named: true
+		}
 	}
 
 	fn from_unnamed<I>(fields: I) -> Self
@@ -25,7 +30,10 @@ impl ParsedFields {
 			.enumerate()
 			.map(|(i, field)| (format_ident!("arg{}", i), field.ty))
 			.collect();
-		Self { fields, named: false }
+		Self {
+			fields,
+			named: false
+		}
 	}
 
 	fn from_unit() -> Self {

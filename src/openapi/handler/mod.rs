@@ -8,8 +8,8 @@ use gotham::{
 	helpers::http::response::{create_empty_response, create_response},
 	hyper::{
 		header::{
-			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, ETAG, IF_NONE_MATCH, REFERRER_POLICY,
-			X_CONTENT_TYPE_OPTIONS
+			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, ETAG, IF_NONE_MATCH,
+			REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS
 		},
 		Body, Response, StatusCode
 	},
@@ -63,7 +63,10 @@ fn get_security(_state: &State) -> IndexMap<String, ReferenceOr<SecurityScheme>>
 	Default::default()
 }
 
-fn openapi_string(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<String, serde_json::Error> {
+fn openapi_string(
+	state: &State,
+	openapi: &Arc<RwLock<OpenAPI>>
+) -> Result<String, serde_json::Error> {
 	let openapi = openapi.read();
 
 	let mut openapi = openapi.clone();
@@ -85,7 +88,12 @@ fn create_openapi_response(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Res
 		},
 		Err(e) => {
 			error!("Unable to handle OpenAPI request due to error: {}", e);
-			create_response(state, StatusCode::INTERNAL_SERVER_ERROR, TEXT_PLAIN_UTF_8, "")
+			create_response(
+				state,
+				StatusCode::INTERNAL_SERVER_ERROR,
+				TEXT_PLAIN_UTF_8,
+				""
+			)
 		}
 	}
 }
@@ -143,7 +151,10 @@ impl NewHandler for OpenapiDocHandler {
 	}
 }
 
-fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Response<Body>, HandlerError> {
+fn redoc_handler(
+	state: &State,
+	openapi: &Arc<RwLock<OpenAPI>>
+) -> Result<Response<Body>, HandlerError> {
 	let spec = openapi_string(state, openapi)?;
 	let encoded_spec = spec
 		.chars()
@@ -186,7 +197,10 @@ fn redoc_handler(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Result<Respon
 
 	let mut res = create_response(state, StatusCode::OK, TEXT_HTML_UTF_8, buf);
 	let headers = res.headers_mut();
-	headers.insert(CACHE_CONTROL, HeaderValue::from_static("public,max-age=2592000"));
+	headers.insert(
+		CACHE_CONTROL,
+		HeaderValue::from_static("public,max-age=2592000")
+	);
 	headers.insert(
 		CONTENT_SECURITY_POLICY,
 		format!(

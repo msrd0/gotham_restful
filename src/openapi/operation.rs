@@ -4,14 +4,19 @@ use gotham::{hyper::StatusCode, mime::Mime};
 use openapi_type::{
 	indexmap::IndexMap,
 	openapi::{
-		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr, ReferenceOr::Item,
-		RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind, StatusCode as OAStatusCode, Type
+		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr,
+		ReferenceOr::Item, RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind,
+		StatusCode as OAStatusCode, Type
 	},
 	OpenapiSchema
 };
 use std::collections::HashMap;
 
-fn new_parameter_data(name: String, required: bool, schema: ReferenceOr<Box<Schema>>) -> ParameterData {
+fn new_parameter_data(
+	name: String,
+	required: bool,
+	schema: ReferenceOr<Box<Schema>>
+) -> ParameterData {
 	ParameterData {
 		name,
 		description: None,
@@ -32,7 +37,10 @@ struct OperationParams {
 }
 
 impl OperationParams {
-	fn add_path_params(path_params: Option<OpenapiSchema>, params: &mut Vec<ReferenceOr<Parameter>>) {
+	fn add_path_params(
+		path_params: Option<OpenapiSchema>,
+		params: &mut Vec<ReferenceOr<Parameter>>
+	) {
 		let path_params = match path_params {
 			Some(pp) => pp.schema,
 			None => return
@@ -50,7 +58,10 @@ impl OperationParams {
 		}
 	}
 
-	fn add_query_params(query_params: Option<OpenapiSchema>, params: &mut Vec<ReferenceOr<Parameter>>) {
+	fn add_query_params(
+		query_params: Option<OpenapiSchema>,
+		params: &mut Vec<ReferenceOr<Parameter>>
+	) {
 		let query_params = match query_params {
 			Some(qp) => qp.schema,
 			None => return
@@ -93,9 +104,18 @@ pub(crate) struct OperationDescription {
 impl OperationDescription {
 	/// Create a new operation description for the given endpoint type and schema. If the endpoint
 	/// does not specify an operation id, the path is used to generate one.
-	pub(crate) fn new<E: EndpointWithSchema>(responses: HashMap<StatusCode, ReferenceOr<Schema>>, path: &str) -> Self {
+	pub(crate) fn new<E: EndpointWithSchema>(
+		responses: HashMap<StatusCode, ReferenceOr<Schema>>,
+		path: &str
+	) -> Self {
 		let operation_id = E::operation_id().or_else(|| {
-			E::operation_verb().map(|verb| format!("{}_{}", verb, path.replace("/", "_").trim_start_matches('_')))
+			E::operation_verb().map(|verb| {
+				format!(
+					"{}_{}",
+					verb,
+					path.replace("/", "_").trim_start_matches('_')
+				)
+			})
 		});
 		Self {
 			operation_id,
@@ -123,7 +143,10 @@ impl OperationDescription {
 		self.supported_types = Body::supported_types();
 	}
 
-	fn schema_to_content(types: Vec<Mime>, schema: ReferenceOr<Schema>) -> IndexMap<String, MediaType> {
+	fn schema_to_content(
+		types: Vec<Mime>,
+		schema: ReferenceOr<Schema>
+	) -> IndexMap<String, MediaType> {
 		let mut content: IndexMap<String, MediaType> = IndexMap::new();
 		for ty in types {
 			content.insert(ty.to_string(), MediaType {
@@ -136,7 +159,16 @@ impl OperationDescription {
 
 	pub(crate) fn into_operation(self) -> Operation {
 		// this is unfortunately neccessary to prevent rust from complaining about partially moving self
-		let (operation_id, description, accepted_types, responses, params, body_schema, supported_types, requires_auth) = (
+		let (
+			operation_id,
+			description,
+			accepted_types,
+			responses,
+			params,
+			body_schema,
+			supported_types,
+			requires_auth
+		) = (
 			self.operation_id,
 			self.description,
 			self.accepted_types,
@@ -150,11 +182,15 @@ impl OperationDescription {
 		let responses: IndexMap<OAStatusCode, ReferenceOr<Response>> = responses
 			.into_iter()
 			.map(|(code, schema)| {
-				let content = Self::schema_to_content(accepted_types.clone().or_all_types(), schema);
+				let content =
+					Self::schema_to_content(accepted_types.clone().or_all_types(), schema);
 				(
 					OAStatusCode::Code(code.as_u16()),
 					Item(Response {
-						description: code.canonical_reason().map(|d| d.to_string()).unwrap_or_default(),
+						description: code
+							.canonical_reason()
+							.map(|d| d.to_string())
+							.unwrap_or_default(),
 						content,
 						..Default::default()
 					})
@@ -203,7 +239,10 @@ mod test {
 	fn no_content_schema_to_content() {
 		let types = NoContent::accepted_types();
 		let schema = <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT);
-		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
+		let content = OperationDescription::schema_to_content(
+			types.or_all_types(),
+			Item(schema.into_schema())
+		);
 		assert!(content.is_empty());
 	}
 
@@ -211,7 +250,10 @@ mod test {
 	fn raw_schema_to_content() {
 		let types = Raw::<&str>::accepted_types();
 		let schema = <Raw<&str> as ResponseSchema>::schema(StatusCode::OK);
-		let content = OperationDescription::schema_to_content(types.or_all_types(), Item(schema.into_schema()));
+		let content = OperationDescription::schema_to_content(
+			types.or_all_types(),
+			Item(schema.into_schema())
+		);
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);

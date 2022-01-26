@@ -42,7 +42,9 @@ macro_rules! implOpenapiRouter {
 				F: FnOnce(&mut OpenapiRouter<'_, ScopeBuilder<'_, C, P>>)
 			{
 				let mut openapi_builder = self.openapi_builder.clone();
-				let new_scope = self.scope.map(|scope| format!("{}/{}", scope, path).replace("//", "/"));
+				let new_scope = self
+					.scope
+					.map(|scope| format!("{}/{}", scope, path).replace("//", "/"));
 				self.router.scope(path, |router| {
 					let mut router = OpenapiRouter {
 						router,
@@ -62,7 +64,9 @@ macro_rules! implOpenapiRouter {
 			fn openapi_spec(&mut self, path: &str) {
 				self.router
 					.get(path)
-					.to_new_handler(OpenapiSpecHandler::new(self.openapi_builder.openapi.clone()));
+					.to_new_handler(OpenapiSpecHandler::new(
+						self.openapi_builder.openapi.clone()
+					));
 			}
 
 			fn openapi_doc(&mut self, path: &str) {
@@ -85,7 +89,8 @@ macro_rules! implOpenapiRouter {
 			}
 		}
 
-		impl<'a, 'b, C, P> DrawResourceRoutesWithSchema for (&mut OpenapiRouter<'a, $implType<'b, C, P>>, &str)
+		impl<'a, 'b, C, P> DrawResourceRoutesWithSchema
+			for (&mut OpenapiRouter<'a, $implType<'b, C, P>>, &str)
 		where
 			C: PipelineHandleChain<P> + Copy + Send + Sync + 'static,
 			P: RefUnwindSafe + Send + Sync + 'static
@@ -93,7 +98,10 @@ macro_rules! implOpenapiRouter {
 			fn endpoint<E: EndpointWithSchema + 'static>(&mut self) {
 				let mut responses: HashMap<StatusCode, _> = HashMap::new();
 				for code in E::Output::status_codes() {
-					responses.insert(code, (self.0).openapi_builder.add_schema(E::Output::schema(code)));
+					responses.insert(
+						code,
+						(self.0).openapi_builder.add_schema(E::Output::schema(code))
+					);
 				}
 				let mut path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
 				let mut descr = OperationDescription::new::<E>(responses, &path);
@@ -109,9 +117,10 @@ macro_rules! implOpenapiRouter {
 				}
 
 				let uri: &str = &E::uri();
-				let uri = regex_replace_all!(r#"(^|/):([^/]+)(/|$)"#, uri, |_, prefix, name, suffix| {
-					format!("{}{{{}}}{}", prefix, name, suffix)
-				});
+				let uri =
+					regex_replace_all!(r#"(^|/):([^/]+)(/|$)"#, uri, |_, prefix, name, suffix| {
+						format!("{}{{{}}}{}", prefix, name, suffix)
+					});
 				if !uri.is_empty() {
 					path = format!("{}/{}", path, uri);
 				}
@@ -127,7 +136,10 @@ macro_rules! implOpenapiRouter {
 					Method::HEAD => item.head = Some(op),
 					Method::PATCH => item.patch = Some(op),
 					Method::TRACE => item.trace = Some(op),
-					method => warn!("Ignoring unsupported method '{}' in OpenAPI Specification", method)
+					method => warn!(
+						"Ignoring unsupported method '{}' in OpenAPI Specification",
+						method
+					)
 				};
 				(self.0).openapi_builder.add_path(path, item);
 

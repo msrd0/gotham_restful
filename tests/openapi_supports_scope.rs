@@ -49,5 +49,9 @@ fn openapi_supports_scope() {
 	test_get_response(&server, "http://localhost/bar/foo2", RESPONSE);
 	test_get_response(&server, "http://localhost/bar/baz/foo3", RESPONSE);
 	test_get_response(&server, "http://localhost/foo4", RESPONSE);
-	test_openapi_response(&server, "http://localhost/openapi", "tests/openapi_supports_scope.json");
+	test_openapi_response(
+		&server,
+		"http://localhost/openapi",
+		"tests/openapi_supports_scope.json"
+	);
 }

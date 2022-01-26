@@ -91,7 +91,11 @@ fn sync_methods() {
 
 	test_get_response(&server, "http://localhost/foo", READ_ALL_RESPONSE);
 	test_get_response(&server, "http://localhost/foo/1", READ_RESPONSE);
-	test_get_response(&server, "http://localhost/foo/search?query=hello+world", SEARCH_RESPONSE);
+	test_get_response(
+		&server,
+		"http://localhost/foo/search?query=hello+world",
+		SEARCH_RESPONSE
+	);
 	test_post_response(
 		&server,
 		"http://localhost/foo",
