@@ -319,6 +319,8 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="self">self</span>, <span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::{
 	<span class="ident">handler::HandlerError</span>,
@@ -471,7 +473,9 @@
 	}
 
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">full_body</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="op">&lt;</span><span class="ident">Body</span> <span class="kw">as</span> <span class="ident">gotham::hyper::body::HttpBody</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">full_body</span>(
+		<span class="kw-2">mut</span> <span class="self">self</span>
+	) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="op">&lt;</span><span class="ident">Body</span> <span class="kw">as</span> <span class="ident">gotham::hyper::body::HttpBody</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
 		<span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
 		<span class="kw">use</span> <span class="ident">gotham::hyper::body::to_bytes</span>;
 
@@ -556,7 +560,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorlog&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">errorlog</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">E</span>) {
-	<span class="macro">error!</span>(<span class="string">&quot;The handler encountered an error: {}&quot;</span>, <span class="ident">e</span>);
+	<span class="macro">error!</span>(<span class="string">&quot;The handler encountered an error: {e}&quot;</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorlog&quot;</span>))]</span>

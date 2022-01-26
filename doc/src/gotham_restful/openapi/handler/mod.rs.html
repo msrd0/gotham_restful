@@ -211,6 +211,19 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_imports</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SECURITY_NAME</span>;
 <span class="kw">use</span> <span class="ident">either::Either</span>;
@@ -221,8 +234,8 @@
 	<span class="ident">helpers::http::response</span>::{<span class="ident">create_empty_response</span>, <span class="ident">create_response</span>},
 	<span class="ident">hyper</span>::{
 		<span class="ident">header</span>::{
-			<span class="ident">HeaderMap</span>, <span class="ident">HeaderValue</span>, <span class="ident">CACHE_CONTROL</span>, <span class="ident">CONTENT_SECURITY_POLICY</span>, <span class="ident">ETAG</span>, <span class="ident">IF_NONE_MATCH</span>, <span class="ident">REFERRER_POLICY</span>,
-			<span class="ident">X_CONTENT_TYPE_OPTIONS</span>
+			<span class="ident">HeaderMap</span>, <span class="ident">HeaderValue</span>, <span class="ident">CACHE_CONTROL</span>, <span class="ident">CONTENT_SECURITY_POLICY</span>, <span class="ident">ETAG</span>, <span class="ident">IF_NONE_MATCH</span>,
+			<span class="ident">REFERRER_POLICY</span>, <span class="ident">X_CONTENT_TYPE_OPTIONS</span>
 		},
 		<span class="ident">Body</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>
 	},
@@ -276,7 +289,10 @@
 	<span class="ident">Default::default</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">openapi_string</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">openapi_string</span>(
+	<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>,
+	<span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="ident">openapi</span>.<span class="ident">read</span>();
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="ident">openapi</span>.<span class="ident">clone</span>();
@@ -297,8 +313,13 @@
 			<span class="ident">res</span>
 		},
 		<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-			<span class="macro">error!</span>(<span class="string">&quot;Unable to handle OpenAPI request due to error: {}&quot;</span>, <span class="ident">e</span>);
-			<span class="ident">create_response</span>(<span class="ident">state</span>, <span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>, <span class="ident">TEXT_PLAIN_UTF_8</span>, <span class="string">&quot;&quot;</span>)
+			<span class="macro">error!</span>(<span class="string">&quot;Unable to handle OpenAPI request due to error: {e}&quot;</span>);
+			<span class="ident">create_response</span>(
+				<span class="ident">state</span>,
+				<span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>,
+				<span class="ident">TEXT_PLAIN_UTF_8</span>,
+				<span class="string">&quot;&quot;</span>
+			)
 		}
 	}
 }
@@ -356,7 +377,10 @@
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">redoc_handler</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">redoc_handler</span>(
+	<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>,
+	<span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="ident">openapi_string</span>(<span class="ident">state</span>, <span class="ident">openapi</span>)<span class="question-mark">?</span>;
 	<span class="kw">let</span> <span class="ident">encoded_spec</span> <span class="op">=</span> <span class="ident">spec</span>
 		.<span class="ident">chars</span>()
@@ -399,12 +423,14 @@
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_response</span>(<span class="ident">state</span>, <span class="ident">StatusCode::OK</span>, <span class="ident">TEXT_HTML_UTF_8</span>, <span class="ident">buf</span>);
 	<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers_mut</span>();
-	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">CACHE_CONTROL</span>, <span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;public,max-age=2592000&quot;</span>));
+	<span class="ident">headers</span>.<span class="ident">insert</span>(
+		<span class="ident">CACHE_CONTROL</span>,
+		<span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;public,max-age=2592000&quot;</span>)
+	);
 	<span class="ident">headers</span>.<span class="ident">insert</span>(
 		<span class="ident">CONTENT_SECURITY_POLICY</span>,
 		<span class="macro">format!</span>(
-			<span class="string">&quot;default-src &#39;none&#39;;base-uri &#39;none&#39;;script-src &#39;unsafe-inline&#39; https://cdn.jsdelivr.net &#39;sha256-{}&#39; &#39;strict-dynamic&#39;;style-src &#39;unsafe-inline&#39; https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src &#39;self&#39;;img-src blob: data:&quot;</span>,
-			<span class="ident">script_hash</span>
+			<span class="string">&quot;default-src &#39;none&#39;;base-uri &#39;none&#39;;script-src &#39;unsafe-inline&#39; https://cdn.jsdelivr.net &#39;sha256-{script_hash}&#39; &#39;strict-dynamic&#39;;style-src &#39;unsafe-inline&#39; https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src &#39;self&#39;;img-src blob: data:&quot;</span>,
 		).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
 	);
 	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">ETAG</span>, <span class="ident">etag</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());

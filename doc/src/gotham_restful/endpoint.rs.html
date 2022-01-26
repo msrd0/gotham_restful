@@ -149,6 +149,8 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
 <span class="kw">use</span> <span class="ident">futures_util::future::BoxFuture</span>;
 <span class="kw">use</span> <span class="ident">gotham</span>::{
@@ -176,7 +178,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">OpenapiType</span> <span class="kw">for</span> <span class="ident">NoopExtractor</span> {
 	<span class="kw">fn</span> <span class="ident">schema</span>() -&gt; <span class="ident">OpenapiSchema</span> {
-		<span class="macro">warn!</span>(<span class="string">&quot;You&#39;re asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want.&quot;</span>);
+		<span class="macro">warn!</span>(
+			<span class="string">&quot;You&#39;re asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want.&quot;</span>
+		);
 		<span class="op">&lt;</span>() <span class="kw">as</span> <span class="ident">OpenapiType</span><span class="op">&gt;</span><span class="ident">::schema</span>()
 	}
 }

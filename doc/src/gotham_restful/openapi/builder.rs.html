@@ -161,6 +161,9 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">openapi_type</span>::{
 	<span class="ident">indexmap::IndexMap</span>,
 	<span class="ident">openapi</span>::{
@@ -253,7 +256,7 @@
 		<span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">name</span>.<span class="ident">clone</span>() {
 			<span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
 				<span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Reference</span> {
-					<span class="ident">reference</span>: <span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{}&quot;</span>, <span class="ident">name</span>)
+					<span class="ident">reference</span>: <span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{name}&quot;</span>)
 				};
 				<span class="self">self</span>.<span class="ident">add_schema_impl</span>(<span class="ident">name</span>, <span class="ident">schema</span>);
 				<span class="ident">reference</span>
@@ -286,7 +289,10 @@
 		<span class="ident">OpenapiInfo</span> {
 			<span class="ident">title</span>: <span class="string">&quot;TEST CASE&quot;</span>.<span class="ident">to_owned</span>(),
 			<span class="ident">version</span>: <span class="string">&quot;1.2.3&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">urls</span>: <span class="macro">vec!</span>[<span class="string">&quot;http://localhost:1234&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;https://example.org&quot;</span>.<span class="ident">to_owned</span>()]
+			<span class="ident">urls</span>: <span class="macro">vec!</span>[
+				<span class="string">&quot;http://localhost:1234&quot;</span>.<span class="ident">to_owned</span>(),
+				<span class="string">&quot;https://example.org&quot;</span>.<span class="ident">to_owned</span>(),
+			]
 		}
 	}
 

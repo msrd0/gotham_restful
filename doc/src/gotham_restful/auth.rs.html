@@ -485,6 +485,55 @@
 <span id="482">482</span>
 <span id="483">483</span>
 <span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AuthError</span>, <span class="ident">Forbidden</span>};
 
 <span class="kw">use</span> <span class="ident">cookie::CookieJar</span>;
@@ -580,7 +629,11 @@ impl&lt;T&gt; AuthHandler&lt;T&gt; for CustomAuthHandler {
 */</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AuthHandler</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Return the SHA256-HMAC secret used to verify the JWT token.</span>
-	<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">decode_data</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+	<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+		<span class="kw-2">&amp;</span><span class="self">self</span>,
+		<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>,
+		<span class="ident">decode_data</span>: <span class="ident">F</span>
+	) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// An [AuthHandler] returning always the same secret. See [AuthMiddleware] for a usage example.</span>
@@ -600,7 +653,11 @@ impl&lt;T&gt; AuthHandler&lt;T&gt; for CustomAuthHandler {
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AuthHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StaticAuthHandler</span> {
-	<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">_decode_data</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+		<span class="kw-2">&amp;</span><span class="self">self</span>,
+		<span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>,
+		<span class="ident">_decode_data</span>: <span class="ident">F</span>
+	) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">secret</span>.<span class="ident">clone</span>())
 	}
 }
@@ -627,7 +684,7 @@ struct AuthData {
 
 #[read_all]
 fn read_all(auth : &amp;AuthStatus&lt;AuthData&gt;) -&gt; Success&lt;String&gt; {
-	format!(&quot;{:?}&quot;, auth).into()
+	format!(&quot;{auth:?}&quot;).into()
 }
 
 fn main() {
@@ -735,7 +792,11 @@ fn main() {
 		};
 
 		<span class="comment">// validate the token</span>
-		<span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">jsonwebtoken::decode</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">DecodingKey::from_secret</span>(<span class="kw-2">&amp;</span><span class="ident">secret</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">validation</span>) {
+		<span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">jsonwebtoken::decode</span>(
+			<span class="kw-2">&amp;</span><span class="ident">token</span>,
+			<span class="kw-2">&amp;</span><span class="ident">DecodingKey::from_secret</span>(<span class="kw-2">&amp;</span><span class="ident">secret</span>),
+			<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">validation</span>
+		) {
 			<span class="prelude-val">Ok</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">claims</span>,
 			<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">into_kind</span>() {
 				<span class="ident">ErrorKind::ExpiredSignature</span> =&gt; <span class="kw">return</span> <span class="ident">AuthStatus::Expired</span>,
@@ -765,7 +826,9 @@ fn main() {
 		<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">status</span>);
 
 		<span class="comment">// call the rest of the chain</span>
-		<span class="ident">chain</span>(<span class="ident">state</span>).<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">state</span>, <span class="ident">res</span>)<span class="op">|</span> <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">res</span>))).<span class="ident">boxed</span>()
+		<span class="ident">chain</span>(<span class="ident">state</span>)
+			.<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">state</span>, <span class="ident">res</span>)<span class="op">|</span> <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">res</span>)))
+			.<span class="ident">boxed</span>()
 	}
 }
 
@@ -792,9 +855,9 @@ fn main() {
 	<span class="kw">const</span> <span class="ident">JWT_SECRET</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="string">b&quot;Lyzsfnta0cdxyF0T9y6VGxp3jpgoMUuW&quot;</span>;
 
 	<span class="comment">// some known tokens</span>
-	<span class="kw">const</span> <span class="ident">VALID_TOKEN</span> : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk&quot;</span>;
-	<span class="kw">const</span> <span class="ident">EXPIRED_TOKEN</span> : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0&quot;</span>;
-	<span class="kw">const</span> <span class="ident">INVALID_TOKEN</span> : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9&quot;</span>;
+	<span class="kw">const</span> <span class="ident">VALID_TOKEN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk&quot;</span>;
+	<span class="kw">const</span> <span class="ident">EXPIRED_TOKEN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0&quot;</span>;
+	<span class="kw">const</span> <span class="ident">INVALID_TOKEN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9&quot;</span>;
 
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
 	<span class="kw">struct</span> <span class="ident">TestData</span> {
@@ -818,17 +881,26 @@ fn main() {
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 	<span class="kw">struct</span> <span class="ident">NoneAuthHandler</span>;
 	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AuthHandler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoneAuthHandler</span> {
-		<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">_decode_data</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+			<span class="kw-2">&amp;</span><span class="self">self</span>,
+			<span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>,
+			<span class="ident">_decode_data</span>: <span class="ident">F</span>
+		) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 			<span class="prelude-val">None</span>
 		}
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_auth_middleware_none_secret</span>() {
-		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">AuthMiddleware</span><span class="op">&lt;</span><span class="ident">TestData</span>, <span class="ident">NoneAuthHandler</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_source</span>(<span class="ident">AuthSource::AuthorizationHeader</span>);
+		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">AuthMiddleware</span><span class="op">&lt;</span><span class="ident">TestData</span>, <span class="ident">NoneAuthHandler</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_source</span>(
+			<span class="ident">AuthSource::AuthorizationHeader</span>
+		);
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">AUTHORIZATION</span>, <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="ident">VALID_TOKEN</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+			<span class="ident">headers</span>.<span class="ident">insert</span>(
+				<span class="ident">AUTHORIZATION</span>,
+				<span class="macro">format!</span>(<span class="string">&quot;Bearer {VALID_TOKEN}&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+			);
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 		});
@@ -840,7 +912,11 @@ fn main() {
 	<span class="kw">where</span>
 		<span class="ident">T</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">PartialEq</span>
 	{
-		<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">decode_data</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+			<span class="kw-2">&amp;</span><span class="self">self</span>,
+			<span class="ident">_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>,
+			<span class="ident">decode_data</span>: <span class="ident">F</span>
+		) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 			<span class="macro">assert_eq!</span>(<span class="ident">decode_data</span>(), <span class="prelude-val">Some</span>(<span class="ident">T::default</span>()));
 			<span class="prelude-val">Some</span>(<span class="ident">JWT_SECRET</span>.<span class="ident">to_vec</span>())
 		}
@@ -848,10 +924,15 @@ fn main() {
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_auth_middleware_decode_data</span>() {
-		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">AuthMiddleware</span><span class="op">&lt;</span><span class="ident">TestData</span>, <span class="ident">TestAssertingHandler</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_source</span>(<span class="ident">AuthSource::AuthorizationHeader</span>);
+		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">AuthMiddleware</span><span class="op">&lt;</span><span class="ident">TestData</span>, <span class="ident">TestAssertingHandler</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_source</span>(
+			<span class="ident">AuthSource::AuthorizationHeader</span>
+		);
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">AUTHORIZATION</span>, <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="ident">VALID_TOKEN</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+			<span class="ident">headers</span>.<span class="ident">insert</span>(
+				<span class="ident">AUTHORIZATION</span>,
+				<span class="macro">format!</span>(<span class="string">&quot;Bearer {VALID_TOKEN}&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+			);
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 		});
@@ -861,7 +942,11 @@ fn main() {
 	<span class="kw">where</span>
 		<span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Send</span>
 	{
-		<span class="ident">AuthMiddleware::new</span>(<span class="ident">source</span>, <span class="ident">Default::default</span>(), <span class="ident">StaticAuthHandler::from_array</span>(<span class="ident">JWT_SECRET</span>))
+		<span class="ident">AuthMiddleware::new</span>(
+			<span class="ident">source</span>,
+			<span class="ident">Default::default</span>(),
+			<span class="ident">StaticAuthHandler::from_array</span>(<span class="ident">JWT_SECRET</span>)
+		)
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
@@ -871,7 +956,7 @@ fn main() {
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Unauthenticated</span> =&gt; {},
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Unauthenticated, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Unauthenticated, got {status:?}&quot;</span>)
 			};
 		});
 	}
@@ -881,12 +966,15 @@ fn main() {
 		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="ident">new_middleware</span>::<span class="op">&lt;</span><span class="ident">TestData</span><span class="op">&gt;</span>(<span class="ident">AuthSource::AuthorizationHeader</span>);
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">AUTHORIZATION</span>, <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="ident">EXPIRED_TOKEN</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+			<span class="ident">headers</span>.<span class="ident">insert</span>(
+				<span class="ident">AUTHORIZATION</span>,
+				<span class="macro">format!</span>(<span class="string">&quot;Bearer {EXPIRED_TOKEN}&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+			);
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Expired</span> =&gt; {},
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Expired, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Expired, got {status:?}&quot;</span>)
 			};
 		});
 	}
@@ -896,12 +984,15 @@ fn main() {
 		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="ident">new_middleware</span>::<span class="op">&lt;</span><span class="ident">TestData</span><span class="op">&gt;</span>(<span class="ident">AuthSource::AuthorizationHeader</span>);
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">AUTHORIZATION</span>, <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="ident">INVALID_TOKEN</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+			<span class="ident">headers</span>.<span class="ident">insert</span>(
+				<span class="ident">AUTHORIZATION</span>,
+				<span class="macro">format!</span>(<span class="string">&quot;Bearer {INVALID_TOKEN}&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+			);
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Invalid</span> =&gt; {},
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Invalid, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Invalid, got {status:?}&quot;</span>)
 			};
 		});
 	}
@@ -911,12 +1002,15 @@ fn main() {
 		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="ident">new_middleware</span>::<span class="op">&lt;</span><span class="ident">TestData</span><span class="op">&gt;</span>(<span class="ident">AuthSource::AuthorizationHeader</span>);
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">AUTHORIZATION</span>, <span class="macro">format!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="ident">VALID_TOKEN</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+			<span class="ident">headers</span>.<span class="ident">insert</span>(
+				<span class="ident">AUTHORIZATION</span>,
+				<span class="macro">format!</span>(<span class="string">&quot;Bearer {VALID_TOKEN}&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+			);
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">TestData::default</span>()),
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
 			};
 		})
 	}
@@ -924,7 +1018,8 @@ fn main() {
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_auth_middleware_header_token</span>() {
 		<span class="kw">let</span> <span class="ident">header_name</span> <span class="op">=</span> <span class="string">&quot;x-znoiprwmvfexju&quot;</span>;
-		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="ident">new_middleware</span>::<span class="op">&lt;</span><span class="ident">TestData</span><span class="op">&gt;</span>(<span class="ident">AuthSource::Header</span>(<span class="ident">HeaderName::from_static</span>(<span class="ident">header_name</span>)));
+		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span>
+			<span class="ident">new_middleware</span>::<span class="op">&lt;</span><span class="ident">TestData</span><span class="op">&gt;</span>(<span class="ident">AuthSource::Header</span>(<span class="ident">HeaderName::from_static</span>(<span class="ident">header_name</span>)));
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
 			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">header_name</span>, <span class="ident">VALID_TOKEN</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
@@ -932,7 +1027,7 @@ fn main() {
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">TestData::default</span>()),
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
 			};
 		})
 	}
@@ -948,7 +1043,7 @@ fn main() {
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">TestData::default</span>()),
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
 			};
 		})
 	}
@@ -959,12 +1054,15 @@ fn main() {
 		<span class="kw">let</span> <span class="ident">middleware</span> <span class="op">=</span> <span class="ident">new_middleware</span>::<span class="op">&lt;</span><span class="ident">TestData</span><span class="op">&gt;</span>(<span class="ident">AuthSource::Cookie</span>(<span class="ident">cookie_name</span>.<span class="ident">to_owned</span>()));
 		<span class="ident">State::with_new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::new</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">COOKIE</span>, <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, <span class="ident">cookie_name</span>, <span class="ident">VALID_TOKEN</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+			<span class="ident">headers</span>.<span class="ident">insert</span>(
+				<span class="ident">COOKIE</span>,
+				<span class="macro">format!</span>(<span class="string">&quot;{cookie_name}={VALID_TOKEN}&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+			);
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
 				<span class="ident">AuthStatus::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">TestData::default</span>()),
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {:?}&quot;</span>, <span class="ident">status</span>)
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
 			};
 		})
 	}
