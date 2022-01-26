@@ -237,7 +237,7 @@ impl<T: ToString> From<T> for ResourceError {
 
 #[cfg(feature = "errorlog")]
 fn errorlog<E: Display>(e: E) {
-	error!("The handler encountered an error: {}", e);
+	error!("The handler encountered an error: {e}");
 }
 
 #[cfg(not(feature = "errorlog"))]

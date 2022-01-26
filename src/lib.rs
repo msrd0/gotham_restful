@@ -1,13 +1,12 @@
 #![warn(missing_debug_implementations, rust_2018_idioms, unreachable_pub)]
 #![forbid(unsafe_code)]
 // deny warnings in CI
-#![cfg_attr(gotham_restful_deny_warnings, allow(renamed_and_removed_lints))]
 #![cfg_attr(gotham_restful_deny_warnings, deny(warnings))]
 // clippy doesn't like our code style
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::tabs_in_doc_comments))]
 // intra-doc links only fully work when OpenAPI is enabled
-#![cfg_attr(feature = "openapi", deny(broken_intra_doc_links))]
-#![cfg_attr(not(feature = "openapi"), allow(broken_intra_doc_links))]
+#![cfg_attr(feature = "openapi", deny(rustdoc::broken_intra_doc_links))]
+#![cfg_attr(not(feature = "openapi"), allow(rustdoc::broken_intra_doc_links))]
 
 /*!
 This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to

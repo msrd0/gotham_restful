@@ -87,7 +87,7 @@ fn create_openapi_response(state: &State, openapi: &Arc<RwLock<OpenAPI>>) -> Res
 			res
 		},
 		Err(e) => {
-			error!("Unable to handle OpenAPI request due to error: {}", e);
+			error!("Unable to handle OpenAPI request due to error: {e}");
 			create_response(
 				state,
 				StatusCode::INTERNAL_SERVER_ERROR,
@@ -204,8 +204,7 @@ fn redoc_handler(
 	headers.insert(
 		CONTENT_SECURITY_POLICY,
 		format!(
-			"default-src 'none';base-uri 'none';script-src 'unsafe-inline' https://cdn.jsdelivr.net 'sha256-{}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:",
-			script_hash
+			"default-src 'none';base-uri 'none';script-src 'unsafe-inline' https://cdn.jsdelivr.net 'sha256-{script_hash}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:",
 		).parse().unwrap()
 	);
 	headers.insert(ETAG, etag.parse().unwrap());

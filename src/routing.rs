@@ -132,7 +132,7 @@ where
 
 	let out = E::handle(state, placeholders, params, body).await;
 	let res = out.into_response().await.map_err(Into::into)?;
-	debug!("Returning response {:?}", res);
+	debug!("Returning response {res:?}");
 	Ok(response_from(res, state))
 }
 
@@ -237,7 +237,7 @@ macro_rules! implDrawResourceRoutes {
 		{
 			fn endpoint<E: Endpoint + 'static>(&mut self) {
 				let uri = format!("{}/{}", self.1, E::uri());
-				debug!("Registering endpoint for {}", uri);
+				debug!("Registering endpoint for {uri}");
 				self.0.associate(&uri, |assoc| {
 					assoc
 						.request(vec![E::http_method()])

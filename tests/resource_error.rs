@@ -27,7 +27,7 @@ mod resource_error {
 	#[test]
 	fn internal_server_error() {
 		let err = Error::InternalServerError("Brocken".to_owned());
-		assert_eq!(&format!("{}", err), "Internal Server Error: Brocken");
+		assert_eq!(&format!("{err}"), "Internal Server Error: Brocken");
 
 		let res = err.into_response_error().unwrap();
 		assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);

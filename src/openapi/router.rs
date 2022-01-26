@@ -44,7 +44,7 @@ macro_rules! implOpenapiRouter {
 				let mut openapi_builder = self.openapi_builder.clone();
 				let new_scope = self
 					.scope
-					.map(|scope| format!("{}/{}", scope, path).replace("//", "/"));
+					.map(|scope| format!("{scope}/{path}").replace("//", "/"));
 				self.router.scope(path, |router| {
 					let mut router = OpenapiRouter {
 						router,
@@ -119,10 +119,10 @@ macro_rules! implOpenapiRouter {
 				let uri: &str = &E::uri();
 				let uri =
 					regex_replace_all!(r#"(^|/):([^/]+)(/|$)"#, uri, |_, prefix, name, suffix| {
-						format!("{}{{{}}}{}", prefix, name, suffix)
+						format!("{prefix}{{{name}}}{suffix}")
 					});
 				if !uri.is_empty() {
-					path = format!("{}/{}", path, uri);
+					path = format!("{path}/{uri}");
 				}
 
 				let op = descr.into_operation();
@@ -136,10 +136,9 @@ macro_rules! implOpenapiRouter {
 					Method::HEAD => item.head = Some(op),
 					Method::PATCH => item.patch = Some(op),
 					Method::TRACE => item.trace = Some(op),
-					method => warn!(
-						"Ignoring unsupported method '{}' in OpenAPI Specification",
-						method
-					)
+					method => {
+						warn!("Ignoring unsupported method '{method}' in OpenAPI Specification")
+					}
 				};
 				(self.0).openapi_builder.add_path(path, item);
 

@@ -55,7 +55,7 @@ fn process_variant(variant: Variant) -> Result<ErrorVariant> {
 			for (i, field) in unnamed.unnamed.into_iter().enumerate() {
 				fields.push(ErrorVariantField {
 					attrs: field.attrs,
-					ident: format_ident!("arg{}", i),
+					ident: format_ident!("arg{i}"),
 					ty: field.ty
 				})
 			}
@@ -101,7 +101,7 @@ fn process_variant(variant: Variant) -> Result<ErrorVariant> {
 
 fn path_segment(name: &str) -> PathSegment {
 	PathSegment {
-		ident: format_ident!("{}", name),
+		ident: format_ident!("{name}"),
 		arguments: Default::default()
 	}
 }
@@ -172,7 +172,7 @@ impl ErrorVariant {
 		}
 		let params = params
 			.into_iter()
-			.map(|name| format_ident!("{}{}", if self.is_named { "" } else { "arg" }, name));
+			.map(|name| format_ident!("{}{name}", if self.is_named { "" } else { "arg" }));
 
 		let fields_pat = self.fields_pat();
 		Ok(quote! {
@@ -225,7 +225,7 @@ impl ErrorVariant {
 					ident.span(),
 					"Missing #[status(code)] for this variant"
 				));
-			},
+			}
 		};
 
 		Ok(quote! {

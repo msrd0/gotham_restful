@@ -75,7 +75,7 @@ pub(crate) fn expand_private_openapi_trait(
 				p.span(),
 				"Expected name of the Resource struct this method belongs to"
 			));
-		},
+		}
 	};
 
 	let orig_trait = {

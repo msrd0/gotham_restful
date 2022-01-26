@@ -109,13 +109,8 @@ impl OperationDescription {
 		path: &str
 	) -> Self {
 		let operation_id = E::operation_id().or_else(|| {
-			E::operation_verb().map(|verb| {
-				format!(
-					"{}_{}",
-					verb,
-					path.replace("/", "_").trim_start_matches('_')
-				)
-			})
+			E::operation_verb()
+				.map(|verb| format!("{verb}_{}", path.replace("/", "_").trim_start_matches('_')))
 		});
 		Self {
 			operation_id,

@@ -90,7 +90,7 @@ impl OpenapiBuilder {
 		match schema.name.clone() {
 			Some(name) => {
 				let reference = Reference {
-					reference: format!("#/components/schemas/{}", name)
+					reference: format!("#/components/schemas/{name}")
 				};
 				self.add_schema_impl(name, schema);
 				reference

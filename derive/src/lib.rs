@@ -28,7 +28,7 @@ use private_openapi_trait::expand_private_openapi_trait;
 
 #[inline]
 fn print_tokens(tokens: TokenStream2) -> TokenStream {
-	// eprintln!("{}", tokens);
+	// eprintln!("{tokens}");
 	tokens.into()
 }
 

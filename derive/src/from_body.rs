@@ -28,7 +28,7 @@ impl ParsedFields {
 	{
 		let fields = fields
 			.enumerate()
-			.map(|(i, field)| (format_ident!("arg{}", i), field.ty))
+			.map(|(i, field)| (format_ident!("arg{i}"), field.ty))
 			.collect();
 		Self {
 			fields,

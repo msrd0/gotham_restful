@@ -148,7 +148,7 @@ struct AuthData {
 
 #[read_all]
 fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
-	format!("{:?}", auth).into()
+	format!("{auth:?}").into()
 }
 
 fn main() {
@@ -363,7 +363,7 @@ mod test {
 			let mut headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				format!("Bearer {}", VALID_TOKEN).parse().unwrap()
+				format!("Bearer {VALID_TOKEN}").parse().unwrap()
 			);
 			state.put(headers);
 			middleware.auth_status(&mut state);
@@ -395,7 +395,7 @@ mod test {
 			let mut headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				format!("Bearer {}", VALID_TOKEN).parse().unwrap()
+				format!("Bearer {VALID_TOKEN}").parse().unwrap()
 			);
 			state.put(headers);
 			middleware.auth_status(&mut state);
@@ -420,7 +420,7 @@ mod test {
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Unauthenticated => {},
-				_ => panic!("Expected AuthStatus::Unauthenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Unauthenticated, got {status:?}")
 			};
 		});
 	}
@@ -432,13 +432,13 @@ mod test {
 			let mut headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				format!("Bearer {}", EXPIRED_TOKEN).parse().unwrap()
+				format!("Bearer {EXPIRED_TOKEN}").parse().unwrap()
 			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Expired => {},
-				_ => panic!("Expected AuthStatus::Expired, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Expired, got {status:?}")
 			};
 		});
 	}
@@ -450,13 +450,13 @@ mod test {
 			let mut headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				format!("Bearer {}", INVALID_TOKEN).parse().unwrap()
+				format!("Bearer {INVALID_TOKEN}").parse().unwrap()
 			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Invalid => {},
-				_ => panic!("Expected AuthStatus::Invalid, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Invalid, got {status:?}")
 			};
 		});
 	}
@@ -468,13 +468,13 @@ mod test {
 			let mut headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				format!("Bearer {}", VALID_TOKEN).parse().unwrap()
+				format!("Bearer {VALID_TOKEN}").parse().unwrap()
 			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}
@@ -491,7 +491,7 @@ mod test {
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}
@@ -507,7 +507,7 @@ mod test {
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}
@@ -520,13 +520,13 @@ mod test {
 			let mut headers = HeaderMap::new();
 			headers.insert(
 				COOKIE,
-				format!("{}={}", cookie_name, VALID_TOKEN).parse().unwrap()
+				format!("{cookie_name}={VALID_TOKEN}").parse().unwrap()
 			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}

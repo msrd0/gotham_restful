@@ -45,13 +45,13 @@ macro_rules! endpoint_type_setter {
 				fn [<set_ $name>](&mut self, span: Span, [<new_ $name>]: $ty) -> Result<()> {
 					match self {
 						Self::Custom { $name, .. } if $name.is_some() => {
-							Err(Error::new(span, concat!("`", concat!(stringify!($name), "` must not appear more than once"))))
+							Err(Error::new(span, concat!("`", stringify!($name), "` must not appear more than once")))
 						},
 						Self::Custom { $name, .. } => {
 							*$name = Some([<new_ $name>]);
 							Ok(())
 						},
-						_ => Err(Error::new(span, concat!("`", concat!(stringify!($name), "` can only be used on custom endpoints"))))
+						_ => Err(Error::new(span, concat!("`", stringify!($name), "` can only be used on custom endpoints")))
 					}
 				}
 			}
@@ -79,7 +79,7 @@ impl FromStr for EndpointType {
 			"Remove" | "remove" => Ok(Self::Delete),
 			_ => Err(Error::new(
 				Span::call_site(),
-				format!("Unknown method: `{}'", str)
+				format!("Unknown method: `{str}'")
 			))
 		}
 	}
@@ -394,7 +394,7 @@ fn expand_wants_auth(wants_auth: Option<LitBool>, default: bool) -> TokenStream 
 }
 
 pub fn endpoint_ident(fn_ident: &Ident) -> Ident {
-	format_ident!("{}___gotham_restful_endpoint", fn_ident)
+	format_ident!("{fn_ident}___gotham_restful_endpoint")
 }
 
 macro_rules! error_if_not_openapi {
@@ -519,14 +519,14 @@ fn expand_endpoint_type(
 	let fun_is_async = fun.sig.asyncness.is_some();
 
 	let ident = endpoint_ident(fun_ident);
-	let dummy_ident = format_ident!("_IMPL_Endpoint_for_{}", ident);
+	let dummy_ident = format_ident!("_IMPL_Endpoint_for_{ident}");
 	let (output_ty, is_no_content) = match &fun.sig.output {
 		ReturnType::Default => (quote!(::gotham_restful::NoContent), true),
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
 	let output_struct_ident = schema.as_ref().map(|schema_fn| {
 		Ident::new(
-			&format!("{}_gotham_restful_ResponseSchema", schema_fn),
+			&format!("{schema_fn}_gotham_restful_ResponseSchema"),
 			Span::call_site()
 		)
 	});
@@ -782,7 +782,7 @@ fn expand_endpoint_type(
 		};
 	};
 	if debug {
-		eprintln!("{}", code);
+		eprintln!("{code}");
 	}
 	Ok(code)
 }
