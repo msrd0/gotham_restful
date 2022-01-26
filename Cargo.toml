@@ -5,7 +5,7 @@ members = [".", "./derive"]
 
 [package]
 name = "gotham_restful"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 rust-version = "1.56.0"
@@ -18,8 +18,8 @@ repository = "https://github.com/msrd0/gotham_restful"
 include = ["/src/**/*.rs", "/src/openapi/handler/script.min.js", "/LICENSE", "/crates-io.md"]
 
 [dependencies]
-futures-core = "0.3.18"
-futures-util = "0.3.18"
+futures-core = "0.3.19"
+futures-util = "0.3.19"
 gotham = { version = "0.7.1", features = ["derive"], default-features = false }
 gotham_restful_derive = { version = "0.6.0", path = "./derive" }
 log = "0.4.8"
@@ -28,24 +28,24 @@ serde_json = "1.0"
 thiserror = "1.0"
 
 # non-feature optional dependencies
-base64 = { version = "0.13.0", optional = true }
+base64 = { version = "0.13", optional = true }
 cookie = { version = "0.15", optional = true }
 either = { version = "1.6", optional = true }
 gotham_middleware_diesel = { version = "0.4.0", optional = true }
 jsonwebtoken = { version = "7.2", optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
-openapi_type = { version = "0.3.0", optional = true }
+openapi_type = { version = "0.3.1", optional = true }
 parking_lot = { version = "0.11.1", optional = true }
-sha2 = { version = "0.10.0", optional = true }
+sha2 = { version = "0.10", optional = true }
 
 [dev-dependencies]
 diesel = { version = "1.4.6", features = ["postgres"] }
-futures-executor = "0.3.15"
-gotham = { version = "0.7.0", features = ["testing"], default-features = false }
+futures-executor = "0.3.19"
+gotham = { version = "0.7", features = ["testing"], default-features = false }
 paste = "1.0"
 pretty_assertions = "1.0"
 pretty_env_logger = "0.4"
-tokio = { version = "1.6", features = ["time"], default-features = false }
+tokio = { version = "1.15", features = ["time"], default-features = false }
 thiserror = "1.0"
 trybuild = "=1.0.54"
 
