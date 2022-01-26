@@ -1,10 +1,8 @@
 error[E0412]: cannot find type `read_any___gotham_restful_endpoint` in this scope
- --> tests/ui/resource/unknown_method.rs:4:10
+ --> tests/ui/resource/unknown_method.rs:5:12
   |
-4 | #[derive(Resource)]
-  |          ^^^^^^^^ help: a struct with a similar name exists: `read_all___gotham_restful_endpoint`
+5 | #[resource(read_any)]
+  |            ^^^^^^^^ help: a struct with a similar name exists: `read_all___gotham_restful_endpoint`
 ...
 8 | #[read_all]
   | ----------- similarly named struct `read_all___gotham_restful_endpoint` defined here
-  |
-  = note: this error originates in the derive macro `Resource` (in Nightly builds, run with -Z macro-backtrace for more info)

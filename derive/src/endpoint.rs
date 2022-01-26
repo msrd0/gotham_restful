@@ -394,7 +394,7 @@ fn expand_wants_auth(wants_auth: Option<LitBool>, default: bool) -> TokenStream 
 }
 
 pub fn endpoint_ident(fn_ident: &Ident) -> Ident {
-	format_ident!("{fn_ident}___gotham_restful_endpoint")
+	format_ident!("{}___gotham_restful_endpoint", fn_ident)
 }
 
 macro_rules! error_if_not_openapi {
