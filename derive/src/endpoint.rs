@@ -519,7 +519,6 @@ fn expand_endpoint_type(
 	let fun_is_async = fun.sig.asyncness.is_some();
 
 	let ident = endpoint_ident(fun_ident);
-	let dummy_ident = format_ident!("_IMPL_Endpoint_for_{ident}");
 	let (output_ty, is_no_content) = match &fun.sig.output {
 		ReturnType::Default => (quote!(::gotham_restful::NoContent), true),
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
@@ -740,8 +739,7 @@ fn expand_endpoint_type(
 		#[allow(non_camel_case_types)]
 		#fun_vis struct #ident;
 
-		#[allow(non_upper_case_globals)]
-		static #dummy_ident: () = {
+		const _: () = {
 			#output_struct
 
 			impl #tr8 for #ident {
