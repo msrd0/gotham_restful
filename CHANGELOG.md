@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.62](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc62-2022-01-26)
 
 ## [0.6.1] - 2022-01-26
 ### Updated
