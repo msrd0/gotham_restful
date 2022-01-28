@@ -525,6 +525,33 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">unreachable_pub</span>)]</span>
 <span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
 <span class="comment">// deny warnings in CI</span>
@@ -535,430 +562,457 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>), <span class="ident">allow</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
 
-<span class="doccomment">/*!
-This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to
-create resources with assigned endpoints that aim to be a more convenient way of creating handlers
-for requests.
-
-# Features
-
- - Automatically parse **JSON** request and produce response bodies
- - Allow using **raw** request and response bodies
- - Convenient **macros** to create responses that can be registered with gotham&#39;s router
- - Auto-Generate an **OpenAPI** specification for your API
- - Manage **CORS** headers so you don&#39;t have to
- - Manage **Authentication** with JWT
- - Integrate diesel connection pools for easy **database** integration
-
-# Safety
-
-This crate is just as safe as you&#39;d expect from anything written in safe Rust - and
-`#![forbid(unsafe_code)]` ensures that no unsafe was used.
-
-# Endpoints
-
-There are a set of pre-defined endpoints that should cover the majority of REST APIs. However,
-it is also possible to define your own endpoints.
-
-## Pre-defined Endpoints
-
-Assuming you assign `/foobar` to your resource, the following pre-defined endpoints exist:
-
-| Endpoint Name | Required Arguments | HTTP Verb | HTTP Path      |
-| ------------- | ------------------ | --------- | -------------- |
-| read_all      |                    | GET       | /foobar        |
-| read          | id                 | GET       | /foobar/:id    |
-| search        | query              | GET       | /foobar/search |
-| create        | body               | POST      | /foobar        |
-| update_all    | body               | PUT       | /foobar        |
-| update        | id, body           | PUT       | /foobar/:id    |
-| delete_all    |                    | DELETE    | /foobar        |
-| delete        | id                 | DELETE    | /foobar/:id    |
-
-Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
-simple example looks like this:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-/// Our RESTful resource.
-#[derive(Resource)]
-#[resource(read)]
-struct FooResource;
-
-/// The return type of the foo read endpoint.
-#[derive(Serialize)]
-# #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]
-struct Foo {
-	id: u64
-}
-
-/// The foo read endpoint.
-#[read]
-fn read(id: u64) -&gt; Success&lt;Foo&gt; {
-	Foo { id }.into()
-}
-# fn main() {
-# 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {
-# 		route.resource::&lt;FooResource&gt;(&quot;foo&quot;);
-# 	}));
-# }
-```
-
-## Custom Endpoints
-
-Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that
-of the pre-defined endpoints, but you need to give it more context:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::build_simple_router, prelude::*};
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-use gotham_restful::gotham::hyper::Method;
-
-#[derive(Resource)]
-#[resource(custom_endpoint)]
-struct CustomResource;
-
-/// This type is used to parse path parameters.
-#[derive(Clone, Deserialize, StateData, StaticResponseExtender)]
-# #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]
-struct CustomPath {
-	name: String
-}
-
-#[endpoint(uri = &quot;custom/:name/read&quot;, method = &quot;Method::GET&quot;, params = false, body = false)]
-fn custom_endpoint(path: CustomPath) -&gt; Success&lt;String&gt; {
-	path.name.into()
-}
-# fn main() {
-# 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {
-# 		route.resource::&lt;CustomResource&gt;(&quot;custom&quot;);
-# 	}));
-# }
-```
-
-# Arguments
-
-Some endpoints require arguments. Those should be
- * **id** Should be a deserializable json-primitive like [`i64`] or [`String`].
- * **body** Should be any deserializable object, or any type implementing [`RequestBody`].
- * **query** Should be any deserializable object whose variables are json-primitives. It will
-   however not be parsed from json, but from HTTP GET parameters like in `search?id=1`. The
-   type needs to implement [`QueryStringExtractor`](gotham::extractor::QueryStringExtractor).
-
-Additionally, all handlers may take a reference to gotham&#39;s [`State`]. Please note that for async
-handlers, it needs to be a mutable reference until rustc&#39;s lifetime checks across await bounds
-improve.
-
-# Uploads and Downloads
-
-By default, every request body is parsed from json, and every respone is converted to json using
-[serde_json]. However, you may also use raw bodies. This is an example where the request body
-is simply returned as the response again, no json parsing involved:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{mime::{self, Mime}, router::builder::*};
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-#[derive(Resource)]
-#[resource(create)]
-struct ImageResource;
-
-#[derive(FromBody, RequestBody)]
-#[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
-struct RawImage {
-	content: Vec&lt;u8&gt;,
-	content_type: Mime
-}
-
-#[create]
-fn create(body : RawImage) -&gt; Raw&lt;Vec&lt;u8&gt;&gt; {
-	Raw::new(body.content, body.content_type)
-}
-# fn main() {
-# 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {
-# 		route.resource::&lt;ImageResource&gt;(&quot;image&quot;);
-# 	}));
-# }
-```
-
-# Custom HTTP Headers
-
-You can read request headers from the state as you would in any other gotham handler, and specify
-custom response headers using [Response::header].
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::hyper::header::{ACCEPT, HeaderMap, VARY};
-# use gotham::{router::builder::*, state::State};
-# use gotham_restful::*;
-#[derive(Resource)]
-#[resource(read_all)]
-struct FooResource;
-
-#[read_all]
-async fn read_all(state: &amp;mut State) -&gt; NoContent {
-	let headers: &amp;HeaderMap = state.borrow();
-	let accept = &amp;headers[ACCEPT];
-# drop(accept);
-
-	let mut res = NoContent::default();
-	res.header(VARY, &quot;accept&quot;.parse().unwrap());
-	res
-}
-# fn main() {
-# 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {
-# 		route.resource::&lt;FooResource&gt;(&quot;foo&quot;);
-# 	}));
-# }
-```
-
-# Features
-
-To make life easier for common use-cases, this create offers a few features that might be helpful
-when you implement your web server.  The complete feature list is
- - [`auth`](#authentication-feature) Advanced JWT middleware
- - `chrono` openapi support for chrono types
- - `full` enables all features except `without-openapi`
- - [`cors`](#cors-feature) CORS handling for all endpoint handlers
- - [`database`](#database-feature) diesel middleware support
- - `errorlog` log errors returned from endpoint handlers
- - [`openapi`](#openapi-feature) router additions to generate an openapi spec
- - `uuid` openapi support for uuid
- - `without-openapi` (**default**) disables `openapi` support.
-
-## Authentication Feature
-
-In order to enable authentication support, enable the `auth` feature gate. This allows you to
-register a middleware that can automatically check for the existence of an JWT authentication
-token. Besides being supported by the endpoint macros, it supports to lookup the required JWT secret
-with the JWT data, hence you can use several JWT secrets and decide on the fly which secret to use.
-None of this is currently supported by gotham&#39;s own JWT middleware.
-
-A simple example that uses only a single secret looks like this:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = &quot;auth&quot;)]
-# mod auth_feature_enabled {
-# use gotham::{router::builder::*, pipeline::*, state::State};
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-#[derive(Resource)]
-#[resource(read)]
-struct SecretResource;
-
-#[derive(Serialize)]
-# #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]
-struct Secret {
-	id: u64,
-	intended_for: String
-}
-
-#[derive(Deserialize, Clone)]
-struct AuthData {
-	sub: String,
-	exp: u64
-}
-
-#[read]
-fn read(auth: AuthStatus&lt;AuthData&gt;, id: u64) -&gt; AuthSuccess&lt;Secret&gt; {
-	let intended_for = auth.ok()?.sub;
-	Ok(Secret { id, intended_for })
-}
-
-fn main() {
-	let auth: AuthMiddleware&lt;AuthData, _&gt; = AuthMiddleware::new(
-		AuthSource::AuthorizationHeader,
-		AuthValidation::default(),
-		StaticAuthHandler::from_array(b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;)
-	);
-	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
-	gotham::start(&quot;127.0.0.1:8080&quot;, build_router(chain, pipelines, |route| {
-		route.resource::&lt;SecretResource&gt;(&quot;secret&quot;);
-	}));
-}
-# }
-```
-
-## CORS Feature
-
-The cors feature allows an easy usage of this web server from other origins. By default, only
-the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired
-configuration as a middleware.
-
-A simple example that allows authentication from every origin (note that `*` always disallows
-authentication), and every content type, looks like this:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = &quot;cors&quot;)]
-# mod cors_feature_enabled {
-# use gotham::{hyper::header::*, router::builder::*, pipeline::*, state::State};
-# use gotham_restful::{*, cors::*};
-# use serde::{Deserialize, Serialize};
-#[derive(Resource)]
-#[resource(read_all)]
-struct FooResource;
-
-#[read_all]
-fn read_all() {
-	// your handler
-}
-
-fn main() {
-	let cors = CorsConfig {
-		origin: Origin::Copy,
-		headers: Headers::List(vec![CONTENT_TYPE]),
-		max_age: 0,
-		credentials: true
-	};
-	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
-	gotham::start(&quot;127.0.0.1:8080&quot;, build_router(chain, pipelines, |route| {
-		route.resource::&lt;FooResource&gt;(&quot;foo&quot;);
-	}));
-}
-# }
-```
-
-The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`]
-for an example.
-
-## Database Feature
-
-The database feature allows an easy integration of [diesel] into your handler functions. Please
-note however that due to the way gotham&#39;s diesel middleware implementation, it is not possible
-to run async code while holding a database connection. If you need to combine async and database,
-you&#39;ll need to borrow the connection from the [`State`] yourself and return a boxed future.
-
-A simple non-async example looks like this:
-
-```rust,no_run
-# #[macro_use] extern crate diesel;
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = &quot;database&quot;)]
-# mod database_feature_enabled {
-# use diesel::{table, PgConnection, QueryResult, RunQueryDsl};
-# use gotham::{router::builder::*, pipeline::*, state::State};
-# use gotham_middleware_diesel::DieselMiddleware;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-# use std::env;
-# table! {
-#   foo (id) {
-#     id -&gt; Int8,
-#     value -&gt; Text,
-#   }
-# }
-#[derive(Resource)]
-#[resource(read_all)]
-struct FooResource;
-
-#[derive(Queryable, Serialize)]
-# #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]
-struct Foo {
-	id: i64,
-	value: String
-}
-
-#[read_all]
-fn read_all(conn: &amp;PgConnection) -&gt; QueryResult&lt;Vec&lt;Foo&gt;&gt; {
-	foo::table.load(conn)
-}
-
-type Repo = gotham_middleware_diesel::Repo&lt;PgConnection&gt;;
-
-fn main() {
-	let repo = Repo::new(&amp;env::var(&quot;DATABASE_URL&quot;).unwrap());
-	let diesel = DieselMiddleware::new(repo);
-
-	let (chain, pipelines) = single_pipeline(new_pipeline().add(diesel).build());
-	gotham::start(&quot;127.0.0.1:8080&quot;, build_router(chain, pipelines, |route| {
-		route.resource::&lt;FooResource&gt;(&quot;foo&quot;);
-	}));
-}
-# }
-```
-
-## OpenAPI Feature
-
-The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section
-carefully both as a binary as well as a library author to avoid unwanted suprises.
-
-In order to automatically create an openapi specification, gotham-restful needs knowledge over
-all routes and the types returned. `serde` does a great job at serialization but doesn&#39;t give
-enough type information, so all types used in the router need to implement
-[`OpenapiType`](openapi_type::OpenapiType). This can be derived for almoust any type and there
-should be no need to implement it manually. A simple example looks like this:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = &quot;openapi&quot;)]
-# mod openapi_feature_enabled {
-# use gotham::{router::builder::*, state::State};
-# use gotham_restful::*;
-# use openapi_type::OpenapiType;
-# use serde::{Deserialize, Serialize};
-#[derive(Resource)]
-#[resource(read_all)]
-struct FooResource;
-
-#[derive(OpenapiType, Serialize)]
-struct Foo {
-	bar: String
-}
-
-#[read_all]
-fn read_all() -&gt; Success&lt;Foo&gt; {
-	Foo { bar: &quot;Hello World&quot;.to_owned() }.into()
-}
-
-fn main() {
-	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {
-		let info = OpenapiInfo {
-			title: &quot;My Foo API&quot;.to_owned(),
-			version: &quot;0.1.0&quot;.to_owned(),
-			urls: vec![&quot;https://example.org/foo/api/v1&quot;.to_owned()]
-		};
-		route.with_openapi(info, |mut route| {
-			route.resource::&lt;FooResource&gt;(&quot;foo&quot;);
-			route.openapi_spec(&quot;openapi&quot;);
-			route.openapi_doc(&quot;/&quot;);
-		});
-	}));
-}
-# }
-```
-
-Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`.
-The first one will return the generated openapi specification in JSON format, allowing you to easily
-generate clients in different languages without worying to exactly replicate your api in each of those
-languages. The second one will return documentation in HTML format, so you can easily view your
-api and share it with other people.
-
-However, please note that by default, the `without-openapi` feature of this crate is enabled.
-Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements
-to some of the traits and types in this crate, for example instead of [`Endpoint`] you now have to
-implement [`EndpointWithSchema`]. This means that some code might only compile on either feature, but not
-on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both
-features through and conditionally enable the openapi code, like this:
-
-```rust
-# #[macro_use] extern crate gotham_restful;
-# use serde::{Deserialize, Serialize};
-#[derive(Deserialize, Serialize)]
-#[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]
-struct Foo;
-```
-
- [diesel]: https://diesel.rs/
- [`State`]: gotham::state::State
-*/</span>
+<span class="doccomment">//! This crate is an extension to the popular [gotham web framework][gotham] for Rust. It allows you to</span>
+<span class="doccomment">//! create resources with assigned endpoints that aim to be a more convenient way of creating handlers</span>
+<span class="doccomment">//! for requests.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  - Automatically parse **JSON** request and produce response bodies</span>
+<span class="doccomment">//!  - Allow using **raw** request and response bodies</span>
+<span class="doccomment">//!  - Convenient **macros** to create responses that can be registered with gotham&#39;s router</span>
+<span class="doccomment">//!  - Auto-Generate an **OpenAPI** specification for your API</span>
+<span class="doccomment">//!  - Manage **CORS** headers so you don&#39;t have to</span>
+<span class="doccomment">//!  - Manage **Authentication** with JWT</span>
+<span class="doccomment">//!  - Integrate diesel connection pools for easy **database** integration</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Safety</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate is just as safe as you&#39;d expect from anything written in safe Rust - and</span>
+<span class="doccomment">//! `#![forbid(unsafe_code)]` ensures that no unsafe was used.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Endpoints</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are a set of pre-defined endpoints that should cover the majority of REST APIs. However,</span>
+<span class="doccomment">//! it is also possible to define your own endpoints.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Pre-defined Endpoints</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Assuming you assign `/foobar` to your resource, the following pre-defined endpoints exist:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! | Endpoint Name | Required Arguments | HTTP Verb | HTTP Path      |</span>
+<span class="doccomment">//! | ------------- | ------------------ | --------- | -------------- |</span>
+<span class="doccomment">//! | read_all      |                    | GET       | /foobar        |</span>
+<span class="doccomment">//! | read          | id                 | GET       | /foobar/:id    |</span>
+<span class="doccomment">//! | search        | query              | GET       | /foobar/search |</span>
+<span class="doccomment">//! | create        | body               | POST      | /foobar        |</span>
+<span class="doccomment">//! | update_all    | body               | PUT       | /foobar        |</span>
+<span class="doccomment">//! | update        | id, body           | PUT       | /foobar/:id    |</span>
+<span class="doccomment">//! | delete_all    |                    | DELETE    | /foobar        |</span>
+<span class="doccomment">//! | delete        | id                 | DELETE    | /foobar/:id    |</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A</span>
+<span class="doccomment">//! simple example looks like this:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # use gotham::router::builder::*;</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! /// Our RESTful resource.</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(read)]</span>
+<span class="doccomment">//! struct FooResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// The return type of the foo read endpoint.</span>
+<span class="doccomment">//! #[derive(Serialize)]</span>
+<span class="doccomment">//! # #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]</span>
+<span class="doccomment">//! struct Foo {</span>
+<span class="doccomment">//! 	id: u64</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// The foo read endpoint.</span>
+<span class="doccomment">//! #[read]</span>
+<span class="doccomment">//! fn read(id: u64) -&gt; Success&lt;Foo&gt; {</span>
+<span class="doccomment">//! 	Foo { id }.into()</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! # 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {</span>
+<span class="doccomment">//! # 		route.resource::&lt;FooResource&gt;(&quot;foo&quot;);</span>
+<span class="doccomment">//! # 	})).expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Custom Endpoints</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that</span>
+<span class="doccomment">//! of the pre-defined endpoints, but you need to give it more context:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # use gotham::{router::build_simple_router, prelude::*};</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! use gotham_restful::gotham::hyper::Method;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(custom_endpoint)]</span>
+<span class="doccomment">//! struct CustomResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// This type is used to parse path parameters.</span>
+<span class="doccomment">//! #[derive(Clone, Deserialize, StateData, StaticResponseExtender)]</span>
+<span class="doccomment">//! # #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]</span>
+<span class="doccomment">//! struct CustomPath {</span>
+<span class="doccomment">//! 	name: String</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[endpoint(</span>
+<span class="doccomment">//! 	uri = &quot;custom/:name/read&quot;,</span>
+<span class="doccomment">//! 	method = &quot;Method::GET&quot;,</span>
+<span class="doccomment">//! 	params = false,</span>
+<span class="doccomment">//! 	body = false</span>
+<span class="doccomment">//! )]</span>
+<span class="doccomment">//! fn custom_endpoint(path: CustomPath) -&gt; Success&lt;String&gt; {</span>
+<span class="doccomment">//! 	path.name.into()</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! # 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {</span>
+<span class="doccomment">//! # 		route.resource::&lt;CustomResource&gt;(&quot;custom&quot;);</span>
+<span class="doccomment">//! # 	})).expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Arguments</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Some endpoints require arguments. Those should be</span>
+<span class="doccomment">//!  * **id** Should be a deserializable json-primitive like [`i64`] or [`String`].</span>
+<span class="doccomment">//!  * **body** Should be any deserializable object, or any type implementing [`RequestBody`].</span>
+<span class="doccomment">//!  * **query** Should be any deserializable object whose variables are json-primitives. It will</span>
+<span class="doccomment">//!    however not be parsed from json, but from HTTP GET parameters like in `search?id=1`. The</span>
+<span class="doccomment">//!    type needs to implement [`QueryStringExtractor`](gotham::extractor::QueryStringExtractor).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Additionally, all handlers may take a reference to gotham&#39;s [`State`]. Please note that for async</span>
+<span class="doccomment">//! handlers, it needs to be a mutable reference until rustc&#39;s lifetime checks across await bounds</span>
+<span class="doccomment">//! improve.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Uploads and Downloads</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! By default, every request body is parsed from json, and every respone is converted to json using</span>
+<span class="doccomment">//! [serde_json]. However, you may also use raw bodies. This is an example where the request body</span>
+<span class="doccomment">//! is simply returned as the response again, no json parsing involved:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # use gotham::{mime::{self, Mime}, router::builder::*};</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(create)]</span>
+<span class="doccomment">//! struct ImageResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(FromBody, RequestBody)]</span>
+<span class="doccomment">//! #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]</span>
+<span class="doccomment">//! struct RawImage {</span>
+<span class="doccomment">//! 	content: Vec&lt;u8&gt;,</span>
+<span class="doccomment">//! 	content_type: Mime</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[create]</span>
+<span class="doccomment">//! fn create(body: RawImage) -&gt; Raw&lt;Vec&lt;u8&gt;&gt; {</span>
+<span class="doccomment">//! 	Raw::new(body.content, body.content_type)</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! # 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {</span>
+<span class="doccomment">//! # 		route.resource::&lt;ImageResource&gt;(&quot;image&quot;);</span>
+<span class="doccomment">//! # 	})).expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Custom HTTP Headers</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! You can read request headers from the state as you would in any other gotham handler, and specify</span>
+<span class="doccomment">//! custom response headers using [Response::header].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # use gotham::hyper::header::{ACCEPT, HeaderMap, VARY};</span>
+<span class="doccomment">//! # use gotham::{router::builder::*, state::State};</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(read_all)]</span>
+<span class="doccomment">//! struct FooResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[read_all]</span>
+<span class="doccomment">//! async fn read_all(state: &amp;mut State) -&gt; NoContent {</span>
+<span class="doccomment">//! 	let headers: &amp;HeaderMap = state.borrow();</span>
+<span class="doccomment">//! 	let accept = &amp;headers[ACCEPT];</span>
+<span class="doccomment">//! # drop(accept);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! 	let mut res = NoContent::default();</span>
+<span class="doccomment">//! 	res.header(VARY, &quot;accept&quot;.parse().unwrap());</span>
+<span class="doccomment">//! 	res</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! # 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {</span>
+<span class="doccomment">//! # 		route.resource::&lt;FooResource&gt;(&quot;foo&quot;);</span>
+<span class="doccomment">//! # 	})).expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! To make life easier for common use-cases, this create offers a few features that might be helpful</span>
+<span class="doccomment">//! when you implement your web server.  The complete feature list is</span>
+<span class="doccomment">//!  - [`auth`](#authentication-feature) Advanced JWT middleware</span>
+<span class="doccomment">//!  - [`cors`](#cors-feature) CORS handling for all endpoint handlers</span>
+<span class="doccomment">//!  - [`database`](#database-feature) diesel middleware support</span>
+<span class="doccomment">//!  - `errorlog` log errors returned from endpoint handlers</span>
+<span class="doccomment">//!  - `full` enables all features except `without-openapi`</span>
+<span class="doccomment">//!  - [`openapi`](#openapi-feature) router additions to generate an openapi spec</span>
+<span class="doccomment">//!  - `without-openapi` (**default**) disables `openapi` support.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Authentication Feature</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In order to enable authentication support, enable the `auth` feature gate. This allows you to</span>
+<span class="doccomment">//! register a middleware that can automatically check for the existence of an JWT authentication</span>
+<span class="doccomment">//! token. Besides being supported by the endpoint macros, it supports to lookup the required JWT secret</span>
+<span class="doccomment">//! with the JWT data, hence you can use several JWT secrets and decide on the fly which secret to use.</span>
+<span class="doccomment">//! None of this is currently supported by gotham&#39;s own JWT middleware.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A simple example that uses only a single secret looks like this:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;auth&quot;)]</span>
+<span class="doccomment">//! # mod auth_feature_enabled {</span>
+<span class="doccomment">//! # use gotham::{router::builder::*, pipeline::*, state::State};</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(read)]</span>
+<span class="doccomment">//! struct SecretResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(Serialize)]</span>
+<span class="doccomment">//! # #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]</span>
+<span class="doccomment">//! struct Secret {</span>
+<span class="doccomment">//! 	id: u64,</span>
+<span class="doccomment">//! 	intended_for: String</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(Deserialize, Clone)]</span>
+<span class="doccomment">//! struct AuthData {</span>
+<span class="doccomment">//! 	sub: String,</span>
+<span class="doccomment">//! 	exp: u64</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[read]</span>
+<span class="doccomment">//! fn read(auth: AuthStatus&lt;AuthData&gt;, id: u64) -&gt; AuthSuccess&lt;Secret&gt; {</span>
+<span class="doccomment">//! 	let intended_for = auth.ok()?.sub;</span>
+<span class="doccomment">//! 	Ok(Secret { id, intended_for })</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//! 	let auth: AuthMiddleware&lt;AuthData, _&gt; = AuthMiddleware::new(</span>
+<span class="doccomment">//! 		AuthSource::AuthorizationHeader,</span>
+<span class="doccomment">//! 		AuthValidation::default(),</span>
+<span class="doccomment">//! 		StaticAuthHandler::from_array(b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;)</span>
+<span class="doccomment">//! 	);</span>
+<span class="doccomment">//! 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());</span>
+<span class="doccomment">//! 	gotham::start(</span>
+<span class="doccomment">//! 		&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">//! 		build_router(chain, pipelines, |route| {</span>
+<span class="doccomment">//! 			route.resource::&lt;SecretResource&gt;(&quot;secret&quot;);</span>
+<span class="doccomment">//! 		})</span>
+<span class="doccomment">//! 	)</span>
+<span class="doccomment">//! 	.expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## CORS Feature</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The cors feature allows an easy usage of this web server from other origins. By default, only</span>
+<span class="doccomment">//! the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired</span>
+<span class="doccomment">//! configuration as a middleware.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A simple example that allows authentication from every origin (note that `*` always disallows</span>
+<span class="doccomment">//! authentication), and every content type, looks like this:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;cors&quot;)]</span>
+<span class="doccomment">//! # mod cors_feature_enabled {</span>
+<span class="doccomment">//! # use gotham::{hyper::header::*, router::builder::*, pipeline::*, state::State};</span>
+<span class="doccomment">//! # use gotham_restful::{*, cors::*};</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(read_all)]</span>
+<span class="doccomment">//! struct FooResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[read_all]</span>
+<span class="doccomment">//! fn read_all() {</span>
+<span class="doccomment">//! 	// your handler</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//! 	let cors = CorsConfig {</span>
+<span class="doccomment">//! 		origin: Origin::Copy,</span>
+<span class="doccomment">//! 		headers: Headers::List(vec![CONTENT_TYPE]),</span>
+<span class="doccomment">//! 		max_age: 0,</span>
+<span class="doccomment">//! 		credentials: true</span>
+<span class="doccomment">//! 	};</span>
+<span class="doccomment">//! 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());</span>
+<span class="doccomment">//! 	gotham::start(</span>
+<span class="doccomment">//! 		&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">//! 		build_router(chain, pipelines, |route| {</span>
+<span class="doccomment">//! 			route.resource::&lt;FooResource&gt;(&quot;foo&quot;);</span>
+<span class="doccomment">//! 		})</span>
+<span class="doccomment">//! 	)</span>
+<span class="doccomment">//! 	.expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`]</span>
+<span class="doccomment">//! for an example.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Database Feature</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The database feature allows an easy integration of [diesel] into your handler functions. Please</span>
+<span class="doccomment">//! note however that due to the way gotham&#39;s diesel middleware implementation, it is not possible</span>
+<span class="doccomment">//! to run async code while holding a database connection. If you need to combine async and database,</span>
+<span class="doccomment">//! you&#39;ll need to borrow the connection from the [`State`] yourself and return a boxed future.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A simple non-async example looks like this:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate diesel;</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;database&quot;)]</span>
+<span class="doccomment">//! # mod database_feature_enabled {</span>
+<span class="doccomment">//! # use diesel::{table, PgConnection, QueryResult, RunQueryDsl};</span>
+<span class="doccomment">//! # use gotham::{router::builder::*, pipeline::*, state::State};</span>
+<span class="doccomment">//! # use gotham_middleware_diesel::DieselMiddleware;</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! # use std::env;</span>
+<span class="doccomment">//! # table! {</span>
+<span class="doccomment">//! #   foo (id) {</span>
+<span class="doccomment">//! #     id -&gt; Int8,</span>
+<span class="doccomment">//! #     value -&gt; Text,</span>
+<span class="doccomment">//! #   }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(read_all)]</span>
+<span class="doccomment">//! struct FooResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(Queryable, Serialize)]</span>
+<span class="doccomment">//! # #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]</span>
+<span class="doccomment">//! struct Foo {</span>
+<span class="doccomment">//! 	id: i64,</span>
+<span class="doccomment">//! 	value: String</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[read_all]</span>
+<span class="doccomment">//! fn read_all(conn: &amp;PgConnection) -&gt; QueryResult&lt;Vec&lt;Foo&gt;&gt; {</span>
+<span class="doccomment">//! 	foo::table.load(conn)</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! type Repo = gotham_middleware_diesel::Repo&lt;PgConnection&gt;;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//! 	let repo = Repo::new(&amp;env::var(&quot;DATABASE_URL&quot;).unwrap());</span>
+<span class="doccomment">//! 	let diesel = DieselMiddleware::new(repo);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! 	let (chain, pipelines) = single_pipeline(new_pipeline().add(diesel).build());</span>
+<span class="doccomment">//! 	gotham::start(</span>
+<span class="doccomment">//! 		&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">//! 		build_router(chain, pipelines, |route| {</span>
+<span class="doccomment">//! 			route.resource::&lt;FooResource&gt;(&quot;foo&quot;);</span>
+<span class="doccomment">//! 		})</span>
+<span class="doccomment">//! 	)</span>
+<span class="doccomment">//! 	.expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## OpenAPI Feature</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section</span>
+<span class="doccomment">//! carefully both as a binary as well as a library author to avoid unwanted suprises.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In order to automatically create an openapi specification, gotham-restful needs knowledge over</span>
+<span class="doccomment">//! all routes and the types returned. `serde` does a great job at serialization but doesn&#39;t give</span>
+<span class="doccomment">//! enough type information, so all types used in the router need to implement</span>
+<span class="doccomment">//! [`OpenapiType`](openapi_type::OpenapiType). This can be derived for almoust any type and there</span>
+<span class="doccomment">//! should be no need to implement it manually. A simple example looks like this:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;openapi&quot;)]</span>
+<span class="doccomment">//! # mod openapi_feature_enabled {</span>
+<span class="doccomment">//! # use gotham::{router::builder::*, state::State};</span>
+<span class="doccomment">//! # use gotham_restful::*;</span>
+<span class="doccomment">//! # use openapi_type::OpenapiType;</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//! #[derive(Resource)]</span>
+<span class="doccomment">//! #[resource(read_all)]</span>
+<span class="doccomment">//! struct FooResource;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(OpenapiType, Serialize)]</span>
+<span class="doccomment">//! struct Foo {</span>
+<span class="doccomment">//! 	bar: String</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[read_all]</span>
+<span class="doccomment">//! fn read_all() -&gt; Success&lt;Foo&gt; {</span>
+<span class="doccomment">//! 	Foo {</span>
+<span class="doccomment">//! 		bar: &quot;Hello World&quot;.to_owned()</span>
+<span class="doccomment">//! 	}</span>
+<span class="doccomment">//! 	.into()</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! fn main() {</span>
+<span class="doccomment">//! 	gotham::start(</span>
+<span class="doccomment">//! 		&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">//! 		build_simple_router(|route| {</span>
+<span class="doccomment">//! 			let info = OpenapiInfo {</span>
+<span class="doccomment">//! 				title: &quot;My Foo API&quot;.to_owned(),</span>
+<span class="doccomment">//! 				version: &quot;0.1.0&quot;.to_owned(),</span>
+<span class="doccomment">//! 				urls: vec![&quot;https://example.org/foo/api/v1&quot;.to_owned()]</span>
+<span class="doccomment">//! 			};</span>
+<span class="doccomment">//! 			route.with_openapi(info, |mut route| {</span>
+<span class="doccomment">//! 				route.resource::&lt;FooResource&gt;(&quot;foo&quot;);</span>
+<span class="doccomment">//! 				route.openapi_spec(&quot;openapi&quot;);</span>
+<span class="doccomment">//! 				route.openapi_doc(&quot;/&quot;);</span>
+<span class="doccomment">//! 			});</span>
+<span class="doccomment">//! 		})</span>
+<span class="doccomment">//! 	)</span>
+<span class="doccomment">//! 	.expect(&quot;Failed to start gotham&quot;);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`.</span>
+<span class="doccomment">//! The first one will return the generated openapi specification in JSON format, allowing you to easily</span>
+<span class="doccomment">//! generate clients in different languages without worying to exactly replicate your api in each of those</span>
+<span class="doccomment">//! languages. The second one will return documentation in HTML format, so you can easily view your</span>
+<span class="doccomment">//! api and share it with other people.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Gotchas</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The openapi feature has some gotchas you should be aware of.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   - The name of a struct is used as a &quot;link&quot; in the openapi specification. Therefore, if you have two</span>
+<span class="doccomment">//!     structs with the same name in your project, the openapi specification will be invalid as only one</span>
+<span class="doccomment">//!     of the two will make it into the spec.</span>
+<span class="doccomment">//!   - By default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the</span>
+<span class="doccomment">//!     `openapi` feature will add additional type bounds and method requirements to some of the traits and</span>
+<span class="doccomment">//! 	types in this crate, for example instead of [`Endpoint`] you now have to implement</span>
+<span class="doccomment">//! 	[`EndpointWithSchema`]. This means that some code might only compile on either feature, but not</span>
+<span class="doccomment">//!     on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass</span>
+<span class="doccomment">//! 	both features through and conditionally enable the openapi code, like this:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     ```rust</span>
+<span class="doccomment">//!     # #[macro_use] extern crate gotham_restful;</span>
+<span class="doccomment">//!     # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">//!     #[derive(Deserialize, Serialize)]</span>
+<span class="doccomment">//!     #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]</span>
+<span class="doccomment">//!     struct Foo;</span>
+<span class="doccomment">//!     ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  [diesel]: https://diesel.rs/</span>
+<span class="doccomment">//!  [`State`]: gotham::state::State</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;without-openapi&quot;</span>))]</span>
 <span class="macro">compile_error!</span>(<span class="string">&quot;The &#39;openapi&#39; and &#39;without-openapi&#39; features cannot be combined&quot;</span>);
