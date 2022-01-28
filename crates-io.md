@@ -206,7 +206,8 @@ fn main() {
 		build_router(chain, pipelines, |route| {
 			route.resource::<SecretResource>("secret");
 		})
-	);
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
@@ -241,7 +242,8 @@ fn main() {
 		build_router(chain, pipelines, |route| {
 			route.resource::<FooResource>("foo");
 		})
-	);
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
@@ -283,7 +285,8 @@ fn main() {
 		build_router(chain, pipelines, |route| {
 			route.resource::<FooResource>("foo");
 		})
-	);
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
@@ -328,7 +331,8 @@ fn main() {
 				route.openapi_doc("/");
 			});
 		})
-	);
+	)
+	.expect("Failed to start gotham");
 }
 ```
 

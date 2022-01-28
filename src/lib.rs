@@ -75,7 +75,7 @@
 //! # fn main() {
 //! # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
 //! # 		route.resource::<FooResource>("foo");
-//! # 	}));
+//! # 	})).expect("Failed to start gotham");
 //! # }
 //! ```
 //!
@@ -114,7 +114,7 @@
 //! # fn main() {
 //! # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
 //! # 		route.resource::<CustomResource>("custom");
-//! # 	}));
+//! # 	})).expect("Failed to start gotham");
 //! # }
 //! ```
 //!
@@ -160,7 +160,7 @@
 //! # fn main() {
 //! # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
 //! # 		route.resource::<ImageResource>("image");
-//! # 	}));
+//! # 	})).expect("Failed to start gotham");
 //! # }
 //! ```
 //!
@@ -191,7 +191,7 @@
 //! # fn main() {
 //! # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
 //! # 		route.resource::<FooResource>("foo");
-//! # 	}));
+//! # 	})).expect("Failed to start gotham");
 //! # }
 //! ```
 //!
@@ -261,7 +261,8 @@
 //! 		build_router(chain, pipelines, |route| {
 //! 			route.resource::<SecretResource>("secret");
 //! 		})
-//! 	);
+//! 	)
+//! 	.expect("Failed to start gotham");
 //! }
 //! # }
 //! ```
@@ -304,7 +305,8 @@
 //! 		build_router(chain, pipelines, |route| {
 //! 			route.resource::<FooResource>("foo");
 //! 		})
-//! 	);
+//! 	)
+//! 	.expect("Failed to start gotham");
 //! }
 //! # }
 //! ```
@@ -366,7 +368,8 @@
 //! 		build_router(chain, pipelines, |route| {
 //! 			route.resource::<FooResource>("foo");
 //! 		})
-//! 	);
+//! 	)
+//! 	.expect("Failed to start gotham");
 //! }
 //! # }
 //! ```
@@ -422,7 +425,8 @@
 //! 				route.openapi_doc("/");
 //! 			});
 //! 		})
-//! 	);
+//! 	)
+//! 	.expect("Failed to start gotham");
 //! }
 //! # }
 //! ```
