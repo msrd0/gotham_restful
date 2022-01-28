@@ -200,13 +200,11 @@
 //! To make life easier for common use-cases, this create offers a few features that might be helpful
 //! when you implement your web server.  The complete feature list is
 //!  - [`auth`](#authentication-feature) Advanced JWT middleware
-//!  - `chrono` openapi support for chrono types
-//!  - `full` enables all features except `without-openapi`
 //!  - [`cors`](#cors-feature) CORS handling for all endpoint handlers
 //!  - [`database`](#database-feature) diesel middleware support
 //!  - `errorlog` log errors returned from endpoint handlers
+//!  - `full` enables all features except `without-openapi`
 //!  - [`openapi`](#openapi-feature) router additions to generate an openapi spec
-//!  - `uuid` openapi support for uuid
 //!  - `without-openapi` (**default**) disables `openapi` support.
 //!
 //! ## Authentication Feature
