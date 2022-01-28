@@ -109,7 +109,12 @@ struct CustomPath {
 	name: String
 }
 
-#[endpoint(uri = "custom/:name/read", method = "Method::GET", params = false, body = false)]
+#[endpoint(
+	uri = "custom/:name/read",
+	method = "Method::GET",
+	params = false,
+	body = false
+)]
 fn custom_endpoint(path: CustomPath) -> Success<String> {
 	path.name.into()
 }
@@ -145,7 +150,7 @@ struct RawImage {
 }
 
 #[create]
-fn create(body : RawImage) -> Raw<Vec<u8>> {
+fn create(body: RawImage) -> Raw<Vec<u8>> {
 	Raw::new(body.content, body.content_type)
 }
 ```
@@ -225,9 +230,12 @@ fn main() {
 		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
 	);
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<SecretResource>("secret");
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_router(chain, pipelines, |route| {
+			route.resource::<SecretResource>("secret");
+		})
+	);
 }
 ```
 
@@ -257,9 +265,12 @@ fn main() {
 		credentials: true
 	};
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<FooResource>("foo");
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_router(chain, pipelines, |route| {
+			route.resource::<FooResource>("foo");
+		})
+	);
 }
 ```
 
@@ -296,9 +307,12 @@ fn main() {
 	let diesel = DieselMiddleware::new(repo);
 
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(diesel).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<FooResource>("foo");
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_router(chain, pipelines, |route| {
+			route.resource::<FooResource>("foo");
+		})
+	);
 }
 ```
 
@@ -322,35 +336,51 @@ struct Foo {
 
 #[read_all]
 fn read_all() -> Success<Foo> {
-	Foo { bar: "Hello World".to_owned() }.into()
+	Foo {
+		bar: "Hello World".to_owned()
+	}
+	.into()
 }
 
 fn main() {
-	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-		let info = OpenapiInfo {
-			title: "My Foo API".to_owned(),
-			version: "0.1.0".to_owned(),
-			urls: vec!["https://example.org/foo/api/v1".to_owned()]
-		};
-		route.with_openapi(info, |mut route| {
-			route.resource::<FooResource>("foo");
-			route.openapi_spec("openapi");
-			route.openapi_doc("/");
-		});
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_simple_router(|route| {
+			let info = OpenapiInfo {
+				title: "My Foo API".to_owned(),
+				version: "0.1.0".to_owned(),
+				urls: vec!["https://example.org/foo/api/v1".to_owned()]
+			};
+			route.with_openapi(info, |mut route| {
+				route.resource::<FooResource>("foo");
+				route.openapi_spec("openapi");
+				route.openapi_doc("/");
+			});
+		})
+	);
 }
 ```
 
 Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`. The first one will return the generated openapi specification in JSON format, allowing you to easily generate clients in different languages without worying to exactly replicate your api in each of those languages. The second one will return documentation in HTML format, so you can easily view your api and share it with other people.
 
-However, please note that by default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements to some of the traits and types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both features through and conditionally enable the openapi code, like this:
 
+#### Gotchas
 
-```rust
-#[derive(Deserialize, Serialize)]
-#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
-struct Foo;
-```
+The openapi feature has some gotchas you should be aware of.
+
+ - The name of a struct is used as a “link” in the openapi specification. Therefore, if you have two structs with the same name in your project, the openapi specification will be invalid as only one of the two will make it into the spec.
+	
+	
+ - By default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements to some of the traits and types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both features through and conditionally enable the openapi code, like this:
+	
+	
+	```rust
+	#[derive(Deserialize, Serialize)]
+	#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
+	struct Foo;
+	```
+	
+	
 
 
 
