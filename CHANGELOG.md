@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
+### Updated
+ - `jsonwebtoken` crate to 8.0
+
+### Changed
+ - When logging errors, the `Debug` implementation is now used (`errorlog` feature only)
+ - `AuthStatus::Invalid` now contains the jsonwebtoken error (`auth` feature only)
+ - `AuthStatus::Expired` has been removed (`auth` feature only)
+ - `AuthError` is now a struct and will include an error message in the payload
 
 ## [0.6.3] - 2022-01-28
 ### Updated

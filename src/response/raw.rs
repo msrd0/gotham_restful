@@ -2,9 +2,6 @@ use super::{handle_error, IntoResponse, IntoResponseError};
 use crate::{types::ResourceType, FromBody, RequestBody, Response};
 #[cfg(feature = "openapi")]
 use crate::{IntoResponseWithSchema, ResponseSchema};
-#[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
-
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
 use gotham::{
@@ -16,8 +13,10 @@ use gotham::{
 };
 #[cfg(feature = "openapi")]
 use openapi_type::openapi::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
+#[cfg(feature = "openapi")]
+use openapi_type::{OpenapiSchema, OpenapiType};
 use serde_json::error::Error as SerdeJsonError;
-use std::{convert::Infallible, fmt::Display, pin::Pin};
+use std::{convert::Infallible, fmt::Debug, pin::Pin};
 
 /**
 This type can be used both as a raw request body, as well as as a raw response. However, all types
@@ -130,7 +129,7 @@ where
 impl<T, E> IntoResponse for Result<Raw<T>, E>
 where
 	Raw<T>: IntoResponse,
-	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
+	E: Debug + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
 	type Err = E::Err;
 
@@ -146,7 +145,7 @@ where
 impl<T, E> ResponseSchema for Result<Raw<T>, E>
 where
 	Raw<T>: IntoResponseWithSchema,
-	E: Display + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
+	E: Debug + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();

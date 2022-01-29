@@ -236,7 +236,7 @@ impl ErrorVariant {
 	fn were(&self) -> Option<TokenStream> {
 		self.from_ty
 			.as_ref()
-			.map(|(_, ty)| quote!( #ty : ::std::error::Error ))
+			.map(|(_, ty)| quote!(#ty : ::gotham_restful::IntoResponseError))
 	}
 }
 
@@ -304,7 +304,9 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 				let ty = &field.ty;
 				quote!( #ty : Default )
 			})
-			.chain(iter::once(quote!( #from_ty : ::std::error::Error )));
+			.chain(iter::once(
+				quote!(#from_ty : ::gotham_restful::IntoResponseError)
+			));
 		let fields_let = var
 			.fields
 			.iter()

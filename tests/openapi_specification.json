@@ -206,8 +206,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": false,
-                  "type": "object"
+                  "format": "binary",
+                  "type": "string"
                 }
               }
             },
@@ -251,8 +251,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": false,
-                  "type": "object"
+                  "format": "binary",
+                  "type": "string"
                 }
               }
             },

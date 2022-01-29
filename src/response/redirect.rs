@@ -9,10 +9,7 @@ use gotham::hyper::{
 };
 #[cfg(feature = "openapi")]
 use openapi_type::OpenapiSchema;
-use std::{
-	error::Error as StdError,
-	fmt::{Debug, Display}
-};
+use std::{error::Error as StdError, fmt::Debug};
 use thiserror::Error;
 
 /**
@@ -81,7 +78,7 @@ pub enum RedirectError<E: StdError + 'static> {
 #[allow(ambiguous_associated_items)] // an enum variant is not a type. never.
 impl<E> IntoResponse for Result<Redirect, E>
 where
-	E: Display + IntoResponseError,
+	E: Debug + IntoResponseError,
 	<E as IntoResponseError>::Err: StdError + Sync
 {
 	type Err = RedirectError<<E as IntoResponseError>::Err>;
@@ -97,7 +94,7 @@ where
 #[cfg(feature = "openapi")]
 impl<E> ResponseSchema for Result<Redirect, E>
 where
-	E: Display + IntoResponseError,
+	E: Debug + IntoResponseError,
 	<E as IntoResponseError>::Err: StdError + Sync
 {
 	fn status_codes() -> Vec<StatusCode> {

@@ -11,7 +11,7 @@ use gotham::{
 };
 #[cfg(feature = "openapi")]
 use openapi_type::{OpenapiSchema, OpenapiType};
-use std::{fmt::Display, future::Future, pin::Pin};
+use std::{fmt::Debug, future::Future, pin::Pin};
 
 /**
 This is the return type of a resource that doesn't actually return something. It will result
@@ -87,7 +87,7 @@ impl ResponseSchema for NoContent {
 
 impl<E> IntoResponse for Result<NoContent, E>
 where
-	E: Display + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = serde_json::Error>
 {
 	type Err = serde_json::Error;
 
@@ -108,7 +108,7 @@ where
 #[cfg(feature = "openapi")]
 impl<E> ResponseSchema for Result<NoContent, E>
 where
-	E: Display + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = serde_json::Error>
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();
