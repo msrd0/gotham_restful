@@ -32,7 +32,7 @@ base64 = { version = "0.13", optional = true }
 cookie = { version = "0.15", optional = true }
 either = { version = "1.6", optional = true }
 gotham_middleware_diesel = { version = "0.4.0", optional = true }
-jsonwebtoken = { version = "=8.0.0-beta.7", optional = true }
+jsonwebtoken = { version = "=8.0.0-beta.8", optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
 openapi_type = { version = "0.3.1", optional = true }
 parking_lot = { version = "0.11.1", optional = true }
