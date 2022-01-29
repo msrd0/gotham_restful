@@ -36,7 +36,10 @@ fn custom_request_body() {
 		.post("http://localhost/foo", RESPONSE, TEXT_PLAIN)
 		.perform()
 		.unwrap();
-	assert_eq!(res.headers().get(CONTENT_TYPE).unwrap().to_str().unwrap(), "text/plain");
+	assert_eq!(
+		res.headers().get(CONTENT_TYPE).unwrap().to_str().unwrap(),
+		"text/plain"
+	);
 	let res = res.read_body().unwrap();
 	let body: &[u8] = res.as_ref();
 	assert_eq!(body, RESPONSE);

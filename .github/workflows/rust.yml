@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [1.56, stable, beta]
+        toolchain: [1.58, stable, beta]
         nightly: [false]
         features: ["default", "full"]
         include:
@@ -65,13 +65,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.56"
+          toolchain: "1.58"
       - uses: actions/cache@v2
         with:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-1.56
+          key: ${{ runner.os }}-cargo-1.58
       - run: cargo test --no-default-features --features full --tests -- --ignored
         env:
           RUST_BACKTRACE: 1

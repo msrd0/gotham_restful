@@ -1,11 +1,11 @@
 error: `params` can only be used on custom endpoints
- --> $DIR/non_custom_params_attribute.rs:8:12
+ --> tests/ui/endpoint/non_custom_params_attribute.rs:8:12
   |
 8 | #[read_all(params = true)]
   |            ^^^^^^
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/non_custom_params_attribute.rs:5:12
+ --> tests/ui/endpoint/non_custom_params_attribute.rs:5:12
   |
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

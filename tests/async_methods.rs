@@ -18,7 +18,9 @@ mod util {
 use util::{test_delete_response, test_get_response, test_post_response, test_put_response};
 
 #[derive(Resource)]
-#[resource(read_all, read, search, create, update_all, update, delete_all, delete, state_test)]
+#[resource(
+	read_all, read, search, create, update_all, update, delete_all, delete, state_test
+)]
 struct FooResource;
 
 #[derive(Deserialize)]
@@ -103,7 +105,11 @@ fn async_methods() {
 
 	test_get_response(&server, "http://localhost/foo", READ_ALL_RESPONSE);
 	test_get_response(&server, "http://localhost/foo/1", READ_RESPONSE);
-	test_get_response(&server, "http://localhost/foo/search?query=hello+world", SEARCH_RESPONSE);
+	test_get_response(
+		&server,
+		"http://localhost/foo/search?query=hello+world",
+		SEARCH_RESPONSE
+	);
 	test_post_response(
 		&server,
 		"http://localhost/foo",
@@ -127,5 +133,9 @@ fn async_methods() {
 	);
 	test_delete_response(&server, "http://localhost/foo", DELETE_ALL_RESPONSE);
 	test_delete_response(&server, "http://localhost/foo/1", DELETE_RESPONSE);
-	test_get_response(&server, "http://localhost/foo/state_test", STATE_TEST_RESPONSE);
+	test_get_response(
+		&server,
+		"http://localhost/foo/state_test",
+		STATE_TEST_RESPONSE
+	);
 }

@@ -150,7 +150,9 @@ impl Response {
 	}
 
 	#[cfg(test)]
-	pub(crate) fn full_body(mut self) -> Result<Vec<u8>, <Body as gotham::hyper::body::HttpBody>::Error> {
+	pub(crate) fn full_body(
+		mut self
+	) -> Result<Vec<u8>, <Body as gotham::hyper::body::HttpBody>::Error> {
 		use futures_executor::block_on;
 		use gotham::hyper::body::to_bytes;
 
@@ -235,7 +237,7 @@ impl<T: ToString> From<T> for ResourceError {
 
 #[cfg(feature = "errorlog")]
 fn errorlog<E: Display>(e: E) {
-	error!("The handler encountered an error: {}", e);
+	error!("The handler encountered an error: {e}");
 }
 
 #[cfg(not(feature = "errorlog"))]

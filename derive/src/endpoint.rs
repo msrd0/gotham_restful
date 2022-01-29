@@ -5,8 +5,8 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote, quote_spanned, ToTokens};
 use std::str::FromStr;
 use syn::{
-	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, Expr, FnArg, ItemFn, LitBool, LitStr, Meta, NestedMeta,
-	PatType, Result, ReturnType, Type
+	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, Expr, FnArg, ItemFn, LitBool,
+	LitStr, Meta, NestedMeta, PatType, Result, ReturnType, Type
 };
 
 #[allow(clippy::large_enum_variant)]
@@ -45,13 +45,13 @@ macro_rules! endpoint_type_setter {
 				fn [<set_ $name>](&mut self, span: Span, [<new_ $name>]: $ty) -> Result<()> {
 					match self {
 						Self::Custom { $name, .. } if $name.is_some() => {
-							Err(Error::new(span, concat!("`", concat!(stringify!($name), "` must not appear more than once"))))
+							Err(Error::new(span, concat!("`", stringify!($name), "` must not appear more than once")))
 						},
 						Self::Custom { $name, .. } => {
 							*$name = Some([<new_ $name>]);
 							Ok(())
 						},
-						_ => Err(Error::new(span, concat!("`", concat!(stringify!($name), "` can only be used on custom endpoints"))))
+						_ => Err(Error::new(span, concat!("`", stringify!($name), "` can only be used on custom endpoints")))
 					}
 				}
 			}
@@ -77,7 +77,10 @@ impl FromStr for EndpointType {
 			"Change" | "change" => Ok(Self::Update),
 			"RemoveAll" | "remove_all" => Ok(Self::DeleteAll),
 			"Remove" | "remove" => Ok(Self::Delete),
-			_ => Err(Error::new(Span::call_site(), format!("Unknown method: `{}'", str)))
+			_ => Err(Error::new(
+				Span::call_site(),
+				format!("Unknown method: `{str}'")
+			))
 		}
 	}
 }
@@ -120,9 +123,11 @@ impl EndpointType {
 
 	fn has_placeholders(&self) -> LitBool {
 		match self {
-			Self::ReadAll | Self::Search | Self::Create | Self::UpdateAll | Self::DeleteAll => LitBool {
-				value: false,
-				span: Span::call_site()
+			Self::ReadAll | Self::Search | Self::Create | Self::UpdateAll | Self::DeleteAll => {
+				LitBool {
+					value: false,
+					span: Span::call_site()
+				}
 			},
 			Self::Read | Self::Update | Self::Delete => LitBool {
 				value: true,
@@ -143,7 +148,9 @@ impl EndpointType {
 			Self::ReadAll | Self::Search | Self::Create | Self::UpdateAll | Self::DeleteAll => {
 				quote!(::gotham_restful::NoopExtractor)
 			},
-			Self::Read | Self::Update | Self::Delete => quote!(::gotham_restful::private::IdPlaceholder::<#arg_ty>),
+			Self::Read | Self::Update | Self::Delete => {
+				quote!(::gotham_restful::private::IdPlaceholder::<#arg_ty>)
+			},
 			Self::Custom { .. } => {
 				if self.has_placeholders().value {
 					arg_ty.to_token_stream()
@@ -156,11 +163,15 @@ impl EndpointType {
 
 	fn needs_params(&self) -> LitBool {
 		match self {
-			Self::ReadAll | Self::Read | Self::Create | Self::UpdateAll | Self::Update | Self::DeleteAll | Self::Delete => {
-				LitBool {
-					value: false,
-					span: Span::call_site()
-				}
+			Self::ReadAll
+			| Self::Read
+			| Self::Create
+			| Self::UpdateAll
+			| Self::Update
+			| Self::DeleteAll
+			| Self::Delete => LitBool {
+				value: false,
+				span: Span::call_site()
 			},
 			Self::Search => LitBool {
 				value: true,
@@ -175,7 +186,13 @@ impl EndpointType {
 
 	fn params_ty(&self, arg_ty: Option<&Type>) -> TokenStream {
 		match self {
-			Self::ReadAll | Self::Read | Self::Create | Self::UpdateAll | Self::Update | Self::DeleteAll | Self::Delete => {
+			Self::ReadAll
+			| Self::Read
+			| Self::Create
+			| Self::UpdateAll
+			| Self::Update
+			| Self::DeleteAll
+			| Self::Delete => {
 				quote!(::gotham_restful::NoopExtractor)
 			},
 			Self::Search => quote!(#arg_ty),
@@ -208,7 +225,9 @@ impl EndpointType {
 
 	fn body_ty(&self, arg_ty: Option<&Type>) -> TokenStream {
 		match self {
-			Self::ReadAll | Self::Read | Self::Search | Self::DeleteAll | Self::Delete => quote!(()),
+			Self::ReadAll | Self::Read | Self::Search | Self::DeleteAll | Self::Delete => {
+				quote!(())
+			},
 			Self::Create | Self::UpdateAll | Self::Update => quote!(#arg_ty),
 			Self::Custom { .. } => {
 				if self.needs_body().value {
@@ -246,7 +265,10 @@ impl HandlerArgType {
 
 	fn ty(&self) -> Option<&Type> {
 		match self {
-			Self::MethodArg(ty) | Self::DatabaseConnection(ty) | Self::AuthStatus(ty) | Self::AuthStatusRef(ty) => Some(ty),
+			Self::MethodArg(ty)
+			| Self::DatabaseConnection(ty)
+			| Self::AuthStatus(ty)
+			| Self::AuthStatusRef(ty) => Some(ty),
 			_ => None
 		}
 	}
@@ -270,11 +292,17 @@ impl Spanned for HandlerArg {
 fn interpret_arg_ty(attrs: &[Attribute], name: &str, ty: Type) -> Result<HandlerArgType> {
 	let attr = attrs
 		.iter()
-		.find(|arg| arg.path.segments.iter().any(|path| &path.ident.to_string() == "rest_arg"))
+		.find(|arg| {
+			arg.path
+				.segments
+				.iter()
+				.any(|path| &path.ident.to_string() == "rest_arg")
+		})
 		.map(|arg| arg.tokens.to_string());
 
 	// TODO issue a warning for _state usage once diagnostics become stable
-	if attr.as_deref() == Some("state") || (attr.is_none() && (name == "state" || name == "_state")) {
+	if attr.as_deref() == Some("state") || (attr.is_none() && (name == "state" || name == "_state"))
+	{
 		return match ty {
 			Type::Reference(ty) => Ok(if ty.mutability.is_none() {
 				HandlerArgType::StateRef
@@ -288,7 +316,9 @@ fn interpret_arg_ty(attrs: &[Attribute], name: &str, ty: Type) -> Result<Handler
 		};
 	}
 
-	if cfg!(feature = "auth") && (attr.as_deref() == Some("auth") || (attr.is_none() && name == "auth")) {
+	if cfg!(feature = "auth")
+		&& (attr.as_deref() == Some("auth") || (attr.is_none() && name == "auth"))
+	{
 		return Ok(match ty {
 			Type::Reference(ty) => HandlerArgType::AuthStatusRef(*ty.elem),
 			ty => HandlerArgType::AuthStatus(ty)
@@ -296,7 +326,9 @@ fn interpret_arg_ty(attrs: &[Attribute], name: &str, ty: Type) -> Result<Handler
 	}
 
 	if cfg!(feature = "database")
-		&& (attr.as_deref() == Some("connection") || attr.as_deref() == Some("conn") || (attr.is_none() && name == "conn"))
+		&& (attr.as_deref() == Some("connection")
+			|| attr.as_deref() == Some("conn")
+			|| (attr.is_none() && name == "conn"))
 	{
 		return Ok(HandlerArgType::DatabaseConnection(match ty {
 			Type::Reference(ty) => *ty.elem,
@@ -381,10 +413,17 @@ macro_rules! error_if_not_openapi {
 
 // clippy doesn't realize that vectors can be used in closures
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_collect))]
-fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn) -> Result<TokenStream> {
+fn expand_endpoint_type(
+	mut ty: EndpointType,
+	attrs: AttributeArgs,
+	fun: &ItemFn
+) -> Result<TokenStream> {
 	// reject unsafe functions
 	if let Some(unsafety) = fun.sig.unsafety {
-		return Err(Error::new(unsafety.span(), "Endpoint handler methods must not be unsafe"));
+		return Err(Error::new(
+			unsafety.span(),
+			"Endpoint handler methods must not be unsafe"
+		));
 	}
 
 	// parse arguments
@@ -407,7 +446,10 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 				} else if kv.path.is_ident("wants_auth") {
 					wants_auth = Some(kv.lit.expect_bool()?);
 				} else if kv.path.is_ident("method") {
-					ty.set_method(kv.path.span(), kv.lit.expect_str()?.parse_with(Expr::parse)?)?;
+					ty.set_method(
+						kv.path.span(),
+						kv.lit.expect_str()?.parse_with(Expr::parse)?
+					)?;
 				} else if kv.path.is_ident("uri") {
 					ty.set_uri(kv.path.span(), kv.lit.expect_str()?)?;
 				} else if kv.path.is_ident("params") {
@@ -424,7 +466,9 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	error_if_not_openapi!(operation_id, schema, status_codes);
 	if schema.is_some() != status_codes.is_some() {
 		return Err(Error::new(
-			schema.map(|s| s.span()).unwrap_or_else(|| status_codes.unwrap().span()),
+			schema
+				.map(|s| s.span())
+				.unwrap_or_else(|| status_codes.unwrap().span()),
 			"`schema` and `status_codes` may only be used together"
 		));
 	}
@@ -475,14 +519,16 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	let fun_is_async = fun.sig.asyncness.is_some();
 
 	let ident = endpoint_ident(fun_ident);
-	let dummy_ident = format_ident!("_IMPL_Endpoint_for_{}", ident);
 	let (output_ty, is_no_content) = match &fun.sig.output {
 		ReturnType::Default => (quote!(::gotham_restful::NoContent), true),
 		ReturnType::Type(_, ty) => (quote!(#ty), false)
 	};
-	let output_struct_ident = schema
-		.as_ref()
-		.map(|schema_fn| Ident::new(&format!("{}_gotham_restful_ResponseSchema", schema_fn), Span::call_site()));
+	let output_struct_ident = schema.as_ref().map(|schema_fn| {
+		Ident::new(
+			&format!("{schema_fn}_gotham_restful_ResponseSchema"),
+			Span::call_site()
+		)
+	});
 	let output_struct = schema.map(|schema_fn| {
 		let output_struct_ident = output_struct_ident.as_ref().unwrap_or_else(|| unreachable!());
 		let status_codes_fn = status_codes.unwrap_or_else(|| unreachable!());
@@ -538,21 +584,30 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		}
 	});
 	let (output_typedef, final_return_ty) = match output_struct_ident {
-		Some(output_struct_ident) => (quote!(type Output = #output_struct_ident;), quote!(#output_struct_ident)),
+		Some(output_struct_ident) => (
+			quote!(type Output = #output_struct_ident;),
+			quote!(#output_struct_ident)
+		),
 		None => (
 			quote_spanned!(output_ty.span() => type Output = #output_ty;),
 			quote!(#output_ty)
 		)
 	};
 
-	let arg_tys = args.iter().filter(|arg| arg.ty.is_method_arg()).collect::<Vec<_>>();
+	let arg_tys = args
+		.iter()
+		.filter(|arg| arg.ty.is_method_arg())
+		.collect::<Vec<_>>();
 	let mut arg_ty_idx = 0;
 	let mut next_arg_ty = |return_none: bool| {
 		if return_none {
 			return Ok(None);
 		}
 		if arg_ty_idx >= arg_tys.len() {
-			return Err(Error::new(fun_ident.span(), "Too few arguments"));
+			return Err(Error::new(
+				fun_ident.span(),
+				"Too few arguments for this endpoint handler"
+			));
 		}
 		let ty = arg_tys[arg_ty_idx].ty.ty().unwrap();
 		arg_ty_idx += 1;
@@ -573,7 +628,8 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	})?;
 	let has_placeholders = ty.has_placeholders();
 	let placeholder_ty = ty.placeholders_ty(next_arg_ty(!has_placeholders.value)?);
-	let placeholder_typedef = quote_spanned!(placeholder_ty.span() => type Placeholders = #placeholder_ty;);
+	let placeholder_typedef =
+		quote_spanned!(placeholder_ty.span() => type Placeholders = #placeholder_ty;);
 	let needs_params = ty.needs_params();
 	let params_ty = ty.params_ty(next_arg_ty(!needs_params.value)?);
 	let params_typedef = quote_spanned!(params_ty.span() => type Params = #params_ty;);
@@ -582,7 +638,10 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 	let body_typedef = quote_spanned!(body_ty.span() => type Body = #body_ty;);
 
 	if arg_ty_idx < arg_tys.len() {
-		return Err(Error::new(fun_ident.span(), "Too many arguments"));
+		return Err(Error::new(
+			fun_ident.span(),
+			"Extra arguments for this endpoint handler"
+		));
 	}
 
 	let mut handle_args: Vec<TokenStream> = Vec::new();
@@ -624,8 +683,14 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 
 		let mut handle_content = quote!(#fun_ident(#(#handle_args),*));
 		if fun_is_async {
-			if let Some(arg) = args.iter().find(|arg| matches!(arg.ty, HandlerArgType::StateRef)) {
-				return Err(Error::new(arg.span(), "Endpoint handler functions that are async must not take `&State` as an argument, consider taking `&mut State`"));
+			if let Some(arg) = args
+				.iter()
+				.find(|arg| matches!(arg.ty, HandlerArgType::StateRef))
+			{
+				return Err(Error::new(
+					arg.span(),
+					"Endpoint handler functions that are async must not take `&State` as an argument, consider taking `&mut State`"
+				));
 			}
 			handle_content = quote!(#handle_content.await);
 		}
@@ -674,8 +739,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		#[allow(non_camel_case_types)]
 		#fun_vis struct #ident;
 
-		#[allow(non_upper_case_globals)]
-		static #dummy_ident: () = {
+		const _: () = {
 			#output_struct
 
 			impl #tr8 for #ident {
@@ -722,7 +786,7 @@ fn expand_endpoint_type(mut ty: EndpointType, attrs: AttributeArgs, fun: &ItemFn
 		};
 	};
 	if debug {
-		eprintln!("{}", code);
+		eprintln!("{code}");
 	}
 	Ok(code)
 }

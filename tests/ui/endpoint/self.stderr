@@ -1,11 +1,11 @@
 error: Didn't expect self parameter
- --> $DIR/self.rs:9:13
+ --> tests/ui/endpoint/self.rs:9:13
   |
 9 | fn read_all(self) {}
   |             ^^^^
 
 error: `self` parameter is only allowed in associated functions
- --> $DIR/self.rs:9:13
+ --> tests/ui/endpoint/self.rs:9:13
   |
 9 | fn read_all(self) {}
   |             ^^^^ not semantically valid as function parameter
@@ -13,7 +13,7 @@ error: `self` parameter is only allowed in associated functions
   = note: associated functions are those in `impl` or `trait` definitions
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/self.rs:5:12
+ --> tests/ui/endpoint/self.rs:5:12
   |
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

@@ -1,4 +1,5 @@
 use crate::{endpoint::endpoint_ident, util::CollectToResult};
+use either::Either;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::iter;
@@ -29,11 +30,11 @@ pub fn expand_resource(input: DeriveInput) -> Result<TokenStream> {
 		.filter(|attr| attr.path.is_ident("resource"))
 		.map(|attr| syn::parse2(attr.tokens).map(|m: MethodList| m.0.into_iter()))
 		.flat_map(|list| match list {
-			Ok(iter) => Box::new(iter.map(|method| {
+			Ok(iter) => Either::Left(iter.map(|method| {
 				let ident = endpoint_ident(&method);
 				Ok(quote!(route.endpoint::<#ident>();))
-			})) as Box<dyn Iterator<Item = Result<TokenStream>>>,
-			Err(err) => Box::new(iter::once(Err(err)))
+			})),
+			Err(err) => Either::Right(iter::once(Err(err)))
 		})
 		.collect_to_result()?;
 

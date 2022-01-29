@@ -2,8 +2,8 @@ use crate::util::{remove_parens, CollectToResult};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::{
-	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, ItemTrait, LitStr, Meta, NestedMeta, PredicateType,
-	Result, TraitItem, WherePredicate
+	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, ItemTrait, LitStr, Meta,
+	NestedMeta, PredicateType, Result, TraitItem, WherePredicate
 };
 
 struct TraitItemAttrs {
@@ -51,7 +51,10 @@ impl TraitItemAttrs {
 	}
 }
 
-pub(crate) fn expand_private_openapi_trait(mut attrs: AttributeArgs, tr8: ItemTrait) -> Result<TokenStream> {
+pub(crate) fn expand_private_openapi_trait(
+	mut attrs: AttributeArgs,
+	tr8: ItemTrait
+) -> Result<TokenStream> {
 	let tr8_attrs = &tr8.attrs;
 	let vis = &tr8.vis;
 	let ident = &tr8.ident;
@@ -71,8 +74,8 @@ pub(crate) fn expand_private_openapi_trait(mut attrs: AttributeArgs, tr8: ItemTr
 			return Err(Error::new(
 				p.span(),
 				"Expected name of the Resource struct this method belongs to"
-			))
-		},
+			));
+		}
 	};
 
 	let orig_trait = {
@@ -93,7 +96,10 @@ pub(crate) fn expand_private_openapi_trait(mut attrs: AttributeArgs, tr8: ItemTr
 								.sig
 								.generics
 								.type_params_mut()
-								.filter(|param| param.ident.to_string() == bound.bounded_ty.to_token_stream().to_string())
+								.filter(|param| {
+									param.ident.to_string()
+										== bound.bounded_ty.to_token_stream().to_string()
+								})
 								.for_each(|param| param.bounds.extend(bound.bounds.clone()));
 						}
 						if attrs.openapi_only {
@@ -139,7 +145,10 @@ pub(crate) fn expand_private_openapi_trait(mut attrs: AttributeArgs, tr8: ItemTr
 								.sig
 								.generics
 								.type_params_mut()
-								.filter(|param| param.ident.to_string() == bound.bounded_ty.to_token_stream().to_string())
+								.filter(|param| {
+									param.ident.to_string()
+										== bound.bounded_ty.to_token_stream().to_string()
+								})
 								.for_each(|param| param.bounds.extend(bound.bounds.clone()));
 						}
 						TraitItem::Method(method)

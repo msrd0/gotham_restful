@@ -1,11 +1,11 @@
 error: Invalid attribute syntax
- --> $DIR/invalid_attribute.rs:8:12
+ --> tests/ui/endpoint/invalid_attribute.rs:8:12
   |
 8 | #[read_all(FooResource)]
   |            ^^^^^^^^^^^
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/invalid_attribute.rs:5:12
+ --> tests/ui/endpoint/invalid_attribute.rs:5:12
   |
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

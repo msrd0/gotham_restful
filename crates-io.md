@@ -1,4 +1,4 @@
-# gotham-restful [![Rust 1.56+](https://img.shields.io/badge/rustc-1.56+-orange.svg)](https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
+# gotham-restful [![Rust 1.58+](https://img.shields.io/badge/rustc-1.58+-orange.svg)](https://blog.rust-lang.org/2022/01/13/Rust-1.58.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
 
 This crate is an extension to the popular [gotham web framework][__link0] for Rust. It allows you to create resources with assigned endpoints that aim to be a more convenient way of creating handlers for requests.
 
@@ -80,7 +80,12 @@ struct CustomPath {
 	name: String
 }
 
-#[endpoint(uri = "custom/:name/read", method = "Method::GET", params = false, body = false)]
+#[endpoint(
+	uri = "custom/:name/read",
+	method = "Method::GET",
+	params = false,
+	body = false
+)]
 fn custom_endpoint(path: CustomPath) -> Success<String> {
 	path.name.into()
 }
@@ -116,7 +121,7 @@ struct RawImage {
 }
 
 #[create]
-fn create(body : RawImage) -> Raw<Vec<u8>> {
+fn create(body: RawImage) -> Raw<Vec<u8>> {
 	Raw::new(body.content, body.content_type)
 }
 ```
@@ -149,13 +154,11 @@ async fn read_all(state: &mut State) -> NoContent {
 To make life easier for common use-cases, this create offers a few features that might be helpful when you implement your web server.  The complete feature list is
 
  - [`auth`](#authentication-feature) Advanced JWT middleware
- - `chrono` openapi support for chrono types
- - `full` enables all features except `without-openapi`
  - [`cors`](#cors-feature) CORS handling for all endpoint handlers
  - [`database`](#database-feature) diesel middleware support
  - `errorlog` log errors returned from endpoint handlers
+ - `full` enables all features except `without-openapi`
  - [`openapi`](#openapi-feature) router additions to generate an openapi spec
- - `uuid` openapi support for uuid
  - `without-openapi` (**default**) disables `openapi` support.
 
 
@@ -196,9 +199,13 @@ fn main() {
 		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
 	);
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<SecretResource>("secret");
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_router(chain, pipelines, |route| {
+			route.resource::<SecretResource>("secret");
+		})
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
@@ -228,9 +235,13 @@ fn main() {
 		credentials: true
 	};
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<FooResource>("foo");
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_router(chain, pipelines, |route| {
+			route.resource::<FooResource>("foo");
+		})
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
@@ -267,9 +278,13 @@ fn main() {
 	let diesel = DieselMiddleware::new(repo);
 
 	let (chain, pipelines) = single_pipeline(new_pipeline().add(diesel).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<FooResource>("foo");
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_router(chain, pipelines, |route| {
+			route.resource::<FooResource>("foo");
+		})
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
@@ -293,35 +308,52 @@ struct Foo {
 
 #[read_all]
 fn read_all() -> Success<Foo> {
-	Foo { bar: "Hello World".to_owned() }.into()
+	Foo {
+		bar: "Hello World".to_owned()
+	}
+	.into()
 }
 
 fn main() {
-	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-		let info = OpenapiInfo {
-			title: "My Foo API".to_owned(),
-			version: "0.1.0".to_owned(),
-			urls: vec!["https://example.org/foo/api/v1".to_owned()]
-		};
-		route.with_openapi(info, |mut route| {
-			route.resource::<FooResource>("foo");
-			route.openapi_spec("openapi");
-			route.openapi_doc("/");
-		});
-	}));
+	gotham::start(
+		"127.0.0.1:8080",
+		build_simple_router(|route| {
+			let info = OpenapiInfo {
+				title: "My Foo API".to_owned(),
+				version: "0.1.0".to_owned(),
+				urls: vec!["https://example.org/foo/api/v1".to_owned()]
+			};
+			route.with_openapi(info, |mut route| {
+				route.resource::<FooResource>("foo");
+				route.openapi_spec("openapi");
+				route.openapi_doc("/");
+			});
+		})
+	)
+	.expect("Failed to start gotham");
 }
 ```
 
 Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`. The first one will return the generated openapi specification in JSON format, allowing you to easily generate clients in different languages without worying to exactly replicate your api in each of those languages. The second one will return documentation in HTML format, so you can easily view your api and share it with other people.
 
-However, please note that by default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements to some of the traits and types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both features through and conditionally enable the openapi code, like this:
 
+#### Gotchas
 
-```rust
-#[derive(Deserialize, Serialize)]
-#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
-struct Foo;
-```
+The openapi feature has some gotchas you should be aware of.
+
+ - The name of a struct is used as a “link” in the openapi specification. Therefore, if you have two structs with the same name in your project, the openapi specification will be invalid as only one of the two will make it into the spec.
+	
+	
+ - By default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements to some of the traits and types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both features through and conditionally enable the openapi code, like this:
+	
+	
+	```rust
+	#[derive(Deserialize, Serialize)]
+	#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
+	struct Foo;
+	```
+	
+	
 
 
 
@@ -352,14 +384,14 @@ limitations under the License.
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link11]: https://docs.rs/openapi_type/0.3.0/openapi_type/?search=openapi_type::OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.6.0/gotham_restful/?search=gotham_restful::endpoint::Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.6.0/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
+ [__link11]: https://docs.rs/openapi_type/0.3.1/openapi_type/?search=openapi_type::OpenapiType
+ [__link12]: https://docs.rs/gotham_restful/0.6.3/gotham_restful/?search=gotham_restful::endpoint::Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.6.3/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
- [__link3]: https://docs.rs/gotham_restful/0.6.0/gotham_restful/?search=gotham_restful::types::RequestBody
+ [__link3]: https://docs.rs/gotham_restful/0.6.3/gotham_restful/?search=gotham_restful::types::RequestBody
  [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.73
- [__link7]: https://docs.rs/gotham_restful/0.6.0/gotham_restful/?search=gotham_restful::response::Response::header
- [__link8]: https://docs.rs/gotham_restful/0.6.0/gotham_restful/?search=gotham_restful::cors::CorsRoute
+ [__link6]: https://crates.io/crates/serde_json/1.0.78
+ [__link7]: https://docs.rs/gotham_restful/0.6.3/gotham_restful/?search=gotham_restful::response::Response::header
+ [__link8]: https://docs.rs/gotham_restful/0.6.3/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/

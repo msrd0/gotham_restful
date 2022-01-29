@@ -5,6 +5,22 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.6.3] - 2022-01-28
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.63](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc63-2022-01-27)
+ - The documentation now makes more clear that two types with the same name cause problems (`openapi` feature only)
+
+## [0.6.2] - 2022-01-27
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.62](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc62-2022-01-26)
+
+### Changed
+ - Improved some error messages from the derive macros
+
+## [0.6.1] - 2022-01-26
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.61](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc61-2022-01-26)
+
 ## [0.6.0] - 2022-01-01
 ### Updated
  - `openapi_type` crate to 0.3

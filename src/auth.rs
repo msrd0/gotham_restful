@@ -93,7 +93,11 @@ impl<T> AuthHandler<T> for CustomAuthHandler {
 */
 pub trait AuthHandler<Data> {
 	/// Return the SHA256-HMAC secret used to verify the JWT token.
-	fn jwt_secret<F: FnOnce() -> Option<Data>>(&self, state: &mut State, decode_data: F) -> Option<Vec<u8>>;
+	fn jwt_secret<F: FnOnce() -> Option<Data>>(
+		&self,
+		state: &mut State,
+		decode_data: F
+	) -> Option<Vec<u8>>;
 }
 
 /// An [AuthHandler] returning always the same secret. See [AuthMiddleware] for a usage example.
@@ -113,7 +117,11 @@ impl StaticAuthHandler {
 }
 
 impl<T> AuthHandler<T> for StaticAuthHandler {
-	fn jwt_secret<F: FnOnce() -> Option<T>>(&self, _state: &mut State, _decode_data: F) -> Option<Vec<u8>> {
+	fn jwt_secret<F: FnOnce() -> Option<T>>(
+		&self,
+		_state: &mut State,
+		_decode_data: F
+	) -> Option<Vec<u8>> {
 		Some(self.secret.clone())
 	}
 }
@@ -140,7 +148,7 @@ struct AuthData {
 
 #[read_all]
 fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
-	format!("{:?}", auth).into()
+	format!("{auth:?}").into()
 }
 
 fn main() {
@@ -248,7 +256,11 @@ where
 		};
 
 		// validate the token
-		let data: Data = match jsonwebtoken::decode(&token, &DecodingKey::from_secret(&secret), &self.validation) {
+		let data: Data = match jsonwebtoken::decode(
+			&token,
+			&DecodingKey::from_secret(&secret),
+			&self.validation
+		) {
 			Ok(data) => data.claims,
 			Err(e) => match e.into_kind() {
 				ErrorKind::ExpiredSignature => return AuthStatus::Expired,
@@ -278,7 +290,9 @@ where
 		state.put(status);
 
 		// call the rest of the chain
-		chain(state).and_then(|(state, res)| future::ok((state, res))).boxed()
+		chain(state)
+			.and_then(|(state, res)| future::ok((state, res)))
+			.boxed()
 	}
 }
 
@@ -305,9 +319,9 @@ mod test {
 	const JWT_SECRET: &'static [u8; 32] = b"Lyzsfnta0cdxyF0T9y6VGxp3jpgoMUuW";
 
 	// some known tokens
-	const VALID_TOKEN : &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk";
-	const EXPIRED_TOKEN : &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0";
-	const INVALID_TOKEN : &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9";
+	const VALID_TOKEN: &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk";
+	const EXPIRED_TOKEN: &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0";
+	const INVALID_TOKEN: &'static str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9";
 
 	#[derive(Debug, Deserialize, PartialEq)]
 	struct TestData {
@@ -331,17 +345,26 @@ mod test {
 	#[derive(Default)]
 	struct NoneAuthHandler;
 	impl<T> AuthHandler<T> for NoneAuthHandler {
-		fn jwt_secret<F: FnOnce() -> Option<T>>(&self, _state: &mut State, _decode_data: F) -> Option<Vec<u8>> {
+		fn jwt_secret<F: FnOnce() -> Option<T>>(
+			&self,
+			_state: &mut State,
+			_decode_data: F
+		) -> Option<Vec<u8>> {
 			None
 		}
 	}
 
 	#[test]
 	fn test_auth_middleware_none_secret() {
-		let middleware = <AuthMiddleware<TestData, NoneAuthHandler>>::from_source(AuthSource::AuthorizationHeader);
+		let middleware = <AuthMiddleware<TestData, NoneAuthHandler>>::from_source(
+			AuthSource::AuthorizationHeader
+		);
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
-			headers.insert(AUTHORIZATION, format!("Bearer {}", VALID_TOKEN).parse().unwrap());
+			headers.insert(
+				AUTHORIZATION,
+				format!("Bearer {VALID_TOKEN}").parse().unwrap()
+			);
 			state.put(headers);
 			middleware.auth_status(&mut state);
 		});
@@ -353,7 +376,11 @@ mod test {
 	where
 		T: Debug + Default + PartialEq
 	{
-		fn jwt_secret<F: FnOnce() -> Option<T>>(&self, _state: &mut State, decode_data: F) -> Option<Vec<u8>> {
+		fn jwt_secret<F: FnOnce() -> Option<T>>(
+			&self,
+			_state: &mut State,
+			decode_data: F
+		) -> Option<Vec<u8>> {
 			assert_eq!(decode_data(), Some(T::default()));
 			Some(JWT_SECRET.to_vec())
 		}
@@ -361,10 +388,15 @@ mod test {
 
 	#[test]
 	fn test_auth_middleware_decode_data() {
-		let middleware = <AuthMiddleware<TestData, TestAssertingHandler>>::from_source(AuthSource::AuthorizationHeader);
+		let middleware = <AuthMiddleware<TestData, TestAssertingHandler>>::from_source(
+			AuthSource::AuthorizationHeader
+		);
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
-			headers.insert(AUTHORIZATION, format!("Bearer {}", VALID_TOKEN).parse().unwrap());
+			headers.insert(
+				AUTHORIZATION,
+				format!("Bearer {VALID_TOKEN}").parse().unwrap()
+			);
 			state.put(headers);
 			middleware.auth_status(&mut state);
 		});
@@ -374,7 +406,11 @@ mod test {
 	where
 		T: DeserializeOwned + Send
 	{
-		AuthMiddleware::new(source, Default::default(), StaticAuthHandler::from_array(JWT_SECRET))
+		AuthMiddleware::new(
+			source,
+			Default::default(),
+			StaticAuthHandler::from_array(JWT_SECRET)
+		)
 	}
 
 	#[test]
@@ -384,7 +420,7 @@ mod test {
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Unauthenticated => {},
-				_ => panic!("Expected AuthStatus::Unauthenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Unauthenticated, got {status:?}")
 			};
 		});
 	}
@@ -394,12 +430,15 @@ mod test {
 		let middleware = new_middleware::<TestData>(AuthSource::AuthorizationHeader);
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
-			headers.insert(AUTHORIZATION, format!("Bearer {}", EXPIRED_TOKEN).parse().unwrap());
+			headers.insert(
+				AUTHORIZATION,
+				format!("Bearer {EXPIRED_TOKEN}").parse().unwrap()
+			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Expired => {},
-				_ => panic!("Expected AuthStatus::Expired, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Expired, got {status:?}")
 			};
 		});
 	}
@@ -409,12 +448,15 @@ mod test {
 		let middleware = new_middleware::<TestData>(AuthSource::AuthorizationHeader);
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
-			headers.insert(AUTHORIZATION, format!("Bearer {}", INVALID_TOKEN).parse().unwrap());
+			headers.insert(
+				AUTHORIZATION,
+				format!("Bearer {INVALID_TOKEN}").parse().unwrap()
+			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Invalid => {},
-				_ => panic!("Expected AuthStatus::Invalid, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Invalid, got {status:?}")
 			};
 		});
 	}
@@ -424,12 +466,15 @@ mod test {
 		let middleware = new_middleware::<TestData>(AuthSource::AuthorizationHeader);
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
-			headers.insert(AUTHORIZATION, format!("Bearer {}", VALID_TOKEN).parse().unwrap());
+			headers.insert(
+				AUTHORIZATION,
+				format!("Bearer {VALID_TOKEN}").parse().unwrap()
+			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}
@@ -437,7 +482,8 @@ mod test {
 	#[test]
 	fn test_auth_middleware_header_token() {
 		let header_name = "x-znoiprwmvfexju";
-		let middleware = new_middleware::<TestData>(AuthSource::Header(HeaderName::from_static(header_name)));
+		let middleware =
+			new_middleware::<TestData>(AuthSource::Header(HeaderName::from_static(header_name)));
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
 			headers.insert(header_name, VALID_TOKEN.parse().unwrap());
@@ -445,7 +491,7 @@ mod test {
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}
@@ -461,7 +507,7 @@ mod test {
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}
@@ -472,12 +518,15 @@ mod test {
 		let middleware = new_middleware::<TestData>(AuthSource::Cookie(cookie_name.to_owned()));
 		State::with_new(|mut state| {
 			let mut headers = HeaderMap::new();
-			headers.insert(COOKIE, format!("{}={}", cookie_name, VALID_TOKEN).parse().unwrap());
+			headers.insert(
+				COOKIE,
+				format!("{cookie_name}={VALID_TOKEN}").parse().unwrap()
+			);
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
 				AuthStatus::Authenticated(data) => assert_eq!(data, TestData::default()),
-				_ => panic!("Expected AuthStatus::Authenticated, got {:?}", status)
+				_ => panic!("Expected AuthStatus::Authenticated, got {status:?}")
 			};
 		})
 	}

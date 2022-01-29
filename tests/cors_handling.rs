@@ -23,11 +23,18 @@ fn update_all(_body: Raw<Vec<u8>>) {}
 
 fn test_server(cfg: CorsConfig) -> TestServer {
 	let (chain, pipeline) = single_pipeline(new_pipeline().add(cfg).build());
-	TestServer::new(build_router(chain, pipeline, |router| router.resource::<FooResource>("/foo"))).unwrap()
+	TestServer::new(build_router(chain, pipeline, |router| {
+		router.resource::<FooResource>("/foo")
+	}))
+	.unwrap()
 }
 
-fn test_response<TS, C>(req: TestRequest<TS, C>, origin: Option<&str>, vary: Option<&str>, credentials: bool)
-where
+fn test_response<TS, C>(
+	req: TestRequest<TS, C>,
+	origin: Option<&str>,
+	vary: Option<&str>,
+	credentials: bool
+) where
 	TS: Server + 'static,
 	C: Connect + Clone + Send + Sync + 'static
 {
@@ -37,7 +44,14 @@ where
 		.unwrap();
 	assert_eq!(res.status(), StatusCode::NO_CONTENT);
 	let headers = res.headers();
-	println!("{}", headers.keys().map(|name| name.as_str()).collect::<Vec<_>>().join(","));
+	println!(
+		"{}",
+		headers
+			.keys()
+			.map(|name| name.as_str())
+			.collect::<Vec<_>>()
+			.join(",")
+	);
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_ORIGIN)
@@ -45,7 +59,13 @@ where
 			.as_deref(),
 		origin
 	);
-	assert_eq!(headers.get(VARY).and_then(|value| value.to_str().ok()).as_deref(), vary);
+	assert_eq!(
+		headers
+			.get(VARY)
+			.and_then(|value| value.to_str().ok())
+			.as_deref(),
+		vary
+	);
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_CREDENTIALS)
@@ -57,7 +77,14 @@ where
 	assert!(headers.get(ACCESS_CONTROL_MAX_AGE).is_none());
 }
 
-fn test_preflight(server: &TestServer, method: &str, origin: Option<&str>, vary: &str, credentials: bool, max_age: u64) {
+fn test_preflight(
+	server: &TestServer,
+	method: &str,
+	origin: Option<&str>,
+	vary: &str,
+	credentials: bool,
+	max_age: u64
+) {
 	let res = server
 		.client()
 		.options("http://example.org/foo")
@@ -67,7 +94,14 @@ fn test_preflight(server: &TestServer, method: &str, origin: Option<&str>, vary:
 		.unwrap();
 	assert_eq!(res.status(), StatusCode::NO_CONTENT);
 	let headers = res.headers();
-	println!("{}", headers.keys().map(|name| name.as_str()).collect::<Vec<_>>().join(","));
+	println!(
+		"{}",
+		headers
+			.keys()
+			.map(|name| name.as_str())
+			.collect::<Vec<_>>()
+			.join(",")
+	);
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_METHODS)
@@ -82,7 +116,13 @@ fn test_preflight(server: &TestServer, method: &str, origin: Option<&str>, vary:
 			.as_deref(),
 		origin
 	);
-	assert_eq!(headers.get(VARY).and_then(|value| value.to_str().ok()).as_deref(), Some(vary));
+	assert_eq!(
+		headers
+			.get(VARY)
+			.and_then(|value| value.to_str().ok())
+			.as_deref(),
+		Some(vary)
+	);
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_CREDENTIALS)
@@ -118,7 +158,14 @@ fn test_preflight_headers(
 	let res = res.perform().unwrap();
 	assert_eq!(res.status(), StatusCode::NO_CONTENT);
 	let headers = res.headers();
-	println!("{}", headers.keys().map(|name| name.as_str()).collect::<Vec<_>>().join(","));
+	println!(
+		"{}",
+		headers
+			.keys()
+			.map(|name| name.as_str())
+			.collect::<Vec<_>>()
+			.join(",")
+	);
 	if let Some(hdr) = allowed_headers {
 		assert_eq!(
 			headers
@@ -130,7 +177,13 @@ fn test_preflight_headers(
 	} else {
 		assert!(!headers.contains_key(ACCESS_CONTROL_ALLOW_HEADERS));
 	}
-	assert_eq!(headers.get(VARY).and_then(|value| value.to_str().ok()).as_deref(), Some(vary));
+	assert_eq!(
+		headers
+			.get(VARY)
+			.and_then(|value| value.to_str().ok())
+			.as_deref(),
+		Some(vary)
+	);
 }
 
 #[test]
@@ -138,11 +191,25 @@ fn cors_origin_none() {
 	let cfg = Default::default();
 	let server = test_server(cfg);
 
-	test_preflight(&server, "PUT", None, "access-control-request-method", false, 0);
+	test_preflight(
+		&server,
+		"PUT",
+		None,
+		"access-control-request-method",
+		false,
+		0
+	);
 
-	test_response(server.client().get("http://example.org/foo"), None, None, false);
 	test_response(
-		server.client().put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
+		server.client().get("http://example.org/foo"),
+		None,
+		None,
+		false
+	);
+	test_response(
+		server
+			.client()
+			.put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
 		None,
 		None,
 		false
@@ -157,11 +224,25 @@ fn cors_origin_star() {
 	};
 	let server = test_server(cfg);
 
-	test_preflight(&server, "PUT", Some("*"), "access-control-request-method", false, 0);
+	test_preflight(
+		&server,
+		"PUT",
+		Some("*"),
+		"access-control-request-method",
+		false,
+		0
+	);
 
-	test_response(server.client().get("http://example.org/foo"), Some("*"), None, false);
 	test_response(
-		server.client().put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
+		server.client().get("http://example.org/foo"),
+		Some("*"),
+		None,
+		false
+	);
+	test_response(
+		server
+			.client()
+			.put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
 		Some("*"),
 		None,
 		false
@@ -192,7 +273,9 @@ fn cors_origin_single() {
 		false
 	);
 	test_response(
-		server.client().put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
+		server
+			.client()
+			.put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
 		Some("https://foo.com"),
 		None,
 		false
@@ -223,7 +306,9 @@ fn cors_origin_copy() {
 		false
 	);
 	test_response(
-		server.client().put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
+		server
+			.client()
+			.put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
 		Some("http://example.org"),
 		Some("origin"),
 		false
@@ -236,7 +321,13 @@ fn cors_headers_none() {
 	let server = test_server(cfg);
 
 	test_preflight_headers(&server, "PUT", None, None, "access-control-request-method");
-	test_preflight_headers(&server, "PUT", Some("Content-Type"), None, "access-control-request-method");
+	test_preflight_headers(
+		&server,
+		"PUT",
+		Some("Content-Type"),
+		None,
+		"access-control-request-method"
+	);
 }
 
 #[test]
@@ -247,7 +338,13 @@ fn cors_headers_list() {
 	};
 	let server = test_server(cfg);
 
-	test_preflight_headers(&server, "PUT", None, Some("content-type"), "access-control-request-method");
+	test_preflight_headers(
+		&server,
+		"PUT",
+		None,
+		Some("content-type"),
+		"access-control-request-method"
+	);
 	test_preflight_headers(
 		&server,
 		"PUT",
@@ -290,11 +387,25 @@ fn cors_credentials() {
 	};
 	let server = test_server(cfg);
 
-	test_preflight(&server, "PUT", None, "access-control-request-method", true, 0);
+	test_preflight(
+		&server,
+		"PUT",
+		None,
+		"access-control-request-method",
+		true,
+		0
+	);
 
-	test_response(server.client().get("http://example.org/foo"), None, None, true);
 	test_response(
-		server.client().put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
+		server.client().get("http://example.org/foo"),
+		None,
+		None,
+		true
+	);
+	test_response(
+		server
+			.client()
+			.put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
 		None,
 		None,
 		true
@@ -310,11 +421,25 @@ fn cors_max_age() {
 	};
 	let server = test_server(cfg);
 
-	test_preflight(&server, "PUT", None, "access-control-request-method", false, 31536000);
+	test_preflight(
+		&server,
+		"PUT",
+		None,
+		"access-control-request-method",
+		false,
+		31536000
+	);
 
-	test_response(server.client().get("http://example.org/foo"), None, None, false);
 	test_response(
-		server.client().put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
+		server.client().get("http://example.org/foo"),
+		None,
+		None,
+		false
+	);
+	test_response(
+		server
+			.client()
+			.put("http://example.org/foo", Body::empty(), TEXT_PLAIN),
 		None,
 		None,
 		false

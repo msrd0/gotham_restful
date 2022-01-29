@@ -3,9 +3,10 @@ use gotham::{
 	helpers::http::response::create_empty_response,
 	hyper::{
 		header::{
-			HeaderMap, HeaderName, HeaderValue, ACCESS_CONTROL_ALLOW_CREDENTIALS, ACCESS_CONTROL_ALLOW_HEADERS,
-			ACCESS_CONTROL_ALLOW_METHODS, ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_MAX_AGE,
-			ACCESS_CONTROL_REQUEST_HEADERS, ACCESS_CONTROL_REQUEST_METHOD, ORIGIN, VARY
+			HeaderMap, HeaderName, HeaderValue, ACCESS_CONTROL_ALLOW_CREDENTIALS,
+			ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_METHODS,
+			ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_MAX_AGE, ACCESS_CONTROL_REQUEST_HEADERS,
+			ACCESS_CONTROL_REQUEST_METHOD, ORIGIN, VARY
 		},
 		Body, Method, Response, StatusCode
 	},
@@ -90,7 +91,9 @@ impl Headers {
 			Self::List(list) => Some(list.join(",").parse().unwrap()),
 			Self::Copy => {
 				let headers = HeaderMap::borrow_from(state);
-				headers.get(ACCESS_CONTROL_REQUEST_HEADERS).map(Clone::clone)
+				headers
+					.get(ACCESS_CONTROL_REQUEST_HEADERS)
+					.map(Clone::clone)
 			}
 		}
 	}
@@ -205,13 +208,18 @@ pub fn handle_cors(state: &State, res: &mut Response<Body>) {
 
 		// if the origin is copied over, we should tell the browser by specifying the Vary header
 		if cfg.origin.varies() {
-			let vary = headers.get(VARY).map(|vary| format!("{},origin", vary.to_str().unwrap()));
+			let vary = headers
+				.get(VARY)
+				.map(|vary| format!("{},origin", vary.to_str().unwrap()));
 			headers.insert(VARY, vary.as_deref().unwrap_or("origin").parse().unwrap());
 		}
 
 		// if we allow credentials, tell the browser
 		if cfg.credentials {
-			headers.insert(ACCESS_CONTROL_ALLOW_CREDENTIALS, HeaderValue::from_static("true"));
+			headers.insert(
+				ACCESS_CONTROL_ALLOW_CREDENTIALS,
+				HeaderValue::from_static("true")
+			);
 		}
 	}
 }
@@ -292,6 +300,8 @@ where
 {
 	fn cors(&mut self, path: &str, method: Method) {
 		let matcher = AccessControlRequestMethodMatcher::new(method);
-		self.options(path).extend_route_matcher(matcher).to(cors_preflight_handler);
+		self.options(path)
+			.extend_route_matcher(matcher)
+			.to(cors_preflight_handler);
 	}
 }

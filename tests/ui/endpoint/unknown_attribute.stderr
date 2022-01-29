@@ -1,11 +1,11 @@
 error: Unknown attribute
- --> $DIR/unknown_attribute.rs:8:12
+ --> tests/ui/endpoint/unknown_attribute.rs:8:12
   |
 8 | #[read_all(pineapple = "on pizza")]
   |            ^^^^^^^^^
 
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> $DIR/unknown_attribute.rs:5:12
+ --> tests/ui/endpoint/unknown_attribute.rs:5:12
   |
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

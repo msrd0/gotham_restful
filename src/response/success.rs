@@ -75,8 +75,8 @@ impl<T: ResponseBody> IntoResponse for Success<T> {
 	type Err = serde_json::Error;
 
 	fn into_response(self) -> Pin<Box<dyn Future<Output = Result<Response, Self::Err>> + Send>> {
-		let res =
-			serde_json::to_string(&self.value).map(|body| Response::json(StatusCode::OK, body).with_headers(self.headers));
+		let res = serde_json::to_string(&self.value)
+			.map(|body| Response::json(StatusCode::OK, body).with_headers(self.headers));
 		future::ready(res).boxed()
 	}
 
@@ -128,6 +128,10 @@ mod test {
 
 	#[test]
 	fn success_accepts_json() {
-		assert!(<Success<Msg>>::accepted_types().or_all_types().contains(&APPLICATION_JSON))
+		assert!(
+			<Success<Msg>>::accepted_types()
+				.or_all_types()
+				.contains(&APPLICATION_JSON)
+		)
 	}
 }
