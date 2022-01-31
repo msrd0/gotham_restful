@@ -13,6 +13,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
  - `AuthStatus::Expired` has been removed (`auth` feature only)
  - `AuthError` is now a struct and will include an error message in the payload
 
+## [0.6.4] - 2022-01-31
+### Updated
+ - `parking_lot` crate to 0.12
+
 ## [0.6.3] - 2022-01-28
 ### Updated
  - The linked redoc version has been updated to [2.0.0-rc.63](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc63-2022-01-27)
