@@ -497,7 +497,7 @@ pub mod private {
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;
 	#[cfg(feature = "openapi")]
-	pub use openapi_type::{indexmap::IndexMap, openapi, OpenapiSchema, OpenapiType};
+	pub use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
 }
 
 #[cfg(feature = "auth")]

@@ -18,7 +18,7 @@ use gotham::{
 };
 use openapi_type::{
 	indexmap::IndexMap,
-	openapi::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}
+	openapiv3::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}
 };
 use parking_lot::RwLock;
 use sha2::{Digest, Sha256};
