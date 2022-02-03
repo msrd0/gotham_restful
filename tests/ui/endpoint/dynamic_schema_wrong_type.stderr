@@ -2,7 +2,7 @@ error[E0308]: mismatched types
   --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:21
    |
 16 | #[read_all(schema = "schema", status_codes = "status_codes")]
-   |                     ^^^^^^^^ expected `u16`, found struct `gotham_restful::gotham::hyper::StatusCode`
+   |                     ^^^^^^^^ expected `u16`, found struct `StatusCode`
 
 error[E0308]: mismatched types
   --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:21
@@ -19,8 +19,8 @@ error[E0308]: mismatched types
 16 | #[read_all(schema = "schema", status_codes = "status_codes")]
    |                                              ^^^^^^^^^^^^^^
    |                                              |
-   |                                              expected struct `gotham_restful::gotham::hyper::StatusCode`, found `u16`
+   |                                              expected struct `StatusCode`, found `u16`
    |                                              expected due to this
    |
-   = note: expected struct `Vec<gotham_restful::gotham::hyper::StatusCode>`
+   = note: expected struct `Vec<StatusCode>`
               found struct `Vec<u16>`

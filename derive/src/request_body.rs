@@ -26,7 +26,6 @@ fn impl_openapi_type(_ident: &Ident, _generics: &Generics) -> TokenStream {
 
 #[cfg(feature = "openapi")]
 fn impl_openapi_type(ident: &Ident, generics: &Generics) -> TokenStream {
-	let openapi = quote!(::gotham_restful::private::openapiv3);
 	quote! {
 		impl #generics ::gotham_restful::private::OpenapiType for #ident #generics {
 			fn visit_type<V>(visitor: &mut V)

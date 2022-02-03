@@ -17,7 +17,7 @@ error[E0277]: the trait bound `for<'de> FooBody: serde::de::Deserialize<'de>` is
    |                ^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooBody`
    |
    = note: required because of the requirements on the impl of `serde::de::DeserializeOwned` for `FooBody`
-   = note: required because of the requirements on the impl of `gotham_restful::RequestBody` for `FooBody`
+   = note: required because of the requirements on the impl of `RequestBody` for `FooBody`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Body`
   --> src/endpoint.rs
    |
