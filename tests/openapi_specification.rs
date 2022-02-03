@@ -4,15 +4,15 @@
 extern crate pretty_assertions;
 
 use gotham::{
-	hyper::Method,
-	mime::IMAGE_PNG,
+	hyper::{Method, StatusCode},
+	mime::{IMAGE_PNG, TEXT_PLAIN_UTF_8},
 	pipeline::{new_pipeline, single_pipeline},
 	prelude::*,
 	router::build_router,
 	test::TestServer
 };
 use gotham_restful::*;
-use openapi_type::OpenapiType;
+use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
 use serde::{Deserialize, Serialize};
 
 #[allow(dead_code)]
@@ -87,6 +87,37 @@ fn search_secret(auth: AuthStatus, _query: SecretQuery) -> AuthSuccess<Secrets> 
 }
 
 #[derive(Resource)]
+#[resource(coffee_read_all)]
+struct CoffeeResource;
+
+fn teapot_status_codes() -> Vec<StatusCode> {
+	vec![StatusCode::IM_A_TEAPOT]
+}
+
+fn teapot_schema(code: StatusCode) -> OpenapiSchema {
+	assert_eq!(code, StatusCode::IM_A_TEAPOT);
+
+	struct Binary;
+
+	impl OpenapiType for Binary {
+		fn visit_type<V: Visitor>(visitor: &mut V) {
+			visitor.visit_binary();
+		}
+	}
+
+	Binary::schema()
+}
+
+#[read_all(status_codes = "teapot_status_codes", schema = "teapot_schema")]
+fn coffee_read_all() -> Response {
+	Response::new(
+		StatusCode::IM_A_TEAPOT,
+		"Sorry, this is just your fancy grandma's teapot. Can't make coffee.",
+		Some(TEXT_PLAIN_UTF_8)
+	)
+}
+
+#[derive(Resource)]
 #[resource(custom_read_with, custom_patch)]
 struct CustomResource;
 
@@ -120,6 +151,7 @@ fn openapi_specification() {
 			// the leading slash tests that the spec doesn't contain '//img' nonsense
 			router.resource::<ImageResource>("/img");
 			router.resource::<SecretResource>("secret");
+			router.resource::<CoffeeResource>("coffee");
 			router.resource::<CustomResource>("custom");
 			router.openapi_spec("openapi");
 		});
