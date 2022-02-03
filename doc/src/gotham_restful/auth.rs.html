@@ -534,7 +534,14 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AuthError</span>, <span class="ident">Forbidden</span>};
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AuthError</span>;
 
 <span class="kw">use</span> <span class="ident">cookie::CookieJar</span>;
 <span class="kw">use</span> <span class="ident">futures_util</span>::{
@@ -549,7 +556,7 @@
 	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
 	<span class="ident">state::State</span>
 };
-<span class="kw">use</span> <span class="ident">jsonwebtoken</span>::{<span class="ident">errors::ErrorKind</span>, <span class="ident">DecodingKey</span>};
+<span class="kw">use</span> <span class="ident">jsonwebtoken::DecodingKey</span>;
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">marker::PhantomData</span>, <span class="ident">panic::RefUnwindSafe</span>, <span class="ident">pin::Pin</span>};
 
@@ -558,15 +565,20 @@
 <span class="doccomment">/// The authentication status returned by the auth middleware for each request.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StateData</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AuthStatus</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// The auth status is unknown.</span>
+	<span class="doccomment">/// The auth status is unknown. This is likely because no secret was provided</span>
+	<span class="doccomment">/// that could be used to verify the token of the client.</span>
 	<span class="ident">Unknown</span>,
+
 	<span class="doccomment">/// The request has been performed without any kind of authentication.</span>
 	<span class="ident">Unauthenticated</span>,
-	<span class="doccomment">/// The request has been performed with an invalid authentication.</span>
-	<span class="ident">Invalid</span>,
-	<span class="doccomment">/// The request has been performed with an expired authentication.</span>
-	<span class="ident">Expired</span>,
-	<span class="doccomment">/// The request has been performed with a valid authentication.</span>
+
+	<span class="doccomment">/// The request has been performed with an invalid authentication. This</span>
+	<span class="doccomment">/// includes expired tokens. Further details can be obtained from the</span>
+	<span class="doccomment">/// included error.</span>
+	<span class="ident">Invalid</span>(<span class="ident">jsonwebtoken::errors::Error</span>),
+
+	<span class="doccomment">/// The request has been performed with a valid authentication. The claims</span>
+	<span class="doccomment">/// that were decoded from the token are attached.</span>
 	<span class="ident">Authenticated</span>(<span class="ident">T</span>)
 }
 
@@ -575,23 +587,23 @@
 	<span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
 {
 	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+		<span class="comment">// TODO why is this manually implemented?</span>
 		<span class="kw">match</span> <span class="self">self</span> {
 			<span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
 			<span class="ident"><span class="self">Self</span>::Unauthenticated</span> =&gt; <span class="ident"><span class="self">Self</span>::Unauthenticated</span>,
-			<span class="ident"><span class="self">Self</span>::Invalid</span> =&gt; <span class="ident"><span class="self">Self</span>::Invalid</span>,
-			<span class="ident"><span class="self">Self</span>::Expired</span> =&gt; <span class="ident"><span class="self">Self</span>::Expired</span>,
+			<span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">err</span>) =&gt; <span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">err</span>.<span class="ident">clone</span>()),
 			<span class="ident"><span class="self">Self</span>::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="ident"><span class="self">Self</span>::Authenticated</span>(<span class="ident">data</span>.<span class="ident">clone</span>())
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">AuthStatus</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {}
-
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">AuthStatus</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ok</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">AuthError</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">data</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Forbidden</span>)
+			<span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AuthError::new</span>(<span class="string">&quot;The authentication could not be determined&quot;</span>)),
+			<span class="ident"><span class="self">Self</span>::Unauthenticated</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AuthError::new</span>(<span class="string">&quot;Missing token&quot;</span>)),
+			<span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">AuthError::new</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid token: {err}&quot;</span>))),
+			<span class="ident"><span class="self">Self</span>::Authenticated</span>(<span class="ident">data</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">data</span>)
 		}
 	}
 }
@@ -798,10 +810,7 @@ fn main() {
 			<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">validation</span>
 		) {
 			<span class="prelude-val">Ok</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">claims</span>,
-			<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">into_kind</span>() {
-				<span class="ident">ErrorKind::ExpiredSignature</span> =&gt; <span class="kw">return</span> <span class="ident">AuthStatus::Expired</span>,
-				<span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="ident">AuthStatus::Invalid</span>
-			}
+			<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">AuthStatus::Invalid</span>(<span class="ident">e</span>)
 		};
 
 		<span class="comment">// we found a valid token</span>
@@ -849,6 +858,7 @@ fn main() {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">cookie::Cookie</span>;
 	<span class="kw">use</span> <span class="ident">gotham::hyper::header::COOKIE</span>;
+	<span class="kw">use</span> <span class="ident">jsonwebtoken::errors::ErrorKind</span>;
 	<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
 	<span class="comment">// 256-bit random string</span>
@@ -973,8 +983,10 @@ fn main() {
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
-				<span class="ident">AuthStatus::Expired</span> =&gt; {},
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Expired, got {status:?}&quot;</span>)
+				<span class="ident">AuthStatus::Invalid</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">ErrorKind::ExpiredSignature</span> =&gt; {},
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(
+					<span class="string">&quot;Expected AuthStatus::Invalid(..) with ErrorKind::ExpiredSignature, got {status:?}&quot;</span>
+				)
 			};
 		});
 	}
@@ -991,8 +1003,10 @@ fn main() {
 			<span class="ident">state</span>.<span class="ident">put</span>(<span class="ident">headers</span>);
 			<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">middleware</span>.<span class="ident">auth_status</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
 			<span class="kw">match</span> <span class="ident">status</span> {
-				<span class="ident">AuthStatus::Invalid</span> =&gt; {},
-				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Invalid, got {status:?}&quot;</span>)
+				<span class="ident">AuthStatus::Invalid</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">ErrorKind::InvalidToken</span> =&gt; {},
+				<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(
+					<span class="string">&quot;Expected AuthStatus::Invalid(..) with ErrorKind::InvalidToken, got {status:?}&quot;</span>
+				)
 			};
 		});
 	}

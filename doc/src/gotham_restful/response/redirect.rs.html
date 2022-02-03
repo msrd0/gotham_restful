@@ -164,9 +164,6 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">handle_error</span>, <span class="ident">IntoResponse</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponseError</span>, <span class="ident">Response</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
@@ -178,10 +175,7 @@
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">openapi_type::OpenapiSchema</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-	<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
-	<span class="ident">fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>}
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">fmt::Debug</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 <span class="doccomment">/**
@@ -250,7 +244,7 @@ fn read_all() -&gt; Redirect {
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">ambiguous_associated_items</span>)]</span> <span class="comment">// an enum variant is not a type. never.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoResponse</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Redirect</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">E</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">IntoResponseError</span>,
+	<span class="ident">E</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">IntoResponseError</span>,
 	<span class="op">&lt;</span><span class="ident">E</span> <span class="kw">as</span> <span class="ident">IntoResponseError</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Sync</span>
 {
 	<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">RedirectError</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">E</span> <span class="kw">as</span> <span class="ident">IntoResponseError</span><span class="op">&gt;</span><span class="ident">::Err</span><span class="op">&gt;</span>;
@@ -266,7 +260,7 @@ fn read_all() -&gt; Redirect {
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">ResponseSchema</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Redirect</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">E</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">IntoResponseError</span>,
+	<span class="ident">E</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">IntoResponseError</span>,
 	<span class="op">&lt;</span><span class="ident">E</span> <span class="kw">as</span> <span class="ident">IntoResponseError</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Sync</span>
 {
 	<span class="kw">fn</span> <span class="ident">status_codes</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
