@@ -245,15 +245,15 @@ fn errorlog<E>(_e: E) {}
 
 fn handle_error<E>(e: E) -> Pin<Box<dyn Future<Output = Result<Response, E::Err>> + Send>>
 where
-	E: Display + IntoResponseError
+	E: Debug + IntoResponseError
 {
-	let msg = e.to_string();
+	let msg = format!("{e:?}");
 	let res = e.into_response_error();
 	match &res {
 		Ok(res) if res.status.is_server_error() => errorlog(msg),
 		Err(err) => {
 			errorlog(msg);
-			errorlog(&err);
+			errorlog(format!("{err:?}"));
 		},
 		_ => {}
 	};

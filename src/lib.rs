@@ -524,8 +524,8 @@ pub use endpoint::{Endpoint, NoopExtractor};
 
 mod response;
 pub use response::{
-	AuthError, AuthError::Forbidden, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponse,
-	IntoResponseError, NoContent, Raw, Redirect, Response, Success
+	AuthError, AuthErrorOrOther, AuthResult, AuthSuccess, IntoResponse, IntoResponseError,
+	NoContent, Raw, Redirect, Response, Success
 };
 #[cfg(feature = "openapi")]
 pub use response::{IntoResponseWithSchema, ResponseSchema};

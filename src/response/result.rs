@@ -2,19 +2,18 @@ use super::{handle_error, IntoResponse, ResourceError};
 #[cfg(feature = "openapi")]
 use crate::ResponseSchema;
 use crate::{Response, ResponseBody, Success};
-#[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
-
 use futures_core::future::Future;
 use gotham::{
 	anyhow::Error,
 	hyper::StatusCode,
 	mime::{Mime, APPLICATION_JSON}
 };
-use std::{fmt::Display, pin::Pin};
+#[cfg(feature = "openapi")]
+use openapi_type::{OpenapiSchema, OpenapiType};
+use std::{fmt::Debug, pin::Pin};
 
 pub trait IntoResponseError {
-	type Err: Display + Send + 'static;
+	type Err: Debug + Send + 'static;
 
 	fn into_response_error(self) -> Result<Response, Self::Err>;
 
@@ -55,7 +54,7 @@ where
 impl<R, E> IntoResponse for Result<R, E>
 where
 	R: ResponseBody,
-	E: Display + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = serde_json::Error>
 {
 	type Err = E::Err;
 
@@ -75,7 +74,7 @@ where
 impl<R, E> ResponseSchema for Result<R, E>
 where
 	R: ResponseBody,
-	E: Display + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = serde_json::Error>
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();

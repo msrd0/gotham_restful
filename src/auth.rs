@@ -1,4 +1,4 @@
-use crate::{AuthError, Forbidden};
+use crate::AuthError;
 
 use cookie::CookieJar;
 use futures_util::{
@@ -13,7 +13,7 @@ use gotham::{
 	prelude::*,
 	state::State
 };
-use jsonwebtoken::{errors::ErrorKind, DecodingKey};
+use jsonwebtoken::DecodingKey;
 use serde::de::DeserializeOwned;
 use std::{marker::PhantomData, panic::RefUnwindSafe, pin::Pin};
 
@@ -22,15 +22,20 @@ pub type AuthValidation = jsonwebtoken::Validation;
 /// The authentication status returned by the auth middleware for each request.
 #[derive(Debug, StateData)]
 pub enum AuthStatus<T: Send + 'static> {
-	/// The auth status is unknown.
+	/// The auth status is unknown. This is likely because no secret was provided
+	/// that could be used to verify the token of the client.
 	Unknown,
+
 	/// The request has been performed without any kind of authentication.
 	Unauthenticated,
-	/// The request has been performed with an invalid authentication.
-	Invalid,
-	/// The request has been performed with an expired authentication.
-	Expired,
-	/// The request has been performed with a valid authentication.
+
+	/// The request has been performed with an invalid authentication. This
+	/// includes expired tokens. Further details can be obtained from the
+	/// included error.
+	Invalid(jsonwebtoken::errors::Error),
+
+	/// The request has been performed with a valid authentication. The claims
+	/// that were decoded from the token are attached.
 	Authenticated(T)
 }
 
@@ -39,23 +44,23 @@ where
 	T: Clone + Send + 'static
 {
 	fn clone(&self) -> Self {
+		// TODO why is this manually implemented?
 		match self {
 			Self::Unknown => Self::Unknown,
 			Self::Unauthenticated => Self::Unauthenticated,
-			Self::Invalid => Self::Invalid,
-			Self::Expired => Self::Expired,
+			Self::Invalid(err) => Self::Invalid(err.clone()),
 			Self::Authenticated(data) => Self::Authenticated(data.clone())
 		}
 	}
 }
 
-impl<T> Copy for AuthStatus<T> where T: Copy + Send + 'static {}
-
 impl<T: Send + 'static> AuthStatus<T> {
 	pub fn ok(self) -> Result<T, AuthError> {
 		match self {
-			Self::Authenticated(data) => Ok(data),
-			_ => Err(Forbidden)
+			Self::Unknown => Err(AuthError::new("The authentication could not be determined")),
+			Self::Unauthenticated => Err(AuthError::new("Missing token")),
+			Self::Invalid(err) => Err(AuthError::new(format!("Invalid token: {err}"))),
+			Self::Authenticated(data) => Ok(data)
 		}
 	}
 }
@@ -262,10 +267,7 @@ where
 			&self.validation
 		) {
 			Ok(data) => data.claims,
-			Err(e) => match e.into_kind() {
-				ErrorKind::ExpiredSignature => return AuthStatus::Expired,
-				_ => return AuthStatus::Invalid
-			}
+			Err(e) => return AuthStatus::Invalid(e)
 		};
 
 		// we found a valid token
@@ -313,6 +315,7 @@ mod test {
 	use super::*;
 	use cookie::Cookie;
 	use gotham::hyper::header::COOKIE;
+	use jsonwebtoken::errors::ErrorKind;
 	use std::fmt::Debug;
 
 	// 256-bit random string
@@ -437,8 +440,10 @@ mod test {
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
-				AuthStatus::Expired => {},
-				_ => panic!("Expected AuthStatus::Expired, got {status:?}")
+				AuthStatus::Invalid(err) if *err.kind() == ErrorKind::ExpiredSignature => {},
+				_ => panic!(
+					"Expected AuthStatus::Invalid(..) with ErrorKind::ExpiredSignature, got {status:?}"
+				)
 			};
 		});
 	}
@@ -455,8 +460,10 @@ mod test {
 			state.put(headers);
 			let status = middleware.auth_status(&mut state);
 			match status {
-				AuthStatus::Invalid => {},
-				_ => panic!("Expected AuthStatus::Invalid, got {status:?}")
+				AuthStatus::Invalid(err) if *err.kind() == ErrorKind::InvalidToken => {},
+				_ => panic!(
+					"Expected AuthStatus::Invalid(..) with ErrorKind::InvalidToken, got {status:?}"
+				)
 			};
 		});
 	}
