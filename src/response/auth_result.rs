@@ -72,7 +72,7 @@ fn read_all(auth : AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
 */
 pub type AuthSuccess<T> = Result<T, AuthError>;
 
-/// This is an error type that either yields a _403 Forbidden_ respone if produced
+/// This is an error type that either yields a _403 Forbidden_ response if produced
 /// from an authentication error, or delegates to another error type. This type is
 /// best used with [`AuthResult`].
 #[derive(Debug, Clone, ResourceError)]
