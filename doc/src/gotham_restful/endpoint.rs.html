@@ -160,7 +160,7 @@
 	<span class="ident">state</span>::{<span class="ident">State</span>, <span class="ident">StateData</span>}
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
+<span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiType</span>, <span class="ident">Visitor</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
@@ -177,11 +177,11 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">OpenapiType</span> <span class="kw">for</span> <span class="ident">NoopExtractor</span> {
-	<span class="kw">fn</span> <span class="ident">schema</span>() -&gt; <span class="ident">OpenapiSchema</span> {
+	<span class="kw">fn</span> <span class="ident">visit_type</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&gt;</span>(<span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">V</span>) {
 		<span class="macro">warn!</span>(
 			<span class="string">&quot;You&#39;re asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want.&quot;</span>
 		);
-		<span class="op">&lt;</span>() <span class="kw">as</span> <span class="ident">OpenapiType</span><span class="op">&gt;</span><span class="ident">::schema</span>()
+		<span class="ident">visitor</span>.<span class="ident">visit_unit</span>();
 	}
 }
 

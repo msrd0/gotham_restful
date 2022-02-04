@@ -166,7 +166,7 @@
 <span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">openapi_type</span>::{
 	<span class="ident">indexmap::IndexMap</span>,
-	<span class="ident">openapi</span>::{
+	<span class="ident">openapiv3</span>::{
 		<span class="self">self</span>, <span class="ident">Components</span>, <span class="ident">OpenAPI</span>, <span class="ident">PathItem</span>, <span class="ident">ReferenceOr</span>,
 		<span class="ident">ReferenceOr</span>::{<span class="ident">Item</span>, <span class="ident">Reference</span>},
 		<span class="ident">Schema</span>, <span class="ident">Server</span>
@@ -193,7 +193,7 @@
 		<span class="self">Self</span> {
 			<span class="ident">openapi</span>: <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">OpenAPI</span> {
 				<span class="ident">openapi</span>: <span class="string">&quot;3.0.2&quot;</span>.<span class="ident">to_string</span>(),
-				<span class="ident">info</span>: <span class="ident">openapi::Info</span> {
+				<span class="ident">info</span>: <span class="ident">openapiv3::Info</span> {
 					<span class="ident">title</span>: <span class="ident">info</span>.<span class="ident">title</span>,
 					<span class="ident">version</span>: <span class="ident">info</span>.<span class="ident">version</span>,
 					..<span class="ident">Default::default</span>()
@@ -232,11 +232,11 @@
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">openapi</span>.<span class="ident">write</span>();
 		<span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">openapi</span>.<span class="ident">components</span> {
 			<span class="prelude-val">Some</span>(<span class="ident">comp</span>) =&gt; {
-				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>()));
+				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
 			},
 			<span class="prelude-val">None</span> =&gt; {
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comp</span> <span class="op">=</span> <span class="ident">Components::default</span>();
-				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>()));
+				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
 				<span class="ident">openapi</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">comp</span>);
 			}
 		};
@@ -253,7 +253,7 @@
 	}
 
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">schema</span>: <span class="ident">OpenapiSchema</span>) -&gt; <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">name</span>.<span class="ident">clone</span>() {
+		<span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">schema</span>.<span class="ident">schema_data</span>.<span class="ident">title</span>.<span class="ident">clone</span>() {
 			<span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
 				<span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Reference</span> {
 					<span class="ident">reference</span>: <span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{name}&quot;</span>)
@@ -263,7 +263,7 @@
 			},
 			<span class="prelude-val">None</span> =&gt; {
 				<span class="self">self</span>.<span class="ident">add_schema_dependencies</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>.<span class="ident">dependencies</span>);
-				<span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>())
+				<span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>)
 			}
 		}
 	}
@@ -319,11 +319,11 @@
 
 		<span class="macro">assert_eq!</span>(
 			<span class="ident">openapi</span>.<span class="ident">components</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>().<span class="ident">schemas</span>[<span class="string">&quot;Message&quot;</span>],
-			<span class="ident">ReferenceOr::Item</span>(<span class="ident">Message::schema</span>().<span class="ident">into_schema</span>())
+			<span class="ident">ReferenceOr::Item</span>(<span class="ident">Message::schema</span>().<span class="ident">schema</span>)
 		);
 		<span class="macro">assert_eq!</span>(
 			<span class="ident">openapi</span>.<span class="ident">components</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>().<span class="ident">schemas</span>[<span class="string">&quot;Messages&quot;</span>],
-			<span class="ident">ReferenceOr::Item</span>(<span class="ident">Messages::schema</span>().<span class="ident">into_schema</span>())
+			<span class="ident">ReferenceOr::Item</span>(<span class="ident">Messages::schema</span>().<span class="ident">schema</span>)
 		);
 	}
 }

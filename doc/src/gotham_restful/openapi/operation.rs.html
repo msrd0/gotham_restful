@@ -262,7 +262,7 @@
 <span class="kw">use</span> <span class="ident">gotham</span>::{<span class="ident">hyper::StatusCode</span>, <span class="ident">mime::Mime</span>};
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{
 	<span class="ident">indexmap::IndexMap</span>,
-	<span class="ident">openapi</span>::{
+	<span class="ident">openapiv3</span>::{
 		<span class="ident">MediaType</span>, <span class="ident">Operation</span>, <span class="ident">Parameter</span>, <span class="ident">ParameterData</span>, <span class="ident">ParameterSchemaOrContent</span>, <span class="ident">ReferenceOr</span>,
 		<span class="ident">ReferenceOr::Item</span>, <span class="ident">RequestBody</span> <span class="kw">as</span> <span class="ident">OARequestBody</span>, <span class="ident">Response</span>, <span class="ident">Responses</span>, <span class="ident">Schema</span>, <span class="ident">SchemaKind</span>,
 		<span class="ident">StatusCode</span> <span class="kw">as</span> <span class="ident">OAStatusCode</span>, <span class="ident">Type</span>
@@ -296,6 +296,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OperationParams</span> {
+	<span class="comment">// TODO shouldn&#39;t this be a custom openapi_type::Visitor</span>
+	<span class="comment">// rather than this hacky code?</span>
 	<span class="kw">fn</span> <span class="ident">add_path_params</span>(
 		<span class="ident">path_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OpenapiSchema</span><span class="op">&gt;</span>,
 		<span class="ident">params</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Parameter</span><span class="op">&gt;</span><span class="op">&gt;</span>
@@ -304,7 +306,7 @@
 			<span class="prelude-val">Some</span>(<span class="ident">pp</span>) =&gt; <span class="ident">pp</span>.<span class="ident">schema</span>,
 			<span class="prelude-val">None</span> =&gt; <span class="kw">return</span>
 		};
-		<span class="kw">let</span> <span class="ident">path_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path_params</span> {
+		<span class="kw">let</span> <span class="ident">path_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path_params</span>.<span class="ident">schema_kind</span> {
 			<span class="ident">SchemaKind::Type</span>(<span class="ident">Type::Object</span>(<span class="ident">ty</span>)) =&gt; <span class="ident">ty</span>,
 			<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Path Parameters needs to be a plain struct&quot;</span>)
 		};
@@ -317,6 +319,8 @@
 		}
 	}
 
+	<span class="comment">// TODO shouldn&#39;t this be a custom openapi_type::Visitor</span>
+	<span class="comment">// rather than this hacky code?</span>
 	<span class="kw">fn</span> <span class="ident">add_query_params</span>(
 		<span class="ident">query_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OpenapiSchema</span><span class="op">&gt;</span>,
 		<span class="ident">params</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Parameter</span><span class="op">&gt;</span><span class="op">&gt;</span>
@@ -325,7 +329,7 @@
 			<span class="prelude-val">Some</span>(<span class="ident">qp</span>) =&gt; <span class="ident">qp</span>.<span class="ident">schema</span>,
 			<span class="prelude-val">None</span> =&gt; <span class="kw">return</span>
 		};
-		<span class="kw">let</span> <span class="ident">query_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query_params</span> {
+		<span class="kw">let</span> <span class="ident">query_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query_params</span>.<span class="ident">schema_kind</span> {
 			<span class="ident">SchemaKind::Type</span>(<span class="ident">Type::Object</span>(<span class="ident">ty</span>)) =&gt; <span class="ident">ty</span>,
 			<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Query Parameters needs to be a plain struct&quot;</span>)
 		};
@@ -493,10 +497,8 @@
 	<span class="kw">fn</span> <span class="ident">no_content_schema_to_content</span>() {
 		<span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">NoContent::accepted_types</span>();
 		<span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">NoContent</span> <span class="kw">as</span> <span class="ident">ResponseSchema</span><span class="op">&gt;</span><span class="ident">::schema</span>(<span class="ident">StatusCode::NO_CONTENT</span>);
-		<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">OperationDescription::schema_to_content</span>(
-			<span class="ident">types</span>.<span class="ident">or_all_types</span>(),
-			<span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>())
-		);
+		<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
+			<span class="ident">OperationDescription::schema_to_content</span>(<span class="ident">types</span>.<span class="ident">or_all_types</span>(), <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
 		<span class="macro">assert!</span>(<span class="ident">content</span>.<span class="ident">is_empty</span>());
 	}
 
@@ -504,10 +506,8 @@
 	<span class="kw">fn</span> <span class="ident">raw_schema_to_content</span>() {
 		<span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">Raw</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::accepted_types</span>();
 		<span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">ResponseSchema</span><span class="op">&gt;</span><span class="ident">::schema</span>(<span class="ident">StatusCode::OK</span>);
-		<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">OperationDescription::schema_to_content</span>(
-			<span class="ident">types</span>.<span class="ident">or_all_types</span>(),
-			<span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">into_schema</span>())
-		);
+		<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
+			<span class="ident">OperationDescription::schema_to_content</span>(<span class="ident">types</span>.<span class="ident">or_all_types</span>(), <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
 		<span class="macro">assert_eq!</span>(<span class="ident">content</span>.<span class="ident">len</span>(), <span class="number">1</span>);
 		<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">values</span>().<span class="ident">nth</span>(<span class="number">0</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
 		<span class="macro">assert_eq!</span>(<span class="ident">json</span>, <span class="string">r#&quot;{&quot;schema&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;format&quot;:&quot;binary&quot;}}&quot;#</span>);
