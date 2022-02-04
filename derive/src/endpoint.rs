@@ -8,6 +8,7 @@ use syn::{
 	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, Expr, FnArg, ItemFn, LitBool,
 	LitStr, Meta, NestedMeta, PatType, Result, ReturnType, Type
 };
+use unindent::Unindent;
 
 #[allow(clippy::large_enum_variant)]
 pub enum EndpointType {
@@ -474,7 +475,7 @@ fn expand_endpoint_type(
 	}
 
 	// extract the documentation
-	let mut doc: Vec<String> = Vec::new();
+	let mut doc: Vec<String> = vec![String::new()];
 	for attr in &fun.attrs {
 		if attr.path.is_ident("doc") {
 			if let Some(lit) = attr.parse_meta().and_then(|meta| {
@@ -487,19 +488,19 @@ fn expand_endpoint_type(
 			}
 		}
 	}
-	let doc = doc.join("\n");
-	#[allow(unused_variables)]
-	let doc = doc.trim();
+	let doc = doc.join("\n").unindent();
+	#[cfg_attr(not(feature = "openapi"), allow(unused_variables))]
+	let doc = doc.trim_end();
 
 	#[allow(unused_mut)]
-	let mut description = quote!();
+	let mut description: Option<TokenStream> = None;
 	#[cfg(feature = "openapi")]
 	if !doc.is_empty() {
-		description = quote! {
+		description = Some(quote! {
 			fn description() -> ::core::option::Option<::std::string::String> {
 				::core::option::Option::Some(::std::string::String::from(#doc))
 			}
-		};
+		});
 	}
 
 	// extract arguments into pattern, ident and type

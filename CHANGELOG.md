@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
+ - rustdoc comments from endpoints are now properly trimmed (`openapi` feature only)
 
 ## [0.6.4] - 2022-01-31
 ### Updated

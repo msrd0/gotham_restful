@@ -223,7 +223,7 @@
     },
     "/secret/{id}": {
       "get": {
-        "description": "This endpoint gives access to the secret.\n\n You need to be authenticated to call this endpoint.",
+        "description": "This endpoint gives access to the secret.\n\nYou need to be authenticated to call this endpoint.",
         "operationId": "read_secret",
         "parameters": [
           {
