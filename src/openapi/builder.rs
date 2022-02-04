@@ -1,6 +1,6 @@
 use openapi_type::{
 	indexmap::IndexMap,
-	openapi::{
+	openapiv3::{
 		self, Components, OpenAPI, PathItem, ReferenceOr,
 		ReferenceOr::{Item, Reference},
 		Schema, Server
@@ -27,7 +27,7 @@ impl OpenapiBuilder {
 		Self {
 			openapi: Arc::new(RwLock::new(OpenAPI {
 				openapi: "3.0.2".to_string(),
-				info: openapi::Info {
+				info: openapiv3::Info {
 					title: info.title,
 					version: info.version,
 					..Default::default()
@@ -66,11 +66,11 @@ impl OpenapiBuilder {
 		let mut openapi = self.openapi.write();
 		match &mut openapi.components {
 			Some(comp) => {
-				comp.schemas.insert(name, Item(schema.into_schema()));
+				comp.schemas.insert(name, Item(schema.schema));
 			},
 			None => {
 				let mut comp = Components::default();
-				comp.schemas.insert(name, Item(schema.into_schema()));
+				comp.schemas.insert(name, Item(schema.schema));
 				openapi.components = Some(comp);
 			}
 		};
@@ -87,7 +87,7 @@ impl OpenapiBuilder {
 	}
 
 	pub(crate) fn add_schema(&mut self, mut schema: OpenapiSchema) -> ReferenceOr<Schema> {
-		match schema.name.clone() {
+		match schema.schema.schema_data.title.clone() {
 			Some(name) => {
 				let reference = Reference {
 					reference: format!("#/components/schemas/{name}")
@@ -97,7 +97,7 @@ impl OpenapiBuilder {
 			},
 			None => {
 				self.add_schema_dependencies(&mut schema.dependencies);
-				Item(schema.into_schema())
+				Item(schema.schema)
 			}
 		}
 	}
@@ -153,11 +153,11 @@ mod test {
 
 		assert_eq!(
 			openapi.components.clone().unwrap_or_default().schemas["Message"],
-			ReferenceOr::Item(Message::schema().into_schema())
+			ReferenceOr::Item(Message::schema().schema)
 		);
 		assert_eq!(
 			openapi.components.clone().unwrap_or_default().schemas["Messages"],
-			ReferenceOr::Item(Messages::schema().into_schema())
+			ReferenceOr::Item(Messages::schema().schema)
 		);
 	}
 }

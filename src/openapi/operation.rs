@@ -3,7 +3,7 @@ use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody}
 use gotham::{hyper::StatusCode, mime::Mime};
 use openapi_type::{
 	indexmap::IndexMap,
-	openapi::{
+	openapiv3::{
 		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr,
 		ReferenceOr::Item, RequestBody as OARequestBody, Response, Responses, Schema, SchemaKind,
 		StatusCode as OAStatusCode, Type
@@ -37,6 +37,8 @@ struct OperationParams {
 }
 
 impl OperationParams {
+	// TODO shouldn't this be a custom openapi_type::Visitor
+	// rather than this hacky code?
 	fn add_path_params(
 		path_params: Option<OpenapiSchema>,
 		params: &mut Vec<ReferenceOr<Parameter>>
@@ -45,7 +47,7 @@ impl OperationParams {
 			Some(pp) => pp.schema,
 			None => return
 		};
-		let path_params = match path_params {
+		let path_params = match path_params.schema_kind {
 			SchemaKind::Type(Type::Object(ty)) => ty,
 			_ => panic!("Path Parameters needs to be a plain struct")
 		};
@@ -58,6 +60,8 @@ impl OperationParams {
 		}
 	}
 
+	// TODO shouldn't this be a custom openapi_type::Visitor
+	// rather than this hacky code?
 	fn add_query_params(
 		query_params: Option<OpenapiSchema>,
 		params: &mut Vec<ReferenceOr<Parameter>>
@@ -66,7 +70,7 @@ impl OperationParams {
 			Some(qp) => qp.schema,
 			None => return
 		};
-		let query_params = match query_params {
+		let query_params = match query_params.schema_kind {
 			SchemaKind::Type(Type::Object(ty)) => ty,
 			_ => panic!("Query Parameters needs to be a plain struct")
 		};
@@ -234,10 +238,8 @@ mod test {
 	fn no_content_schema_to_content() {
 		let types = NoContent::accepted_types();
 		let schema = <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT);
-		let content = OperationDescription::schema_to_content(
-			types.or_all_types(),
-			Item(schema.into_schema())
-		);
+		let content =
+			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
 		assert!(content.is_empty());
 	}
 
@@ -245,10 +247,8 @@ mod test {
 	fn raw_schema_to_content() {
 		let types = Raw::<&str>::accepted_types();
 		let schema = <Raw<&str> as ResponseSchema>::schema(StatusCode::OK);
-		let content = OperationDescription::schema_to_content(
-			types.or_all_types(),
-			Item(schema.into_schema())
-		);
+		let content =
+			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);

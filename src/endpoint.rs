@@ -7,7 +7,7 @@ use gotham::{
 	state::{State, StateData}
 };
 #[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
+use openapi_type::{OpenapiType, Visitor};
 use serde::{Deserialize, Deserializer};
 use std::borrow::Cow;
 
@@ -24,11 +24,11 @@ impl<'de> Deserialize<'de> for NoopExtractor {
 
 #[cfg(feature = "openapi")]
 impl OpenapiType for NoopExtractor {
-	fn schema() -> OpenapiSchema {
+	fn visit_type<V: Visitor>(visitor: &mut V) {
 		warn!(
 			"You're asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want."
 		);
-		<() as OpenapiType>::schema()
+		visitor.visit_unit();
 	}
 }
 

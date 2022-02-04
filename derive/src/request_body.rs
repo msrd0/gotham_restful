@@ -26,22 +26,13 @@ fn impl_openapi_type(_ident: &Ident, _generics: &Generics) -> TokenStream {
 
 #[cfg(feature = "openapi")]
 fn impl_openapi_type(ident: &Ident, generics: &Generics) -> TokenStream {
-	let openapi = quote!(::gotham_restful::private::openapi);
 	quote! {
 		impl #generics ::gotham_restful::private::OpenapiType for #ident #generics {
-			fn schema() -> ::gotham_restful::private::OpenapiSchema {
-				::gotham_restful::private::OpenapiSchema::new(
-					#openapi::SchemaKind::Type(
-						#openapi::Type::String(
-							#openapi::StringType {
-								format: #openapi::VariantOrUnknownOrEmpty::Item(
-									#openapi::StringFormat::Binary
-								),
-								.. ::std::default::Default::default()
-							}
-						)
-					)
-				)
+			fn visit_type<V>(visitor: &mut V)
+			where
+				V: ::gotham_restful::private::Visitor
+			{
+				visitor.visit_binary();
 			}
 		}
 	}

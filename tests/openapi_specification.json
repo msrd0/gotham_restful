@@ -44,6 +44,24 @@
   },
   "openapi": "3.0.2",
   "paths": {
+    "/coffee": {
+      "get": {
+        "operationId": "read_all_coffee",
+        "responses": {
+          "418": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "I'm a teapot"
+          }
+        }
+      }
+    },
     "/custom": {
       "patch": {
         "requestBody": {

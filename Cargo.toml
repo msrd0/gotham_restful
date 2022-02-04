@@ -34,7 +34,7 @@ either = { version = "1.6", optional = true }
 gotham_middleware_diesel = { version = "0.4.0", optional = true }
 jsonwebtoken = { version = "8.0", default-features = false, optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
-openapi_type = { version = "0.3.1", optional = true }
+openapi_type = { version = "0.4", optional = true }
 parking_lot = { version = "0.12", optional = true }
 sha2 = { version = "0.10", optional = true }
 

@@ -12,9 +12,7 @@ use gotham::{
 	mime::Mime
 };
 #[cfg(feature = "openapi")]
-use openapi_type::openapi::{SchemaKind, StringFormat, StringType, Type, VariantOrUnknownOrEmpty};
-#[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
+use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
 use serde_json::error::Error as SerdeJsonError;
 use std::{convert::Infallible, fmt::Debug, pin::Pin};
 
@@ -94,11 +92,8 @@ impl<T> RequestBody for Raw<T> where Raw<T>: FromBody + ResourceType {}
 
 #[cfg(feature = "openapi")]
 impl<T> OpenapiType for Raw<T> {
-	fn schema() -> OpenapiSchema {
-		OpenapiSchema::new(SchemaKind::Type(Type::String(StringType {
-			format: VariantOrUnknownOrEmpty::Item(StringFormat::Binary),
-			..Default::default()
-		})))
+	fn visit_type<V: Visitor>(visitor: &mut V) {
+		visitor.visit_binary()
 	}
 }
 
