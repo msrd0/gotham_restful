@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ## [Unreleased]
 ### Updated
  - `jsonwebtoken` crate to 8.0
+ - `openapi_type` crate to 0.4
 
 ### Changed
  - When logging errors, the `Debug` implementation is now used (`errorlog` feature only)
