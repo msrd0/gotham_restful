@@ -1,60 +1,40 @@
 use super::{handle_error, IntoResponse, ResourceError};
 #[cfg(feature = "openapi")]
-use crate::ResponseSchema;
+use crate::{MimeAndSchema, ResponseSchema};
 use crate::{Response, ResponseBody, Success};
 use futures_core::future::Future;
 use gotham::{
-	anyhow::Error,
+	anyhow,
 	hyper::StatusCode,
 	mime::{Mime, APPLICATION_JSON}
 };
-#[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
 use std::{fmt::Debug, pin::Pin};
 
 pub trait IntoResponseError {
 	type Err: Debug + Send + 'static;
 
 	fn into_response_error(self) -> Result<Response, Self::Err>;
-
-	#[cfg(feature = "openapi")]
-	fn status_codes() -> Vec<StatusCode>;
-
-	#[cfg(feature = "openapi")]
-	fn schema(code: StatusCode) -> OpenapiSchema;
 }
 
 impl<E> IntoResponseError for E
 where
-	E: Into<Error>
+	E: Into<anyhow::Error>
 {
 	type Err = serde_json::Error;
 
 	fn into_response_error(self) -> Result<Response, Self::Err> {
-		let err: Error = self.into();
-		let err: ResourceError = err.into();
+		let err = ResourceError::from(self.into());
 		Ok(Response::json(
 			StatusCode::INTERNAL_SERVER_ERROR,
 			serde_json::to_string(&err)?
 		))
-	}
-
-	#[cfg(feature = "openapi")]
-	fn status_codes() -> Vec<StatusCode> {
-		vec![StatusCode::INTERNAL_SERVER_ERROR]
-	}
-
-	#[cfg(feature = "openapi")]
-	fn schema(code: StatusCode) -> OpenapiSchema {
-		assert_eq!(code, StatusCode::INTERNAL_SERVER_ERROR);
-		ResourceError::schema()
 	}
 }
 
 impl<R, E> IntoResponse for Result<R, E>
 where
 	R: ResponseBody,
-	E: Debug + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = <Success<R> as IntoResponse>::Err>
 {
 	type Err = E::Err;
 
@@ -74,7 +54,7 @@ where
 impl<R, E> ResponseSchema for Result<R, E>
 where
 	R: ResponseBody,
-	E: Debug + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = serde_json::Error> + ResponseSchema
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();
@@ -82,9 +62,12 @@ where
 		status_codes
 	}
 
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		match code {
-			StatusCode::OK => R::schema(),
+			StatusCode::OK => vec![MimeAndSchema {
+				mime: APPLICATION_JSON,
+				schema: R::schema()
+			}],
 			code => E::schema(code)
 		}
 	}

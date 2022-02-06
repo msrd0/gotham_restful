@@ -1,6 +1,6 @@
 use super::IntoResponse;
 #[cfg(feature = "openapi")]
-use crate::ResponseSchema;
+use crate::{MimeAndSchema, ResponseSchema};
 use crate::{Response, ResponseBody};
 use futures_util::future::{self, FutureExt};
 use gotham::{
@@ -10,8 +10,6 @@ use gotham::{
 	},
 	mime::{Mime, APPLICATION_JSON}
 };
-#[cfg(feature = "openapi")]
-use openapi_type::OpenapiSchema;
 use std::{fmt::Debug, future::Future, pin::Pin};
 
 /**
@@ -87,9 +85,12 @@ impl<T: ResponseBody> IntoResponse for Success<T> {
 
 #[cfg(feature = "openapi")]
 impl<T: ResponseBody> ResponseSchema for Success<T> {
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		assert_eq!(code, StatusCode::OK);
-		T::schema()
+		vec![MimeAndSchema {
+			mime: APPLICATION_JSON,
+			schema: T::schema()
+		}]
 	}
 }
 

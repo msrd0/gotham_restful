@@ -1,14 +1,15 @@
 use super::{handle_error, IntoResponse};
 use crate::{IntoResponseError, Response};
 #[cfg(feature = "openapi")]
-use crate::{NoContent, ResponseSchema};
+use crate::{MimeAndSchema, NoContent, ResponseSchema};
 use futures_util::future::{BoxFuture, FutureExt, TryFutureExt};
-use gotham::hyper::{
-	header::{InvalidHeaderValue, LOCATION},
-	Body, StatusCode
+use gotham::{
+	anyhow,
+	hyper::{
+		header::{InvalidHeaderValue, LOCATION},
+		Body, StatusCode
+	}
 };
-#[cfg(feature = "openapi")]
-use openapi_type::OpenapiSchema;
 use std::{error::Error as StdError, fmt::Debug};
 use thiserror::Error;
 
@@ -60,7 +61,7 @@ impl ResponseSchema for Redirect {
 		vec![StatusCode::SEE_OTHER]
 	}
 
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		assert_eq!(code, StatusCode::SEE_OTHER);
 		<NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT)
 	}
@@ -94,8 +95,8 @@ where
 #[cfg(feature = "openapi")]
 impl<E> ResponseSchema for Result<Redirect, E>
 where
-	E: Debug + IntoResponseError,
-	<E as IntoResponseError>::Err: StdError + Sync
+	E: Debug + IntoResponseError + ResponseSchema,
+	<E as IntoResponseError>::Err: Into<anyhow::Error>
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();
@@ -103,7 +104,7 @@ where
 		status_codes
 	}
 
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		match code {
 			StatusCode::SEE_OTHER => <Redirect as ResponseSchema>::schema(StatusCode::SEE_OTHER),
 			code => E::schema(code)
