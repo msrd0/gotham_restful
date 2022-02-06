@@ -179,6 +179,10 @@ pub trait IntoResponse {
 	fn into_response(self) -> BoxFuture<'static, Result<Response, Self::Err>>;
 
 	/// Return a list of supported mime types.
+	#[cfg_attr(
+		feature = "openapi",
+		doc = "\n Note that this does not influence the auto-generated OpenAPI specification."
+	)]
 	fn accepted_types() -> Option<Vec<Mime>> {
 		None
 	}

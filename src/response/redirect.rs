@@ -3,12 +3,11 @@ use crate::{IntoResponseError, Response};
 #[cfg(feature = "openapi")]
 use crate::{MimeAndSchema, NoContent, ResponseSchema};
 use futures_util::future::{BoxFuture, FutureExt, TryFutureExt};
-use gotham::{
-	anyhow,
-	hyper::{
-		header::{InvalidHeaderValue, LOCATION},
-		Body, StatusCode
-	}
+#[cfg(feature = "openapi")]
+use gotham::anyhow;
+use gotham::hyper::{
+	header::{InvalidHeaderValue, LOCATION},
+	Body, StatusCode
 };
 use std::{error::Error as StdError, fmt::Debug};
 use thiserror::Error;

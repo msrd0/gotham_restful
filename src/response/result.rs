@@ -3,11 +3,9 @@ use super::{handle_error, IntoResponse, ResourceError};
 use crate::{MimeAndSchema, ResponseSchema};
 use crate::{Response, ResponseBody, Success};
 use futures_core::future::Future;
-use gotham::{
-	anyhow,
-	hyper::StatusCode,
-	mime::{Mime, APPLICATION_JSON}
-};
+#[cfg(feature = "openapi")]
+use gotham::mime::APPLICATION_JSON;
+use gotham::{anyhow, hyper::StatusCode, mime::Mime};
 use std::{fmt::Debug, pin::Pin};
 
 pub trait IntoResponseError {
@@ -28,6 +26,24 @@ where
 			StatusCode::INTERNAL_SERVER_ERROR,
 			serde_json::to_string(&err)?
 		))
+	}
+}
+
+#[cfg(feature = "openapi")]
+impl<E> ResponseSchema for E
+where
+	E: Into<anyhow::Error>
+{
+	fn status_codes() -> Vec<StatusCode> {
+		vec![StatusCode::INTERNAL_SERVER_ERROR]
+	}
+
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
+		assert_eq!(code, StatusCode::INTERNAL_SERVER_ERROR);
+		vec![MimeAndSchema {
+			mime: APPLICATION_JSON,
+			schema: ResourceError::schema()
+		}]
 	}
 }
 

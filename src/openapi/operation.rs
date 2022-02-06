@@ -230,14 +230,27 @@ impl OperationDescription {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use crate::{NoContent, Raw, ResponseSchema};
+	use crate::{IntoResponse, MimeAndSchema, NoContent, Raw, ResponseSchema};
+
+	fn schema_to_content(schema: Vec<MimeAndSchema>) -> IndexMap<String, MediaType> {
+		OperationDescription::schema_to_content(
+			schema
+				.into_iter()
+				.map(|mime_schema| {
+					(
+						mime_schema.mime,
+						ReferenceOr::Item(mime_schema.schema.schema)
+					)
+				})
+				.collect()
+		)
+	}
 
 	#[test]
 	fn no_content_schema_to_content() {
 		let types = NoContent::accepted_types();
 		let schema = <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT);
-		let content =
-			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
+		let content = schema_to_content(schema);
 		assert!(content.is_empty());
 	}
 
@@ -245,8 +258,7 @@ mod test {
 	fn raw_schema_to_content() {
 		let types = Raw::<&str>::accepted_types();
 		let schema = <Raw<&str> as ResponseSchema>::schema(StatusCode::OK);
-		let content =
-			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
+		let content = schema_to_content(schema);
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);
