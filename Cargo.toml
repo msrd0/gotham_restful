@@ -5,7 +5,7 @@ members = [".", "./derive"]
 
 [package]
 name = "gotham_restful"
-version = "0.6.4"
+version = "0.6.5"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 rust-version = "1.58.0"
@@ -21,7 +21,7 @@ include = ["/src/**/*.rs", "/src/openapi/handler/script.min.js", "/LICENSE", "/c
 futures-core = "0.3.19"
 futures-util = "0.3.19"
 gotham = { version = "0.7.1", features = ["derive"], default-features = false }
-gotham_restful_derive = { version = "0.6.1", path = "./derive" }
+gotham_restful_derive = { version = "0.6.2", path = "./derive" }
 log = "0.4.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

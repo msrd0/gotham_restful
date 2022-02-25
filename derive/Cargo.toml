@@ -2,7 +2,7 @@
 
 [package]
 name = "gotham_restful_derive"
-version = "0.6.1"
+version = "0.6.2"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 description = "Derive macros for gotham_restful"
