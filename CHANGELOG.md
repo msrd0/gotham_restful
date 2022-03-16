@@ -5,9 +5,13 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.6.6] - 2022-03-16
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.65](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.65)
+
 ## [0.6.5] - 2022-02-25
 ### Updated
- - The linked redoc version has been updated to [2.0.0-rc.63](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc63-2022-01-27)
+ - The linked redoc version has been updated to [2.0.0-rc.64](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.64)
 
 ### Changed
  - rustdoc comments from endpoints are now properly trimmed (`openapi` feature only)
