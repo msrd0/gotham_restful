@@ -14,6 +14,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
  - `AuthStatus::Expired` has been removed (`auth` feature only)
  - `AuthError` is now a struct and will include an error message in the payload
 
+## [0.6.7] - 2022-03-31
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.66](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc66-2022-03-30)
+
 ## [0.6.6] - 2022-03-16
 ### Updated
  - The linked redoc version has been updated to [2.0.0-rc.65](https://github.com/Redocly/redoc/releases/tag/v2.0.0-rc.65)
