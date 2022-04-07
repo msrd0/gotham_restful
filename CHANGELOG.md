@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
+
+## [0.7.0] - 2022-04-07
 ### Updated
  - `jsonwebtoken` crate to 8.0
  - `openapi_type` crate to 0.4
