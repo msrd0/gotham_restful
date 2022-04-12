@@ -7,5 +7,7 @@ error: Expected boolean literal
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
  --> tests/ui/endpoint/wants_auth_non_bool.rs:5:12
   |
+4 | #[derive(Resource)]
+  |                  - help: you might be missing a type parameter: `<read_all___gotham_restful_endpoint>`
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

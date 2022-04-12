@@ -7,5 +7,7 @@ error: `body` can only be used on custom endpoints
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
  --> tests/ui/endpoint/non_custom_body_attribute.rs:5:12
   |
+4 | #[derive(Resource)]
+  |                  - help: you might be missing a type parameter: `<read_all___gotham_restful_endpoint>`
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

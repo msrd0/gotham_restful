@@ -9,5 +9,7 @@ error: Missing `method` attribute (e.g. `#[endpoint(method = "gotham_restful::go
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
  --> tests/ui/endpoint/custom_method_missing.rs:5:12
   |
+4 | #[derive(Resource)]
+  |                  - help: you might be missing a type parameter: `<read_all___gotham_restful_endpoint>`
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope

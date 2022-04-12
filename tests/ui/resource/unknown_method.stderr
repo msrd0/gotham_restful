@@ -2,7 +2,16 @@ error[E0412]: cannot find type `read_any___gotham_restful_endpoint` in this scop
  --> tests/ui/resource/unknown_method.rs:5:12
   |
 5 | #[resource(read_any)]
-  |            ^^^^^^^^ help: a struct with a similar name exists: `read_all___gotham_restful_endpoint`
+  |            ^^^^^^^^
 ...
 8 | #[read_all]
   | ----------- similarly named struct `read_all___gotham_restful_endpoint` defined here
+  |
+help: a struct with a similar name exists
+  |
+5 | #[resource(read_all___gotham_restful_endpoint)]
+  |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+help: you might be missing a type parameter
+  |
+4 | #[derive(Resource<read_any___gotham_restful_endpoint>)]
+  |                  ++++++++++++++++++++++++++++++++++++
