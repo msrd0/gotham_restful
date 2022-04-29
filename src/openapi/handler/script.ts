@@ -12,6 +12,8 @@ function initRedoc() {
 	}
 	
 	const spec = JSON.parse(specElem.textContent ?? "");
+	const bgColor = '#262a2b';
+	const fgColor = '#fafafa';
 	const options = {
 		expandResponses: "200",
 		onlyRequiredInSamples: true,
@@ -27,8 +29,17 @@ function initRedoc() {
 				}
 			},
 			sidebar: {
-				backgroundColor: '#262a2b',
-				textColor: '#fafafa'
+				width: '20rem',
+				backgroundColor: bgColor,
+				textColor: fgColor
+			},
+			rightPanel: {
+				backgroundColor: bgColor,
+				textColor: fgColor
+			},
+			fab: {
+				backgroundColor: bgColor,
+				textColor: fgColor
 			}
 		}
 	};
