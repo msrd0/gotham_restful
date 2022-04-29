@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.7.1] - 2022-04-29
+### Updated
+ - The linked redoc version has been updated to [2.0.0-rc.67](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc67-2022-04-28)
+
 ## [0.7.0] - 2022-04-07
 ### Updated
  - `jsonwebtoken` crate to 8.0
