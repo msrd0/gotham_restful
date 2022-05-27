@@ -381,6 +381,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0AYXSEG6KAXpraV4d6G3YDDlVDC3nlGwGo9-fv8GeZGz3ted3CfMABYXKEG2_KYsbpLNXHG2SJE4iJUYn4G3ERz6t1UMSRG-naswgE7L1gYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy4zgmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjgx
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
