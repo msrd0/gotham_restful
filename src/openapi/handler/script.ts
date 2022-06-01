@@ -1,7 +1,7 @@
 declare var Redoc: any;
 
-const REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.70/bundles/redoc.standalone.js";
-const REDOC_SRI = "u7pHtMkHiucDjjYKn3aJe/QpjoAQwvhehWO3FrblAqHNkvMMzzYnv6KFhl7bnQomtOCCUNvV/5IQlpR42IvTfQ==";
+const REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.71/bundles/redoc.standalone.js";
+const REDOC_SRI = "s0m3MginfMqcGQ+cLF98ZUhdQcjJ48wvFdx3hEfs9LZExgyC2dz5BVECF8mYTGxoCFevDHXjmXiWL4843tz5hg==";
 
 function initRedoc() {
 	const specElem = document.getElementById('spec');
