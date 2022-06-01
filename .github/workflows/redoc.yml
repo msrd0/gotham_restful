@@ -19,7 +19,7 @@ jobs:
       
       - name: Update ReDoc
         run: |
-          url="https://cdn.jsdelivr.net/npm/redoc@${{ steps.redoc-version.outputs.version }}/bundles/redoc.standalone.js"
+          url="https://cdn.redoc.ly/redoc/v${{ steps.redoc-version.outputs.version }}/bundles/redoc.standalone.js"
           sri="$(wget -qO- "$url" | sha512sum | awk '{print $1}' | fold -b2 | while read line; do printf "\x$line"; done | base64 -w0)"
           cd src/openapi/handler
           sed -i script.ts \
