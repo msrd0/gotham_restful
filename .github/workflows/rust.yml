@@ -10,8 +10,8 @@ jobs:
   webpack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
       - run: cd src/openapi/handler && npm install && npm run webpack
@@ -35,14 +35,14 @@ jobs:
     name: test-${{ matrix.toolchain }}-features-${{ matrix.features }}
     continue-on-error: ${{ matrix.nightly }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
       - name: Get Rust Version
         id: rust-version
         run: echo "::set-output name=version::$(cargo -V | head -n1 | awk '{print $2}')"
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/git
@@ -62,16 +62,16 @@ jobs:
   test-trybuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.60"
-      - uses: actions/cache@v2
+          toolchain: "1.62"
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-1.60
+          key: ${{ runner.os }}-cargo-1.62
       - run: cargo test --no-default-features --features full --tests -- --ignored
         env:
           RUST_BACKTRACE: 1
@@ -79,14 +79,15 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: "1.62"
           components: clippy
       - name: Get Rust Version
         id: rust-version
         run: echo "::set-output name=version::$(cargo -V | head -n1 | awk '{print $2}')"
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/git
@@ -98,7 +99,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
@@ -108,7 +109,7 @@ jobs:
   readme:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: docker://ghcr.io/msrd0/cargo-doc2readme
         with:
           entrypoint: ./readme.sh
@@ -117,7 +118,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - name: Get Rust Version
         id: rust-version
@@ -125,7 +126,7 @@ jobs:
       - name: Get Tarpaulin Version
         id: tarpaulin-version
         run: echo "::set-output name=version::$(wget -qO- 'https://api.github.com/repos/xd009642/tarpaulin/releases/latest' | jq -r '.tag_name')"
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/bin/cargo-tarpaulin
@@ -148,7 +149,7 @@ jobs:
           	--out Html --out Json
         env:
           RUST_BACKTRACE: 1
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: tarpaulin-report
           path: |
@@ -158,9 +159,9 @@ jobs:
   doc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo
@@ -170,7 +171,7 @@ jobs:
         env:
           RUSTDOCFLAGS: "--default-theme ayu --cfg gotham_restful_deny_warnings"
       - run: tar cfJ rustdoc.tar.xz target/doc/
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: rustdoc
           path: rustdoc.tar.xz
@@ -180,13 +181,13 @@ jobs:
     needs: [coverage, doc]
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: gh-pages
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: rustdoc
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: tarpaulin-report
       

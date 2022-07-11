@@ -5,3 +5,7 @@ error[E0277]: the trait bound `AuthData: Clone` is not satisfied
    |                         ^^^^^^^^^^ the trait `Clone` is not implemented for `AuthData`
    |
    = note: required because of the requirements on the impl of `Clone` for `gotham_restful::AuthStatus<AuthData>`
+help: consider annotating `AuthData` with `#[derive(Clone)]`
+   |
+9  | #[derive(Clone)]
+   |
