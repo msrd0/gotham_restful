@@ -1,0 +1,44 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[package]
+workspace = ".."
+name = "gotham_restful_redoc"
+version = "0.1.0"
+authors = ["Dominic Meiser <git@msrd0.de>"]
+edition = "2021"
+rust-version = "1.58.0"
+description = "Private implementation detail of gotham_restful"
+license = "Apache-2.0"
+repository = "https://github.com/msrd0/gotham_restful"
+include = ["/src/**/*.rs", "/src/**/*.min.js", "/LICENSE"]
+
+[dependencies]
+futures-core = "0.3.19"
+futures-util = "0.3.19"
+gotham = { version = "0.7.1", features = ["derive"], default-features = false }
+log = "0.4.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+
+# non-feature optional dependencies
+base64 = "0.13"
+cookie = { version = "0.15", optional = true }
+either = "1.6"
+gotham_middleware_diesel = { version = "0.4.0", optional = true }
+jsonwebtoken = { version = "8.0", default-features = false, optional = true }
+lazy-regex = { version = "2.2.1", optional = true }
+openapi_type = { version = "0.4.1", optional = true }
+parking_lot = { version = "0.12", optional = true }
+sha2 = "0.10"
+
+[dev-dependencies]
+diesel = { version = "1.4.6", features = ["postgres"] }
+futures-executor = "0.3.19"
+gotham = { version = "0.7.1", features = ["testing"], default-features = false }
+paste = "1.0"
+pretty_assertions = "1.0"
+pretty_env_logger = "0.4"
+tokio = { version = "1.17", features = ["time"], default-features = false }
+thiserror = "1.0"
+trybuild = "=1.0.63"

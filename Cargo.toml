@@ -1,7 +1,7 @@
 # -*- eval: (cargo-minor-mode 1) -*-
 
 [workspace]
-members = [".", "./derive"]
+members = [".", "./derive", "./redoc"]
 
 [package]
 name = "gotham_restful"
@@ -32,6 +32,7 @@ base64 = { version = "0.13", optional = true }
 cookie = { version = "0.15", optional = true }
 either = { version = "1.6", optional = true }
 gotham_middleware_diesel = { version = "0.4.0", optional = true }
+gotham_restful_redoc = { version = "0.1.0", path = "./redoc", optional = true }
 jsonwebtoken = { version = "8.0", default-features = false, optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
 openapi_type = { version = "0.4.1", optional = true }
@@ -60,7 +61,7 @@ errorlog = []
 
 # These features are exclusive - https://github.com/msrd0/gotham_restful/issues/4
 without-openapi = []
-openapi = ["gotham_restful_derive/openapi", "base64", "either", "lazy-regex", "openapi_type", "parking_lot", "sha2"]
+openapi = ["gotham_restful_derive/openapi", "gotham_restful_redoc", "base64", "either", "lazy-regex", "openapi_type", "parking_lot", "sha2"]
 
 [package.metadata.docs.rs]
 no-default-features = true
