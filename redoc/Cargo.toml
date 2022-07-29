@@ -10,7 +10,7 @@ rust-version = "1.58.0"
 description = "Private implementation detail of gotham_restful"
 license = "Apache-2.0"
 repository = "https://github.com/msrd0/gotham_restful"
-include = ["/src/**/*.rs", "/src/**/*.min.js", "/LICENSE"]
+include = ["/src/lib.rs", "/src/script.min.js", "/LICENSE"]
 
 [dependencies]
 futures-core = "0.3.19"
