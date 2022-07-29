@@ -14,8 +14,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - run: cd src/openapi/handler && npm install && npm run webpack
-      - run: git diff --exit-code src/openapi/handler
+      - run: cd redoc/src && npm install && npm run webpack
+      - run: git diff --exit-code redoc/src
   
   test:
     strategy:

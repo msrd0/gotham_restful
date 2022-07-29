@@ -11,12 +11,10 @@ updates:
     reviewers:
       - "msrd0"
   - package-ecosystem: npm
-    directory: "src/openapi/handler"
+    directory: "redoc/src"
     schedule:
       interval: weekly
       time: "06:00"
       timezone: "Europe/Amsterdam"
     labels:
       - dependencies
-    reviewers:
-      - "msrd0"
