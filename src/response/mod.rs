@@ -10,12 +10,9 @@ use gotham::{
 #[cfg(feature = "openapi")]
 use openapi_type::{OpenapiSchema, OpenapiType};
 use serde::Serialize;
-use std::{
-	convert::Infallible,
-	fmt::{Debug, Display},
-	future::Future,
-	pin::Pin
-};
+#[cfg(feature = "errorlog")]
+use std::fmt::Display;
+use std::{convert::Infallible, fmt::Debug, future::Future, pin::Pin};
 
 mod auth_result;
 #[allow(unreachable_pub)]
