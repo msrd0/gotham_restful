@@ -322,9 +322,6 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="self">self</span>, <span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">gotham</span>::{
 	<span class="ident">handler::HandlerError</span>,
@@ -337,12 +334,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-	<span class="ident">convert::Infallible</span>,
-	<span class="ident">fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>},
-	<span class="ident">future::Future</span>,
-	<span class="ident">pin::Pin</span>
-};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorlog&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::Infallible</span>, <span class="ident">fmt::Debug</span>, <span class="ident">future::Future</span>, <span class="ident">pin::Pin</span>};
 
 <span class="kw">mod</span> <span class="ident">auth_result</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
