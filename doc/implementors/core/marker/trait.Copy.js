@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["gotham_restful"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.62.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"gotham_restful/struct.NoopExtractor.html\" title=\"struct gotham_restful::NoopExtractor\">NoopExtractor</a>","synthetic":false,"types":["gotham_restful::endpoint::NoopExtractor"]}];
+implementors["gotham_restful"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.63.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"gotham_restful/struct.NoopExtractor.html\" title=\"struct gotham_restful::NoopExtractor\">NoopExtractor</a>","synthetic":false,"types":["gotham_restful::endpoint::NoopExtractor"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
