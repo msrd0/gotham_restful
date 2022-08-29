@@ -1,4 +1,4 @@
-# gotham-restful [![Rust 1.58+](https://img.shields.io/badge/rustc-1.58+-orange.svg)](https://blog.rust-lang.org/2022/01/13/Rust-1.58.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
+# gotham-restful [![Rust 1.59+](https://img.shields.io/badge/rustc-1.59+-orange.svg)](https://blog.rust-lang.org/2022/02/24/Rust-1.59.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
 
 This crate is an extension to the popular [gotham web framework][__link0] for Rust. It allows you to create resources with assigned endpoints that aim to be a more convenient way of creating handlers for requests.
 
@@ -381,18 +381,18 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0AYXSEG6KAXpraV4d6G3YDDlVDC3nlGwGo9-fv8GeZGz3ted3CfMABYXKEG2_KYsbpLNXHG2SJE4iJUYn4G3ERz6t1UMSRG-naswgE7L1gYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy41gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjgy
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0AYXSEG6PbnIuA2DbfG4zPhMgEFY4jGyI4iOc_d8lZG3qmqxzKdxBSYXKEG2_KYsbpLNXHG2SJE4iJUYn4G3ERz6t1UMSRG-naswgE7L1gYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy41gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg1
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
  [__link11]: https://docs.rs/openapi_type/0.4.1/openapi_type/?search=openapi_type::OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::endpoint::Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
+ [__link12]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
- [__link3]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::types::RequestBody
+ [__link3]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::RequestBody
  [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.82
- [__link7]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::response::Response::header
+ [__link6]: https://crates.io/crates/serde_json/1.0.85
+ [__link7]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::Response::header
  [__link8]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/

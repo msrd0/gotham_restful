@@ -9,9 +9,9 @@
 	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-main-blue.svg"/>
 	</a>
-    <a href="https://blog.rust-lang.org/2022/01/13/Rust-1.58.0.html">
-        <img alt="Rust 1.58+" src="https://img.shields.io/badge/rustc-1.58+-orange.svg"/>
-    </a>
+	<a href="https://blog.rust-lang.org/2022/02/24/Rust-1.59.0.html">
+		<img alt="Rust 1.59+" src="https://img.shields.io/badge/rustc-1.59+-orange.svg"/>
+	</a>
 	<a href="https://deps.rs/repo/github/msrd0/gotham_restful">
 		<img alt="dependencies" src="https://deps.rs/repo/github/msrd0/gotham_restful/status.svg"/>
 	</a>
@@ -413,18 +413,18 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0AYXSEG_Z5Vxg8ByuqGx4Nj6lfyzTBGzBKFd6EtrWYG6_zwX9Vnp88YXKEG2_KYsbpLNXHG2SJE4iJUYn4G3ERz6t1UMSRG-naswgE7L1gYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy41gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjgy
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0AYXSEG_T9DC59itjXG40WOGuT-khOG4kS62Nc1tByG8bzxQdCjZw8YXKEG2_KYsbpLNXHG2SJE4iJUYn4G3ERz6t1UMSRG-naswgE7L1gYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy41gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg1
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
  [__link11]: https://docs.rs/openapi_type/0.4.1/openapi_type/?search=openapi_type::OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::endpoint::Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::endpoint::EndpointWithSchema
+ [__link12]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
- [__link3]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::types::RequestBody
+ [__link3]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::RequestBody
  [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.82
- [__link7]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::response::Response::header
+ [__link6]: https://crates.io/crates/serde_json/1.0.85
+ [__link7]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::Response::header
  [__link8]: https://docs.rs/gotham_restful/0.7.5/gotham_restful/?search=gotham_restful::cors::CorsRoute
  [__link9]: https://diesel.rs/
