@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.7.6] - 2022-09-07
+### Updated
+ - The `gotham_restful_redoc` crate was updated to version 0.2
+
 ## [0.7.5] - 2022-07-29
 ### Updated
  - The linked redoc version has been updated to [2.0.0-rc.74](https://github.com/Redocly/redoc/blob/master/CHANGELOG.md#200-rc74-2022-07-28)

@@ -5,7 +5,7 @@ members = [".", "./derive", "./redoc"]
 
 [package]
 name = "gotham_restful"
-version = "0.7.5"
+version = "0.7.6"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 rust-version = "1.58.0"
@@ -31,7 +31,7 @@ thiserror = "1.0"
 base64 = { version = "0.13", optional = true }
 cookie = { version = "0.15", optional = true }
 gotham_middleware_diesel = { version = "0.4.0", optional = true }
-gotham_restful_redoc = { version = "0.1.0", path = "./redoc", optional = true }
+gotham_restful_redoc = { version = "0.2", path = "./redoc", optional = true }
 jsonwebtoken = { version = "8.0", default-features = false, optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
 openapi_type = { version = "0.4.1", optional = true }
