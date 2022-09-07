@@ -4,19 +4,24 @@ use futures_util::{future, future::FutureExt};
 use gotham::{
 	anyhow,
 	handler::{Handler, HandlerError, HandlerFuture, NewHandler},
-	helpers::http::response::create_response,
+	helpers::http::response::{create_empty_response, create_response},
 	hyper::{
-		header::{HeaderValue, X_CONTENT_TYPE_OPTIONS},
+		header::{
+			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, ETAG, IF_NONE_MATCH,
+			REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS
+		},
 		Body, Response, StatusCode
 	},
-	mime::{APPLICATION_JSON, TEXT_PLAIN_UTF_8},
+	mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8},
 	state::State
 };
+use gotham_restful_redoc::Redoc;
 use openapi_type::{
 	indexmap::IndexMap,
 	openapiv3::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}
 };
 use parking_lot::RwLock;
+use sha2::{Digest, Sha256};
 use std::{panic::RefUnwindSafe, pin::Pin, sync::Arc};
 
 #[cfg(feature = "auth")]
@@ -151,7 +156,37 @@ fn redoc_handler(
 	openapi: &Arc<RwLock<OpenAPI>>
 ) -> Result<Response<Body>, HandlerError> {
 	let spec = openapi_string(state, openapi)?;
-	gotham_restful_redoc::handler(state, spec)
+	let Redoc { html, script_hash } = gotham_restful_redoc::html(spec);
+
+	let mut etag = Sha256::new();
+	etag.update(&html);
+	let etag = format!("\"{}\"", base64::encode(etag.finalize()));
+
+	if state
+		.borrow::<HeaderMap>()
+		.get(IF_NONE_MATCH)
+		.map_or(false, |header| header.as_bytes() == etag.as_bytes())
+	{
+		let res = create_empty_response(state, StatusCode::NOT_MODIFIED);
+		return Ok(res);
+	}
+
+	let mut res = create_response(state, StatusCode::OK, TEXT_HTML_UTF_8, html);
+	let headers = res.headers_mut();
+	headers.insert(
+		CACHE_CONTROL,
+		HeaderValue::from_static("public,max-age=2592000")
+	);
+	headers.insert(
+		CONTENT_SECURITY_POLICY,
+		format!(
+			"default-src 'none';base-uri 'none';script-src 'unsafe-inline' https://cdn.jsdelivr.net 'sha256-{script_hash}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:",
+		).parse().unwrap()
+	);
+	headers.insert(ETAG, etag.parse().unwrap());
+	headers.insert(REFERRER_POLICY, HeaderValue::from_static("no-referrer"));
+	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
+	Ok(res)
 }
 
 impl Handler for OpenapiDocHandler {
