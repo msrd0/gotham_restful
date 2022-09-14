@@ -79,17 +79,21 @@ pub enum AuthSource {
 }
 
 /// This trait will help the auth middleware to determine the validity of an authentication token.
-/// 
+///
 /// A very basic implementation could look like this:
-/// 
+///
 /// ```
 /// # use gotham_restful::{AuthHandler, gotham::state::State};
 /// #
-/// const SECRET : &'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
-/// 
+/// const SECRET: &'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
+///
 /// struct CustomAuthHandler;
 /// impl<T> AuthHandler<T> for CustomAuthHandler {
-/// 	fn jwt_secret<F : FnOnce() -> Option<T>>(&self, _state : &mut State, _decode_data : F) -> Option<Vec<u8>> {
+/// 	fn jwt_secret<F: FnOnce() -> Option<T>>(
+/// 		&self,
+/// 		_state: &mut State,
+/// 		_decode_data: F
+/// 	) -> Option<Vec<u8>> {
 /// 		Some(SECRET.to_vec())
 /// 	}
 /// }
@@ -131,7 +135,7 @@ impl<T> AuthHandler<T> for StaticAuthHandler {
 
 /// This is the auth middleware. To use it, first make sure you have the `auth` feature enabled. Then
 /// simply add it to your pipeline and request it inside your handler:
-/// 
+///
 /// ```rust,no_run
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # use gotham::{router::builder::*, pipeline::*, state::State};
@@ -141,18 +145,18 @@ impl<T> AuthHandler<T> for StaticAuthHandler {
 /// #[derive(Resource)]
 /// #[resource(read_all)]
 /// struct AuthResource;
-/// 
+///
 /// #[derive(Debug, Deserialize, Clone)]
 /// struct AuthData {
 /// 	sub: String,
 /// 	exp: u64
 /// }
-/// 
+///
 /// #[read_all]
-/// fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
+/// fn read_all(auth: &AuthStatus<AuthData>) -> Success<String> {
 /// 	format!("{auth:?}").into()
 /// }
-/// 
+///
 /// fn main() {
 /// 	let auth: AuthMiddleware<AuthData, _> = AuthMiddleware::new(
 /// 		AuthSource::AuthorizationHeader,
@@ -160,9 +164,12 @@ impl<T> AuthHandler<T> for StaticAuthHandler {
 /// 		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
 /// 	);
 /// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
-/// 	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-/// 		route.resource::<AuthResource>("auth");
-/// 	}));
+/// 	gotham::start(
+/// 		"127.0.0.1:8080",
+/// 		build_router(chain, pipelines, |route| {
+/// 			route.resource::<AuthResource>("auth");
+/// 		})
+/// 	);
 /// }
 /// ```
 #[derive(Debug)]

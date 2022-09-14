@@ -102,9 +102,9 @@ impl Headers {
 
 /// This is the configuration that the CORS handler will follow. Its default configuration is basically
 /// not to touch any responses, resulting in the browser's default behaviour.
-/// 
+///
 /// To change settings, you need to put this type into gotham's [State]:
-/// 
+///
 /// ```rust,no_run
 /// # use gotham::{router::builder::*, pipeline::*, state::State};
 /// # use gotham_restful::{*, cors::Origin};
@@ -120,15 +120,15 @@ impl Headers {
 /// 	}));
 /// }
 /// ```
-/// 
+///
 /// This easy approach allows you to have one global cors configuration. If you prefer to have separate
 /// configurations for different scopes, you need to register the middleware inside your routing logic:
-/// 
+///
 /// ```rust,no_run
 /// # use gotham::{router::builder::*, pipeline::*, state::State};
 /// # use gotham_restful::{*, cors::Origin};
 /// let pipelines = new_pipeline_set();
-/// 
+///
 /// The first cors configuration
 /// let cors_a = CorsConfig {
 /// 	origin: Origin::Star,
@@ -137,7 +137,7 @@ impl Headers {
 /// let (pipelines, chain_a) = pipelines.add(
 /// 	new_pipeline().add(cors_a).build()
 /// );
-/// 
+///
 /// The second cors configuration
 /// let cors_b = CorsConfig {
 /// 	origin: Origin::Copy,
@@ -146,7 +146,7 @@ impl Headers {
 /// let (pipelines, chain_b) = pipelines.add(
 /// 	new_pipeline().add(cors_b).build()
 /// );
-/// 
+///
 /// let pipeline_set = finalize_pipeline_set(pipelines);
 /// gotham::start("127.0.0.1:8080", build_router((), pipeline_set, |route| {
 /// routing without any cors config
@@ -182,11 +182,11 @@ impl Middleware for CorsConfig {
 
 /// Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that
 /// the response is aligned with the `state`'s [CorsConfig].
-/// 
+///
 /// If you are using the [Resource](crate::Resource) type (which is the recommended way), you'll never
 /// have to call this method. However, if you are writing your own handler method, you might want to
 /// call this after your request to add the required CORS headers.
-/// 
+///
 /// For further information on CORS, read <https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>.
 pub fn handle_cors(state: &State, res: &mut Response<Body>) {
 	let config = CorsConfig::try_borrow_from(state);

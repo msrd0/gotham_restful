@@ -20,7 +20,7 @@ use std::{convert::Infallible, fmt::Debug, pin::Pin};
 /// of request bodies are accepted by this type. It is therefore recommended to derive your own type
 /// from [RequestBody] and only use this when you need to return a raw response. This is a usage
 /// example that simply returns its body:
-/// 
+///
 /// ```rust,no_run
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # use gotham::router::builder::*;
@@ -28,9 +28,9 @@ use std::{convert::Infallible, fmt::Debug, pin::Pin};
 /// #[derive(Resource)]
 /// #[resource(create)]
 /// struct ImageResource;
-/// 
+///
 /// #[create]
-/// fn create(body : Raw<Vec<u8>>) -> Raw<Vec<u8>> {
+/// fn create(body: Raw<Vec<u8>>) -> Raw<Vec<u8>> {
 /// 	body
 /// }
 /// # fn main() {

@@ -42,9 +42,9 @@ impl IntoResponseError for AuthError {
 /// This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
 /// that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
 /// response will be issued.
-/// 
+///
 /// Use can look something like this (assuming the `auth` feature is enabled):
-/// 
+///
 /// ```rust
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # #[cfg(feature = "auth")]
@@ -101,9 +101,9 @@ where
 /// This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
 /// that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
 /// response will be issued.
-/// 
+///
 /// Use can look something like this (assuming the `auth` feature is enabled):
-/// 
+///
 /// ```
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # #[cfg(feature = "auth")]

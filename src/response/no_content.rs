@@ -16,7 +16,7 @@ use std::{fmt::Debug, future::Future, pin::Pin};
 /// This is the return type of a resource that doesn't actually return something. It will result
 /// in a _204 No Content_ answer by default. You don't need to use this type directly if using
 /// the function attributes:
-/// 
+///
 /// ```
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # mod doc_tests_are_broken {
@@ -33,7 +33,6 @@ use std::{fmt::Debug, future::Future, pin::Pin};
 /// }
 /// # }
 /// ```
-/// 
 #[derive(Clone, Debug, Default)]
 pub struct NoContent {
 	headers: HeaderMap

@@ -15,7 +15,7 @@ use thiserror::Error;
 /// This is the return type of a resource that only returns a redirect. It will result
 /// in a _303 See Other_ answer, meaning the redirect will always result in a GET request
 /// on the target.
-/// 
+///
 /// ```
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # mod doc_tests_are_broken {

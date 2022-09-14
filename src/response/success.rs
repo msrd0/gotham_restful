@@ -15,9 +15,9 @@ use openapi_type::OpenapiSchema;
 use std::{fmt::Debug, future::Future, pin::Pin};
 
 /// This can be returned from a resource when there is no cause of an error.
-/// 
+///
 /// Usage example:
-/// 
+///
 /// ```
 /// # #[macro_use] extern crate gotham_restful_derive;
 /// # mod doc_tests_are_broken {
@@ -34,10 +34,12 @@ use std::{fmt::Debug, future::Future, pin::Pin};
 /// struct MyResponse {
 /// 	message: &'static str
 /// }
-/// 
+///
 /// #[read_all]
 /// fn read_all() -> Success<MyResponse> {
-/// 	let res = MyResponse { message: "I'm always happy" };
+/// 	let res = MyResponse {
+/// 		message: "I'm always happy"
+/// 	};
 /// 	res.into()
 /// }
 /// # }
