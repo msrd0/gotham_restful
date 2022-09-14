@@ -22,8 +22,6 @@ impl<T: OpenapiType> ResourceType for T {}
 /// A type that can be used inside a response body. Implemented for every type that is
 /// serializable with serde. If the `openapi` feature is used, it must also be of type
 /// [OpenapiType].
-///
-///  [OpenapiType]: trait.OpenapiType.html
 pub trait ResponseBody: ResourceType + Serialize {}
 
 impl<T: ResourceType + Serialize> ResponseBody for T {}
@@ -81,8 +79,6 @@ impl<T: DeserializeOwned> FromBody for T {
 /// 	content_type: Mime
 /// }
 /// ```
-///
-///  [OpenapiType]: trait.OpenapiType.html
 pub trait RequestBody: ResourceType + FromBody {
 	/// Return all types that are supported as content types. Use `None` if all types are supported.
 	fn supported_types() -> Option<Vec<Mime>> {
