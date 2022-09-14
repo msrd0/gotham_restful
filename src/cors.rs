@@ -115,9 +115,12 @@ impl Headers {
 /// 		..Default::default()
 /// 	};
 /// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
-/// 	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-/// your routing logic
-/// 	}));
+/// 	gotham::start(
+/// 		"127.0.0.1:8080",
+/// 		build_router(chain, pipelines, |route| {
+/// 			// your routing logic
+/// 		})
+/// 	);
 /// }
 /// ```
 ///
