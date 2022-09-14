@@ -16,31 +16,29 @@ use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
 use serde_json::error::Error as SerdeJsonError;
 use std::{convert::Infallible, fmt::Debug, pin::Pin};
 
-/**
-This type can be used both as a raw request body, as well as as a raw response. However, all types
-of request bodies are accepted by this type. It is therefore recommended to derive your own type
-from [RequestBody] and only use this when you need to return a raw response. This is a usage
-example that simply returns its body:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
-# use gotham_restful::*;
-#[derive(Resource)]
-#[resource(create)]
-struct ImageResource;
-
-#[create]
-fn create(body : Raw<Vec<u8>>) -> Raw<Vec<u8>> {
-	body
-}
-# fn main() {
-# 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
-# 		route.resource::<ImageResource>("img");
-# 	}));
-# }
-```
-*/
+/// This type can be used both as a raw request body, as well as as a raw response. However, all types
+/// of request bodies are accepted by this type. It is therefore recommended to derive your own type
+/// from [RequestBody] and only use this when you need to return a raw response. This is a usage
+/// example that simply returns its body:
+/// 
+/// ```rust,no_run
+/// # #[macro_use] extern crate gotham_restful_derive;
+/// # use gotham::router::builder::*;
+/// # use gotham_restful::*;
+/// #[derive(Resource)]
+/// #[resource(create)]
+/// struct ImageResource;
+/// 
+/// #[create]
+/// fn create(body : Raw<Vec<u8>>) -> Raw<Vec<u8>> {
+/// 	body
+/// }
+/// # fn main() {
+/// # 	gotham::start("127.0.0.1:8080", build_simple_router(|route| {
+/// # 		route.resource::<ImageResource>("img");
+/// # 	}));
+/// # }
+/// ```
 #[derive(Debug)]
 pub struct Raw<T> {
 	pub raw: T,

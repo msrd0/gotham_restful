@@ -78,24 +78,22 @@ pub enum AuthSource {
 	AuthorizationHeader
 }
 
-/**
-This trait will help the auth middleware to determine the validity of an authentication token.
-
-A very basic implementation could look like this:
-
-```
-# use gotham_restful::{AuthHandler, gotham::state::State};
-#
-const SECRET : &'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
-
-struct CustomAuthHandler;
-impl<T> AuthHandler<T> for CustomAuthHandler {
-	fn jwt_secret<F : FnOnce() -> Option<T>>(&self, _state : &mut State, _decode_data : F) -> Option<Vec<u8>> {
-		Some(SECRET.to_vec())
-	}
-}
-```
-*/
+/// This trait will help the auth middleware to determine the validity of an authentication token.
+/// 
+/// A very basic implementation could look like this:
+/// 
+/// ```
+/// # use gotham_restful::{AuthHandler, gotham::state::State};
+/// #
+/// const SECRET : &'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
+/// 
+/// struct CustomAuthHandler;
+/// impl<T> AuthHandler<T> for CustomAuthHandler {
+/// 	fn jwt_secret<F : FnOnce() -> Option<T>>(&self, _state : &mut State, _decode_data : F) -> Option<Vec<u8>> {
+/// 		Some(SECRET.to_vec())
+/// 	}
+/// }
+/// ```
 pub trait AuthHandler<Data> {
 	/// Return the SHA256-HMAC secret used to verify the JWT token.
 	fn jwt_secret<F: FnOnce() -> Option<Data>>(
@@ -131,44 +129,42 @@ impl<T> AuthHandler<T> for StaticAuthHandler {
 	}
 }
 
-/**
-This is the auth middleware. To use it, first make sure you have the `auth` feature enabled. Then
-simply add it to your pipeline and request it inside your handler:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::builder::*, pipeline::*, state::State};
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-#
-#[derive(Resource)]
-#[resource(read_all)]
-struct AuthResource;
-
-#[derive(Debug, Deserialize, Clone)]
-struct AuthData {
-	sub: String,
-	exp: u64
-}
-
-#[read_all]
-fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
-	format!("{auth:?}").into()
-}
-
-fn main() {
-	let auth: AuthMiddleware<AuthData, _> = AuthMiddleware::new(
-		AuthSource::AuthorizationHeader,
-		AuthValidation::default(),
-		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
-	);
-	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
-	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
-		route.resource::<AuthResource>("auth");
-	}));
-}
-```
-*/
+/// This is the auth middleware. To use it, first make sure you have the `auth` feature enabled. Then
+/// simply add it to your pipeline and request it inside your handler:
+/// 
+/// ```rust,no_run
+/// # #[macro_use] extern crate gotham_restful_derive;
+/// # use gotham::{router::builder::*, pipeline::*, state::State};
+/// # use gotham_restful::*;
+/// # use serde::{Deserialize, Serialize};
+/// #
+/// #[derive(Resource)]
+/// #[resource(read_all)]
+/// struct AuthResource;
+/// 
+/// #[derive(Debug, Deserialize, Clone)]
+/// struct AuthData {
+/// 	sub: String,
+/// 	exp: u64
+/// }
+/// 
+/// #[read_all]
+/// fn read_all(auth : &AuthStatus<AuthData>) -> Success<String> {
+/// 	format!("{auth:?}").into()
+/// }
+/// 
+/// fn main() {
+/// 	let auth: AuthMiddleware<AuthData, _> = AuthMiddleware::new(
+/// 		AuthSource::AuthorizationHeader,
+/// 		AuthValidation::default(),
+/// 		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
+/// 	);
+/// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
+/// 	gotham::start("127.0.0.1:8080", build_router(chain, pipelines, |route| {
+/// 		route.resource::<AuthResource>("auth");
+/// 	}));
+/// }
+/// ```
 #[derive(Debug)]
 pub struct AuthMiddleware<Data, Handler> {
 	source: AuthSource,

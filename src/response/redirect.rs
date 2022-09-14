@@ -12,30 +12,28 @@ use openapi_type::OpenapiSchema;
 use std::{error::Error as StdError, fmt::Debug};
 use thiserror::Error;
 
-/**
-This is the return type of a resource that only returns a redirect. It will result
-in a _303 See Other_ answer, meaning the redirect will always result in a GET request
-on the target.
-
-```
-# #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
-# use gotham::state::State;
-# use gotham_restful::*;
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-#[read_all]
-fn read_all() -> Redirect {
-	Redirect {
-		to: "http://localhost:8080/cool/new/location".to_owned()
-	}
-}
-# }
-```
-*/
+/// This is the return type of a resource that only returns a redirect. It will result
+/// in a _303 See Other_ answer, meaning the redirect will always result in a GET request
+/// on the target.
+/// 
+/// ```
+/// # #[macro_use] extern crate gotham_restful_derive;
+/// # mod doc_tests_are_broken {
+/// # use gotham::state::State;
+/// # use gotham_restful::*;
+/// #
+/// # #[derive(Resource)]
+/// # #[resource(read_all)]
+/// # struct MyResource;
+/// #
+/// #[read_all]
+/// fn read_all() -> Redirect {
+/// 	Redirect {
+/// 		to: "http://localhost:8080/cool/new/location".to_owned()
+/// 	}
+/// }
+/// # }
+/// ```
 #[derive(Clone, Debug, Default)]
 pub struct Redirect {
 	pub to: String

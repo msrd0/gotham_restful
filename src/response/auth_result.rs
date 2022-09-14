@@ -39,37 +39,35 @@ impl IntoResponseError for AuthError {
 	}
 }
 
-/**
-This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
-that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
-response will be issued.
-
-Use can look something like this (assuming the `auth` feature is enabled):
-
-```rust
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = "auth")]
-# mod auth_feature_enabled {
-# use gotham::state::State;
-# use gotham_restful::*;
-# use serde::Deserialize;
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-# #[derive(Clone, Deserialize)]
-# struct MyAuthData { exp : u64 }
-#
-#[read_all]
-fn read_all(auth : AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
-	let auth_data = auth.ok()?;
-	// do something
-	Ok(NoContent::default())
-}
-# }
-```
-*/
+/// This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
+/// that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
+/// response will be issued.
+/// 
+/// Use can look something like this (assuming the `auth` feature is enabled):
+/// 
+/// ```rust
+/// # #[macro_use] extern crate gotham_restful_derive;
+/// # #[cfg(feature = "auth")]
+/// # mod auth_feature_enabled {
+/// # use gotham::state::State;
+/// # use gotham_restful::*;
+/// # use serde::Deserialize;
+/// #
+/// # #[derive(Resource)]
+/// # #[resource(read_all)]
+/// # struct MyResource;
+/// #
+/// # #[derive(Clone, Deserialize)]
+/// # struct MyAuthData { exp : u64 }
+/// #
+/// #[read_all]
+/// fn read_all(auth : AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
+/// 	let auth_data = auth.ok()?;
+/// do something
+/// 	Ok(NoContent::default())
+/// }
+/// # }
+/// ```
 pub type AuthSuccess<T> = Result<T, AuthError>;
 
 /// This is an error type that either yields a _403 Forbidden_ response if produced
@@ -100,35 +98,33 @@ where
 	}
 }
 
-/**
-This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
-that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
-response will be issued.
-
-Use can look something like this (assuming the `auth` feature is enabled):
-
-```
-# #[macro_use] extern crate gotham_restful_derive;
-# #[cfg(feature = "auth")]
-# mod auth_feature_enabled {
-# use gotham::state::State;
-# use gotham_restful::*;
-# use serde::Deserialize;
-# use std::io;
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-# #[derive(Clone, Deserialize)]
-# struct MyAuthData { exp : u64 }
-#
-#[read_all]
-fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent, io::Error> {
-	let auth_data = auth.ok()?;
-	// do something
-	Ok(NoContent::default().into())
-}
-# }
-*/
+/// This return type can be used to wrap any type implementing [IntoResponse](crate::IntoResponse)
+/// that can only be returned if the client is authenticated. Otherwise, an empty _403 Forbidden_
+/// response will be issued.
+/// 
+/// Use can look something like this (assuming the `auth` feature is enabled):
+/// 
+/// ```
+/// # #[macro_use] extern crate gotham_restful_derive;
+/// # #[cfg(feature = "auth")]
+/// # mod auth_feature_enabled {
+/// # use gotham::state::State;
+/// # use gotham_restful::*;
+/// # use serde::Deserialize;
+/// # use std::io;
+/// #
+/// # #[derive(Resource)]
+/// # #[resource(read_all)]
+/// # struct MyResource;
+/// #
+/// # #[derive(Clone, Deserialize)]
+/// # struct MyAuthData { exp : u64 }
+/// #
+/// #[read_all]
+/// fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent, io::Error> {
+/// 	let auth_data = auth.ok()?;
+/// do something
+/// 	Ok(NoContent::default().into())
+/// }
+/// # }
 pub type AuthResult<T, E> = Result<T, AuthErrorOrOther<E>>;

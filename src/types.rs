@@ -28,26 +28,24 @@ pub trait ResponseBody: ResourceType + Serialize {}
 
 impl<T: ResourceType + Serialize> ResponseBody for T {}
 
-/**
-This trait should be implemented for every type that can be built from an HTTP request body
-plus its media type.
-
-For most use cases it is sufficient to derive this trait, you usually don't need to manually
-implement this. Therefore, make sure that the first variable of your struct can be built from
-[Bytes], and the second one can be build from [Mime]. If you have any additional variables, they
-need to be [Default]. This is an example of such a struct:
-
-```rust
-# use gotham::mime::{self, Mime};
-# use gotham_restful::{FromBody, RequestBody};
-#[derive(FromBody, RequestBody)]
-#[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
-struct RawImage {
-	content: Vec<u8>,
-	content_type: Mime
-}
-```
-*/
+/// This trait should be implemented for every type that can be built from an HTTP request body
+/// plus its media type.
+/// 
+/// For most use cases it is sufficient to derive this trait, you usually don't need to manually
+/// implement this. Therefore, make sure that the first variable of your struct can be built from
+/// [Bytes], and the second one can be build from [Mime]. If you have any additional variables, they
+/// need to be [Default]. This is an example of such a struct:
+/// 
+/// ```rust
+/// # use gotham::mime::{self, Mime};
+/// # use gotham_restful::{FromBody, RequestBody};
+/// #[derive(FromBody, RequestBody)]
+/// #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
+/// struct RawImage {
+/// 	content: Vec<u8>,
+/// 	content_type: Mime
+/// }
+/// ```
 pub trait FromBody: Sized {
 	/// The error type returned by the conversion if it was unsuccessfull. When using the derive
 	/// macro, there is no way to trigger an error, so [std::convert::Infallible] is used here.
@@ -66,27 +64,25 @@ impl<T: DeserializeOwned> FromBody for T {
 	}
 }
 
-/**
-A type that can be used inside a request body. Implemented for every type that is deserializable
-with serde. If the `openapi` feature is used, it must also be of type [OpenapiType].
-
-If you want a non-deserializable type to be used as a request body, e.g. because you'd like to
-get the raw data, you can derive it for your own type. All you need is to have a type implementing
-[FromBody] and optionally a list of supported media types:
-
-```rust
-# use gotham::mime::{self, Mime};
-# use gotham_restful::{FromBody, RequestBody};
-#[derive(FromBody, RequestBody)]
-#[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
-struct RawImage {
-	content: Vec<u8>,
-	content_type: Mime
-}
-```
-
- [OpenapiType]: trait.OpenapiType.html
-*/
+/// A type that can be used inside a request body. Implemented for every type that is deserializable
+/// with serde. If the `openapi` feature is used, it must also be of type [OpenapiType].
+/// 
+/// If you want a non-deserializable type to be used as a request body, e.g. because you'd like to
+/// get the raw data, you can derive it for your own type. All you need is to have a type implementing
+/// [FromBody] and optionally a list of supported media types:
+/// 
+/// ```rust
+/// # use gotham::mime::{self, Mime};
+/// # use gotham_restful::{FromBody, RequestBody};
+/// #[derive(FromBody, RequestBody)]
+/// #[supported_types(mime::IMAGE_GIF, mime::IMAGE_JPEG, mime::IMAGE_PNG)]
+/// struct RawImage {
+/// 	content: Vec<u8>,
+/// 	content_type: Mime
+/// }
+/// ```
+/// 
+///  [OpenapiType]: trait.OpenapiType.html
 pub trait RequestBody: ResourceType + FromBody {
 	/// Return all types that are supported as content types. Use `None` if all types are supported.
 	fn supported_types() -> Option<Vec<Mime>> {
