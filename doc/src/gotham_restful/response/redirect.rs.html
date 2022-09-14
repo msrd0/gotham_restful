@@ -167,8 +167,6 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">handle_error</span>, <span class="ident">IntoResponse</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponseError</span>, <span class="ident">Response</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
@@ -183,30 +181,28 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">fmt::Debug</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
-<span class="doccomment">/**
-This is the return type of a resource that only returns a redirect. It will result
-in a _303 See Other_ answer, meaning the redirect will always result in a GET request
-on the target.
-
-```
-# #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
-# use gotham::state::State;
-# use gotham_restful::*;
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-#[read_all]
-fn read_all() -&gt; Redirect {
-	Redirect {
-		to: &quot;http://localhost:8080/cool/new/location&quot;.to_owned()
-	}
-}
-# }
-```
-*/</span>
+<span class="doccomment">/// This is the return type of a resource that only returns a redirect. It will result</span>
+<span class="doccomment">/// in a _303 See Other_ answer, meaning the redirect will always result in a GET request</span>
+<span class="doccomment">/// on the target.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">/// # mod doc_tests_are_broken {</span>
+<span class="doccomment">/// # use gotham::state::State;</span>
+<span class="doccomment">/// # use gotham_restful::*;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # #[derive(Resource)]</span>
+<span class="doccomment">/// # #[resource(read_all)]</span>
+<span class="doccomment">/// # struct MyResource;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #[read_all]</span>
+<span class="doccomment">/// fn read_all() -&gt; Redirect {</span>
+<span class="doccomment">/// 	Redirect {</span>
+<span class="doccomment">/// 		to: &quot;http://localhost:8080/cool/new/location&quot;.to_owned()</span>
+<span class="doccomment">/// 	}</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Redirect</span> {
 	<span class="kw">pub</span> <span class="ident">to</span>: <span class="ident">String</span>

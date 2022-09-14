@@ -377,14 +377,14 @@ to provide the response.</p>
 router. This trait is implemented for all types that implement <a href="trait.IntoResponse.html" title="IntoResponse">IntoResponse</a> and
 <a href="trait.ResponseSchema.html" title="ResponseSchema">ResponseSchema</a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.RequestBody.html" title="gotham_restful::RequestBody trait">RequestBody</a></div><div class="item-right docblock-short"><p>A type that can be used inside a request body. Implemented for every type that is deserializable
-with serde. If the <code>openapi</code> feature is used, it must also be of type <a href="trait.OpenapiType.html">OpenapiType</a>.</p>
+with serde. If the <code>openapi</code> feature is used, it must also be of type [OpenapiType].</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Resource.html" title="gotham_restful::Resource trait">Resource</a></div><div class="item-right docblock-short"><p>This trait must be implemented for every resource. It allows you to register the different
 endpoints that can be handled by this resource to be registered with the underlying router.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ResourceWithSchema.html" title="gotham_restful::ResourceWithSchema trait">ResourceWithSchema</a></div><div class="item-right docblock-short"><p>This trait must be implemented for every resource. It allows you to register the different
 endpoints that can be handled by this resource to be registered with the underlying router.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ResponseBody.html" title="gotham_restful::ResponseBody trait">ResponseBody</a></div><div class="item-right docblock-short"><p>A type that can be used inside a response body. Implemented for every type that is
 serializable with serde. If the <code>openapi</code> feature is used, it must also be of type
-<a href="trait.OpenapiType.html">OpenapiType</a>.</p>
+[OpenapiType].</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ResponseSchema.html" title="gotham_restful::ResponseSchema trait">ResponseSchema</a></div><div class="item-right docblock-short"><p>Additional details for <a href="trait.IntoResponse.html" title="IntoResponse">IntoResponse</a> to be used with an OpenAPI-aware router.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.WithOpenapi.html" title="gotham_restful::WithOpenapi trait">WithOpenapi</a></div><div class="item-right docblock-short"><p>This trait adds the <code>with_openapi</code> method to gotham’s routing. It turns the default
 router into one that will only allow RESTful resources, but record them and generate

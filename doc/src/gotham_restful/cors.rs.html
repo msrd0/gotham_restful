@@ -307,12 +307,6 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">gotham</span>::{
 	<span class="ident">handler::HandlerFuture</span>,
 	<span class="ident">helpers::http::response::create_empty_response</span>,
@@ -333,11 +327,9 @@
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">panic::RefUnwindSafe</span>, <span class="ident">pin::Pin</span>};
 
-<span class="doccomment">/**
-Specify the allowed origins of the request. It is up to the browser to check the validity of the
-origin. This, when sent to the browser, will indicate whether or not the request&#39;s origin was
-allowed to make the request.
-*/</span>
+<span class="doccomment">/// Specify the allowed origins of the request. It is up to the browser to check the validity of the</span>
+<span class="doccomment">/// origin. This, when sent to the browser, will indicate whether or not the request&#39;s origin was</span>
+<span class="doccomment">/// allowed to make the request.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Origin</span> {
 	<span class="doccomment">/// Do not send any `Access-Control-Allow-Origin` headers.</span>
@@ -376,10 +368,8 @@ allowed to make the request.
 	}
 }
 
-<span class="doccomment">/**
-Specify the allowed headers of the request. It is up to the browser to check that only the allowed
-headers are sent with the request.
-*/</span>
+<span class="doccomment">/// Specify the allowed headers of the request. It is up to the browser to check that only the allowed</span>
+<span class="doccomment">/// headers are sent with the request.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Headers</span> {
 	<span class="doccomment">/// Do not send any `Access-Control-Allow-Headers` headers.</span>
@@ -419,66 +409,66 @@ headers are sent with the request.
 	}
 }
 
-<span class="doccomment">/**
-This is the configuration that the CORS handler will follow. Its default configuration is basically
-not to touch any responses, resulting in the browser&#39;s default behaviour.
-
-To change settings, you need to put this type into gotham&#39;s [State]:
-
-```rust,no_run
-# use gotham::{router::builder::*, pipeline::*, state::State};
-# use gotham_restful::{*, cors::Origin};
-# #[cfg_attr(feature = &quot;cargo-clippy&quot;, allow(clippy::needless_doctest_main))]
-fn main() {
-	let cors = CorsConfig {
-		origin: Origin::Star,
-		..Default::default()
-	};
-	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
-	gotham::start(&quot;127.0.0.1:8080&quot;, build_router(chain, pipelines, |route| {
-		// your routing logic
-	}));
-}
-```
-
-This easy approach allows you to have one global cors configuration. If you prefer to have separate
-configurations for different scopes, you need to register the middleware inside your routing logic:
-
-```rust,no_run
-# use gotham::{router::builder::*, pipeline::*, state::State};
-# use gotham_restful::{*, cors::Origin};
-let pipelines = new_pipeline_set();
-
-// The first cors configuration
-let cors_a = CorsConfig {
-	origin: Origin::Star,
-	..Default::default()
-};
-let (pipelines, chain_a) = pipelines.add(
-	new_pipeline().add(cors_a).build()
-);
-
-// The second cors configuration
-let cors_b = CorsConfig {
-	origin: Origin::Copy,
-	..Default::default()
-};
-let (pipelines, chain_b) = pipelines.add(
-	new_pipeline().add(cors_b).build()
-);
-
-let pipeline_set = finalize_pipeline_set(pipelines);
-gotham::start(&quot;127.0.0.1:8080&quot;, build_router((), pipeline_set, |route| {
-	// routing without any cors config
-	route.with_pipeline_chain((chain_a, ()), |route| {
-		// routing with cors config a
-	});
-	route.with_pipeline_chain((chain_b, ()), |route| {
-		// routing with cors config b
-	});
-}));
-```
-*/</span>
+<span class="doccomment">/// This is the configuration that the CORS handler will follow. Its default configuration is basically</span>
+<span class="doccomment">/// not to touch any responses, resulting in the browser&#39;s default behaviour.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// To change settings, you need to put this type into gotham&#39;s [State]:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # use gotham::{router::builder::*, pipeline::*, state::State};</span>
+<span class="doccomment">/// # use gotham_restful::{*, cors::Origin};</span>
+<span class="doccomment">/// # #[cfg_attr(feature = &quot;cargo-clippy&quot;, allow(clippy::needless_doctest_main))]</span>
+<span class="doccomment">/// fn main() {</span>
+<span class="doccomment">/// 	let cors = CorsConfig {</span>
+<span class="doccomment">/// 		origin: Origin::Star,</span>
+<span class="doccomment">/// 		..Default::default()</span>
+<span class="doccomment">/// 	};</span>
+<span class="doccomment">/// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());</span>
+<span class="doccomment">/// 	gotham::start(</span>
+<span class="doccomment">/// 		&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">/// 		build_router(chain, pipelines, |route| {</span>
+<span class="doccomment">/// 			// your routing logic</span>
+<span class="doccomment">/// 		})</span>
+<span class="doccomment">/// 	);</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This easy approach allows you to have one global cors configuration. If you prefer to have separate</span>
+<span class="doccomment">/// configurations for different scopes, you need to register the middleware inside your routing logic:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # use gotham::{router::builder::*, pipeline::*, state::State};</span>
+<span class="doccomment">/// # use gotham_restful::{*, cors::Origin};</span>
+<span class="doccomment">/// let pipelines = new_pipeline_set();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // The first cors configuration</span>
+<span class="doccomment">/// let cors_a = CorsConfig {</span>
+<span class="doccomment">/// 	origin: Origin::Star,</span>
+<span class="doccomment">/// 	..Default::default()</span>
+<span class="doccomment">/// };</span>
+<span class="doccomment">/// let (pipelines, chain_a) = pipelines.add(new_pipeline().add(cors_a).build());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // The second cors configuration</span>
+<span class="doccomment">/// let cors_b = CorsConfig {</span>
+<span class="doccomment">/// 	origin: Origin::Copy,</span>
+<span class="doccomment">/// 	..Default::default()</span>
+<span class="doccomment">/// };</span>
+<span class="doccomment">/// let (pipelines, chain_b) = pipelines.add(new_pipeline().add(cors_b).build());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let pipeline_set = finalize_pipeline_set(pipelines);</span>
+<span class="doccomment">/// gotham::start(</span>
+<span class="doccomment">/// 	&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">/// 	build_router((), pipeline_set, |route| {</span>
+<span class="doccomment">/// 		// routing without any cors config</span>
+<span class="doccomment">/// 		route.with_pipeline_chain((chain_a, ()), |route| {</span>
+<span class="doccomment">/// 			// routing with cors config a</span>
+<span class="doccomment">/// 		});</span>
+<span class="doccomment">/// 		route.with_pipeline_chain((chain_b, ()), |route| {</span>
+<span class="doccomment">/// 			// routing with cors config b</span>
+<span class="doccomment">/// 		});</span>
+<span class="doccomment">/// 	})</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">NewMiddleware</span>, <span class="ident">StateData</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CorsConfig</span> {
 	<span class="doccomment">/// The allowed origins.</span>
@@ -501,16 +491,14 @@ gotham::start(&quot;127.0.0.1:8080&quot;, build_router((), pipeline_set, |route|
 	}
 }
 
-<span class="doccomment">/**
-Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that
-the response is aligned with the `state`&#39;s [CorsConfig].
-
-If you are using the [Resource](crate::Resource) type (which is the recommended way), you&#39;ll never
-have to call this method. However, if you are writing your own handler method, you might want to
-call this after your request to add the required CORS headers.
-
-For further information on CORS, read &lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS&gt;.
-*/</span>
+<span class="doccomment">/// Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that</span>
+<span class="doccomment">/// the response is aligned with the `state`&#39;s [CorsConfig].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If you are using the [Resource](crate::Resource) type (which is the recommended way), you&#39;ll never</span>
+<span class="doccomment">/// have to call this method. However, if you are writing your own handler method, you might want to</span>
+<span class="doccomment">/// call this after your request to add the required CORS headers.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// For further information on CORS, read &lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS&gt;.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_cors</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">res</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
 	<span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">CorsConfig::try_borrow_from</span>(<span class="ident">state</span>);
 	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">config</span> {

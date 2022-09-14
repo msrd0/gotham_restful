@@ -202,8 +202,6 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">handle_error</span>, <span class="ident">IntoResponse</span>, <span class="ident">IntoResponseError</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">types::ResourceType</span>, <span class="ident">FromBody</span>, <span class="ident">RequestBody</span>, <span class="ident">Response</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
@@ -222,31 +220,29 @@
 <span class="kw">use</span> <span class="ident">serde_json::error::Error</span> <span class="kw">as</span> <span class="ident">SerdeJsonError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::Infallible</span>, <span class="ident">fmt::Debug</span>, <span class="ident">pin::Pin</span>};
 
-<span class="doccomment">/**
-This type can be used both as a raw request body, as well as as a raw response. However, all types
-of request bodies are accepted by this type. It is therefore recommended to derive your own type
-from [RequestBody] and only use this when you need to return a raw response. This is a usage
-example that simply returns its body:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::router::builder::*;
-# use gotham_restful::*;
-#[derive(Resource)]
-#[resource(create)]
-struct ImageResource;
-
-#[create]
-fn create(body : Raw&lt;Vec&lt;u8&gt;&gt;) -&gt; Raw&lt;Vec&lt;u8&gt;&gt; {
-	body
-}
-# fn main() {
-# 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {
-# 		route.resource::&lt;ImageResource&gt;(&quot;img&quot;);
-# 	}));
-# }
-```
-*/</span>
+<span class="doccomment">/// This type can be used both as a raw request body, as well as as a raw response. However, all types</span>
+<span class="doccomment">/// of request bodies are accepted by this type. It is therefore recommended to derive your own type</span>
+<span class="doccomment">/// from [RequestBody] and only use this when you need to return a raw response. This is a usage</span>
+<span class="doccomment">/// example that simply returns its body:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">/// # use gotham::router::builder::*;</span>
+<span class="doccomment">/// # use gotham_restful::*;</span>
+<span class="doccomment">/// #[derive(Resource)]</span>
+<span class="doccomment">/// #[resource(create)]</span>
+<span class="doccomment">/// struct ImageResource;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[create]</span>
+<span class="doccomment">/// fn create(body: Raw&lt;Vec&lt;u8&gt;&gt;) -&gt; Raw&lt;Vec&lt;u8&gt;&gt; {</span>
+<span class="doccomment">/// 	body</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # fn main() {</span>
+<span class="doccomment">/// # 	gotham::start(&quot;127.0.0.1:8080&quot;, build_simple_router(|route| {</span>
+<span class="doccomment">/// # 		route.resource::&lt;ImageResource&gt;(&quot;img&quot;);</span>
+<span class="doccomment">/// # 	}));</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">pub</span> <span class="ident">raw</span>: <span class="ident">T</span>,

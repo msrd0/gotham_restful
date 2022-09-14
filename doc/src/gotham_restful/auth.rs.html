@@ -546,6 +546,9 @@
 <span id="538">538</span>
 <span id="539">539</span>
 <span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AuthError</span>;
 
 <span class="kw">use</span> <span class="ident">cookie::CookieJar</span>;
@@ -626,24 +629,26 @@
 	<span class="ident">AuthorizationHeader</span>
 }
 
-<span class="doccomment">/**
-This trait will help the auth middleware to determine the validity of an authentication token.
-
-A very basic implementation could look like this:
-
-```
-# use gotham_restful::{AuthHandler, gotham::state::State};
-#
-const SECRET : &amp;&#39;static [u8; 32] = b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;;
-
-struct CustomAuthHandler;
-impl&lt;T&gt; AuthHandler&lt;T&gt; for CustomAuthHandler {
-	fn jwt_secret&lt;F : FnOnce() -&gt; Option&lt;T&gt;&gt;(&amp;self, _state : &amp;mut State, _decode_data : F) -&gt; Option&lt;Vec&lt;u8&gt;&gt; {
-		Some(SECRET.to_vec())
-	}
-}
-```
-*/</span>
+<span class="doccomment">/// This trait will help the auth middleware to determine the validity of an authentication token.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// A very basic implementation could look like this:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # use gotham_restful::{AuthHandler, gotham::state::State};</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// const SECRET: &amp;&#39;static [u8; 32] = b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// struct CustomAuthHandler;</span>
+<span class="doccomment">/// impl&lt;T&gt; AuthHandler&lt;T&gt; for CustomAuthHandler {</span>
+<span class="doccomment">/// 	fn jwt_secret&lt;F: FnOnce() -&gt; Option&lt;T&gt;&gt;(</span>
+<span class="doccomment">/// 		&amp;self,</span>
+<span class="doccomment">/// 		_state: &amp;mut State,</span>
+<span class="doccomment">/// 		_decode_data: F</span>
+<span class="doccomment">/// 	) -&gt; Option&lt;Vec&lt;u8&gt;&gt; {</span>
+<span class="doccomment">/// 		Some(SECRET.to_vec())</span>
+<span class="doccomment">/// 	}</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AuthHandler</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Return the SHA256-HMAC secret used to verify the JWT token.</span>
 	<span class="kw">fn</span> <span class="ident">jwt_secret</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&gt;</span><span class="op">&gt;</span>(
@@ -679,44 +684,45 @@ impl&lt;T&gt; AuthHandler&lt;T&gt; for CustomAuthHandler {
 	}
 }
 
-<span class="doccomment">/**
-This is the auth middleware. To use it, first make sure you have the `auth` feature enabled. Then
-simply add it to your pipeline and request it inside your handler:
-
-```rust,no_run
-# #[macro_use] extern crate gotham_restful_derive;
-# use gotham::{router::builder::*, pipeline::*, state::State};
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-#
-#[derive(Resource)]
-#[resource(read_all)]
-struct AuthResource;
-
-#[derive(Debug, Deserialize, Clone)]
-struct AuthData {
-	sub: String,
-	exp: u64
-}
-
-#[read_all]
-fn read_all(auth : &amp;AuthStatus&lt;AuthData&gt;) -&gt; Success&lt;String&gt; {
-	format!(&quot;{auth:?}&quot;).into()
-}
-
-fn main() {
-	let auth: AuthMiddleware&lt;AuthData, _&gt; = AuthMiddleware::new(
-		AuthSource::AuthorizationHeader,
-		AuthValidation::default(),
-		StaticAuthHandler::from_array(b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;)
-	);
-	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
-	gotham::start(&quot;127.0.0.1:8080&quot;, build_router(chain, pipelines, |route| {
-		route.resource::&lt;AuthResource&gt;(&quot;auth&quot;);
-	}));
-}
-```
-*/</span>
+<span class="doccomment">/// This is the auth middleware. To use it, first make sure you have the `auth` feature enabled. Then</span>
+<span class="doccomment">/// simply add it to your pipeline and request it inside your handler:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">/// # use gotham::{router::builder::*, pipeline::*, state::State};</span>
+<span class="doccomment">/// # use gotham_restful::*;</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #[derive(Resource)]</span>
+<span class="doccomment">/// #[resource(read_all)]</span>
+<span class="doccomment">/// struct AuthResource;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[derive(Debug, Deserialize, Clone)]</span>
+<span class="doccomment">/// struct AuthData {</span>
+<span class="doccomment">/// 	sub: String,</span>
+<span class="doccomment">/// 	exp: u64</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[read_all]</span>
+<span class="doccomment">/// fn read_all(auth: &amp;AuthStatus&lt;AuthData&gt;) -&gt; Success&lt;String&gt; {</span>
+<span class="doccomment">/// 	format!(&quot;{auth:?}&quot;).into()</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// fn main() {</span>
+<span class="doccomment">/// 	let auth: AuthMiddleware&lt;AuthData, _&gt; = AuthMiddleware::new(</span>
+<span class="doccomment">/// 		AuthSource::AuthorizationHeader,</span>
+<span class="doccomment">/// 		AuthValidation::default(),</span>
+<span class="doccomment">/// 		StaticAuthHandler::from_array(b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;)</span>
+<span class="doccomment">/// 	);</span>
+<span class="doccomment">/// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());</span>
+<span class="doccomment">/// 	gotham::start(</span>
+<span class="doccomment">/// 		&quot;127.0.0.1:8080&quot;,</span>
+<span class="doccomment">/// 		build_router(chain, pipelines, |route| {</span>
+<span class="doccomment">/// 			route.resource::&lt;AuthResource&gt;(&quot;auth&quot;);</span>
+<span class="doccomment">/// 		})</span>
+<span class="doccomment">/// 	);</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthMiddleware</span><span class="op">&lt;</span><span class="ident">Data</span>, <span class="ident">Handler</span><span class="op">&gt;</span> {
 	<span class="ident">source</span>: <span class="ident">AuthSource</span>,

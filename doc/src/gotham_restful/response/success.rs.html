@@ -159,36 +159,36 @@
 <span class="kw">use</span> <span class="ident">openapi_type::OpenapiSchema</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Debug</span>, <span class="ident">future::Future</span>, <span class="ident">pin::Pin</span>};
 
-<span class="doccomment">/**
-This can be returned from a resource when there is no cause of an error.
-
-Usage example:
-
-```
-# #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
-# use gotham::state::State;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-#[derive(Deserialize, Serialize)]
-# #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]
-struct MyResponse {
-	message: &amp;&#39;static str
-}
-
-#[read_all]
-fn read_all() -&gt; Success&lt;MyResponse&gt; {
-	let res = MyResponse { message: &quot;I&#39;m always happy&quot; };
-	res.into()
-}
-# }
-```
-*/</span>
+<span class="doccomment">/// This can be returned from a resource when there is no cause of an error.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Usage example:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">/// # mod doc_tests_are_broken {</span>
+<span class="doccomment">/// # use gotham::state::State;</span>
+<span class="doccomment">/// # use gotham_restful::*;</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # #[derive(Resource)]</span>
+<span class="doccomment">/// # #[resource(read_all)]</span>
+<span class="doccomment">/// # struct MyResource;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
+<span class="doccomment">/// # #[cfg_attr(feature = &quot;openapi&quot;, derive(openapi_type::OpenapiType))]</span>
+<span class="doccomment">/// struct MyResponse {</span>
+<span class="doccomment">/// 	message: &amp;&#39;static str</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[read_all]</span>
+<span class="doccomment">/// fn read_all() -&gt; Success&lt;MyResponse&gt; {</span>
+<span class="doccomment">/// 	let res = MyResponse {</span>
+<span class="doccomment">/// 		message: &quot;I&#39;m always happy&quot;</span>
+<span class="doccomment">/// 	};</span>
+<span class="doccomment">/// 	res.into()</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Success</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="ident">value</span>: <span class="ident">T</span>,

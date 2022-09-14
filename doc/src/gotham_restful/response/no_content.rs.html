@@ -177,8 +177,6 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">handle_error</span>, <span class="ident">IntoResponse</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ResponseSchema</span>;
@@ -194,28 +192,26 @@
 <span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Debug</span>, <span class="ident">future::Future</span>, <span class="ident">pin::Pin</span>};
 
-<span class="doccomment">/**
-This is the return type of a resource that doesn&#39;t actually return something. It will result
-in a _204 No Content_ answer by default. You don&#39;t need to use this type directly if using
-the function attributes:
-
-```
-# #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
-# use gotham::state::State;
-# use gotham_restful::*;
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-#[read_all]
-fn read_all() {
-	// do something
-}
-# }
-```
-*/</span>
+<span class="doccomment">/// This is the return type of a resource that doesn&#39;t actually return something. It will result</span>
+<span class="doccomment">/// in a _204 No Content_ answer by default. You don&#39;t need to use this type directly if using</span>
+<span class="doccomment">/// the function attributes:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # #[macro_use] extern crate gotham_restful_derive;</span>
+<span class="doccomment">/// # mod doc_tests_are_broken {</span>
+<span class="doccomment">/// # use gotham::state::State;</span>
+<span class="doccomment">/// # use gotham_restful::*;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # #[derive(Resource)]</span>
+<span class="doccomment">/// # #[resource(read_all)]</span>
+<span class="doccomment">/// # struct MyResource;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #[read_all]</span>
+<span class="doccomment">/// fn read_all() {</span>
+<span class="doccomment">/// 	// do something</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoContent</span> {
 	<span class="ident">headers</span>: <span class="ident">HeaderMap</span>
