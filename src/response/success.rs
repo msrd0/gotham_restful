@@ -14,36 +14,36 @@ use gotham::{
 use openapi_type::OpenapiSchema;
 use std::{fmt::Debug, future::Future, pin::Pin};
 
-/**
-This can be returned from a resource when there is no cause of an error.
-
-Usage example:
-
-```
-# #[macro_use] extern crate gotham_restful_derive;
-# mod doc_tests_are_broken {
-# use gotham::state::State;
-# use gotham_restful::*;
-# use serde::{Deserialize, Serialize};
-#
-# #[derive(Resource)]
-# #[resource(read_all)]
-# struct MyResource;
-#
-#[derive(Deserialize, Serialize)]
-# #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
-struct MyResponse {
-	message: &'static str
-}
-
-#[read_all]
-fn read_all() -> Success<MyResponse> {
-	let res = MyResponse { message: "I'm always happy" };
-	res.into()
-}
-# }
-```
-*/
+/// This can be returned from a resource when there is no cause of an error.
+///
+/// Usage example:
+///
+/// ```
+/// # #[macro_use] extern crate gotham_restful_derive;
+/// # mod doc_tests_are_broken {
+/// # use gotham::state::State;
+/// # use gotham_restful::*;
+/// # use serde::{Deserialize, Serialize};
+/// #
+/// # #[derive(Resource)]
+/// # #[resource(read_all)]
+/// # struct MyResource;
+/// #
+/// #[derive(Deserialize, Serialize)]
+/// # #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
+/// struct MyResponse {
+/// 	message: &'static str
+/// }
+///
+/// #[read_all]
+/// fn read_all() -> Success<MyResponse> {
+/// 	let res = MyResponse {
+/// 		message: "I'm always happy"
+/// 	};
+/// 	res.into()
+/// }
+/// # }
+/// ```
 #[derive(Clone, Debug, Default)]
 pub struct Success<T> {
 	value: T,
