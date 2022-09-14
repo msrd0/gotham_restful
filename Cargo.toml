@@ -5,7 +5,7 @@ members = [".", "./derive", "./redoc"]
 
 [package]
 name = "gotham_restful"
-version = "0.7.6"
+version = "0.7.7"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 rust-version = "1.58.0"
@@ -15,13 +15,13 @@ categories = ["web-programming", "web-programming::http-server"]
 license = "Apache-2.0"
 readme = "crates-io.md"
 repository = "https://github.com/msrd0/gotham_restful"
-include = ["/src/**/*.rs", "/src/openapi/handler/script.min.js", "/LICENSE", "/crates-io.md"]
+include = ["/src/**/*.rs", "/LICENSE", "/crates-io.md"]
 
 [dependencies]
 futures-core = "0.3.19"
 futures-util = "0.3.19"
 gotham = { version = "0.7.1", features = ["derive"], default-features = false }
-gotham_restful_derive = { version = "0.7.0", path = "./derive" }
+gotham_restful_derive = { version = "0.7", path = "./derive" }
 log = "0.4.12"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -30,8 +30,8 @@ thiserror = "1.0"
 # non-feature optional dependencies
 base64 = { version = "0.13", optional = true }
 cookie = { version = "0.15", optional = true }
-gotham_middleware_diesel = { version = "0.4.0", optional = true }
-gotham_restful_redoc = { version = "0.2", path = "./redoc", optional = true }
+gotham_middleware_diesel = { version = "0.4", optional = true }
+gotham_restful_redoc = { version = "0.2.1", path = "./redoc", optional = true }
 jsonwebtoken = { version = "8.0", default-features = false, optional = true }
 lazy-regex = { version = "2.2.1", optional = true }
 openapi_type = { version = "0.4.1", optional = true }
