@@ -121,10 +121,11 @@ where
 /// # struct MyAuthData { exp : u64 }
 /// #
 /// #[read_all]
-/// fn read_all(auth : AuthStatus<MyAuthData>) -> AuthResult<NoContent, io::Error> {
+/// fn read_all(auth: AuthStatus<MyAuthData>) -> AuthResult<NoContent, io::Error> {
 /// 	let auth_data = auth.ok()?;
-/// do something
+/// 	// do something
 /// 	Ok(NoContent::default().into())
 /// }
 /// # }
+/// ```
 pub type AuthResult<T, E> = Result<T, AuthErrorOrOther<E>>;
