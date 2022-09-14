@@ -61,9 +61,9 @@ impl IntoResponseError for AuthError {
 /// # struct MyAuthData { exp : u64 }
 /// #
 /// #[read_all]
-/// fn read_all(auth : AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
+/// fn read_all(auth: AuthStatus<MyAuthData>) -> AuthSuccess<NoContent> {
 /// 	let auth_data = auth.ok()?;
-/// do something
+/// 	// do something
 /// 	Ok(NoContent::default())
 /// }
 /// # }

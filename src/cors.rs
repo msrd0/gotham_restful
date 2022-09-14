@@ -129,34 +129,33 @@ impl Headers {
 /// # use gotham_restful::{*, cors::Origin};
 /// let pipelines = new_pipeline_set();
 ///
-/// The first cors configuration
+/// // The first cors configuration
 /// let cors_a = CorsConfig {
 /// 	origin: Origin::Star,
 /// 	..Default::default()
 /// };
-/// let (pipelines, chain_a) = pipelines.add(
-/// 	new_pipeline().add(cors_a).build()
-/// );
+/// let (pipelines, chain_a) = pipelines.add(new_pipeline().add(cors_a).build());
 ///
-/// The second cors configuration
+/// // The second cors configuration
 /// let cors_b = CorsConfig {
 /// 	origin: Origin::Copy,
 /// 	..Default::default()
 /// };
-/// let (pipelines, chain_b) = pipelines.add(
-/// 	new_pipeline().add(cors_b).build()
-/// );
+/// let (pipelines, chain_b) = pipelines.add(new_pipeline().add(cors_b).build());
 ///
 /// let pipeline_set = finalize_pipeline_set(pipelines);
-/// gotham::start("127.0.0.1:8080", build_router((), pipeline_set, |route| {
-/// routing without any cors config
-/// 	route.with_pipeline_chain((chain_a, ()), |route| {
-/// routing with cors config a
-/// 	});
-/// 	route.with_pipeline_chain((chain_b, ()), |route| {
-/// routing with cors config b
-/// 	});
-/// }));
+/// gotham::start(
+/// 	"127.0.0.1:8080",
+/// 	build_router((), pipeline_set, |route| {
+/// 		// routing without any cors config
+/// 		route.with_pipeline_chain((chain_a, ()), |route| {
+/// 			// routing with cors config a
+/// 		});
+/// 		route.with_pipeline_chain((chain_b, ()), |route| {
+/// 			// routing with cors config b
+/// 		});
+/// 	})
+/// );
 /// ```
 #[derive(Clone, Debug, Default, NewMiddleware, StateData)]
 pub struct CorsConfig {

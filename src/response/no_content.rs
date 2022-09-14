@@ -29,7 +29,7 @@ use std::{fmt::Debug, future::Future, pin::Pin};
 /// #
 /// #[read_all]
 /// fn read_all() {
-/// do something
+/// 	// do something
 /// }
 /// # }
 /// ```
