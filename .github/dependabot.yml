@@ -10,6 +10,7 @@ updates:
       - dependencies
     reviewers:
       - "msrd0"
+
   - package-ecosystem: npm
     directory: "redoc/src"
     schedule:
@@ -18,3 +19,12 @@ updates:
       timezone: "Europe/Amsterdam"
     labels:
       - dependencies
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+    reviewers:
+      - "msrd0"
