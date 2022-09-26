@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.7.8] - 2022-09-26
+### Changed
+ - fixed a compile error when using the `openapi` feature without the `auth` feature
+
 ## [0.7.7] - 2022-09-15
 ### Changed
  - small documentation improvements
