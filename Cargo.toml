@@ -60,7 +60,7 @@ errorlog = []
 
 # These features are exclusive - https://github.com/msrd0/gotham_restful/issues/4
 without-openapi = []
-openapi = ["gotham_restful_derive/openapi", "gotham_restful_redoc", "lazy-regex", "openapi_type", "parking_lot", "sha2"]
+openapi = ["gotham_restful_derive/openapi", "gotham_restful_redoc", "base64", "lazy-regex", "openapi_type", "parking_lot", "sha2"]
 
 [package.metadata.docs.rs]
 no-default-features = true
