@@ -6,6 +6,16 @@ on:
       - main
   pull_request:
 
+env:
+  RUSTDOCFLAGS: "--default-theme ayu"
+  RUST_BACKTRACE: "1"
+  # speed up build by using clang/lld
+  CC: "clang-12"
+  CXX: "clang++-12"
+  LD: "clang-12"
+  LDFLAGS: "-fuse-ld=lld-12"
+  RUSTFLAGS: "-C linker=clang-12 -C link-arg=-fuse-ld=lld-12"
+
 jobs:
   webpack:
     runs-on: ubuntu-latest
@@ -21,24 +31,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [1.59, stable, beta]
-        nightly: [false]
-        features: ["default", "full"]
-        include:
-          - toolchain: nightly
+        rust:
+          - name: MSRV
+            toolchain: 1.59
+            nightly: false
+          - name: Stable
+            toolchain: stable
+            nightly: false
+          - name: beta
+            toolchain: beta
+            nightly: false
+          - name: nightly
+            toolchain: nightly
             nightly: true
-            features: default
-          - toolchain: nightly
-            nightly: true
-            features: full
+        features:
+          - name: default
+            flags: ""
+          - name: openapi
+            flags: "--no-default-features --features openapi"
+          - name: full
+            flags: "--no-default-features --features full"
     runs-on: ubuntu-latest
-    name: test-${{ matrix.toolchain }}-features-${{ matrix.features }}
-    continue-on-error: ${{ matrix.nightly }}
+    name: Test on Rust ${{matrix.rust.name}} with ${{matrix.features.name}} features
+    continue-on-error: ${{matrix.rust.nightly}}
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ matrix.toolchain }}
+          toolchain: ${{matrix.rust.toolchain}}
       - name: Get Rust Version
         id: rust-version
         run: echo "::set-output name=version::$(cargo -V | head -n1 | awk '{print $2}')"
@@ -48,16 +68,8 @@ jobs:
             ~/.cargo/git
             ~/.cargo/registry
             target
-          key: ${{ runner.os }}-rust-${{ steps.rust-version.outputs.version }}
-      - name: Run cargo test
-        run: |
-          features=""
-          [ "${{ matrix.features }}" == "default" ] || features="--no-default-features --features full"
-          echo "\$ cargo test $features"
-          cargo test $features
-        env:
-          RUSTFLAGS: "--cfg gotham_restful_deny_warnings"
-          RUST_BACKTRACE: 1
+          key: ${{runner.os}}-rust-${{steps.rust-version.outputs.version}}
+      - run: RUSTFLAGS="$RUSTFLAGS --cfg gotham_restful_deny_warnings" cargo test ${{matrix.features.flags}}
   
   test-trybuild:
     runs-on: ubuntu-latest
@@ -71,10 +83,8 @@ jobs:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-1.62
+          key: ${{runner.os}}-cargo-1.62
       - run: cargo test --no-default-features --features full --tests -- --ignored
-        env:
-          RUST_BACKTRACE: 1
   
   clippy:
     runs-on: ubuntu-latest
@@ -93,7 +103,7 @@ jobs:
             ~/.cargo/git
             ~/.cargo/registry
             target
-          key: ${{ runner.os }}-rust-${{ steps.rust-version.outputs.version }}-clippy
+          key: ${{runner.os}}-rust-${{steps.rust-version.outputs.version}}-clippy
       - run: cargo clippy --workspace --profile test -- -Dclippy::all
   
   rustfmt:
@@ -147,8 +157,6 @@ jobs:
             --exclude-files 'target/*' \
             --ignore-panics --ignore-tests \
             --out Html --out Json
-        env:
-          RUST_BACKTRACE: 1
       - uses: actions/upload-artifact@v3
         with:
           name: tarpaulin-report
@@ -166,10 +174,8 @@ jobs:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-doc
-      - run: cargo doc --no-default-features --features full --no-deps
-        env:
-          RUSTDOCFLAGS: "--default-theme ayu --cfg gotham_restful_deny_warnings"
+          key: ${{runner.os}}-cargo-doc
+      - run: RUSTDOCFLAGS="$RUSTDOCFLAGS --cfg gotham_restful_deny_warnings" cargo doc --no-default-features --features full --no-deps
       - run: tar cfJ rustdoc.tar.xz target/doc/
       - uses: actions/upload-artifact@v3
         with:
@@ -206,4 +212,4 @@ jobs:
       
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "GitHub Pages for ${{ github.sha }}"
+          commit_message: "GitHub Pages for ${{github.sha}}"
