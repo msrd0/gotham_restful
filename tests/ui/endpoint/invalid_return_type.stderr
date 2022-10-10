@@ -35,7 +35,7 @@ error[E0277]: the trait bound `FooResponse: gotham_restful::IntoResponse` is not
              Result<R, E>
              Result<Raw<T>, E>
              Result<Redirect, E>
-           and 2 others
+           and $N others
 note: required by a bound in `gotham_restful::EndpointWithSchema::Output`
   --> src/endpoint.rs
    |
