@@ -413,18 +413,18 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0AYXSEG_T9DC59itjXG40WOGuT-khOG4kS62Nc1tByG8bzxQdCjZw8YXKEG2_KYsbpLNXHG2SJE4iJUYn4G3ERz6t1UMSRG-naswgE7L1gYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy44gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG_T9DC59itjXG40WOGuT-khOG4kS62Nc1tByG8bzxQdCjZw8YXKEGz6MgxNsT_U5GynjEt29VZ8jG5PwOOcEYwzrG4e8SGfvwTFEYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy44gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
- [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
- [__link11]: https://docs.rs/openapi_type/0.4.1/openapi_type/?search=openapi_type::OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=gotham_restful::Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=gotham_restful::EndpointWithSchema
- [__link2]: https://doc.rust-lang.org/stable/std/?search=std::string::String
- [__link3]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=gotham_restful::RequestBody
- [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::extractor::QueryStringExtractor
- [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=gotham::state::State
+ [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
+ [__link11]: https://docs.rs/openapi_type/0.4.1/openapi_type/?search=OpenapiType
+ [__link12]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=EndpointWithSchema
+ [__link2]: https://doc.rust-lang.org/stable/std/string/struct.String.html
+ [__link3]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=RequestBody
+ [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=extractor::QueryStringExtractor
+ [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
  [__link6]: https://crates.io/crates/serde_json/1.0.87
- [__link7]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=gotham_restful::Response::header
- [__link8]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=gotham_restful::cors::CorsRoute
+ [__link7]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=Response::header
+ [__link8]: https://docs.rs/gotham_restful/0.7.8/gotham_restful/?search=cors::CorsRoute
  [__link9]: https://diesel.rs/
