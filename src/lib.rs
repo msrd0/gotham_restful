@@ -350,7 +350,7 @@
 //! }
 //!
 //! #[read_all]
-//! fn read_all(conn: &PgConnection) -> QueryResult<Vec<Foo>> {
+//! fn read_all(conn: &mut PgConnection) -> QueryResult<Vec<Foo>> {
 //! 	foo::table.load(conn)
 //! }
 //!
