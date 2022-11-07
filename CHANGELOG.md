@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.8.0] - 2022-11-07
+### Updated
+ - Updated `diesel` to 2.0
+
 ## [0.7.8] - 2022-09-26
 ### Changed
  - fixed a compile error when using the `openapi` feature without the `auth` feature
