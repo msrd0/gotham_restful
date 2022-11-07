@@ -9,8 +9,8 @@
 	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-main-blue.svg"/>
 	</a>
-	<a href="https://blog.rust-lang.org/2022/02/24/Rust-1.59.0.html">
-		<img alt="Rust 1.59+" src="https://img.shields.io/badge/rustc-1.59+-orange.svg"/>
+	<a href="https://blog.rust-lang.org/2022/04/07/Rust-1.60.0.html">
+		<img alt="Rust 1.60+" src="https://img.shields.io/badge/rustc-1.60+-orange.svg"/>
 	</a>
 	<a href="https://deps.rs/repo/github/msrd0/gotham_restful">
 		<img alt="dependencies" src="https://deps.rs/repo/github/msrd0/gotham_restful/status.svg"/>
@@ -413,7 +413,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG_T9DC59itjXG40WOGuT-khOG4kS62Nc1tByG8bzxQdCjZw8YXKEGz6MgxNsT_U5GynjEt29VZ8jG5PwOOcEYwzrG4e8SGfvwTFEYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy44gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG436MVLKTBbVG9rOTjYiQw70G6Fc8Kk_HdHWG4O0HsuDVOA0YXKEGz6MgxNsT_U5GynjEt29VZ8jG5PwOOcEYwzrG4e8SGfvwTFEYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy44gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State

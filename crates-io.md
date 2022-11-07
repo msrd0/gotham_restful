@@ -1,4 +1,4 @@
-# gotham-restful [![Rust 1.59+](https://img.shields.io/badge/rustc-1.59+-orange.svg)](https://blog.rust-lang.org/2022/02/24/Rust-1.59.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
+# gotham-restful [![Rust 1.60+](https://img.shields.io/badge/rustc-1.60+-orange.svg)](https://blog.rust-lang.org/2022/04/07/Rust-1.60.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
 
 This crate is an extension to the popular [gotham web framework][__link0] for Rust. It allows you to create resources with assigned endpoints that aim to be a more convenient way of creating handlers for requests.
 
@@ -381,7 +381,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG6PbnIuA2DbfG4zPhMgEFY4jGyI4iOc_d8lZG3qmqxzKdxBSYXKEGz6MgxNsT_U5GynjEt29VZ8jG5PwOOcEYwzrG4e8SGfvwTFEYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy44gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG3KdJKXEwaWOG99_CiC8-nxrGz_aER6k0qlfG3Z2QjvmmqerYXKEGz6MgxNsT_U5GynjEt29VZ8jG5PwOOcEYwzrG4e8SGfvwTFEYWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuNy44gmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
