@@ -234,7 +234,7 @@ you’ll need to borrow the connection from the <a href="https://docs.rs/gotham/
 }
 
 <span class="attribute">#[read_all]
-</span><span class="kw">fn </span>read_all(conn: <span class="kw-2">&amp;</span>PgConnection) -&gt; QueryResult&lt;Vec&lt;Foo&gt;&gt; {
+</span><span class="kw">fn </span>read_all(conn: <span class="kw-2">&amp;mut </span>PgConnection) -&gt; QueryResult&lt;Vec&lt;Foo&gt;&gt; {
 	foo::table.load(conn)
 }
 

@@ -903,7 +903,7 @@
 //! }
 //!
 //! #[read_all]
-//! fn read_all(conn: &amp;PgConnection) -&gt; QueryResult&lt;Vec&lt;Foo&gt;&gt; {
+//! fn read_all(conn: &amp;mut PgConnection) -&gt; QueryResult&lt;Vec&lt;Foo&gt;&gt; {
 //! 	foo::table.load(conn)
 //! }
 //!
