@@ -662,7 +662,7 @@ fn expand_endpoint_type(
 	let handle_args = args.iter().map(|arg| match arg.ty {
 		HandlerArgType::StateRef | HandlerArgType::StateMutRef => quote!(state),
 		HandlerArgType::MethodArg(_) => handle_args.remove(0),
-		HandlerArgType::DatabaseConnection(_) => quote!(&conn),
+		HandlerArgType::DatabaseConnection(_) => quote!(&mut conn),
 		HandlerArgType::AuthStatus(_) => quote!(auth),
 		HandlerArgType::AuthStatusRef(_) => quote!(&auth)
 	});
@@ -706,7 +706,7 @@ fn expand_endpoint_type(
 				let repo = <::gotham_restful::private::Repo<#conn_ty>>::borrow_from(state).clone();
 			};
 			handle_content = quote! {
-				repo.run::<_, _, ()>(move |conn| {
+				repo.run::<_, _, ()>(move |mut conn| {
 					Ok({ #handle_content })
 				}).await.unwrap()
 			};
