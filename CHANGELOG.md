@@ -9,13 +9,16 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [0.7.8] - 2022-09-26
 ### Changed
- - fixed a compile error when using the `openapi` feature without the `auth` feature
+ - Fixed a compile error when using the `openapi` feature without the `auth` feature
 
-## [0.7.7] - 2022-09-15
+## ~[0.7.7] - 2022-09-15~
 ### Changed
  - small documentation improvements
 
-## [0.7.6] - 2022-09-07
+## ~[0.7.6] - 2022-09-07~
+
+**This version introduced a compiler error in [#259] when using the `openapi` feature without the `auth` feature enabled.**
+
 ### Updated
  - The `gotham_restful_redoc` crate was updated to version 0.2
 
@@ -155,3 +158,4 @@ This project adheres to [Semantic Versioning](https://semver.org).
 Previous releases were hosted on GitLab. Please see https://gitlab.com/msrd0/gotham-restful/-/blob/master/CHANGELOG.md
 
  [cargo-doc2readme]: https://github.com/msrd0/cargo-doc2readme
+ [#259]: https://github.com/msrd0/gotham_restful/pull/259
