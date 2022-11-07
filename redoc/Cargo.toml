@@ -6,7 +6,6 @@ name = "gotham_restful_redoc"
 version = "0.2.1+2.0.0"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
-rust-version = "1.58.0"
 description = "Private implementation detail of gotham_restful"
 license = "Apache-2.0"
 repository = "https://github.com/msrd0/gotham_restful"

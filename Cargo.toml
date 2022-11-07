@@ -8,7 +8,7 @@ name = "gotham_restful"
 version = "0.7.8"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
-rust-version = "1.59.0"
+rust-version = "1.60.0"
 description = "RESTful additions for the gotham web framework"
 keywords = ["gotham", "rest", "restful", "web", "http"]
 categories = ["web-programming", "web-programming::http-server"]
@@ -53,14 +53,14 @@ trybuild = "=1.0.71"
 default = ["cors", "errorlog", "without-openapi"]
 full = ["auth", "cors", "database", "errorlog", "openapi"]
 
-auth = ["gotham_restful_derive/auth", "base64", "cookie", "jsonwebtoken"]
+auth = ["gotham_restful_derive/auth", "dep:base64", "dep:cookie", "dep:jsonwebtoken"]
 cors = []
-database = ["gotham_restful_derive/database", "gotham_middleware_diesel"]
+database = ["gotham_restful_derive/database", "dep:gotham_middleware_diesel"]
 errorlog = []
 
 # These features are exclusive - https://github.com/msrd0/gotham_restful/issues/4
 without-openapi = []
-openapi = ["gotham_restful_derive/openapi", "gotham_restful_redoc", "base64", "lazy-regex", "openapi_type", "parking_lot", "sha2"]
+openapi = ["gotham_restful_derive/openapi", "dep:gotham_restful_redoc", "dep:base64", "dep:lazy-regex", "dep:openapi_type", "dep:parking_lot", "dep:sha2"]
 
 [package.metadata.docs.rs]
 no-default-features = true
