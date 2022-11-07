@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/endpoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endpoint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/endpoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endpoint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../gotham_restful/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -150,155 +150,155 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
-<span class="kw">use</span> <span class="ident">futures_util::future::BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">gotham</span>::{
-	<span class="ident">extractor</span>::{<span class="ident">PathExtractor</span>, <span class="ident">QueryStringExtractor</span>},
-	<span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Method</span>, <span class="ident">Response</span>},
-	<span class="ident">router::response::StaticResponseExtender</span>,
-	<span class="ident">state</span>::{<span class="ident">State</span>, <span class="ident">StateData</span>}
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{IntoResponse, RequestBody};
+<span class="kw">use </span>futures_util::future::BoxFuture;
+<span class="kw">use </span>gotham::{
+	extractor::{PathExtractor, QueryStringExtractor},
+	hyper::{Body, Method, Response},
+	router::response::StaticResponseExtender,
+	state::{State, StateData}
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiType</span>, <span class="ident">Visitor</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">use </span>openapi_type::{OpenapiType, Visitor};
+<span class="kw">use </span>serde::{Deserialize, Deserializer};
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// A no-op extractor that can be used as a default type for [Endpoint::Placeholders] and</span>
-<span class="doccomment">/// [Endpoint::Params].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoopExtractor</span>;
+<span class="doccomment">/// A no-op extractor that can be used as a default type for [Endpoint::Placeholders] and
+/// [Endpoint::Params].
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>NoopExtractor;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoopExtractor</span> {
-	<span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>NoopExtractor {
+	<span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(<span class="kw">_</span>: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
 		<span class="prelude-val">Ok</span>(<span class="self">Self</span>)
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">OpenapiType</span> <span class="kw">for</span> <span class="ident">NoopExtractor</span> {
-	<span class="kw">fn</span> <span class="ident">visit_type</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&gt;</span>(<span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">V</span>) {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">impl </span>OpenapiType <span class="kw">for </span>NoopExtractor {
+	<span class="kw">fn </span>visit_type&lt;V: Visitor&gt;(visitor: <span class="kw-2">&amp;mut </span>V) {
 		<span class="macro">warn!</span>(
-			<span class="string">&quot;You&#39;re asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want.&quot;</span>
-		);
-		<span class="ident">visitor</span>.<span class="ident">visit_unit</span>();
+			<span class="string">&quot;You&#39;re asking for the OpenAPI Schema for gotham_restful::NoopExtractor. This is probably not what you want.&quot;
+		</span>);
+		visitor.visit_unit();
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">StateData</span> <span class="kw">for</span> <span class="ident">NoopExtractor</span> {}
+<span class="kw">impl </span>StateData <span class="kw">for </span>NoopExtractor {}
 
-<span class="kw">impl</span> <span class="ident">StaticResponseExtender</span> <span class="kw">for</span> <span class="ident">NoopExtractor</span> {
-	<span class="kw">type</span> <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">Body</span>;
-	<span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {}
+<span class="kw">impl </span>StaticResponseExtender <span class="kw">for </span>NoopExtractor {
+	<span class="kw">type </span>ResBody = Body;
+	<span class="kw">fn </span>extend(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>State, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Response&lt;Body&gt;) {}
 }
 
-<span class="comment">// TODO: Specify default types once https://github.com/rust-lang/rust/issues/29661 lands.</span>
-<span class="attribute">#[<span class="ident">_private_openapi_trait</span>(<span class="ident">EndpointWithSchema</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Endpoint</span> {
-	<span class="doccomment">/// The HTTP Verb of this endpoint.</span>
-	<span class="kw">fn</span> <span class="ident">http_method</span>() -&gt; <span class="ident">Method</span>;
-	<span class="doccomment">/// The URI that this endpoint listens on in gotham&#39;s format.</span>
-	<span class="kw">fn</span> <span class="ident">uri</span>() -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>;
+<span class="comment">// TODO: Specify default types once https://github.com/rust-lang/rust/issues/29661 lands.
+</span><span class="attribute">#[_private_openapi_trait(EndpointWithSchema)]
+</span><span class="kw">pub trait </span>Endpoint {
+	<span class="doccomment">/// The HTTP Verb of this endpoint.
+	</span><span class="kw">fn </span>http_method() -&gt; Method;
+	<span class="doccomment">/// The URI that this endpoint listens on in gotham&#39;s format.
+	</span><span class="kw">fn </span>uri() -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;;
 
-	<span class="doccomment">/// The verb used for generating an operation id if [Self::operation_id] returns [None].</span>
-	<span class="doccomment">/// For example `read`, `read_all`, `create`, `update` etc.</span>
-	<span class="attribute">#[<span class="ident">openapi_only</span>]</span>
-	<span class="kw">fn</span> <span class="ident">operation_verb</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>;
+	<span class="doccomment">/// The verb used for generating an operation id if [Self::operation_id] returns [None].
+	/// For example `read`, `read_all`, `create`, `update` etc.
+	</span><span class="attribute">#[openapi_only]
+	</span><span class="kw">fn </span>operation_verb() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;;
 
-	<span class="doccomment">/// The output type that provides the response.</span>
-	<span class="attribute">#[<span class="ident">openapi_bound</span>(<span class="string">&quot;Output: crate::ResponseSchema&quot;</span>)]</span>
-	<span class="kw">type</span> <span class="ident">Output</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="ident">Send</span>;
+	<span class="doccomment">/// The output type that provides the response.
+	</span><span class="attribute">#[openapi_bound(<span class="string">&quot;Output: crate::ResponseSchema&quot;</span>)]
+	</span><span class="kw">type </span>Output: IntoResponse + Send;
 
-	<span class="doccomment">/// Returns `true` _iff_ the URI contains placeholders. `false` by default.</span>
-	<span class="kw">fn</span> <span class="ident">has_placeholders</span>() -&gt; <span class="ident">bool</span> {
-		<span class="bool-val">false</span>
-	}
-	<span class="doccomment">/// The type that parses the URI placeholders. Use [NoopExtractor] if `has_placeholders()`</span>
-	<span class="doccomment">/// returns `false`.</span>
-	<span class="attribute">#[<span class="ident">openapi_bound</span>(<span class="string">&quot;Placeholders: OpenapiType&quot;</span>)]</span>
-	<span class="kw">type</span> <span class="ident">Placeholders</span>: <span class="ident">PathExtractor</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sync</span>;
+	<span class="doccomment">/// Returns `true` _iff_ the URI contains placeholders. `false` by default.
+	</span><span class="kw">fn </span>has_placeholders() -&gt; bool {
+		<span class="bool-val">false
+	</span>}
+	<span class="doccomment">/// The type that parses the URI placeholders. Use [NoopExtractor] if `has_placeholders()`
+	/// returns `false`.
+	</span><span class="attribute">#[openapi_bound(<span class="string">&quot;Placeholders: OpenapiType&quot;</span>)]
+	</span><span class="kw">type </span>Placeholders: PathExtractor&lt;Body&gt; + Clone + Sync;
 
-	<span class="doccomment">/// Returns `true` _iff_ the request parameters should be parsed. `false` by default.</span>
-	<span class="kw">fn</span> <span class="ident">needs_params</span>() -&gt; <span class="ident">bool</span> {
-		<span class="bool-val">false</span>
-	}
-	<span class="doccomment">/// The type that parses the request parameters. Use [NoopExtractor] if `needs_params()`</span>
-	<span class="doccomment">/// returns `false`.</span>
-	<span class="attribute">#[<span class="ident">openapi_bound</span>(<span class="string">&quot;Params: OpenapiType&quot;</span>)]</span>
-	<span class="kw">type</span> <span class="ident">Params</span>: <span class="ident">QueryStringExtractor</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sync</span>;
+	<span class="doccomment">/// Returns `true` _iff_ the request parameters should be parsed. `false` by default.
+	</span><span class="kw">fn </span>needs_params() -&gt; bool {
+		<span class="bool-val">false
+	</span>}
+	<span class="doccomment">/// The type that parses the request parameters. Use [NoopExtractor] if `needs_params()`
+	/// returns `false`.
+	</span><span class="attribute">#[openapi_bound(<span class="string">&quot;Params: OpenapiType&quot;</span>)]
+	</span><span class="kw">type </span>Params: QueryStringExtractor&lt;Body&gt; + Clone + Sync;
 
-	<span class="doccomment">/// Returns `true` _iff_ the request body should be parsed. `false` by default.</span>
-	<span class="kw">fn</span> <span class="ident">needs_body</span>() -&gt; <span class="ident">bool</span> {
-		<span class="bool-val">false</span>
-	}
-	<span class="doccomment">/// The type to parse the body into. Use `()` if `needs_body()` returns `false`.</span>
-	<span class="kw">type</span> <span class="ident">Body</span>: <span class="ident">RequestBody</span> <span class="op">+</span> <span class="ident">Send</span>;
+	<span class="doccomment">/// Returns `true` _iff_ the request body should be parsed. `false` by default.
+	</span><span class="kw">fn </span>needs_body() -&gt; bool {
+		<span class="bool-val">false
+	</span>}
+	<span class="doccomment">/// The type to parse the body into. Use `()` if `needs_body()` returns `false`.
+	</span><span class="kw">type </span>Body: RequestBody + Send;
 
-	<span class="doccomment">/// Returns `true` if the request wants to know the auth status of the client. `false` by default.</span>
-	<span class="kw">fn</span> <span class="ident">wants_auth</span>() -&gt; <span class="ident">bool</span> {
-		<span class="bool-val">false</span>
-	}
+	<span class="doccomment">/// Returns `true` if the request wants to know the auth status of the client. `false` by default.
+	</span><span class="kw">fn </span>wants_auth() -&gt; bool {
+		<span class="bool-val">false
+	</span>}
 
-	<span class="doccomment">/// Replace the automatically generated operation id with a custom one. Only relevant for the</span>
-	<span class="doccomment">/// OpenAPI Specification.</span>
-	<span class="attribute">#[<span class="ident">openapi_only</span>]</span>
-	<span class="kw">fn</span> <span class="ident">operation_id</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="prelude-val">None</span>
-	}
+	<span class="doccomment">/// Replace the automatically generated operation id with a custom one. Only relevant for the
+	/// OpenAPI Specification.
+	</span><span class="attribute">#[openapi_only]
+	</span><span class="kw">fn </span>operation_id() -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+		<span class="prelude-val">None
+	</span>}
 
-	<span class="doccomment">/// Add a description to the openapi specification. Usually taken from the rustdoc comment</span>
-	<span class="doccomment">/// when using the proc macro.</span>
-	<span class="attribute">#[<span class="ident">openapi_only</span>]</span>
-	<span class="kw">fn</span> <span class="ident">description</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="prelude-val">None</span>
-	}
+	<span class="doccomment">/// Add a description to the openapi specification. Usually taken from the rustdoc comment
+	/// when using the proc macro.
+	</span><span class="attribute">#[openapi_only]
+	</span><span class="kw">fn </span>description() -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+		<span class="prelude-val">None
+	</span>}
 
-	<span class="doccomment">/// The handler for this endpoint.</span>
-	<span class="kw">fn</span> <span class="ident">handle</span>(
-		<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>,
-		<span class="ident">placeholders</span>: <span class="ident"><span class="self">Self</span>::Placeholders</span>,
-		<span class="ident">params</span>: <span class="ident"><span class="self">Self</span>::Params</span>,
-		<span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Body</span><span class="op">&gt;</span>
-	) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>;
+	<span class="doccomment">/// The handler for this endpoint.
+	</span><span class="kw">fn </span>handle(
+		state: <span class="kw-2">&amp;mut </span>State,
+		placeholders: <span class="self">Self</span>::Placeholders,
+		params: <span class="self">Self</span>::Params,
+		body: <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Body&gt;
+	) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>::Output&gt;;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">EndpointWithSchema</span><span class="op">&gt;</span> <span class="ident">Endpoint</span> <span class="kw">for</span> <span class="ident">E</span> {
-	<span class="kw">fn</span> <span class="ident">http_method</span>() -&gt; <span class="ident">Method</span> {
-		<span class="ident">E::http_method</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">impl</span>&lt;E: EndpointWithSchema&gt; Endpoint <span class="kw">for </span>E {
+	<span class="kw">fn </span>http_method() -&gt; Method {
+		E::http_method()
 	}
-	<span class="kw">fn</span> <span class="ident">uri</span>() -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-		<span class="ident">E::uri</span>()
-	}
-
-	<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">E::Output</span>;
-
-	<span class="kw">fn</span> <span class="ident">has_placeholders</span>() -&gt; <span class="ident">bool</span> {
-		<span class="ident">E::has_placeholders</span>()
-	}
-	<span class="kw">type</span> <span class="ident">Placeholders</span> <span class="op">=</span> <span class="ident">E::Placeholders</span>;
-
-	<span class="kw">fn</span> <span class="ident">needs_params</span>() -&gt; <span class="ident">bool</span> {
-		<span class="ident">E::needs_params</span>()
-	}
-	<span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">E::Params</span>;
-
-	<span class="kw">fn</span> <span class="ident">needs_body</span>() -&gt; <span class="ident">bool</span> {
-		<span class="ident">E::needs_body</span>()
-	}
-	<span class="kw">type</span> <span class="ident">Body</span> <span class="op">=</span> <span class="ident">E::Body</span>;
-
-	<span class="kw">fn</span> <span class="ident">wants_auth</span>() -&gt; <span class="ident">bool</span> {
-		<span class="ident">E::wants_auth</span>()
+	<span class="kw">fn </span>uri() -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
+		E::uri()
 	}
 
-	<span class="kw">fn</span> <span class="ident">handle</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-		<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>,
-		<span class="ident">placeholders</span>: <span class="ident"><span class="self">Self</span>::Placeholders</span>,
-		<span class="ident">params</span>: <span class="ident"><span class="self">Self</span>::Params</span>,
-		<span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Body</span><span class="op">&gt;</span>
-	) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-		<span class="ident">E::handle</span>(<span class="ident">state</span>, <span class="ident">placeholders</span>, <span class="ident">params</span>, <span class="ident">body</span>)
+	<span class="kw">type </span>Output = E::Output;
+
+	<span class="kw">fn </span>has_placeholders() -&gt; bool {
+		E::has_placeholders()
+	}
+	<span class="kw">type </span>Placeholders = E::Placeholders;
+
+	<span class="kw">fn </span>needs_params() -&gt; bool {
+		E::needs_params()
+	}
+	<span class="kw">type </span>Params = E::Params;
+
+	<span class="kw">fn </span>needs_body() -&gt; bool {
+		E::needs_body()
+	}
+	<span class="kw">type </span>Body = E::Body;
+
+	<span class="kw">fn </span>wants_auth() -&gt; bool {
+		E::wants_auth()
+	}
+
+	<span class="kw">fn </span>handle&lt;<span class="lifetime">&#39;a</span>&gt;(
+		state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>State,
+		placeholders: <span class="self">Self</span>::Placeholders,
+		params: <span class="self">Self</span>::Params,
+		body: <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Body&gt;
+	) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="self">Self</span>::Output&gt; {
+		E::handle(state, placeholders, params, body)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

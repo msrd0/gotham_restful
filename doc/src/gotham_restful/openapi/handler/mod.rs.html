@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/handler/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/handler/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../gotham_restful/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -199,204 +199,204 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_imports</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SECURITY_NAME</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">future::FutureExt</span>};
-<span class="kw">use</span> <span class="ident">gotham</span>::{
-	<span class="ident">anyhow</span>,
-	<span class="ident">handler</span>::{<span class="ident">Handler</span>, <span class="ident">HandlerError</span>, <span class="ident">HandlerFuture</span>, <span class="ident">NewHandler</span>},
-	<span class="ident">helpers::http::response</span>::{<span class="ident">create_empty_response</span>, <span class="ident">create_response</span>},
-	<span class="ident">hyper</span>::{
-		<span class="ident">header</span>::{
-			<span class="ident">HeaderMap</span>, <span class="ident">HeaderValue</span>, <span class="ident">CACHE_CONTROL</span>, <span class="ident">CONTENT_SECURITY_POLICY</span>, <span class="ident">ETAG</span>, <span class="ident">IF_NONE_MATCH</span>,
-			<span class="ident">REFERRER_POLICY</span>, <span class="ident">X_CONTENT_TYPE_OPTIONS</span>
+</pre><pre class="rust"><code><span class="attribute">#![cfg_attr(not(feature = <span class="string">&quot;auth&quot;</span>), allow(unused_imports))]
+</span><span class="kw">use </span><span class="kw">super</span>::SECURITY_NAME;
+<span class="kw">use </span>futures_util::{future, future::FutureExt};
+<span class="kw">use </span>gotham::{
+	anyhow,
+	handler::{Handler, HandlerError, HandlerFuture, NewHandler},
+	helpers::http::response::{create_empty_response, create_response},
+	hyper::{
+		header::{
+			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, ETAG, IF_NONE_MATCH,
+			REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS
 		},
-		<span class="ident">Body</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>
+		Body, Response, StatusCode
 	},
-	<span class="ident">mime</span>::{<span class="ident">APPLICATION_JSON</span>, <span class="ident">TEXT_HTML_UTF_8</span>, <span class="ident">TEXT_PLAIN_UTF_8</span>},
-	<span class="ident">state::State</span>
+	mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8},
+	state::State
 };
-<span class="kw">use</span> <span class="ident">gotham_restful_redoc::Redoc</span>;
-<span class="kw">use</span> <span class="ident">openapi_type</span>::{
-	<span class="ident">indexmap::IndexMap</span>,
-	<span class="ident">openapiv3</span>::{<span class="ident">APIKeyLocation</span>, <span class="ident">OpenAPI</span>, <span class="ident">ReferenceOr</span>, <span class="ident">SecurityScheme</span>}
+<span class="kw">use </span>gotham_restful_redoc::Redoc;
+<span class="kw">use </span>openapi_type::{
+	indexmap::IndexMap,
+	openapiv3::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}
 };
-<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
-<span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">panic::RefUnwindSafe</span>, <span class="ident">pin::Pin</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>parking_lot::RwLock;
+<span class="kw">use </span>sha2::{Digest, Sha256};
+<span class="kw">use </span>std::{panic::RefUnwindSafe, pin::Pin, sync::Arc};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">get_security</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">SecurityScheme</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AuthSource</span>;
-	<span class="kw">use</span> <span class="ident">gotham::state::FromState</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;auth&quot;</span>)]
+</span><span class="kw">fn </span>get_security(state: <span class="kw-2">&amp;</span>State) -&gt; IndexMap&lt;String, ReferenceOr&lt;SecurityScheme&gt;&gt; {
+	<span class="kw">use </span><span class="kw">crate</span>::AuthSource;
+	<span class="kw">use </span>gotham::state::FromState;
 
-	<span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">AuthSource::try_borrow_from</span>(<span class="ident">state</span>) {
-		<span class="prelude-val">Some</span>(<span class="ident">source</span>) =&gt; <span class="ident">source</span>,
-		<span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Default::default</span>()
+	<span class="kw">let </span>source = <span class="kw">match </span>AuthSource::try_borrow_from(state) {
+		<span class="prelude-val">Some</span>(source) =&gt; source,
+		<span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Default::default()
 	};
 
-	<span class="kw">let</span> <span class="ident">security_scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">source</span> {
-		<span class="ident">AuthSource::Cookie</span>(<span class="ident">name</span>) =&gt; <span class="ident">SecurityScheme::APIKey</span> {
-			<span class="ident">location</span>: <span class="ident">APIKeyLocation::Cookie</span>,
-			<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-			<span class="ident">description</span>: <span class="prelude-val">None</span>
-		},
-		<span class="ident">AuthSource::Header</span>(<span class="ident">name</span>) =&gt; <span class="ident">SecurityScheme::APIKey</span> {
-			<span class="ident">location</span>: <span class="ident">APIKeyLocation::Header</span>,
-			<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-			<span class="ident">description</span>: <span class="prelude-val">None</span>
-		},
-		<span class="ident">AuthSource::AuthorizationHeader</span> =&gt; <span class="ident">SecurityScheme::HTTP</span> {
-			<span class="ident">scheme</span>: <span class="string">&quot;bearer&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">bearer_format</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;JWT&quot;</span>.<span class="ident">to_owned</span>()),
-			<span class="ident">description</span>: <span class="prelude-val">None</span>
-		}
+	<span class="kw">let </span>security_scheme = <span class="kw">match </span>source {
+		AuthSource::Cookie(name) =&gt; SecurityScheme::APIKey {
+			location: APIKeyLocation::Cookie,
+			name: name.to_string(),
+			description: <span class="prelude-val">None
+		</span>},
+		AuthSource::Header(name) =&gt; SecurityScheme::APIKey {
+			location: APIKeyLocation::Header,
+			name: name.to_string(),
+			description: <span class="prelude-val">None
+		</span>},
+		AuthSource::AuthorizationHeader =&gt; SecurityScheme::HTTP {
+			scheme: <span class="string">&quot;bearer&quot;</span>.to_owned(),
+			bearer_format: <span class="prelude-val">Some</span>(<span class="string">&quot;JWT&quot;</span>.to_owned()),
+			description: <span class="prelude-val">None
+		</span>}
 	};
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">security_schemes</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">SecurityScheme</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-	<span class="ident">security_schemes</span>.<span class="ident">insert</span>(<span class="ident">SECURITY_NAME</span>.<span class="ident">to_owned</span>(), <span class="ident">ReferenceOr::Item</span>(<span class="ident">security_scheme</span>));
+	<span class="kw">let </span><span class="kw-2">mut </span>security_schemes: IndexMap&lt;String, ReferenceOr&lt;SecurityScheme&gt;&gt; = Default::default();
+	security_schemes.insert(SECURITY_NAME.to_owned(), ReferenceOr::Item(security_scheme));
 
-	<span class="ident">security_schemes</span>
+	security_schemes
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;auth&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">get_security</span>(<span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">SecurityScheme</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="ident">Default::default</span>()
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;auth&quot;</span>))]
+</span><span class="kw">fn </span>get_security(_state: <span class="kw-2">&amp;</span>State) -&gt; IndexMap&lt;String, ReferenceOr&lt;SecurityScheme&gt;&gt; {
+	Default::default()
 }
 
-<span class="kw">fn</span> <span class="ident">openapi_string</span>(
-	<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>,
-	<span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="ident">openapi</span>.<span class="ident">read</span>();
+<span class="kw">fn </span>openapi_string(
+	state: <span class="kw-2">&amp;</span>State,
+	openapi: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;OpenAPI&gt;&gt;
+) -&gt; <span class="prelude-ty">Result</span>&lt;String, serde_json::Error&gt; {
+	<span class="kw">let </span>openapi = openapi.read();
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="ident">openapi</span>.<span class="ident">clone</span>();
-	<span class="kw">let</span> <span class="ident">security_schemes</span> <span class="op">=</span> <span class="ident">get_security</span>(<span class="ident">state</span>);
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">openapi</span>.<span class="ident">components</span>.<span class="ident">unwrap_or_default</span>();
-	<span class="ident">components</span>.<span class="ident">security_schemes</span> <span class="op">=</span> <span class="ident">security_schemes</span>;
-	<span class="ident">openapi</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
+	<span class="kw">let </span><span class="kw-2">mut </span>openapi = openapi.clone();
+	<span class="kw">let </span>security_schemes = get_security(state);
+	<span class="kw">let </span><span class="kw-2">mut </span>components = openapi.components.unwrap_or_default();
+	components.security_schemes = security_schemes;
+	openapi.components = <span class="prelude-val">Some</span>(components);
 
-	<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">openapi</span>)
+	serde_json::to_string(<span class="kw-2">&amp;</span>openapi)
 }
 
-<span class="kw">fn</span> <span class="ident">create_openapi_response</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
-	<span class="kw">match</span> <span class="ident">openapi_string</span>(<span class="ident">state</span>, <span class="ident">openapi</span>) {
-		<span class="prelude-val">Ok</span>(<span class="ident">body</span>) =&gt; {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_response</span>(<span class="ident">state</span>, <span class="ident">StatusCode::OK</span>, <span class="ident">APPLICATION_JSON</span>, <span class="ident">body</span>);
-			<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers_mut</span>();
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">X_CONTENT_TYPE_OPTIONS</span>, <span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;nosniff&quot;</span>));
-			<span class="ident">res</span>
+<span class="kw">fn </span>create_openapi_response(state: <span class="kw-2">&amp;</span>State, openapi: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;OpenAPI&gt;&gt;) -&gt; Response&lt;Body&gt; {
+	<span class="kw">match </span>openapi_string(state, openapi) {
+		<span class="prelude-val">Ok</span>(body) =&gt; {
+			<span class="kw">let </span><span class="kw-2">mut </span>res = create_response(state, StatusCode::OK, APPLICATION_JSON, body);
+			<span class="kw">let </span>headers = res.headers_mut();
+			headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static(<span class="string">&quot;nosniff&quot;</span>));
+			res
 		},
-		<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+		<span class="prelude-val">Err</span>(e) =&gt; {
 			<span class="macro">error!</span>(<span class="string">&quot;Unable to handle OpenAPI request due to error: {e}&quot;</span>);
-			<span class="ident">create_response</span>(
-				<span class="ident">state</span>,
-				<span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>,
-				<span class="ident">TEXT_PLAIN_UTF_8</span>,
-				<span class="string">&quot;&quot;</span>
-			)
+			create_response(
+				state,
+				StatusCode::INTERNAL_SERVER_ERROR,
+				TEXT_PLAIN_UTF_8,
+				<span class="string">&quot;&quot;
+			</span>)
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OpenapiSpecHandler</span> {
-	<span class="ident">openapi</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OpenapiSpecHandler {
+	openapi: Arc&lt;RwLock&lt;OpenAPI&gt;&gt;
 }
 
-<span class="comment">// safety: the handler only ever aquires a read lock, so this usage of</span>
-<span class="comment">// RwLock is, in fact, unwind safe</span>
-<span class="kw">impl</span> <span class="ident">RefUnwindSafe</span> <span class="kw">for</span> <span class="ident">OpenapiSpecHandler</span> {}
+<span class="comment">// safety: the handler only ever aquires a read lock, so this usage of
+// RwLock is, in fact, unwind safe
+</span><span class="kw">impl </span>RefUnwindSafe <span class="kw">for </span>OpenapiSpecHandler {}
 
-<span class="kw">impl</span> <span class="ident">OpenapiSpecHandler</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">openapi</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">openapi</span> }
+<span class="kw">impl </span>OpenapiSpecHandler {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(openapi: Arc&lt;RwLock&lt;OpenAPI&gt;&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ openapi }
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">NewHandler</span> <span class="kw">for</span> <span class="ident">OpenapiSpecHandler</span> {
-	<span class="kw">type</span> <span class="ident">Instance</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>NewHandler <span class="kw">for </span>OpenapiSpecHandler {
+	<span class="kw">type </span>Instance = <span class="self">Self</span>;
 
-	<span class="kw">fn</span> <span class="ident">new_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+	<span class="kw">fn </span>new_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
+		<span class="prelude-val">Ok</span>(<span class="self">self</span>.clone())
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">Handler</span> <span class="kw">for</span> <span class="ident">OpenapiSpecHandler</span> {
-	<span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_openapi_response</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">openapi</span>);
-		<span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">res</span>)).<span class="ident">boxed</span>()
+<span class="kw">impl </span>Handler <span class="kw">for </span>OpenapiSpecHandler {
+	<span class="kw">fn </span>handle(<span class="self">self</span>, <span class="kw-2">mut </span>state: State) -&gt; Pin&lt;Box&lt;HandlerFuture&gt;&gt; {
+		<span class="kw">let </span>res = create_openapi_response(<span class="kw-2">&amp;mut </span>state, <span class="kw-2">&amp;</span><span class="self">self</span>.openapi);
+		future::ok((state, res)).boxed()
 	}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OpenapiDocHandler</span> {
-	<span class="ident">openapi</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OpenapiDocHandler {
+	openapi: Arc&lt;RwLock&lt;OpenAPI&gt;&gt;
 }
 
-<span class="comment">// safety: the handler only ever aquires a read lock, so this usage of</span>
-<span class="comment">// RwLock is, in fact, unwind safe</span>
-<span class="kw">impl</span> <span class="ident">RefUnwindSafe</span> <span class="kw">for</span> <span class="ident">OpenapiDocHandler</span> {}
+<span class="comment">// safety: the handler only ever aquires a read lock, so this usage of
+// RwLock is, in fact, unwind safe
+</span><span class="kw">impl </span>RefUnwindSafe <span class="kw">for </span>OpenapiDocHandler {}
 
-<span class="kw">impl</span> <span class="ident">OpenapiDocHandler</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">openapi</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">openapi</span> }
+<span class="kw">impl </span>OpenapiDocHandler {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(openapi: Arc&lt;RwLock&lt;OpenAPI&gt;&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ openapi }
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">NewHandler</span> <span class="kw">for</span> <span class="ident">OpenapiDocHandler</span> {
-	<span class="kw">type</span> <span class="ident">Instance</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>NewHandler <span class="kw">for </span>OpenapiDocHandler {
+	<span class="kw">type </span>Instance = <span class="self">Self</span>;
 
-	<span class="kw">fn</span> <span class="ident">new_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+	<span class="kw">fn </span>new_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
+		<span class="prelude-val">Ok</span>(<span class="self">self</span>.clone())
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">redoc_handler</span>(
-	<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>,
-	<span class="ident">openapi</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">HandlerError</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="ident">openapi_string</span>(<span class="ident">state</span>, <span class="ident">openapi</span>)<span class="question-mark">?</span>;
-	<span class="kw">let</span> <span class="ident">Redoc</span> { <span class="ident">html</span>, <span class="ident">script_hash</span> } <span class="op">=</span> <span class="ident">gotham_restful_redoc::html</span>(<span class="ident">spec</span>);
+<span class="kw">fn </span>redoc_handler(
+	state: <span class="kw-2">&amp;</span>State,
+	openapi: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;OpenAPI&gt;&gt;
+) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, HandlerError&gt; {
+	<span class="kw">let </span>spec = openapi_string(state, openapi)<span class="question-mark">?</span>;
+	<span class="kw">let </span>Redoc { html, script_hash } = gotham_restful_redoc::html(spec);
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">etag</span> <span class="op">=</span> <span class="ident">Sha256::new</span>();
-	<span class="ident">etag</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">html</span>);
-	<span class="kw">let</span> <span class="ident">etag</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">base64::encode</span>(<span class="ident">etag</span>.<span class="ident">finalize</span>()));
+	<span class="kw">let </span><span class="kw-2">mut </span>etag = Sha256::new();
+	etag.update(<span class="kw-2">&amp;</span>html);
+	<span class="kw">let </span>etag = <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, base64::encode(etag.finalize()));
 
-	<span class="kw">if</span> <span class="ident">state</span>
-		.<span class="ident">borrow</span>::<span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>()
-		.<span class="ident">get</span>(<span class="ident">IF_NONE_MATCH</span>)
-		.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">header</span><span class="op">|</span> <span class="ident">header</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">etag</span>.<span class="ident">as_bytes</span>())
+	<span class="kw">if </span>state
+		.borrow::&lt;HeaderMap&gt;()
+		.get(IF_NONE_MATCH)
+		.map_or(<span class="bool-val">false</span>, |header| header.as_bytes() == etag.as_bytes())
 	{
-		<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="ident">state</span>, <span class="ident">StatusCode::NOT_MODIFIED</span>);
-		<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>);
+		<span class="kw">let </span>res = create_empty_response(state, StatusCode::NOT_MODIFIED);
+		<span class="kw">return </span><span class="prelude-val">Ok</span>(res);
 	}
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_response</span>(<span class="ident">state</span>, <span class="ident">StatusCode::OK</span>, <span class="ident">TEXT_HTML_UTF_8</span>, <span class="ident">html</span>);
-	<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers_mut</span>();
-	<span class="ident">headers</span>.<span class="ident">insert</span>(
-		<span class="ident">CACHE_CONTROL</span>,
-		<span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;public,max-age=2592000&quot;</span>)
+	<span class="kw">let </span><span class="kw-2">mut </span>res = create_response(state, StatusCode::OK, TEXT_HTML_UTF_8, html);
+	<span class="kw">let </span>headers = res.headers_mut();
+	headers.insert(
+		CACHE_CONTROL,
+		HeaderValue::from_static(<span class="string">&quot;public,max-age=2592000&quot;</span>)
 	);
-	<span class="ident">headers</span>.<span class="ident">insert</span>(
-		<span class="ident">CONTENT_SECURITY_POLICY</span>,
+	headers.insert(
+		CONTENT_SECURITY_POLICY,
 		<span class="macro">format!</span>(
 			<span class="string">&quot;default-src &#39;none&#39;;base-uri &#39;none&#39;;script-src &#39;unsafe-inline&#39; https://cdn.jsdelivr.net &#39;sha256-{script_hash}&#39; &#39;strict-dynamic&#39;;style-src &#39;unsafe-inline&#39; https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src &#39;self&#39;;img-src blob: data:&quot;</span>,
-		).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+		).parse().unwrap()
 	);
-	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">ETAG</span>, <span class="ident">etag</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
-	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">REFERRER_POLICY</span>, <span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;no-referrer&quot;</span>));
-	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">X_CONTENT_TYPE_OPTIONS</span>, <span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;nosniff&quot;</span>));
-	<span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+	headers.insert(ETAG, etag.parse().unwrap());
+	headers.insert(REFERRER_POLICY, HeaderValue::from_static(<span class="string">&quot;no-referrer&quot;</span>));
+	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static(<span class="string">&quot;nosniff&quot;</span>));
+	<span class="prelude-val">Ok</span>(res)
 }
 
-<span class="kw">impl</span> <span class="ident">Handler</span> <span class="kw">for</span> <span class="ident">OpenapiDocHandler</span> {
-	<span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">State</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="ident">redoc_handler</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">openapi</span>) {
-			<span class="prelude-val">Ok</span>(<span class="ident">res</span>) =&gt; <span class="ident">future::ok</span>((<span class="ident">state</span>, <span class="ident">res</span>)).<span class="ident">boxed</span>(),
-			<span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">future::err</span>((<span class="ident">state</span>, <span class="ident">err</span>)).<span class="ident">boxed</span>()
+<span class="kw">impl </span>Handler <span class="kw">for </span>OpenapiDocHandler {
+	<span class="kw">fn </span>handle(<span class="self">self</span>, state: State) -&gt; Pin&lt;Box&lt;HandlerFuture&gt;&gt; {
+		<span class="kw">match </span>redoc_handler(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span><span class="self">self</span>.openapi) {
+			<span class="prelude-val">Ok</span>(res) =&gt; future::ok((state, res)).boxed(),
+			<span class="prelude-val">Err</span>(err) =&gt; future::err((state, err)).boxed()
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

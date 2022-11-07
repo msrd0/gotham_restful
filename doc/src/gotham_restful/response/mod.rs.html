@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/response/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/response/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../gotham_restful/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -317,322 +317,322 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="self">self</span>, <span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
-<span class="kw">use</span> <span class="ident">gotham</span>::{
-	<span class="ident">handler::HandlerError</span>,
-	<span class="ident">hyper</span>::{
-		<span class="ident">header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>},
-		<span class="ident">Body</span>, <span class="ident">StatusCode</span>
+</pre><pre class="rust"><code><span class="kw">use </span>futures_util::future::{<span class="self">self</span>, BoxFuture, FutureExt};
+<span class="kw">use </span>gotham::{
+	handler::HandlerError,
+	hyper::{
+		header::{HeaderMap, HeaderName, HeaderValue},
+		Body, StatusCode
 	},
-	<span class="ident">mime</span>::{<span class="ident">Mime</span>, <span class="ident">APPLICATION_JSON</span>, <span class="ident">STAR_STAR</span>}
+	mime::{Mime, APPLICATION_JSON, STAR_STAR}
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">openapi_type</span>::{<span class="ident">OpenapiSchema</span>, <span class="ident">OpenapiType</span>};
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorlog&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::Infallible</span>, <span class="ident">fmt::Debug</span>, <span class="ident">future::Future</span>, <span class="ident">pin::Pin</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">use </span>openapi_type::{OpenapiSchema, OpenapiType};
+<span class="kw">use </span>serde::Serialize;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;errorlog&quot;</span>)]
+</span><span class="kw">use </span>std::fmt::Display;
+<span class="kw">use </span>std::{convert::Infallible, fmt::Debug, future::Future, pin::Pin};
 
-<span class="kw">mod</span> <span class="ident">auth_result</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">auth_result</span>::{<span class="ident">AuthError</span>, <span class="ident">AuthErrorOrOther</span>, <span class="ident">AuthResult</span>, <span class="ident">AuthSuccess</span>};
+<span class="kw">mod </span>auth_result;
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span>auth_result::{AuthError, AuthErrorOrOther, AuthResult, AuthSuccess};
 
-<span class="kw">mod</span> <span class="ident">no_content</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">no_content::NoContent</span>;
+<span class="kw">mod </span>no_content;
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span>no_content::NoContent;
 
-<span class="kw">mod</span> <span class="ident">raw</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">raw::Raw</span>;
+<span class="kw">mod </span>raw;
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span>raw::Raw;
 
-<span class="kw">mod</span> <span class="ident">redirect</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">redirect::Redirect</span>;
+<span class="kw">mod </span>redirect;
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span>redirect::Redirect;
 
-<span class="kw">mod</span> <span class="ident">result</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">result::IntoResponseError</span>;
+<span class="kw">mod </span>result;
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span>result::IntoResponseError;
 
-<span class="kw">mod</span> <span class="ident">success</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">success::Success</span>;
+<span class="kw">mod </span>success;
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">pub use </span>success::Success;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">OrAllTypes</span> {
-	<span class="kw">fn</span> <span class="ident">or_all_types</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>OrAllTypes {
+	<span class="kw">fn </span>or_all_types(<span class="self">self</span>) -&gt; Vec&lt;Mime&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">OrAllTypes</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">or_all_types</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">STAR_STAR</span>])
+<span class="kw">impl </span>OrAllTypes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;Vec&lt;Mime&gt;&gt; {
+	<span class="kw">fn </span>or_all_types(<span class="self">self</span>) -&gt; Vec&lt;Mime&gt; {
+		<span class="self">self</span>.unwrap_or_else(|| <span class="macro">vec!</span>[STAR_STAR])
 	}
 }
 
-<span class="doccomment">/// A response, used to create the final gotham response from.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is not meant to be used as the return type of endpoint handlers. While it can be</span>
-<span class="doccomment">/// freely used without the `openapi` feature, it is more complicated to use when you enable it,</span>
-<span class="doccomment">/// since this type does not store any schema information. You can attach schema information</span>
-<span class="doccomment">/// like so:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;openapi&quot;)] mod example {</span>
-<span class="doccomment">/// # use gotham::hyper::StatusCode;</span>
-<span class="doccomment">/// # use gotham_restful::*;</span>
-<span class="doccomment">/// # use openapi_type::*;</span>
-<span class="doccomment">/// fn schema(code: StatusCode) -&gt; OpenapiSchema {</span>
-<span class="doccomment">/// 	assert_eq!(code, StatusCode::ACCEPTED);</span>
-<span class="doccomment">/// 	&lt;()&gt;::schema()</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn status_codes() -&gt; Vec&lt;StatusCode&gt; {</span>
-<span class="doccomment">/// 	vec![StatusCode::ACCEPTED]</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[create(schema = &quot;schema&quot;, status_codes = &quot;status_codes&quot;)]</span>
-<span class="doccomment">/// fn create(body: Raw&lt;Vec&lt;u8&gt;&gt;) {}</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Response</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">status</span>: <span class="ident">StatusCode</span>,
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">body</span>: <span class="ident">Body</span>,
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">headers</span>: <span class="ident">HeaderMap</span>
+<span class="doccomment">/// A response, used to create the final gotham response from.
+///
+/// This type is not meant to be used as the return type of endpoint handlers. While it can be
+/// freely used without the `openapi` feature, it is more complicated to use when you enable it,
+/// since this type does not store any schema information. You can attach schema information
+/// like so:
+///
+/// ```rust
+/// # #[cfg(feature = &quot;openapi&quot;)] mod example {
+/// # use gotham::hyper::StatusCode;
+/// # use gotham_restful::*;
+/// # use openapi_type::*;
+/// fn schema(code: StatusCode) -&gt; OpenapiSchema {
+/// 	assert_eq!(code, StatusCode::ACCEPTED);
+/// 	&lt;()&gt;::schema()
+/// }
+///
+/// fn status_codes() -&gt; Vec&lt;StatusCode&gt; {
+/// 	vec![StatusCode::ACCEPTED]
+/// }
+///
+/// #[create(schema = &quot;schema&quot;, status_codes = &quot;status_codes&quot;)]
+/// fn create(body: Raw&lt;Vec&lt;u8&gt;&gt;) {}
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Response {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) status: StatusCode,
+	<span class="kw">pub</span>(<span class="kw">crate</span>) body: Body,
+	<span class="kw">pub</span>(<span class="kw">crate</span>) mime: <span class="prelude-ty">Option</span>&lt;Mime&gt;,
+	<span class="kw">pub</span>(<span class="kw">crate</span>) headers: HeaderMap
 }
 
-<span class="kw">impl</span> <span class="ident">Response</span> {
-	<span class="doccomment">/// Create a new [Response] from raw data.</span>
-	<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">StatusCode</span>, <span class="ident">body</span>: <span class="ident">B</span>, <span class="ident">mime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">status</span>,
-			<span class="ident">body</span>: <span class="ident">body</span>.<span class="ident">into</span>(),
-			<span class="ident">mime</span>,
-			<span class="ident">headers</span>: <span class="ident">Default::default</span>()
+<span class="kw">impl </span>Response {
+	<span class="doccomment">/// Create a new [Response] from raw data.
+	</span><span class="attribute">#[must_use = <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]
+	</span><span class="kw">pub fn </span>new&lt;B: Into&lt;Body&gt;&gt;(status: StatusCode, body: B, mime: <span class="prelude-ty">Option</span>&lt;Mime&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			status,
+			body: body.into(),
+			mime,
+			headers: Default::default()
 		}
 	}
 
-	<span class="doccomment">/// Create a [Response] with mime type json from already serialized data.</span>
-	<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">StatusCode</span>, <span class="ident">body</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">status</span>,
-			<span class="ident">body</span>: <span class="ident">body</span>.<span class="ident">into</span>(),
-			<span class="ident">mime</span>: <span class="prelude-val">Some</span>(<span class="ident">APPLICATION_JSON</span>),
-			<span class="ident">headers</span>: <span class="ident">Default::default</span>()
+	<span class="doccomment">/// Create a [Response] with mime type json from already serialized data.
+	</span><span class="attribute">#[must_use = <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]
+	</span><span class="kw">pub fn </span>json&lt;B: Into&lt;Body&gt;&gt;(status: StatusCode, body: B) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			status,
+			body: body.into(),
+			mime: <span class="prelude-val">Some</span>(APPLICATION_JSON),
+			headers: Default::default()
 		}
 	}
 
-	<span class="doccomment">/// Create a _204 No Content_ [Response].</span>
-	<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_content</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">status</span>: <span class="ident">StatusCode::NO_CONTENT</span>,
-			<span class="ident">body</span>: <span class="ident">Body::empty</span>(),
-			<span class="ident">mime</span>: <span class="prelude-val">None</span>,
-			<span class="ident">headers</span>: <span class="ident">Default::default</span>()
+	<span class="doccomment">/// Create a _204 No Content_ [Response].
+	</span><span class="attribute">#[must_use = <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]
+	</span><span class="kw">pub fn </span>no_content() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			status: StatusCode::NO_CONTENT,
+			body: Body::empty(),
+			mime: <span class="prelude-val">None</span>,
+			headers: Default::default()
 		}
 	}
 
-	<span class="doccomment">/// Create an empty _403 Forbidden_ [Response].</span>
-	<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forbidden</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">status</span>: <span class="ident">StatusCode::FORBIDDEN</span>,
-			<span class="ident">body</span>: <span class="ident">Body::empty</span>(),
-			<span class="ident">mime</span>: <span class="prelude-val">None</span>,
-			<span class="ident">headers</span>: <span class="ident">Default::default</span>()
+	<span class="doccomment">/// Create an empty _403 Forbidden_ [Response].
+	</span><span class="attribute">#[must_use = <span class="string">&quot;Creating a response is pointless if you don&#39;t use it&quot;</span>]
+	</span><span class="kw">pub fn </span>forbidden() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			status: StatusCode::FORBIDDEN,
+			body: Body::empty(),
+			mime: <span class="prelude-val">None</span>,
+			headers: Default::default()
 		}
 	}
 
-	<span class="doccomment">/// Return the status code of this [Response].</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StatusCode</span> {
-		<span class="self">self</span>.<span class="ident">status</span>
+	<span class="doccomment">/// Return the status code of this [Response].
+	</span><span class="kw">pub fn </span>status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StatusCode {
+		<span class="self">self</span>.status
 	}
 
-	<span class="doccomment">/// Return the mime type of this [Response].</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Mime</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">mime</span>.<span class="ident">as_ref</span>()
+	<span class="doccomment">/// Return the mime type of this [Response].
+	</span><span class="kw">pub fn </span>mime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Mime&gt; {
+		<span class="self">self</span>.mime.as_ref()
 	}
 
-	<span class="doccomment">/// Add an HTTP header to the [Response].</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">HeaderName</span>, <span class="ident">value</span>: <span class="ident">HeaderValue</span>) {
-		<span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">value</span>);
+	<span class="doccomment">/// Add an HTTP header to the [Response].
+	</span><span class="kw">pub fn </span>header(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: HeaderName, value: HeaderValue) {
+		<span class="self">self</span>.headers.insert(name, value);
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_headers</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">headers</span>: <span class="ident">HeaderMap</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">self</span>.<span class="ident">headers</span> <span class="op">=</span> <span class="ident">headers</span>;
-		<span class="self">self</span>
-	}
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_headers(<span class="kw-2">mut </span><span class="self">self</span>, headers: HeaderMap) -&gt; <span class="self">Self </span>{
+		<span class="self">self</span>.headers = headers;
+		<span class="self">self
+	</span>}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">full_body</span>(
-		<span class="kw-2">mut</span> <span class="self">self</span>
-	) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="op">&lt;</span><span class="ident">Body</span> <span class="kw">as</span> <span class="ident">gotham::hyper::body::HttpBody</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
-		<span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
-		<span class="kw">use</span> <span class="ident">gotham::hyper::body::to_bytes</span>;
+	<span class="attribute">#[cfg(test)]
+	</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>full_body(
+		<span class="kw-2">mut </span><span class="self">self
+	</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, &lt;Body <span class="kw">as </span>gotham::hyper::body::HttpBody&gt;::Error&gt; {
+		<span class="kw">use </span>futures_executor::block_on;
+		<span class="kw">use </span>gotham::hyper::body::to_bytes;
 
-		<span class="kw">let</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">block_on</span>(<span class="ident">to_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>))<span class="question-mark">?</span>;
-		<span class="prelude-val">Ok</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>())
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">IntoResponse</span> <span class="kw">for</span> <span class="ident">Response</span> {
-	<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Infallible</span>;
-
-	<span class="kw">fn</span> <span class="ident">into_response</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="ident">future::ok</span>(<span class="self">self</span>).<span class="ident">boxed</span>()
+		<span class="kw">let </span>bytes: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>block_on(to_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>.body))<span class="question-mark">?</span>;
+		<span class="prelude-val">Ok</span>(bytes.to_vec())
 	}
 }
 
-<span class="doccomment">/// This trait needs to be implemented by every type returned from an endpoint to</span>
-<span class="doccomment">/// to provide the response.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoResponse</span> {
-	<span class="kw">type</span> <span class="prelude-val">Err</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="kw">impl </span>IntoResponse <span class="kw">for </span>Response {
+	<span class="kw">type </span><span class="prelude-val">Err </span>= Infallible;
 
-	<span class="doccomment">/// Turn this into a response that can be returned to the browser. This api will likely</span>
-	<span class="doccomment">/// change in the future.</span>
-	<span class="kw">fn</span> <span class="ident">into_response</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-	<span class="doccomment">/// Return a list of supported mime types.</span>
-	<span class="kw">fn</span> <span class="ident">accepted_types</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="prelude-val">None</span>
+	<span class="kw">fn </span>into_response(<span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;Response, <span class="self">Self</span>::Err&gt;&gt; {
+		future::ok(<span class="self">self</span>).boxed()
 	}
 }
 
-<span class="doccomment">/// Additional details for [IntoResponse] to be used with an OpenAPI-aware router.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ResponseSchema</span> {
-	<span class="doccomment">/// All status codes returned by this response. Returns `[StatusCode::OK]` by default.</span>
-	<span class="kw">fn</span> <span class="ident">status_codes</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
-		<span class="macro">vec!</span>[<span class="ident">StatusCode::OK</span>]
+<span class="doccomment">/// This trait needs to be implemented by every type returned from an endpoint to
+/// to provide the response.
+</span><span class="kw">pub trait </span>IntoResponse {
+	<span class="kw">type </span><span class="prelude-val">Err</span>: Into&lt;HandlerError&gt; + Send + Sync + <span class="lifetime">&#39;static</span>;
+
+	<span class="doccomment">/// Turn this into a response that can be returned to the browser. This api will likely
+	/// change in the future.
+	</span><span class="kw">fn </span>into_response(<span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;Response, <span class="self">Self</span>::Err&gt;&gt;;
+
+	<span class="doccomment">/// Return a list of supported mime types.
+	</span><span class="kw">fn </span>accepted_types() -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Mime&gt;&gt; {
+		<span class="prelude-val">None
+	</span>}
+}
+
+<span class="doccomment">/// Additional details for [IntoResponse] to be used with an OpenAPI-aware router.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">pub trait </span>ResponseSchema {
+	<span class="doccomment">/// All status codes returned by this response. Returns `[StatusCode::OK]` by default.
+	</span><span class="kw">fn </span>status_codes() -&gt; Vec&lt;StatusCode&gt; {
+		<span class="macro">vec!</span>[StatusCode::OK]
 	}
 
-	<span class="doccomment">/// Return the schema of the response for the given status code. The code may</span>
-	<span class="doccomment">/// only be one that was previously returned by [Self::status_codes]. The</span>
-	<span class="doccomment">/// implementation should panic if that is not the case.</span>
-	<span class="kw">fn</span> <span class="ident">schema</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="ident">OpenapiSchema</span>;
+	<span class="doccomment">/// Return the schema of the response for the given status code. The code may
+	/// only be one that was previously returned by [Self::status_codes]. The
+	/// implementation should panic if that is not the case.
+	</span><span class="kw">fn </span>schema(code: StatusCode) -&gt; OpenapiSchema;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">private</span> {
-	<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">mod </span>private {
+	<span class="kw">pub trait </span>Sealed {}
 }
 
-<span class="doccomment">/// A trait provided to convert a resource&#39;s result to json, and provide an OpenAPI schema to the</span>
-<span class="doccomment">/// router. This trait is implemented for all types that implement [IntoResponse] and</span>
-<span class="doccomment">/// [ResponseSchema].</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoResponseWithSchema</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="ident">ResponseSchema</span> <span class="op">+</span> <span class="ident">private::Sealed</span> {}
+<span class="doccomment">/// A trait provided to convert a resource&#39;s result to json, and provide an OpenAPI schema to the
+/// router. This trait is implemented for all types that implement [IntoResponse] and
+/// [ResponseSchema].
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">pub trait </span>IntoResponseWithSchema: IntoResponse + ResponseSchema + private::Sealed {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="ident">ResponseSchema</span><span class="op">&gt;</span> <span class="ident">private::Sealed</span> <span class="kw">for</span> <span class="ident">R</span> {}
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">impl</span>&lt;R: IntoResponse + ResponseSchema&gt; private::Sealed <span class="kw">for </span>R {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="ident">ResponseSchema</span><span class="op">&gt;</span> <span class="ident">IntoResponseWithSchema</span> <span class="kw">for</span> <span class="ident">R</span> {}
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">impl</span>&lt;R: IntoResponse + ResponseSchema&gt; IntoResponseWithSchema <span class="kw">for </span>R {}
 
-<span class="doccomment">/// The default json returned on an 500 Internal Server Error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">derive</span>(<span class="ident">OpenapiType</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ResourceError</span> {
-	<span class="doccomment">/// This is always `true` and can be used to detect an error response without looking at the</span>
-	<span class="doccomment">/// HTTP status code.</span>
-	<span class="ident">error</span>: <span class="ident">bool</span>,
-	<span class="doccomment">/// The error message.</span>
-	<span class="ident">message</span>: <span class="ident">String</span>
+<span class="doccomment">/// The default json returned on an 500 Internal Server Error.
+</span><span class="attribute">#[derive(Debug, Serialize)]
+#[cfg_attr(feature = <span class="string">&quot;openapi&quot;</span>, derive(OpenapiType))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ResourceError {
+	<span class="doccomment">/// This is always `true` and can be used to detect an error response without looking at the
+	/// HTTP status code.
+	</span>error: bool,
+	<span class="doccomment">/// The error message.
+	</span>message: String
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToString</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResourceError</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">error</span>: <span class="bool-val">true</span>,
-			<span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>()
+<span class="kw">impl</span>&lt;T: ToString&gt; From&lt;T&gt; <span class="kw">for </span>ResourceError {
+	<span class="kw">fn </span>from(message: T) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			error: <span class="bool-val">true</span>,
+			message: message.to_string()
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorlog&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">errorlog</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">E</span>) {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;errorlog&quot;</span>)]
+</span><span class="kw">fn </span>errorlog&lt;E: Display&gt;(e: E) {
 	<span class="macro">error!</span>(<span class="string">&quot;The handler encountered an error: {e}&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorlog&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">errorlog</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">_e</span>: <span class="ident">E</span>) {}
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;errorlog&quot;</span>))]
+</span><span class="kw">fn </span>errorlog&lt;E&gt;(_e: E) {}
 
-<span class="kw">fn</span> <span class="ident">handle_error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">E</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">E::Err</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">E</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">IntoResponseError</span>
+<span class="kw">fn </span>handle_error&lt;E&gt;(e: E) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response, E::Err&gt;&gt; + Send&gt;&gt;
+<span class="kw">where
+	</span>E: Debug + IntoResponseError
 {
-	<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{e:?}&quot;</span>);
-	<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_response_error</span>();
-	<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">res</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">status</span>.<span class="ident">is_server_error</span>() =&gt; <span class="ident">errorlog</span>(<span class="ident">msg</span>),
-		<span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-			<span class="ident">errorlog</span>(<span class="ident">msg</span>);
-			<span class="ident">errorlog</span>(<span class="macro">format!</span>(<span class="string">&quot;{err:?}&quot;</span>));
+	<span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;{e:?}&quot;</span>);
+	<span class="kw">let </span>res = e.into_response_error();
+	<span class="kw">match </span><span class="kw-2">&amp;</span>res {
+		<span class="prelude-val">Ok</span>(res) <span class="kw">if </span>res.status.is_server_error() =&gt; errorlog(msg),
+		<span class="prelude-val">Err</span>(err) =&gt; {
+			errorlog(msg);
+			errorlog(<span class="macro">format!</span>(<span class="string">&quot;{err:?}&quot;</span>));
 		},
-		<span class="kw">_</span> =&gt; {}
+		<span class="kw">_ </span>=&gt; {}
 	};
-	<span class="ident">future::ready</span>(<span class="ident">res</span>).<span class="ident">boxed</span>()
+	future::ready(res).boxed()
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Res</span><span class="op">&gt;</span> <span class="ident">IntoResponse</span> <span class="kw">for</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">Res</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">Res</span>: <span class="ident">IntoResponse</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+<span class="kw">impl</span>&lt;Res&gt; IntoResponse <span class="kw">for </span>Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = Res&gt; + Send&gt;&gt;
+<span class="kw">where
+	</span>Res: IntoResponse + <span class="lifetime">&#39;static
+</span>{
+	<span class="kw">type </span><span class="prelude-val">Err </span>= Res::Err;
+
+	<span class="kw">fn </span>into_response(<span class="self">self</span>) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response, <span class="self">Self</span>::Err&gt;&gt; + Send&gt;&gt; {
+		<span class="self">self</span>.then(IntoResponse::into_response).boxed()
+	}
+
+	<span class="kw">fn </span>accepted_types() -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Mime&gt;&gt; {
+		Res::accepted_types()
+	}
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">impl</span>&lt;Res&gt; ResponseSchema <span class="kw">for </span>Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = Res&gt; + Send&gt;&gt;
+<span class="kw">where
+	</span>Res: ResponseSchema
 {
-	<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Res::Err</span>;
-
-	<span class="kw">fn</span> <span class="ident">into_response</span>(<span class="self">self</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">then</span>(<span class="ident">IntoResponse::into_response</span>).<span class="ident">boxed</span>()
+	<span class="kw">fn </span>status_codes() -&gt; Vec&lt;StatusCode&gt; {
+		Res::status_codes()
 	}
 
-	<span class="kw">fn</span> <span class="ident">accepted_types</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="ident">Res::accepted_types</span>()
+	<span class="kw">fn </span>schema(code: StatusCode) -&gt; OpenapiSchema {
+		Res::schema(code)
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Res</span><span class="op">&gt;</span> <span class="ident">ResponseSchema</span> <span class="kw">for</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">Res</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">Res</span>: <span class="ident">ResponseSchema</span>
-{
-	<span class="kw">fn</span> <span class="ident">status_codes</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
-		<span class="ident">Res::status_codes</span>()
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use </span>futures_executor::block_on;
+	<span class="kw">use </span>thiserror::Error;
+
+	<span class="attribute">#[derive(Debug, Default, Deserialize, Serialize)]
+	#[cfg_attr(feature = <span class="string">&quot;openapi&quot;</span>, derive(openapi_type::OpenapiType))]
+	</span><span class="kw">struct </span>Msg {
+		msg: String
 	}
 
-	<span class="kw">fn</span> <span class="ident">schema</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="ident">OpenapiSchema</span> {
-		<span class="ident">Res::schema</span>(<span class="ident">code</span>)
-	}
-}
+	<span class="attribute">#[derive(Debug, Default, Error)]
+	#[error(<span class="string">&quot;An Error&quot;</span>)]
+	</span><span class="kw">struct </span>MsgError;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
-	<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>result_from_future() {
+		<span class="kw">let </span>nc = NoContent::default();
+		<span class="kw">let </span>res = block_on(nc.into_response()).unwrap();
 
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openapi&quot;</span>, <span class="ident">derive</span>(<span class="ident">openapi_type::OpenapiType</span>))]</span>
-	<span class="kw">struct</span> <span class="ident">Msg</span> {
-		<span class="ident">msg</span>: <span class="ident">String</span>
-	}
+		<span class="kw">let </span>fut_nc = <span class="kw">async move </span>{ NoContent::default() }.boxed();
+		<span class="kw">let </span>fut_res = block_on(fut_nc.into_response()).unwrap();
 
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Error</span>)]</span>
-	<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;An Error&quot;</span>)]</span>
-	<span class="kw">struct</span> <span class="ident">MsgError</span>;
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">result_from_future</span>() {
-		<span class="kw">let</span> <span class="ident">nc</span> <span class="op">=</span> <span class="ident">NoContent::default</span>();
-		<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">block_on</span>(<span class="ident">nc</span>.<span class="ident">into_response</span>()).<span class="ident">unwrap</span>();
-
-		<span class="kw">let</span> <span class="ident">fut_nc</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">NoContent::default</span>() }.<span class="ident">boxed</span>();
-		<span class="kw">let</span> <span class="ident">fut_res</span> <span class="op">=</span> <span class="ident">block_on</span>(<span class="ident">fut_nc</span>.<span class="ident">into_response</span>()).<span class="ident">unwrap</span>();
-
-		<span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">status</span>, <span class="ident">fut_res</span>.<span class="ident">status</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">mime</span>, <span class="ident">fut_res</span>.<span class="ident">mime</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">full_body</span>().<span class="ident">unwrap</span>(), <span class="ident">fut_res</span>.<span class="ident">full_body</span>().<span class="ident">unwrap</span>());
+		<span class="macro">assert_eq!</span>(res.status, fut_res.status);
+		<span class="macro">assert_eq!</span>(res.mime, fut_res.mime);
+		<span class="macro">assert_eq!</span>(res.full_body().unwrap(), fut_res.full_body().unwrap());
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

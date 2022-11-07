@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/operation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>operation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/operation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>operation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../gotham_restful/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -256,261 +256,261 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SECURITY_NAME</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">response::OrAllTypes</span>, <span class="ident">EndpointWithSchema</span>, <span class="ident">IntoResponse</span>, <span class="ident">RequestBody</span>};
-<span class="kw">use</span> <span class="ident">gotham</span>::{<span class="ident">hyper::StatusCode</span>, <span class="ident">mime::Mime</span>};
-<span class="kw">use</span> <span class="ident">openapi_type</span>::{
-	<span class="ident">indexmap::IndexMap</span>,
-	<span class="ident">openapiv3</span>::{
-		<span class="ident">MediaType</span>, <span class="ident">Operation</span>, <span class="ident">Parameter</span>, <span class="ident">ParameterData</span>, <span class="ident">ParameterSchemaOrContent</span>, <span class="ident">ReferenceOr</span>,
-		<span class="ident">ReferenceOr::Item</span>, <span class="ident">RequestBody</span> <span class="kw">as</span> <span class="ident">OARequestBody</span>, <span class="ident">Response</span>, <span class="ident">Responses</span>, <span class="ident">Schema</span>, <span class="ident">SchemaKind</span>,
-		<span class="ident">StatusCode</span> <span class="kw">as</span> <span class="ident">OAStatusCode</span>, <span class="ident">Type</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SECURITY_NAME;
+<span class="kw">use crate</span>::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody};
+<span class="kw">use </span>gotham::{hyper::StatusCode, mime::Mime};
+<span class="kw">use </span>openapi_type::{
+	indexmap::IndexMap,
+	openapiv3::{
+		MediaType, Operation, Parameter, ParameterData, ParameterSchemaOrContent, ReferenceOr,
+		ReferenceOr::Item, RequestBody <span class="kw">as </span>OARequestBody, Response, Responses, Schema, SchemaKind,
+		StatusCode <span class="kw">as </span>OAStatusCode, Type
 	},
-	<span class="ident">OpenapiSchema</span>
+	OpenapiSchema
 };
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">fn</span> <span class="ident">new_parameter_data</span>(
-	<span class="ident">name</span>: <span class="ident">String</span>,
-	<span class="ident">required</span>: <span class="ident">bool</span>,
-	<span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span><span class="op">&gt;</span>
-) -&gt; <span class="ident">ParameterData</span> {
-	<span class="ident">ParameterData</span> {
-		<span class="ident">name</span>,
-		<span class="ident">description</span>: <span class="prelude-val">None</span>,
-		<span class="ident">required</span>,
-		<span class="ident">deprecated</span>: <span class="prelude-val">None</span>,
-		<span class="ident">format</span>: <span class="ident">ParameterSchemaOrContent::Schema</span>(<span class="ident">schema</span>.<span class="ident">unbox</span>()),
-		<span class="ident">example</span>: <span class="prelude-val">None</span>,
-		<span class="ident">examples</span>: <span class="ident">Default::default</span>(),
-		<span class="ident">explode</span>: <span class="prelude-val">None</span>,
-		<span class="ident">extensions</span>: <span class="ident">Default::default</span>()
+<span class="kw">fn </span>new_parameter_data(
+	name: String,
+	required: bool,
+	schema: ReferenceOr&lt;Box&lt;Schema&gt;&gt;
+) -&gt; ParameterData {
+	ParameterData {
+		name,
+		description: <span class="prelude-val">None</span>,
+		required,
+		deprecated: <span class="prelude-val">None</span>,
+		format: ParameterSchemaOrContent::Schema(schema.unbox()),
+		example: <span class="prelude-val">None</span>,
+		examples: Default::default(),
+		explode: <span class="prelude-val">None</span>,
+		extensions: Default::default()
 	}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">OperationParams</span> {
-	<span class="ident">path_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OpenapiSchema</span><span class="op">&gt;</span>,
-	<span class="ident">query_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OpenapiSchema</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">struct </span>OperationParams {
+	path_params: <span class="prelude-ty">Option</span>&lt;OpenapiSchema&gt;,
+	query_params: <span class="prelude-ty">Option</span>&lt;OpenapiSchema&gt;
 }
 
-<span class="kw">impl</span> <span class="ident">OperationParams</span> {
-	<span class="comment">// TODO shouldn&#39;t this be a custom openapi_type::Visitor</span>
-	<span class="comment">// rather than this hacky code?</span>
-	<span class="kw">fn</span> <span class="ident">add_path_params</span>(
-		<span class="ident">path_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OpenapiSchema</span><span class="op">&gt;</span>,
-		<span class="ident">params</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Parameter</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">impl </span>OperationParams {
+	<span class="comment">// TODO shouldn&#39;t this be a custom openapi_type::Visitor
+	// rather than this hacky code?
+	</span><span class="kw">fn </span>add_path_params(
+		path_params: <span class="prelude-ty">Option</span>&lt;OpenapiSchema&gt;,
+		params: <span class="kw-2">&amp;mut </span>Vec&lt;ReferenceOr&lt;Parameter&gt;&gt;
 	) {
-		<span class="kw">let</span> <span class="ident">path_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path_params</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">pp</span>) =&gt; <span class="ident">pp</span>.<span class="ident">schema</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="kw">return</span>
+		<span class="kw">let </span>path_params = <span class="kw">match </span>path_params {
+			<span class="prelude-val">Some</span>(pp) =&gt; pp.schema,
+			<span class="prelude-val">None </span>=&gt; <span class="kw">return
+		</span>};
+		<span class="kw">let </span>path_params = <span class="kw">match </span>path_params.schema_kind {
+			SchemaKind::Type(Type::Object(ty)) =&gt; ty,
+			<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Path Parameters needs to be a plain struct&quot;</span>)
 		};
-		<span class="kw">let</span> <span class="ident">path_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path_params</span>.<span class="ident">schema_kind</span> {
-			<span class="ident">SchemaKind::Type</span>(<span class="ident">Type::Object</span>(<span class="ident">ty</span>)) =&gt; <span class="ident">ty</span>,
-			<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Path Parameters needs to be a plain struct&quot;</span>)
-		};
-		<span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">schema</span>) <span class="kw">in</span> <span class="ident">path_params</span>.<span class="ident">properties</span> {
-			<span class="kw">let</span> <span class="ident">required</span> <span class="op">=</span> <span class="ident">path_params</span>.<span class="ident">required</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-			<span class="ident">params</span>.<span class="ident">push</span>(<span class="ident">Item</span>(<span class="ident">Parameter::Path</span> {
-				<span class="ident">parameter_data</span>: <span class="ident">new_parameter_data</span>(<span class="ident">name</span>, <span class="ident">required</span>, <span class="ident">schema</span>),
-				<span class="ident">style</span>: <span class="ident">Default::default</span>()
+		<span class="kw">for </span>(name, schema) <span class="kw">in </span>path_params.properties {
+			<span class="kw">let </span>required = path_params.required.contains(<span class="kw-2">&amp;</span>name);
+			params.push(Item(Parameter::Path {
+				parameter_data: new_parameter_data(name, required, schema),
+				style: Default::default()
 			}))
 		}
 	}
 
-	<span class="comment">// TODO shouldn&#39;t this be a custom openapi_type::Visitor</span>
-	<span class="comment">// rather than this hacky code?</span>
-	<span class="kw">fn</span> <span class="ident">add_query_params</span>(
-		<span class="ident">query_params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OpenapiSchema</span><span class="op">&gt;</span>,
-		<span class="ident">params</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Parameter</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="comment">// TODO shouldn&#39;t this be a custom openapi_type::Visitor
+	// rather than this hacky code?
+	</span><span class="kw">fn </span>add_query_params(
+		query_params: <span class="prelude-ty">Option</span>&lt;OpenapiSchema&gt;,
+		params: <span class="kw-2">&amp;mut </span>Vec&lt;ReferenceOr&lt;Parameter&gt;&gt;
 	) {
-		<span class="kw">let</span> <span class="ident">query_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query_params</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">qp</span>) =&gt; <span class="ident">qp</span>.<span class="ident">schema</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="kw">return</span>
+		<span class="kw">let </span>query_params = <span class="kw">match </span>query_params {
+			<span class="prelude-val">Some</span>(qp) =&gt; qp.schema,
+			<span class="prelude-val">None </span>=&gt; <span class="kw">return
+		</span>};
+		<span class="kw">let </span>query_params = <span class="kw">match </span>query_params.schema_kind {
+			SchemaKind::Type(Type::Object(ty)) =&gt; ty,
+			<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Query Parameters needs to be a plain struct&quot;</span>)
 		};
-		<span class="kw">let</span> <span class="ident">query_params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query_params</span>.<span class="ident">schema_kind</span> {
-			<span class="ident">SchemaKind::Type</span>(<span class="ident">Type::Object</span>(<span class="ident">ty</span>)) =&gt; <span class="ident">ty</span>,
-			<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Query Parameters needs to be a plain struct&quot;</span>)
-		};
-		<span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">schema</span>) <span class="kw">in</span> <span class="ident">query_params</span>.<span class="ident">properties</span> {
-			<span class="kw">let</span> <span class="ident">required</span> <span class="op">=</span> <span class="ident">query_params</span>.<span class="ident">required</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
-			<span class="ident">params</span>.<span class="ident">push</span>(<span class="ident">Item</span>(<span class="ident">Parameter::Query</span> {
-				<span class="ident">parameter_data</span>: <span class="ident">new_parameter_data</span>(<span class="ident">name</span>, <span class="ident">required</span>, <span class="ident">schema</span>),
-				<span class="ident">allow_reserved</span>: <span class="bool-val">false</span>,
-				<span class="ident">style</span>: <span class="ident">Default::default</span>(),
-				<span class="ident">allow_empty_value</span>: <span class="prelude-val">None</span>
-			}))
+		<span class="kw">for </span>(name, schema) <span class="kw">in </span>query_params.properties {
+			<span class="kw">let </span>required = query_params.required.contains(<span class="kw-2">&amp;</span>name);
+			params.push(Item(Parameter::Query {
+				parameter_data: new_parameter_data(name, required, schema),
+				allow_reserved: <span class="bool-val">false</span>,
+				style: Default::default(),
+				allow_empty_value: <span class="prelude-val">None
+			</span>}))
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">into_params</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Parameter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Parameter</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-		<span class="ident"><span class="self">Self</span>::add_path_params</span>(<span class="self">self</span>.<span class="ident">path_params</span>, <span class="kw-2">&amp;mut</span> <span class="ident">params</span>);
-		<span class="ident"><span class="self">Self</span>::add_query_params</span>(<span class="self">self</span>.<span class="ident">query_params</span>, <span class="kw-2">&amp;mut</span> <span class="ident">params</span>);
-		<span class="ident">params</span>
+	<span class="kw">fn </span>into_params(<span class="self">self</span>) -&gt; Vec&lt;ReferenceOr&lt;Parameter&gt;&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>params: Vec&lt;ReferenceOr&lt;Parameter&gt;&gt; = Vec::new();
+		<span class="self">Self</span>::add_path_params(<span class="self">self</span>.path_params, <span class="kw-2">&amp;mut </span>params);
+		<span class="self">Self</span>::add_query_params(<span class="self">self</span>.query_params, <span class="kw-2">&amp;mut </span>params);
+		params
 	}
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OperationDescription</span> {
-	<span class="ident">operation_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-	<span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OperationDescription {
+	operation_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+	description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-	<span class="ident">accepted_types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">responses</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StatusCode</span>, <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">params</span>: <span class="ident">OperationParams</span>,
-	<span class="ident">body_schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">supported_types</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">requires_auth</span>: <span class="ident">bool</span>
+	accepted_types: <span class="prelude-ty">Option</span>&lt;Vec&lt;Mime&gt;&gt;,
+	responses: HashMap&lt;StatusCode, ReferenceOr&lt;Schema&gt;&gt;,
+	params: OperationParams,
+	body_schema: <span class="prelude-ty">Option</span>&lt;ReferenceOr&lt;Schema&gt;&gt;,
+	supported_types: <span class="prelude-ty">Option</span>&lt;Vec&lt;Mime&gt;&gt;,
+	requires_auth: bool
 }
 
-<span class="kw">impl</span> <span class="ident">OperationDescription</span> {
-	<span class="doccomment">/// Create a new operation description for the given endpoint type and schema. If the endpoint</span>
-	<span class="doccomment">/// does not specify an operation id, the path is used to generate one.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">EndpointWithSchema</span><span class="op">&gt;</span>(
-		<span class="ident">responses</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StatusCode</span>, <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-		<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>
-	) -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="ident">operation_id</span> <span class="op">=</span> <span class="ident">E::operation_id</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
-			<span class="ident">E::operation_verb</span>()
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">verb</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{verb}_{}&quot;</span>, <span class="ident">path</span>.<span class="ident">replace</span>(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;_&quot;</span>).<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)))
+<span class="kw">impl </span>OperationDescription {
+	<span class="doccomment">/// Create a new operation description for the given endpoint type and schema. If the endpoint
+	/// does not specify an operation id, the path is used to generate one.
+	</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new&lt;E: EndpointWithSchema&gt;(
+		responses: HashMap&lt;StatusCode, ReferenceOr&lt;Schema&gt;&gt;,
+		path: <span class="kw-2">&amp;</span>str
+	) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span>operation_id = E::operation_id().or_else(|| {
+			E::operation_verb()
+				.map(|verb| <span class="macro">format!</span>(<span class="string">&quot;{verb}_{}&quot;</span>, path.replace(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;_&quot;</span>).trim_start_matches(<span class="string">&#39;_&#39;</span>)))
 		});
-		<span class="self">Self</span> {
-			<span class="ident">operation_id</span>,
-			<span class="ident">description</span>: <span class="ident">E::description</span>(),
+		<span class="self">Self </span>{
+			operation_id,
+			description: E::description(),
 
-			<span class="ident">accepted_types</span>: <span class="ident">E::Output::accepted_types</span>(),
-			<span class="ident">responses</span>,
-			<span class="ident">params</span>: <span class="ident">Default::default</span>(),
-			<span class="ident">body_schema</span>: <span class="prelude-val">None</span>,
-			<span class="ident">supported_types</span>: <span class="prelude-val">None</span>,
-			<span class="ident">requires_auth</span>: <span class="ident">E::wants_auth</span>()
+			accepted_types: E::Output::accepted_types(),
+			responses,
+			params: Default::default(),
+			body_schema: <span class="prelude-val">None</span>,
+			supported_types: <span class="prelude-val">None</span>,
+			requires_auth: E::wants_auth()
 		}
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_path_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">OpenapiSchema</span>) {
-		<span class="self">self</span>.<span class="ident">params</span>.<span class="ident">path_params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_path_params(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: OpenapiSchema) {
+		<span class="self">self</span>.params.path_params = <span class="prelude-val">Some</span>(params);
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_query_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">OpenapiSchema</span>) {
-		<span class="self">self</span>.<span class="ident">params</span>.<span class="ident">query_params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_query_params(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: OpenapiSchema) {
+		<span class="self">self</span>.params.query_params = <span class="prelude-val">Some</span>(params);
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_body</span><span class="op">&lt;</span><span class="ident">Body</span>: <span class="ident">RequestBody</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">body_schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">schema</span>);
-		<span class="self">self</span>.<span class="ident">supported_types</span> <span class="op">=</span> <span class="ident">Body::supported_types</span>();
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_body&lt;Body: RequestBody&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: ReferenceOr&lt;Schema&gt;) {
+		<span class="self">self</span>.body_schema = <span class="prelude-val">Some</span>(schema);
+		<span class="self">self</span>.supported_types = Body::supported_types();
 	}
 
-	<span class="kw">fn</span> <span class="ident">schema_to_content</span>(
-		<span class="ident">types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>,
-		<span class="ident">schema</span>: <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span>
-	) -&gt; <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">MediaType</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">MediaType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
-		<span class="kw">for</span> <span class="ident">ty</span> <span class="kw">in</span> <span class="ident">types</span> {
-			<span class="ident">content</span>.<span class="ident">insert</span>(<span class="ident">ty</span>.<span class="ident">to_string</span>(), <span class="ident">MediaType</span> {
-				<span class="ident">schema</span>: <span class="prelude-val">Some</span>(<span class="ident">schema</span>.<span class="ident">clone</span>()),
-				..<span class="ident">Default::default</span>()
+	<span class="kw">fn </span>schema_to_content(
+		types: Vec&lt;Mime&gt;,
+		schema: ReferenceOr&lt;Schema&gt;
+	) -&gt; IndexMap&lt;String, MediaType&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>content: IndexMap&lt;String, MediaType&gt; = IndexMap::new();
+		<span class="kw">for </span>ty <span class="kw">in </span>types {
+			content.insert(ty.to_string(), MediaType {
+				schema: <span class="prelude-val">Some</span>(schema.clone()),
+				..Default::default()
 			});
 		}
-		<span class="ident">content</span>
+		content
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_operation</span>(<span class="self">self</span>) -&gt; <span class="ident">Operation</span> {
-		<span class="comment">// this is unfortunately neccessary to prevent rust from complaining about partially moving self</span>
-		<span class="kw">let</span> (
-			<span class="ident">operation_id</span>,
-			<span class="ident">description</span>,
-			<span class="ident">accepted_types</span>,
-			<span class="ident">responses</span>,
-			<span class="ident">params</span>,
-			<span class="ident">body_schema</span>,
-			<span class="ident">supported_types</span>,
-			<span class="ident">requires_auth</span>
-		) <span class="op">=</span> (
-			<span class="self">self</span>.<span class="ident">operation_id</span>,
-			<span class="self">self</span>.<span class="ident">description</span>,
-			<span class="self">self</span>.<span class="ident">accepted_types</span>,
-			<span class="self">self</span>.<span class="ident">responses</span>,
-			<span class="self">self</span>.<span class="ident">params</span>,
-			<span class="self">self</span>.<span class="ident">body_schema</span>,
-			<span class="self">self</span>.<span class="ident">supported_types</span>,
-			<span class="self">self</span>.<span class="ident">requires_auth</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_operation(<span class="self">self</span>) -&gt; Operation {
+		<span class="comment">// this is unfortunately neccessary to prevent rust from complaining about partially moving self
+		</span><span class="kw">let </span>(
+			operation_id,
+			description,
+			accepted_types,
+			responses,
+			params,
+			body_schema,
+			supported_types,
+			requires_auth
+		) = (
+			<span class="self">self</span>.operation_id,
+			<span class="self">self</span>.description,
+			<span class="self">self</span>.accepted_types,
+			<span class="self">self</span>.responses,
+			<span class="self">self</span>.params,
+			<span class="self">self</span>.body_schema,
+			<span class="self">self</span>.supported_types,
+			<span class="self">self</span>.requires_auth
 		);
 
-		<span class="kw">let</span> <span class="ident">responses</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">OAStatusCode</span>, <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">responses</span>
-			.<span class="ident">into_iter</span>()
-			.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">code</span>, <span class="ident">schema</span>)<span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
-					<span class="ident"><span class="self">Self</span>::schema_to_content</span>(<span class="ident">accepted_types</span>.<span class="ident">clone</span>().<span class="ident">or_all_types</span>(), <span class="ident">schema</span>);
+		<span class="kw">let </span>responses: IndexMap&lt;OAStatusCode, ReferenceOr&lt;Response&gt;&gt; = responses
+			.into_iter()
+			.map(|(code, schema)| {
+				<span class="kw">let </span>content =
+					<span class="self">Self</span>::schema_to_content(accepted_types.clone().or_all_types(), schema);
 				(
-					<span class="ident">OAStatusCode::Code</span>(<span class="ident">code</span>.<span class="ident">as_u16</span>()),
-					<span class="ident">Item</span>(<span class="ident">Response</span> {
-						<span class="ident">description</span>: <span class="ident">code</span>
-							.<span class="ident">canonical_reason</span>()
-							.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">to_string</span>())
-							.<span class="ident">unwrap_or_default</span>(),
-						<span class="ident">content</span>,
-						..<span class="ident">Default::default</span>()
+					OAStatusCode::Code(code.as_u16()),
+					Item(Response {
+						description: code
+							.canonical_reason()
+							.map(|d| d.to_string())
+							.unwrap_or_default(),
+						content,
+						..Default::default()
 					})
 				)
 			})
-			.<span class="ident">collect</span>();
+			.collect();
 
-		<span class="kw">let</span> <span class="ident">request_body</span> <span class="op">=</span> <span class="ident">body_schema</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">schema</span><span class="op">|</span> {
-			<span class="ident">Item</span>(<span class="ident">OARequestBody</span> {
-				<span class="ident">content</span>: <span class="ident"><span class="self">Self</span>::schema_to_content</span>(<span class="ident">supported_types</span>.<span class="ident">or_all_types</span>(), <span class="ident">schema</span>),
-				<span class="ident">required</span>: <span class="bool-val">true</span>,
-				..<span class="ident">Default::default</span>()
+		<span class="kw">let </span>request_body = body_schema.map(|schema| {
+			Item(OARequestBody {
+				content: <span class="self">Self</span>::schema_to_content(supported_types.or_all_types(), schema),
+				required: <span class="bool-val">true</span>,
+				..Default::default()
 			})
 		});
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">security</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-		<span class="kw">if</span> <span class="ident">requires_auth</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sec</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
-			<span class="ident">sec</span>.<span class="ident">insert</span>(<span class="ident">SECURITY_NAME</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>());
-			<span class="ident">security</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">sec</span>]);
+		<span class="kw">let </span><span class="kw-2">mut </span>security = <span class="prelude-val">None</span>;
+		<span class="kw">if </span>requires_auth {
+			<span class="kw">let </span><span class="kw-2">mut </span>sec = IndexMap::new();
+			sec.insert(SECURITY_NAME.to_owned(), Vec::new());
+			security = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[sec]);
 		}
 
-		<span class="ident">Operation</span> {
-			<span class="ident">tags</span>: <span class="ident">Vec::new</span>(),
-			<span class="ident">operation_id</span>,
-			<span class="ident">description</span>,
-			<span class="ident">parameters</span>: <span class="ident">params</span>.<span class="ident">into_params</span>(),
-			<span class="ident">request_body</span>,
-			<span class="ident">responses</span>: <span class="ident">Responses</span> {
-				<span class="ident">responses</span>,
-				..<span class="ident">Default::default</span>()
+		Operation {
+			tags: Vec::new(),
+			operation_id,
+			description,
+			parameters: params.into_params(),
+			request_body,
+			responses: Responses {
+				responses,
+				..Default::default()
 			},
-			<span class="ident">deprecated</span>: <span class="bool-val">false</span>,
-			<span class="ident">security</span>,
-			..<span class="ident">Default::default</span>()
+			deprecated: <span class="bool-val">false</span>,
+			security,
+			..Default::default()
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">NoContent</span>, <span class="ident">Raw</span>, <span class="ident">ResponseSchema</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use crate</span>::{NoContent, Raw, ResponseSchema};
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">no_content_schema_to_content</span>() {
-		<span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">NoContent::accepted_types</span>();
-		<span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">NoContent</span> <span class="kw">as</span> <span class="ident">ResponseSchema</span><span class="op">&gt;</span><span class="ident">::schema</span>(<span class="ident">StatusCode::NO_CONTENT</span>);
-		<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
-			<span class="ident">OperationDescription::schema_to_content</span>(<span class="ident">types</span>.<span class="ident">or_all_types</span>(), <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
-		<span class="macro">assert!</span>(<span class="ident">content</span>.<span class="ident">is_empty</span>());
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>no_content_schema_to_content() {
+		<span class="kw">let </span>types = NoContent::accepted_types();
+		<span class="kw">let </span>schema = &lt;NoContent <span class="kw">as </span>ResponseSchema&gt;::schema(StatusCode::NO_CONTENT);
+		<span class="kw">let </span>content =
+			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
+		<span class="macro">assert!</span>(content.is_empty());
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">raw_schema_to_content</span>() {
-		<span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">Raw</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::accepted_types</span>();
-		<span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">ResponseSchema</span><span class="op">&gt;</span><span class="ident">::schema</span>(<span class="ident">StatusCode::OK</span>);
-		<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
-			<span class="ident">OperationDescription::schema_to_content</span>(<span class="ident">types</span>.<span class="ident">or_all_types</span>(), <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">content</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-		<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">values</span>().<span class="ident">nth</span>(<span class="number">0</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq!</span>(<span class="ident">json</span>, <span class="string">r#&quot;{&quot;schema&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;format&quot;:&quot;binary&quot;}}&quot;#</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>raw_schema_to_content() {
+		<span class="kw">let </span>types = Raw::&lt;<span class="kw-2">&amp;</span>str&gt;::accepted_types();
+		<span class="kw">let </span>schema = &lt;Raw&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">as </span>ResponseSchema&gt;::schema(StatusCode::OK);
+		<span class="kw">let </span>content =
+			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
+		<span class="macro">assert_eq!</span>(content.len(), <span class="number">1</span>);
+		<span class="kw">let </span>json = serde_json::to_string(<span class="kw-2">&amp;</span>content.values().nth(<span class="number">0</span>).unwrap()).unwrap();
+		<span class="macro">assert_eq!</span>(json, <span class="string">r#&quot;{&quot;schema&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;format&quot;:&quot;binary&quot;}}&quot;#</span>);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

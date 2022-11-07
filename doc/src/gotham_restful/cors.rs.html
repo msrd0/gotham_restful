@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cors.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cors.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../gotham_restful/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -301,306 +301,306 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">gotham</span>::{
-	<span class="ident">handler::HandlerFuture</span>,
-	<span class="ident">helpers::http::response::create_empty_response</span>,
-	<span class="ident">hyper</span>::{
-		<span class="ident">header</span>::{
-			<span class="ident">HeaderMap</span>, <span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>, <span class="ident">ACCESS_CONTROL_ALLOW_CREDENTIALS</span>,
-			<span class="ident">ACCESS_CONTROL_ALLOW_HEADERS</span>, <span class="ident">ACCESS_CONTROL_ALLOW_METHODS</span>,
-			<span class="ident">ACCESS_CONTROL_ALLOW_ORIGIN</span>, <span class="ident">ACCESS_CONTROL_MAX_AGE</span>, <span class="ident">ACCESS_CONTROL_REQUEST_HEADERS</span>,
-			<span class="ident">ACCESS_CONTROL_REQUEST_METHOD</span>, <span class="ident">ORIGIN</span>, <span class="ident">VARY</span>
+</pre><pre class="rust"><code><span class="kw">use </span>gotham::{
+	handler::HandlerFuture,
+	helpers::http::response::create_empty_response,
+	hyper::{
+		header::{
+			HeaderMap, HeaderName, HeaderValue, ACCESS_CONTROL_ALLOW_CREDENTIALS,
+			ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_METHODS,
+			ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_MAX_AGE, ACCESS_CONTROL_REQUEST_HEADERS,
+			ACCESS_CONTROL_REQUEST_METHOD, ORIGIN, VARY
 		},
-		<span class="ident">Body</span>, <span class="ident">Method</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>
+		Body, Method, Response, StatusCode
 	},
-	<span class="ident">middleware::Middleware</span>,
-	<span class="ident">pipeline::PipelineHandleChain</span>,
-	<span class="ident">prelude</span>::<span class="kw-2">*</span>,
-	<span class="ident">router</span>::{<span class="ident">builder::ExtendRouteMatcher</span>, <span class="ident">route::matcher::AccessControlRequestMethodMatcher</span>},
-	<span class="ident">state::State</span>
+	middleware::Middleware,
+	pipeline::PipelineHandleChain,
+	prelude::<span class="kw-2">*</span>,
+	router::{builder::ExtendRouteMatcher, route::matcher::AccessControlRequestMethodMatcher},
+	state::State
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">panic::RefUnwindSafe</span>, <span class="ident">pin::Pin</span>};
+<span class="kw">use </span>std::{panic::RefUnwindSafe, pin::Pin};
 
-<span class="doccomment">/// Specify the allowed origins of the request. It is up to the browser to check the validity of the</span>
-<span class="doccomment">/// origin. This, when sent to the browser, will indicate whether or not the request&#39;s origin was</span>
-<span class="doccomment">/// allowed to make the request.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Origin</span> {
-	<span class="doccomment">/// Do not send any `Access-Control-Allow-Origin` headers.</span>
-	<span class="prelude-val">None</span>,
-	<span class="doccomment">/// Send `Access-Control-Allow-Origin: *`. Note that browser will not send credentials.</span>
-	<span class="ident">Star</span>,
-	<span class="doccomment">/// Set the `Access-Control-Allow-Origin` header to a single origin.</span>
-	<span class="ident">Single</span>(<span class="ident">String</span>),
-	<span class="doccomment">/// Copy the `Origin` header into the `Access-Control-Allow-Origin` header.</span>
-	<span class="ident">Copy</span>
+<span class="doccomment">/// Specify the allowed origins of the request. It is up to the browser to check the validity of the
+/// origin. This, when sent to the browser, will indicate whether or not the request&#39;s origin was
+/// allowed to make the request.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>Origin {
+	<span class="doccomment">/// Do not send any `Access-Control-Allow-Origin` headers.
+	</span><span class="prelude-val">None</span>,
+	<span class="doccomment">/// Send `Access-Control-Allow-Origin: *`. Note that browser will not send credentials.
+	</span>Star,
+	<span class="doccomment">/// Set the `Access-Control-Allow-Origin` header to a single origin.
+	</span>Single(String),
+	<span class="doccomment">/// Copy the `Origin` header into the `Access-Control-Allow-Origin` header.
+	</span>Copy
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Origin</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::None</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>Origin {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::None
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">Origin</span> {
-	<span class="doccomment">/// Get the header value for the `Access-Control-Allow-Origin` header.</span>
-	<span class="kw">fn</span> <span class="ident">header_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident"><span class="self">Self</span>::Star</span> =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;*&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()),
-			<span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">origin</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">origin</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()),
-			<span class="ident"><span class="self">Self</span>::Copy</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::borrow_from</span>(<span class="ident">state</span>);
-				<span class="ident">headers</span>.<span class="ident">get</span>(<span class="ident">ORIGIN</span>).<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
+<span class="kw">impl </span>Origin {
+	<span class="doccomment">/// Get the header value for the `Access-Control-Allow-Origin` header.
+	</span><span class="kw">fn </span>header_value(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>State) -&gt; <span class="prelude-ty">Option</span>&lt;HeaderValue&gt; {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::None =&gt; <span class="prelude-val">None</span>,
+			<span class="self">Self</span>::Star =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;*&quot;</span>.parse().unwrap()),
+			<span class="self">Self</span>::Single(origin) =&gt; <span class="prelude-val">Some</span>(origin.parse().unwrap()),
+			<span class="self">Self</span>::Copy =&gt; {
+				<span class="kw">let </span>headers = HeaderMap::borrow_from(state);
+				headers.get(ORIGIN).map(Clone::clone)
 			}
 		}
 	}
 
-	<span class="doccomment">/// Returns true if the `Vary` header has to include `Origin`.</span>
-	<span class="kw">fn</span> <span class="ident">varies</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Copy</span>)
+	<span class="doccomment">/// Returns true if the `Vary` header has to include `Origin`.
+	</span><span class="kw">fn </span>varies(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Copy)
 	}
 }
 
-<span class="doccomment">/// Specify the allowed headers of the request. It is up to the browser to check that only the allowed</span>
-<span class="doccomment">/// headers are sent with the request.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Headers</span> {
-	<span class="doccomment">/// Do not send any `Access-Control-Allow-Headers` headers.</span>
-	<span class="prelude-val">None</span>,
-	<span class="doccomment">/// Set the `Access-Control-Allow-Headers` header to the following header list. If empty, this</span>
-	<span class="doccomment">/// is treated as if it was [None].</span>
-	<span class="ident">List</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>),
-	<span class="doccomment">/// Copy the `Access-Control-Request-Headers` header into the `Access-Control-Allow-Header`</span>
-	<span class="doccomment">/// header.</span>
-	<span class="ident">Copy</span>
+<span class="doccomment">/// Specify the allowed headers of the request. It is up to the browser to check that only the allowed
+/// headers are sent with the request.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>Headers {
+	<span class="doccomment">/// Do not send any `Access-Control-Allow-Headers` headers.
+	</span><span class="prelude-val">None</span>,
+	<span class="doccomment">/// Set the `Access-Control-Allow-Headers` header to the following header list. If empty, this
+	/// is treated as if it was [None].
+	</span>List(Vec&lt;HeaderName&gt;),
+	<span class="doccomment">/// Copy the `Access-Control-Request-Headers` header into the `Access-Control-Allow-Header`
+	/// header.
+	</span>Copy
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Headers</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::None</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>Headers {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::None
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">Headers</span> {
-	<span class="doccomment">/// Get the header value for the `Access-Control-Allow-Headers` header.</span>
-	<span class="kw">fn</span> <span class="ident">header_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident"><span class="self">Self</span>::List</span>(<span class="ident">list</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">list</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>()),
-			<span class="ident"><span class="self">Self</span>::Copy</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">HeaderMap::borrow_from</span>(<span class="ident">state</span>);
-				<span class="ident">headers</span>
-					.<span class="ident">get</span>(<span class="ident">ACCESS_CONTROL_REQUEST_HEADERS</span>)
-					.<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
+<span class="kw">impl </span>Headers {
+	<span class="doccomment">/// Get the header value for the `Access-Control-Allow-Headers` header.
+	</span><span class="kw">fn </span>header_value(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>State) -&gt; <span class="prelude-ty">Option</span>&lt;HeaderValue&gt; {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::None =&gt; <span class="prelude-val">None</span>,
+			<span class="self">Self</span>::List(list) =&gt; <span class="prelude-val">Some</span>(list.join(<span class="string">&quot;,&quot;</span>).parse().unwrap()),
+			<span class="self">Self</span>::Copy =&gt; {
+				<span class="kw">let </span>headers = HeaderMap::borrow_from(state);
+				headers
+					.get(ACCESS_CONTROL_REQUEST_HEADERS)
+					.map(Clone::clone)
 			}
 		}
 	}
 
-	<span class="doccomment">/// Returns true if the `Vary` header has to include `Origin`.</span>
-	<span class="kw">fn</span> <span class="ident">varies</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Copy</span>)
+	<span class="doccomment">/// Returns true if the `Vary` header has to include `Origin`.
+	</span><span class="kw">fn </span>varies(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Copy)
 	}
 }
 
-<span class="doccomment">/// This is the configuration that the CORS handler will follow. Its default configuration is basically</span>
-<span class="doccomment">/// not to touch any responses, resulting in the browser&#39;s default behaviour.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To change settings, you need to put this type into gotham&#39;s [State]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use gotham::{router::builder::*, pipeline::*, state::State};</span>
-<span class="doccomment">/// # use gotham_restful::{*, cors::Origin};</span>
-<span class="doccomment">/// # #[cfg_attr(feature = &quot;cargo-clippy&quot;, allow(clippy::needless_doctest_main))]</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">/// 	let cors = CorsConfig {</span>
-<span class="doccomment">/// 		origin: Origin::Star,</span>
-<span class="doccomment">/// 		..Default::default()</span>
-<span class="doccomment">/// 	};</span>
-<span class="doccomment">/// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());</span>
-<span class="doccomment">/// 	gotham::start(</span>
-<span class="doccomment">/// 		&quot;127.0.0.1:8080&quot;,</span>
-<span class="doccomment">/// 		build_router(chain, pipelines, |route| {</span>
-<span class="doccomment">/// 			// your routing logic</span>
-<span class="doccomment">/// 		})</span>
-<span class="doccomment">/// 	);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This easy approach allows you to have one global cors configuration. If you prefer to have separate</span>
-<span class="doccomment">/// configurations for different scopes, you need to register the middleware inside your routing logic:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use gotham::{router::builder::*, pipeline::*, state::State};</span>
-<span class="doccomment">/// # use gotham_restful::{*, cors::Origin};</span>
-<span class="doccomment">/// let pipelines = new_pipeline_set();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The first cors configuration</span>
-<span class="doccomment">/// let cors_a = CorsConfig {</span>
-<span class="doccomment">/// 	origin: Origin::Star,</span>
-<span class="doccomment">/// 	..Default::default()</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// let (pipelines, chain_a) = pipelines.add(new_pipeline().add(cors_a).build());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The second cors configuration</span>
-<span class="doccomment">/// let cors_b = CorsConfig {</span>
-<span class="doccomment">/// 	origin: Origin::Copy,</span>
-<span class="doccomment">/// 	..Default::default()</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// let (pipelines, chain_b) = pipelines.add(new_pipeline().add(cors_b).build());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pipeline_set = finalize_pipeline_set(pipelines);</span>
-<span class="doccomment">/// gotham::start(</span>
-<span class="doccomment">/// 	&quot;127.0.0.1:8080&quot;,</span>
-<span class="doccomment">/// 	build_router((), pipeline_set, |route| {</span>
-<span class="doccomment">/// 		// routing without any cors config</span>
-<span class="doccomment">/// 		route.with_pipeline_chain((chain_a, ()), |route| {</span>
-<span class="doccomment">/// 			// routing with cors config a</span>
-<span class="doccomment">/// 		});</span>
-<span class="doccomment">/// 		route.with_pipeline_chain((chain_b, ()), |route| {</span>
-<span class="doccomment">/// 			// routing with cors config b</span>
-<span class="doccomment">/// 		});</span>
-<span class="doccomment">/// 	})</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">NewMiddleware</span>, <span class="ident">StateData</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CorsConfig</span> {
-	<span class="doccomment">/// The allowed origins.</span>
-	<span class="kw">pub</span> <span class="ident">origin</span>: <span class="ident">Origin</span>,
-	<span class="doccomment">/// The allowed headers.</span>
-	<span class="kw">pub</span> <span class="ident">headers</span>: <span class="ident">Headers</span>,
-	<span class="doccomment">/// The amount of seconds that the preflight request can be cached.</span>
-	<span class="kw">pub</span> <span class="ident">max_age</span>: <span class="ident">u64</span>,
-	<span class="doccomment">/// Whether or not the request may be made with supplying credentials.</span>
-	<span class="kw">pub</span> <span class="ident">credentials</span>: <span class="ident">bool</span>
+<span class="doccomment">/// This is the configuration that the CORS handler will follow. Its default configuration is basically
+/// not to touch any responses, resulting in the browser&#39;s default behaviour.
+///
+/// To change settings, you need to put this type into gotham&#39;s [State]:
+///
+/// ```rust,no_run
+/// # use gotham::{router::builder::*, pipeline::*, state::State};
+/// # use gotham_restful::{*, cors::Origin};
+/// # #[cfg_attr(feature = &quot;cargo-clippy&quot;, allow(clippy::needless_doctest_main))]
+/// fn main() {
+/// 	let cors = CorsConfig {
+/// 		origin: Origin::Star,
+/// 		..Default::default()
+/// 	};
+/// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(cors).build());
+/// 	gotham::start(
+/// 		&quot;127.0.0.1:8080&quot;,
+/// 		build_router(chain, pipelines, |route| {
+/// 			// your routing logic
+/// 		})
+/// 	);
+/// }
+/// ```
+///
+/// This easy approach allows you to have one global cors configuration. If you prefer to have separate
+/// configurations for different scopes, you need to register the middleware inside your routing logic:
+///
+/// ```rust,no_run
+/// # use gotham::{router::builder::*, pipeline::*, state::State};
+/// # use gotham_restful::{*, cors::Origin};
+/// let pipelines = new_pipeline_set();
+///
+/// // The first cors configuration
+/// let cors_a = CorsConfig {
+/// 	origin: Origin::Star,
+/// 	..Default::default()
+/// };
+/// let (pipelines, chain_a) = pipelines.add(new_pipeline().add(cors_a).build());
+///
+/// // The second cors configuration
+/// let cors_b = CorsConfig {
+/// 	origin: Origin::Copy,
+/// 	..Default::default()
+/// };
+/// let (pipelines, chain_b) = pipelines.add(new_pipeline().add(cors_b).build());
+///
+/// let pipeline_set = finalize_pipeline_set(pipelines);
+/// gotham::start(
+/// 	&quot;127.0.0.1:8080&quot;,
+/// 	build_router((), pipeline_set, |route| {
+/// 		// routing without any cors config
+/// 		route.with_pipeline_chain((chain_a, ()), |route| {
+/// 			// routing with cors config a
+/// 		});
+/// 		route.with_pipeline_chain((chain_b, ()), |route| {
+/// 			// routing with cors config b
+/// 		});
+/// 	})
+/// );
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, Default, NewMiddleware, StateData)]
+</span><span class="kw">pub struct </span>CorsConfig {
+	<span class="doccomment">/// The allowed origins.
+	</span><span class="kw">pub </span>origin: Origin,
+	<span class="doccomment">/// The allowed headers.
+	</span><span class="kw">pub </span>headers: Headers,
+	<span class="doccomment">/// The amount of seconds that the preflight request can be cached.
+	</span><span class="kw">pub </span>max_age: u64,
+	<span class="doccomment">/// Whether or not the request may be made with supplying credentials.
+	</span><span class="kw">pub </span>credentials: bool
 }
 
-<span class="kw">impl</span> <span class="ident">Middleware</span> <span class="kw">for</span> <span class="ident">CorsConfig</span> {
-	<span class="kw">fn</span> <span class="ident">call</span><span class="op">&lt;</span><span class="ident">Chain</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">chain</span>: <span class="ident">Chain</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">Chain</span>: <span class="ident">FnOnce</span>(<span class="ident">State</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HandlerFuture</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">impl </span>Middleware <span class="kw">for </span>CorsConfig {
+	<span class="kw">fn </span>call&lt;Chain&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>state: State, chain: Chain) -&gt; Pin&lt;Box&lt;HandlerFuture&gt;&gt;
+	<span class="kw">where
+		</span>Chain: FnOnce(State) -&gt; Pin&lt;Box&lt;HandlerFuture&gt;&gt;
 	{
-		<span class="ident">state</span>.<span class="ident">put</span>(<span class="self">self</span>);
-		<span class="ident">chain</span>(<span class="ident">state</span>)
+		state.put(<span class="self">self</span>);
+		chain(state)
 	}
 }
 
-<span class="doccomment">/// Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that</span>
-<span class="doccomment">/// the response is aligned with the `state`&#39;s [CorsConfig].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you are using the [Resource](crate::Resource) type (which is the recommended way), you&#39;ll never</span>
-<span class="doccomment">/// have to call this method. However, if you are writing your own handler method, you might want to</span>
-<span class="doccomment">/// call this after your request to add the required CORS headers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For further information on CORS, read &lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS&gt;.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_cors</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">res</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-	<span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">CorsConfig::try_borrow_from</span>(<span class="ident">state</span>);
-	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">config</span> {
-		<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers_mut</span>();
+<span class="doccomment">/// Handle CORS for a non-preflight request. This means manipulating the `res` HTTP headers so that
+/// the response is aligned with the `state`&#39;s [CorsConfig].
+///
+/// If you are using the [Resource](crate::Resource) type (which is the recommended way), you&#39;ll never
+/// have to call this method. However, if you are writing your own handler method, you might want to
+/// call this after your request to add the required CORS headers.
+///
+/// For further information on CORS, read &lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS&gt;.
+</span><span class="kw">pub fn </span>handle_cors(state: <span class="kw-2">&amp;</span>State, res: <span class="kw-2">&amp;mut </span>Response&lt;Body&gt;) {
+	<span class="kw">let </span>config = CorsConfig::try_borrow_from(state);
+	<span class="kw">if let </span><span class="prelude-val">Some</span>(cfg) = config {
+		<span class="kw">let </span>headers = res.headers_mut();
 
-		<span class="comment">// non-preflight requests require the Access-Control-Allow-Origin header</span>
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">header</span>) <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">origin</span>.<span class="ident">header_value</span>(<span class="ident">state</span>) {
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">ACCESS_CONTROL_ALLOW_ORIGIN</span>, <span class="ident">header</span>);
+		<span class="comment">// non-preflight requests require the Access-Control-Allow-Origin header
+		</span><span class="kw">if let </span><span class="prelude-val">Some</span>(header) = cfg.origin.header_value(state) {
+			headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, header);
 		}
 
-		<span class="comment">// if the origin is copied over, we should tell the browser by specifying the Vary header</span>
-		<span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">origin</span>.<span class="ident">varies</span>() {
-			<span class="kw">let</span> <span class="ident">vary</span> <span class="op">=</span> <span class="ident">headers</span>
-				.<span class="ident">get</span>(<span class="ident">VARY</span>)
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">vary</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{},origin&quot;</span>, <span class="ident">vary</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>()));
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">VARY</span>, <span class="ident">vary</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;origin&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+		<span class="comment">// if the origin is copied over, we should tell the browser by specifying the Vary header
+		</span><span class="kw">if </span>cfg.origin.varies() {
+			<span class="kw">let </span>vary = headers
+				.get(VARY)
+				.map(|vary| <span class="macro">format!</span>(<span class="string">&quot;{},origin&quot;</span>, vary.to_str().unwrap()));
+			headers.insert(VARY, vary.as_deref().unwrap_or(<span class="string">&quot;origin&quot;</span>).parse().unwrap());
 		}
 
-		<span class="comment">// if we allow credentials, tell the browser</span>
-		<span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">credentials</span> {
-			<span class="ident">headers</span>.<span class="ident">insert</span>(
-				<span class="ident">ACCESS_CONTROL_ALLOW_CREDENTIALS</span>,
-				<span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;true&quot;</span>)
+		<span class="comment">// if we allow credentials, tell the browser
+		</span><span class="kw">if </span>cfg.credentials {
+			headers.insert(
+				ACCESS_CONTROL_ALLOW_CREDENTIALS,
+				HeaderValue::from_static(<span class="string">&quot;true&quot;</span>)
 			);
 		}
 	}
 }
 
-<span class="doccomment">/// Add CORS routing for your path. This is required for handling preflight requests.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use gotham::{hyper::{Body, Method, Response}, router::builder::*};</span>
-<span class="doccomment">/// # use gotham_restful::*;</span>
-<span class="doccomment">/// build_simple_router(|router| {</span>
-<span class="doccomment">/// 	// The handler that needs preflight handling</span>
-<span class="doccomment">/// 	router.post(&quot;/foo&quot;).to(|state| {</span>
-<span class="doccomment">/// 		let mut res: Response&lt;Body&gt; = unimplemented!();</span>
-<span class="doccomment">/// 		handle_cors(&amp;state, &amp;mut res);</span>
-<span class="doccomment">/// 		(state, res)</span>
-<span class="doccomment">/// 	});</span>
-<span class="doccomment">/// 	// Add preflight handling</span>
-<span class="doccomment">/// 	router.cors(&quot;/foo&quot;, Method::POST);</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CorsRoute</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">C</span>: <span class="ident">PipelineHandleChain</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">P</span>: <span class="ident">RefUnwindSafe</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
-{
-	<span class="doccomment">/// Handle a preflight request on `path` for `method`. To configure the behaviour, use</span>
-	<span class="doccomment">/// [CorsConfig].</span>
-	<span class="kw">fn</span> <span class="ident">cors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">Method</span>);
+<span class="doccomment">/// Add CORS routing for your path. This is required for handling preflight requests.
+///
+/// Example:
+///
+/// ```rust,no_run
+/// # use gotham::{hyper::{Body, Method, Response}, router::builder::*};
+/// # use gotham_restful::*;
+/// build_simple_router(|router| {
+/// 	// The handler that needs preflight handling
+/// 	router.post(&quot;/foo&quot;).to(|state| {
+/// 		let mut res: Response&lt;Body&gt; = unimplemented!();
+/// 		handle_cors(&amp;state, &amp;mut res);
+/// 		(state, res)
+/// 	});
+/// 	// Add preflight handling
+/// 	router.cors(&quot;/foo&quot;, Method::POST);
+/// });
+/// ```
+</span><span class="kw">pub trait </span>CorsRoute&lt;C, P&gt;
+<span class="kw">where
+	</span>C: PipelineHandleChain&lt;P&gt; + Copy + Send + Sync + <span class="lifetime">&#39;static</span>,
+	P: RefUnwindSafe + Send + Sync + <span class="lifetime">&#39;static
+</span>{
+	<span class="doccomment">/// Handle a preflight request on `path` for `method`. To configure the behaviour, use
+	/// [CorsConfig].
+	</span><span class="kw">fn </span>cors(<span class="kw-2">&amp;mut </span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str, method: Method);
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cors_preflight_handler</span>(<span class="ident">state</span>: <span class="ident">State</span>) -&gt; (<span class="ident">State</span>, <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
-	<span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">CorsConfig::try_borrow_from</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cors_preflight_handler(state: State) -&gt; (State, Response&lt;Body&gt;) {
+	<span class="kw">let </span>config = CorsConfig::try_borrow_from(<span class="kw-2">&amp;</span>state);
 
-	<span class="comment">// prepare the response</span>
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">create_empty_response</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="ident">StatusCode::NO_CONTENT</span>);
-	<span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers_mut</span>();
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vary</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+	<span class="comment">// prepare the response
+	</span><span class="kw">let </span><span class="kw-2">mut </span>res = create_empty_response(<span class="kw-2">&amp;</span>state, StatusCode::NO_CONTENT);
+	<span class="kw">let </span>headers = res.headers_mut();
+	<span class="kw">let </span><span class="kw-2">mut </span>vary: Vec&lt;HeaderName&gt; = Vec::new();
 
-	<span class="comment">// copy the request method over to the response</span>
-	<span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">HeaderMap::borrow_from</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>)
-		.<span class="ident">get</span>(<span class="ident">ACCESS_CONTROL_REQUEST_METHOD</span>)
-		.<span class="ident">unwrap</span>()
-		.<span class="ident">clone</span>();
-	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">ACCESS_CONTROL_ALLOW_METHODS</span>, <span class="ident">method</span>);
-	<span class="ident">vary</span>.<span class="ident">push</span>(<span class="ident">ACCESS_CONTROL_REQUEST_METHOD</span>);
+	<span class="comment">// copy the request method over to the response
+	</span><span class="kw">let </span>method = HeaderMap::borrow_from(<span class="kw-2">&amp;</span>state)
+		.get(ACCESS_CONTROL_REQUEST_METHOD)
+		.unwrap()
+		.clone();
+	headers.insert(ACCESS_CONTROL_ALLOW_METHODS, method);
+	vary.push(ACCESS_CONTROL_REQUEST_METHOD);
 
-	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cfg</span>) <span class="op">=</span> <span class="ident">config</span> {
-		<span class="comment">// if we allow any headers, copy them over</span>
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">header</span>) <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">headers</span>.<span class="ident">header_value</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>) {
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">ACCESS_CONTROL_ALLOW_HEADERS</span>, <span class="ident">header</span>);
+	<span class="kw">if let </span><span class="prelude-val">Some</span>(cfg) = config {
+		<span class="comment">// if we allow any headers, copy them over
+		</span><span class="kw">if let </span><span class="prelude-val">Some</span>(header) = cfg.headers.header_value(<span class="kw-2">&amp;</span>state) {
+			headers.insert(ACCESS_CONTROL_ALLOW_HEADERS, header);
 		}
 
-		<span class="comment">// if the headers are copied over, we should tell the browser by specifying the Vary header</span>
-		<span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">headers</span>.<span class="ident">varies</span>() {
-			<span class="ident">vary</span>.<span class="ident">push</span>(<span class="ident">ACCESS_CONTROL_REQUEST_HEADERS</span>);
+		<span class="comment">// if the headers are copied over, we should tell the browser by specifying the Vary header
+		</span><span class="kw">if </span>cfg.headers.varies() {
+			vary.push(ACCESS_CONTROL_REQUEST_HEADERS);
 		}
 
-		<span class="comment">// set the max age for the preflight cache</span>
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">age</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">cfg</span><span class="op">|</span> <span class="ident">cfg</span>.<span class="ident">max_age</span>) {
-			<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">ACCESS_CONTROL_MAX_AGE</span>, <span class="ident">age</span>.<span class="ident">into</span>());
+		<span class="comment">// set the max age for the preflight cache
+		</span><span class="kw">if let </span><span class="prelude-val">Some</span>(age) = config.map(|cfg| cfg.max_age) {
+			headers.insert(ACCESS_CONTROL_MAX_AGE, age.into());
 		}
 	}
 
-	<span class="comment">// make sure the browser knows that this request was based on the method</span>
-	<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">VARY</span>, <span class="ident">vary</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>).<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+	<span class="comment">// make sure the browser knows that this request was based on the method
+	</span>headers.insert(VARY, vary.join(<span class="string">&quot;,&quot;</span>).parse().unwrap());
 
-	<span class="ident">handle_cors</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>, <span class="kw-2">&amp;mut</span> <span class="ident">res</span>);
-	(<span class="ident">state</span>, <span class="ident">res</span>)
+	handle_cors(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>res);
+	(state, res)
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">CorsRoute</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">D</span>
-<span class="kw">where</span>
-	<span class="ident">D</span>: <span class="ident">DrawRoutes</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-	<span class="ident">C</span>: <span class="ident">PipelineHandleChain</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">P</span>: <span class="ident">RefUnwindSafe</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
-{
-	<span class="kw">fn</span> <span class="ident">cors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">Method</span>) {
-		<span class="kw">let</span> <span class="ident">matcher</span> <span class="op">=</span> <span class="ident">AccessControlRequestMethodMatcher::new</span>(<span class="ident">method</span>);
-		<span class="self">self</span>.<span class="ident">options</span>(<span class="ident">path</span>)
-			.<span class="ident">extend_route_matcher</span>(<span class="ident">matcher</span>)
-			.<span class="ident">to</span>(<span class="ident">cors_preflight_handler</span>);
+<span class="kw">impl</span>&lt;D, C, P&gt; CorsRoute&lt;C, P&gt; <span class="kw">for </span>D
+<span class="kw">where
+	</span>D: DrawRoutes&lt;C, P&gt;,
+	C: PipelineHandleChain&lt;P&gt; + Copy + Send + Sync + <span class="lifetime">&#39;static</span>,
+	P: RefUnwindSafe + Send + Sync + <span class="lifetime">&#39;static
+</span>{
+	<span class="kw">fn </span>cors(<span class="kw-2">&amp;mut </span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str, method: Method) {
+		<span class="kw">let </span>matcher = AccessControlRequestMethodMatcher::new(method);
+		<span class="self">self</span>.options(path)
+			.extend_route_matcher(matcher)
+			.to(cors_preflight_handler);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

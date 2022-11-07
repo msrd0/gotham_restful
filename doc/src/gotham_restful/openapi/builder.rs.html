@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../gotham_restful/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../gotham_restful/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -163,168 +163,168 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">openapi_type</span>::{
-	<span class="ident">indexmap::IndexMap</span>,
-	<span class="ident">openapiv3</span>::{
-		<span class="self">self</span>, <span class="ident">Components</span>, <span class="ident">OpenAPI</span>, <span class="ident">PathItem</span>, <span class="ident">ReferenceOr</span>,
-		<span class="ident">ReferenceOr</span>::{<span class="ident">Item</span>, <span class="ident">Reference</span>},
-		<span class="ident">Schema</span>, <span class="ident">Server</span>
+</pre><pre class="rust"><code><span class="kw">use </span>openapi_type::{
+	indexmap::IndexMap,
+	openapiv3::{
+		<span class="self">self</span>, Components, OpenAPI, PathItem, ReferenceOr,
+		ReferenceOr::{Item, Reference},
+		Schema, Server
 	},
-	<span class="ident">OpenapiSchema</span>
+	OpenapiSchema
 };
-<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>parking_lot::RwLock;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenapiInfo</span> {
-	<span class="kw">pub</span> <span class="ident">title</span>: <span class="ident">String</span>,
-	<span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">String</span>,
-	<span class="kw">pub</span> <span class="ident">urls</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>OpenapiInfo {
+	<span class="kw">pub </span>title: String,
+	<span class="kw">pub </span>version: String,
+	<span class="kw">pub </span>urls: Vec&lt;String&gt;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OpenapiBuilder</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">openapi</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">OpenAPI</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OpenapiBuilder {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) openapi: Arc&lt;RwLock&lt;OpenAPI&gt;&gt;
 }
 
-<span class="kw">impl</span> <span class="ident">OpenapiBuilder</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">info</span>: <span class="ident">OpenapiInfo</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">openapi</span>: <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">OpenAPI</span> {
-				<span class="ident">openapi</span>: <span class="string">&quot;3.0.2&quot;</span>.<span class="ident">to_string</span>(),
-				<span class="ident">info</span>: <span class="ident">openapiv3::Info</span> {
-					<span class="ident">title</span>: <span class="ident">info</span>.<span class="ident">title</span>,
-					<span class="ident">version</span>: <span class="ident">info</span>.<span class="ident">version</span>,
-					..<span class="ident">Default::default</span>()
+<span class="kw">impl </span>OpenapiBuilder {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(info: OpenapiInfo) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			openapi: Arc::new(RwLock::new(OpenAPI {
+				openapi: <span class="string">&quot;3.0.2&quot;</span>.to_string(),
+				info: openapiv3::Info {
+					title: info.title,
+					version: info.version,
+					..Default::default()
 				},
-				<span class="ident">servers</span>: <span class="ident">info</span>
-					.<span class="ident">urls</span>
-					.<span class="ident">into_iter</span>()
-					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">url</span><span class="op">|</span> <span class="ident">Server</span> {
-						<span class="ident">url</span>,
-						..<span class="ident">Default::default</span>()
+				servers: info
+					.urls
+					.into_iter()
+					.map(|url| Server {
+						url,
+						..Default::default()
 					})
-					.<span class="ident">collect</span>(),
-				..<span class="ident">Default::default</span>()
+					.collect(),
+				..Default::default()
 			}))
 		}
 	}
 
-	<span class="doccomment">/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to</span>
-	<span class="doccomment">/// modify the path and add it back after the modification</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_path</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PathItem</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">openapi</span>.<span class="ident">write</span>();
-		<span class="kw">match</span> <span class="ident">openapi</span>.<span class="ident">paths</span>.<span class="ident">paths</span>.<span class="ident">swap_remove</span>(<span class="ident">path</span>) {
-			<span class="prelude-val">Some</span>(<span class="ident">Item</span>(<span class="ident">item</span>)) =&gt; <span class="ident">item</span>,
-			<span class="kw">_</span> =&gt; <span class="ident">PathItem::default</span>()
+	<span class="doccomment">/// Remove path from the OpenAPI spec, or return an empty one if not included. This is handy if you need to
+	/// modify the path and add it back after the modification
+	</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_path(<span class="kw-2">&amp;mut </span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str) -&gt; PathItem {
+		<span class="kw">let </span><span class="kw-2">mut </span>openapi = <span class="self">self</span>.openapi.write();
+		<span class="kw">match </span>openapi.paths.paths.swap_remove(path) {
+			<span class="prelude-val">Some</span>(Item(item)) =&gt; item,
+			<span class="kw">_ </span>=&gt; PathItem::default()
 		}
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_path</span><span class="op">&lt;</span><span class="ident">Path</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="ident">Path</span>, <span class="ident">item</span>: <span class="ident">PathItem</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">openapi</span>.<span class="ident">write</span>();
-		<span class="ident">openapi</span>.<span class="ident">paths</span>.<span class="ident">paths</span>.<span class="ident">insert</span>(<span class="ident">path</span>.<span class="ident">to_string</span>(), <span class="ident">Item</span>(<span class="ident">item</span>));
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_path&lt;Path: ToString&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, path: Path, item: PathItem) {
+		<span class="kw">let </span><span class="kw-2">mut </span>openapi = <span class="self">self</span>.openapi.write();
+		openapi.paths.paths.insert(path.to_string(), Item(item));
 	}
 
-	<span class="kw">fn</span> <span class="ident">add_schema_impl</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="kw-2">mut</span> <span class="ident">schema</span>: <span class="ident">OpenapiSchema</span>) {
-		<span class="self">self</span>.<span class="ident">add_schema_dependencies</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>.<span class="ident">dependencies</span>);
+	<span class="kw">fn </span>add_schema_impl(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, <span class="kw-2">mut </span>schema: OpenapiSchema) {
+		<span class="self">self</span>.add_schema_dependencies(<span class="kw-2">&amp;mut </span>schema.dependencies);
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">openapi</span>.<span class="ident">write</span>();
-		<span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">openapi</span>.<span class="ident">components</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">comp</span>) =&gt; {
-				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
+		<span class="kw">let </span><span class="kw-2">mut </span>openapi = <span class="self">self</span>.openapi.write();
+		<span class="kw">match </span><span class="kw-2">&amp;mut </span>openapi.components {
+			<span class="prelude-val">Some</span>(comp) =&gt; {
+				comp.schemas.insert(name, Item(schema.schema));
 			},
-			<span class="prelude-val">None</span> =&gt; {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comp</span> <span class="op">=</span> <span class="ident">Components::default</span>();
-				<span class="ident">comp</span>.<span class="ident">schemas</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>));
-				<span class="ident">openapi</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">comp</span>);
+			<span class="prelude-val">None </span>=&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>comp = Components::default();
+				comp.schemas.insert(name, Item(schema.schema));
+				openapi.components = <span class="prelude-val">Some</span>(comp);
 			}
 		};
 	}
 
-	<span class="kw">fn</span> <span class="ident">add_schema_dependencies</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dependencies</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">OpenapiSchema</span><span class="op">&gt;</span>) {
-		<span class="kw">let</span> <span class="ident">keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dependencies</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
-		<span class="kw">for</span> <span class="ident">dep</span> <span class="kw">in</span> <span class="ident">keys</span> {
-			<span class="kw">let</span> <span class="ident">dep_schema</span> <span class="op">=</span> <span class="ident">dependencies</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="ident">dep</span>);
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dep_schema</span>) <span class="op">=</span> <span class="ident">dep_schema</span> {
-				<span class="self">self</span>.<span class="ident">add_schema_impl</span>(<span class="ident">dep</span>, <span class="ident">dep_schema</span>);
+	<span class="kw">fn </span>add_schema_dependencies(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dependencies: <span class="kw-2">&amp;mut </span>IndexMap&lt;String, OpenapiSchema&gt;) {
+		<span class="kw">let </span>keys: Vec&lt;String&gt; = dependencies.keys().map(|k| k.to_string()).collect();
+		<span class="kw">for </span>dep <span class="kw">in </span>keys {
+			<span class="kw">let </span>dep_schema = dependencies.swap_remove(<span class="kw-2">&amp;</span>dep);
+			<span class="kw">if let </span><span class="prelude-val">Some</span>(dep_schema) = dep_schema {
+				<span class="self">self</span>.add_schema_impl(dep, dep_schema);
 			}
 		}
 	}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">schema</span>: <span class="ident">OpenapiSchema</span>) -&gt; <span class="ident">ReferenceOr</span><span class="op">&lt;</span><span class="ident">Schema</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">schema</span>.<span class="ident">schema_data</span>.<span class="ident">title</span>.<span class="ident">clone</span>() {
-			<span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">Reference</span> {
-					<span class="ident">reference</span>: <span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{name}&quot;</span>)
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>schema: OpenapiSchema) -&gt; ReferenceOr&lt;Schema&gt; {
+		<span class="kw">match </span>schema.schema.schema_data.title.clone() {
+			<span class="prelude-val">Some</span>(name) =&gt; {
+				<span class="kw">let </span>reference = Reference {
+					reference: <span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{name}&quot;</span>)
 				};
-				<span class="self">self</span>.<span class="ident">add_schema_impl</span>(<span class="ident">name</span>, <span class="ident">schema</span>);
-				<span class="ident">reference</span>
+				<span class="self">self</span>.add_schema_impl(name, schema);
+				reference
 			},
-			<span class="prelude-val">None</span> =&gt; {
-				<span class="self">self</span>.<span class="ident">add_schema_dependencies</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>.<span class="ident">dependencies</span>);
-				<span class="ident">Item</span>(<span class="ident">schema</span>.<span class="ident">schema</span>)
+			<span class="prelude-val">None </span>=&gt; {
+				<span class="self">self</span>.add_schema_dependencies(<span class="kw-2">&amp;mut </span>schema.dependencies);
+				Item(schema.schema)
 			}
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">openapi_type::OpenapiType</span>;
+<span class="attribute">#[cfg(test)]
+#[allow(dead_code)]
+</span><span class="kw">mod </span>test {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use </span>openapi_type::OpenapiType;
 
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">OpenapiType</span>)]</span>
-	<span class="kw">struct</span> <span class="ident">Message</span> {
-		<span class="ident">msg</span>: <span class="ident">String</span>
+	<span class="attribute">#[derive(OpenapiType)]
+	</span><span class="kw">struct </span>Message {
+		msg: String
 	}
 
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">OpenapiType</span>)]</span>
-	<span class="kw">struct</span> <span class="ident">Messages</span> {
-		<span class="ident">msgs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
+	<span class="attribute">#[derive(OpenapiType)]
+	</span><span class="kw">struct </span>Messages {
+		msgs: Vec&lt;Message&gt;
 	}
 
-	<span class="kw">fn</span> <span class="ident">info</span>() -&gt; <span class="ident">OpenapiInfo</span> {
-		<span class="ident">OpenapiInfo</span> {
-			<span class="ident">title</span>: <span class="string">&quot;TEST CASE&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">version</span>: <span class="string">&quot;1.2.3&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">urls</span>: <span class="macro">vec!</span>[
-				<span class="string">&quot;http://localhost:1234&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="string">&quot;https://example.org&quot;</span>.<span class="ident">to_owned</span>(),
+	<span class="kw">fn </span>info() -&gt; OpenapiInfo {
+		OpenapiInfo {
+			title: <span class="string">&quot;TEST CASE&quot;</span>.to_owned(),
+			version: <span class="string">&quot;1.2.3&quot;</span>.to_owned(),
+			urls: <span class="macro">vec!</span>[
+				<span class="string">&quot;http://localhost:1234&quot;</span>.to_owned(),
+				<span class="string">&quot;https://example.org&quot;</span>.to_owned(),
 			]
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">openapi</span>(<span class="ident">builder</span>: <span class="ident">OpenapiBuilder</span>) -&gt; <span class="ident">OpenAPI</span> {
-		<span class="ident">Arc::try_unwrap</span>(<span class="ident">builder</span>.<span class="ident">openapi</span>).<span class="ident">unwrap</span>().<span class="ident">into_inner</span>()
+	<span class="kw">fn </span>openapi(builder: OpenapiBuilder) -&gt; OpenAPI {
+		Arc::try_unwrap(builder.openapi).unwrap().into_inner()
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">new_builder</span>() {
-		<span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">info</span>();
-		<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">OpenapiBuilder::new</span>(<span class="ident">info</span>.<span class="ident">clone</span>());
-		<span class="kw">let</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="ident">openapi</span>(<span class="ident">builder</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>new_builder() {
+		<span class="kw">let </span>info = info();
+		<span class="kw">let </span>builder = OpenapiBuilder::new(info.clone());
+		<span class="kw">let </span>openapi = openapi(builder);
 
-		<span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">title</span>, <span class="ident">openapi</span>.<span class="ident">info</span>.<span class="ident">title</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">version</span>, <span class="ident">openapi</span>.<span class="ident">info</span>.<span class="ident">version</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">urls</span>.<span class="ident">len</span>(), <span class="ident">openapi</span>.<span class="ident">servers</span>.<span class="ident">len</span>());
+		<span class="macro">assert_eq!</span>(info.title, openapi.info.title);
+		<span class="macro">assert_eq!</span>(info.version, openapi.info.version);
+		<span class="macro">assert_eq!</span>(info.urls.len(), openapi.servers.len());
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">add_schema</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">OpenapiBuilder::new</span>(<span class="ident">info</span>());
-		<span class="ident">builder</span>.<span class="ident">add_schema</span>(<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Messages</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::schema</span>());
-		<span class="kw">let</span> <span class="ident">openapi</span> <span class="op">=</span> <span class="ident">openapi</span>(<span class="ident">builder</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>add_schema() {
+		<span class="kw">let </span><span class="kw-2">mut </span>builder = OpenapiBuilder::new(info());
+		builder.add_schema(&lt;<span class="prelude-ty">Option</span>&lt;Messages&gt;&gt;::schema());
+		<span class="kw">let </span>openapi = openapi(builder);
 
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">openapi</span>.<span class="ident">components</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>().<span class="ident">schemas</span>[<span class="string">&quot;Message&quot;</span>],
-			<span class="ident">ReferenceOr::Item</span>(<span class="ident">Message::schema</span>().<span class="ident">schema</span>)
+			openapi.components.clone().unwrap_or_default().schemas[<span class="string">&quot;Message&quot;</span>],
+			ReferenceOr::Item(Message::schema().schema)
 		);
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">openapi</span>.<span class="ident">components</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>().<span class="ident">schemas</span>[<span class="string">&quot;Messages&quot;</span>],
-			<span class="ident">ReferenceOr::Item</span>(<span class="ident">Messages::schema</span>().<span class="ident">schema</span>)
+			openapi.components.clone().unwrap_or_default().schemas[<span class="string">&quot;Messages&quot;</span>],
+			ReferenceOr::Item(Messages::schema().schema)
 		);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gotham_restful" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
