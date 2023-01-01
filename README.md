@@ -396,7 +396,7 @@ the MSRV (minimum supported rust version) is not considered a breaking change.
 
 ## License
 
-Copyright (C) 2019-2022 Dominic Meiser and [contributors].
+Copyright (C) 2019-2023 Dominic Meiser and [contributors].
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -413,7 +413,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG436MVLKTBbVG9rOTjYiQw70G6Fc8Kk_HdHWG4O0HsuDVOA0YXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuOC4wgmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjg3
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG2eUNt96dlVrGzyursG6ePURG2DQ4LYzWd9UG3uwLisla-NxYXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuOC4wgmxvcGVuYXBpX3R5cGVlMC40LjGCanNlcmRlX2pzb25mMS4wLjkx
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
@@ -424,7 +424,7 @@ limitations under the License.
  [__link3]: https://docs.rs/gotham_restful/0.8.0/gotham_restful/?search=RequestBody
  [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.87
+ [__link6]: https://crates.io/crates/serde_json/1.0.91
  [__link7]: https://docs.rs/gotham_restful/0.8.0/gotham_restful/?search=Response::header
  [__link8]: https://docs.rs/gotham_restful/0.8.0/gotham_restful/?search=cors::CorsRoute
  [__link9]: https://diesel.rs/
