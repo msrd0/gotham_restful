@@ -498,11 +498,24 @@ pub mod private {
 
 	use gotham::state::{FromState, State};
 
+	/// This method is used by the endpoint macro to generate a good error message
+	/// when the used AuthData type does not implement Clone.
+	#[inline]
 	pub fn clone_from_state<T>(state: &State) -> T
 	where
 		T: FromState + Clone
 	{
 		T::borrow_from(state).clone()
+	}
+
+	/// This method is used by the endpoint macro to generate a good error message
+	/// when the schema function accepts the wrong argument.
+	#[inline]
+	pub fn invoke<F, T, U>(f: F, arg: T) -> U
+	where
+		F: FnOnce(T) -> U
+	{
+		f(arg)
 	}
 }
 
