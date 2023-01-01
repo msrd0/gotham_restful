@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## Unreleased
+### Updated
+ - Updated `base64` to 0.21
+
 ## [0.8.0] - 2022-11-07
 ### Updated
  - Updated `diesel` to 2.0
