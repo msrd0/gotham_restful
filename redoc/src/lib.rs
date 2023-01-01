@@ -29,7 +29,7 @@ pub fn html(spec: String) -> Redoc {
 
 	let script = include_str!("script.min.js");
 	let mut script_hash = Sha256::new();
-	script_hash.update(&script);
+	script_hash.update(script);
 	let script_hash = base64::encode(script_hash.finalize());
 
 	let mut html = Vec::<u8>::new();
