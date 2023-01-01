@@ -9,20 +9,14 @@ error[E0631]: type mismatch in function arguments
    |
    = note: expected function signature `fn(StatusCode) -> _`
               found function signature `fn(u16) -> _`
-note: required by a bound in `invoke`
-  --> src/lib.rs
-   |
-   |         F: FnOnce(T) -> U
-   |            ^^^^^^^^^^^^^^ required by this bound in `invoke`
+   = note: required for `fn(u16) -> std::string::String {schema}` to implement `CustomSchema`
 
-error[E0308]: mismatched types
+error[E0271]: expected `fn() -> Vec<u16> {status_codes}` to be a fn item that returns `Vec<StatusCode>`, but it returns `Vec<u16>`
   --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:46
    |
 16 | #[read_all(schema = "schema", status_codes = "status_codes")]
-   |                                              ^^^^^^^^^^^^^^
-   |                                              |
-   |                                              expected struct `StatusCode`, found `u16`
-   |                                              expected due to this
+   |                                              ^^^^^^^^^^^^^^ expected struct `StatusCode`, found `u16`
    |
    = note: expected struct `Vec<StatusCode>`
               found struct `Vec<u16>`
+   = note: required for `fn() -> Vec<u16> {status_codes}` to implement `CustomStatusCodes`

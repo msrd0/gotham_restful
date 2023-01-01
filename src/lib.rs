@@ -496,7 +496,10 @@ pub mod private {
 	pub use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
 	pub use serde_json;
 
-	use gotham::state::{FromState, State};
+	use gotham::{
+		hyper::StatusCode,
+		state::{FromState, State}
+	};
 
 	/// This method is used by the endpoint macro to generate a good error message
 	/// when the used AuthData type does not implement Clone.
@@ -508,14 +511,34 @@ pub mod private {
 		T::borrow_from(state).clone()
 	}
 
-	/// This method is used by the endpoint macro to generate a good error message
-	/// when the schema function accepts the wrong argument.
-	#[inline]
-	pub fn invoke<F, T, U>(f: F, arg: T) -> U
+	/// This trait is used by the endpoint macro to generate a good error message
+	/// when the schema function has the wrong signature.
+	pub trait CustomSchema {
+		fn schema(self, code: StatusCode) -> OpenapiSchema;
+	}
+
+	impl<F> CustomSchema for F
 	where
-		F: FnOnce(T) -> U
+		F: FnOnce(StatusCode) -> OpenapiSchema
 	{
-		f(arg)
+		fn schema(self, code: StatusCode) -> OpenapiSchema {
+			self(code)
+		}
+	}
+
+	/// This trait is used by the endpoint macro to generate a good error message
+	/// when the status_codes function has the wrong signature.
+	pub trait CustomStatusCodes {
+		fn status_codes(self) -> Vec<StatusCode>;
+	}
+
+	impl<F> CustomStatusCodes for F
+	where
+		F: FnOnce() -> Vec<StatusCode>
+	{
+		fn status_codes(self) -> Vec<StatusCode> {
+			self()
+		}
 	}
 }
 
