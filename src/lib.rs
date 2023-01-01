@@ -489,15 +489,21 @@ pub use gotham_restful_derive::*;
 #[doc(hidden)]
 pub mod private {
 	pub use crate::routing::PathExtractor as IdPlaceholder;
-
 	pub use futures_util::future::{BoxFuture, FutureExt};
-
-	pub use serde_json;
-
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;
 	#[cfg(feature = "openapi")]
 	pub use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
+	pub use serde_json;
+
+	use gotham::state::{FromState, State};
+
+	pub fn clone_from_state<T>(state: &State) -> T
+	where
+		T: FromState + Clone
+	{
+		T::borrow_from(state).clone()
+	}
 }
 
 #[cfg(feature = "auth")]

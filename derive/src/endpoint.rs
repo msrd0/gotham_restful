@@ -671,10 +671,8 @@ fn expand_endpoint_type(
 		let mut state_block = quote!();
 		if let Some(arg) = args.iter().find(|arg| arg.ty.is_auth_status()) {
 			let auth_ty = arg.ty.quote_ty();
-			let auth_borrow = quote_spanned! { auth_ty.span() =>
-				<#auth_ty as ::core::clone::Clone>::clone(
-					<#auth_ty as ::gotham_restful::gotham::state::FromState>::borrow_from(state)
-				)
+			let auth_borrow = quote! {
+				::gotham_restful::private::clone_from_state::<#auth_ty>(state)
 			};
 			state_block = quote! {
 				#state_block
