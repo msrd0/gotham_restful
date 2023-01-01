@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.8.1] - 2023-01-01
+### Updated
+ - Fixed proc macro UI that regressed between Rust 1.64 and 1.66: The compiler produced unhelpful and misleading suggestions
+
 ## [0.8.0] - 2022-11-07
 ### Updated
  - Updated `diesel` to 2.0
