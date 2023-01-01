@@ -101,7 +101,7 @@ jobs:
             ~/.cargo/git
             ~/.cargo/registry
             target
-          key: key: "${{runner.os}} Rust ${{steps.rust-toolchain.outputs.cachekey}} (clippy)"
+          key: "${{runner.os}} Rust ${{steps.rust-toolchain.outputs.cachekey}} (clippy)"
       - run: cargo clippy --workspace --profile test -- -Dclippy::all
   
   rustfmt:
