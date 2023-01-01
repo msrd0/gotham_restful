@@ -489,15 +489,64 @@ pub use gotham_restful_derive::*;
 #[doc(hidden)]
 pub mod private {
 	pub use crate::routing::PathExtractor as IdPlaceholder;
-
 	pub use futures_util::future::{BoxFuture, FutureExt};
-
-	pub use serde_json;
-
 	#[cfg(feature = "database")]
 	pub use gotham_middleware_diesel::Repo;
 	#[cfg(feature = "openapi")]
 	pub use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
+	pub use serde_json;
+
+	#[cfg(feature = "openapi")]
+	use gotham::hyper::StatusCode;
+	#[cfg(feature = "auth")]
+	use gotham::state::{FromState, State};
+
+	/// This method is used by the endpoint macro to generate a good error message
+	/// when the used AuthData type does not implement Clone.
+	#[cfg(feature = "auth")]
+	#[inline]
+	pub fn clone_from_state<T>(state: &State) -> T
+	where
+		T: FromState + Clone
+	{
+		T::borrow_from(state).clone()
+	}
+
+	/// This trait is used by the endpoint macro to generate a good error message
+	/// when the schema function has the wrong signature.
+	#[cfg(feature = "openapi")]
+	pub trait CustomSchema {
+		fn schema(self, code: StatusCode) -> OpenapiSchema;
+	}
+
+	#[cfg(feature = "openapi")]
+	impl<F> CustomSchema for F
+	where
+		F: FnOnce(StatusCode) -> OpenapiSchema
+	{
+		#[inline]
+		fn schema(self, code: StatusCode) -> OpenapiSchema {
+			self(code)
+		}
+	}
+
+	/// This trait is used by the endpoint macro to generate a good error message
+	/// when the status_codes function has the wrong signature.
+	#[cfg(feature = "openapi")]
+	pub trait CustomStatusCodes {
+		fn status_codes(self) -> Vec<StatusCode>;
+	}
+
+	#[cfg(feature = "openapi")]
+	impl<F> CustomStatusCodes for F
+	where
+		F: FnOnce() -> Vec<StatusCode>
+	{
+		#[inline]
+		fn status_codes(self) -> Vec<StatusCode> {
+			self()
+		}
+	}
 }
 
 #[cfg(feature = "auth")]

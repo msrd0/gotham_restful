@@ -1,35 +1,22 @@
-error[E0308]: mismatched types
+error[E0631]: type mismatch in function arguments
   --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:21
-   |
-16 | #[read_all(schema = "schema", status_codes = "status_codes")]
-   |                     ^^^^^^^^
-   |                     |
-   |                     expected `u16`, found struct `StatusCode`
-   |                     arguments to this function are incorrect
-   |
-note: function defined here
-  --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:8:4
    |
 8  | fn schema(_: u16) -> String {
-   |    ^^^^^^ ------
-
-error[E0308]: mismatched types
-  --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:21
-   |
+   | --------------------------- found signature defined here
+...
 16 | #[read_all(schema = "schema", status_codes = "status_codes")]
-   |                     ^^^^^^^^
-   |                     |
-   |                     expected struct `OpenapiSchema`, found struct `std::string::String`
-   |                     expected due to this
+   |                     ^^^^^^^^ expected due to this
+   |
+   = note: expected function signature `fn(StatusCode) -> _`
+              found function signature `fn(u16) -> _`
+   = note: required for `fn(u16) -> std::string::String {schema}` to implement `CustomSchema`
 
-error[E0308]: mismatched types
+error[E0271]: expected `fn() -> Vec<u16> {status_codes}` to be a fn item that returns `Vec<StatusCode>`, but it returns `Vec<u16>`
   --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:46
    |
 16 | #[read_all(schema = "schema", status_codes = "status_codes")]
-   |                                              ^^^^^^^^^^^^^^
-   |                                              |
-   |                                              expected struct `StatusCode`, found `u16`
-   |                                              expected due to this
+   |                                              ^^^^^^^^^^^^^^ expected struct `StatusCode`, found `u16`
    |
    = note: expected struct `Vec<StatusCode>`
               found struct `Vec<u16>`
+   = note: required for `fn() -> Vec<u16> {status_codes}` to implement `CustomStatusCodes`

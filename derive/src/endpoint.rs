@@ -531,14 +531,16 @@ fn expand_endpoint_type(
 		)
 	});
 	let output_struct = schema.map(|schema_fn| {
-		let output_struct_ident = output_struct_ident.as_ref().unwrap_or_else(|| unreachable!());
+		let output_struct_ident = output_struct_ident
+			.as_ref()
+			.unwrap_or_else(|| unreachable!());
 		let status_codes_fn = status_codes.unwrap_or_else(|| unreachable!());
 
 		let schema_call = quote_spanned! { schema_fn.span() =>
-			let schema: ::gotham_restful::private::OpenapiSchema = #schema_fn(code);
+			let schema = ::gotham_restful::private::CustomSchema::schema(#schema_fn, code);
 		};
 		let status_codes_call = quote_spanned! { status_codes_fn.span() =>
-			let status_codes: ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> = #status_codes_fn();
+			let status_codes = ::gotham_restful::private::CustomStatusCodes::status_codes(#status_codes_fn);
 		};
 
 		quote! {
@@ -563,7 +565,9 @@ fn expand_endpoint_type(
 					::gotham_restful::IntoResponse::into_response(self.0)
 				}
 
-				fn accepted_types() -> ::core::option::Option<::std::vec::Vec<::gotham_restful::gotham::mime::Mime>> {
+				fn accepted_types() -> ::core::option::Option<
+						::std::vec::Vec<::gotham_restful::gotham::mime::Mime>>
+				{
 					<#output_ty as ::gotham_restful::IntoResponse>::accepted_types()
 				}
 			}
@@ -671,10 +675,8 @@ fn expand_endpoint_type(
 		let mut state_block = quote!();
 		if let Some(arg) = args.iter().find(|arg| arg.ty.is_auth_status()) {
 			let auth_ty = arg.ty.quote_ty();
-			let auth_borrow = quote_spanned! { auth_ty.span() =>
-				<#auth_ty as ::core::clone::Clone>::clone(
-					<#auth_ty as ::gotham_restful::gotham::state::FromState>::borrow_from(state)
-				)
+			let auth_borrow = quote! {
+				::gotham_restful::private::clone_from_state::<#auth_ty>(state)
 			};
 			state_block = quote! {
 				#state_block
