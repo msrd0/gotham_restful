@@ -551,6 +551,12 @@
 <span id="549">549</span>
 <span id="550">550</span>
 <span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
 </pre><pre class="rust"><code><span class="attribute">#![warn(missing_debug_implementations, rust_2018_idioms, unreachable_pub)]
 #![forbid(unsafe_code)]
 </span><span class="comment">// deny warnings in CI
@@ -1042,15 +1048,21 @@
 </span><span class="attribute">#[doc(hidden)]
 </span><span class="kw">pub mod </span>private {
 	<span class="kw">pub use </span><span class="kw">crate</span>::routing::PathExtractor <span class="kw">as </span>IdPlaceholder;
-
 	<span class="kw">pub use </span>futures_util::future::{BoxFuture, FutureExt};
-
-	<span class="kw">pub use </span>serde_json;
-
 	<span class="attribute">#[cfg(feature = <span class="string">&quot;database&quot;</span>)]
 	</span><span class="kw">pub use </span>gotham_middleware_diesel::Repo;
 	<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
 	</span><span class="kw">pub use </span>openapi_type::{OpenapiSchema, OpenapiType, Visitor};
+	<span class="kw">pub use </span>serde_json;
+
+	<span class="kw">use </span>gotham::state::{FromState, State};
+
+	<span class="kw">pub fn </span>clone_from_state&lt;T&gt;(state: <span class="kw-2">&amp;</span>State) -&gt; T
+	<span class="kw">where
+		</span>T: FromState + Clone
+	{
+		T::borrow_from(state).clone()
+	}
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;auth&quot;</span>)]
