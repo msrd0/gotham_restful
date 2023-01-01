@@ -2,6 +2,7 @@
 
 //! Private implementation detail of the `gotham_restful` crate.
 
+use base64::prelude::*;
 use either::Either;
 use sha2::{Digest, Sha256};
 use std::{io::Write, iter};
@@ -30,7 +31,7 @@ pub fn html(spec: String) -> Redoc {
 	let script = include_str!("script.min.js");
 	let mut script_hash = Sha256::new();
 	script_hash.update(&script);
-	let script_hash = base64::encode(script_hash.finalize());
+	let script_hash = BASE64_STANDARD.encode(script_hash.finalize());
 
 	let mut html = Vec::<u8>::new();
 	write!(
