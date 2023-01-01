@@ -557,6 +557,49 @@
 <span id="555">555</span>
 <span id="556">556</span>
 <span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
 </pre><pre class="rust"><code><span class="attribute">#![warn(missing_debug_implementations, rust_2018_idioms, unreachable_pub)]
 #![forbid(unsafe_code)]
 </span><span class="comment">// deny warnings in CI
@@ -1055,13 +1098,56 @@
 	</span><span class="kw">pub use </span>openapi_type::{OpenapiSchema, OpenapiType, Visitor};
 	<span class="kw">pub use </span>serde_json;
 
-	<span class="kw">use </span>gotham::state::{FromState, State};
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+	</span><span class="kw">use </span>gotham::hyper::StatusCode;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;auth&quot;</span>)]
+	</span><span class="kw">use </span>gotham::state::{FromState, State};
 
-	<span class="kw">pub fn </span>clone_from_state&lt;T&gt;(state: <span class="kw-2">&amp;</span>State) -&gt; T
+	<span class="doccomment">/// This method is used by the endpoint macro to generate a good error message
+	/// when the used AuthData type does not implement Clone.
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;auth&quot;</span>)]
+	#[inline]
+	</span><span class="kw">pub fn </span>clone_from_state&lt;T&gt;(state: <span class="kw-2">&amp;</span>State) -&gt; T
 	<span class="kw">where
 		</span>T: FromState + Clone
 	{
 		T::borrow_from(state).clone()
+	}
+
+	<span class="doccomment">/// This trait is used by the endpoint macro to generate a good error message
+	/// when the schema function has the wrong signature.
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+	</span><span class="kw">pub trait </span>CustomSchema {
+		<span class="kw">fn </span>schema(<span class="self">self</span>, code: StatusCode) -&gt; OpenapiSchema;
+	}
+
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+	</span><span class="kw">impl</span>&lt;F&gt; CustomSchema <span class="kw">for </span>F
+	<span class="kw">where
+		</span>F: FnOnce(StatusCode) -&gt; OpenapiSchema
+	{
+		<span class="attribute">#[inline]
+		</span><span class="kw">fn </span>schema(<span class="self">self</span>, code: StatusCode) -&gt; OpenapiSchema {
+			<span class="self">self</span>(code)
+		}
+	}
+
+	<span class="doccomment">/// This trait is used by the endpoint macro to generate a good error message
+	/// when the status_codes function has the wrong signature.
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+	</span><span class="kw">pub trait </span>CustomStatusCodes {
+		<span class="kw">fn </span>status_codes(<span class="self">self</span>) -&gt; Vec&lt;StatusCode&gt;;
+	}
+
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+	</span><span class="kw">impl</span>&lt;F&gt; CustomStatusCodes <span class="kw">for </span>F
+	<span class="kw">where
+		</span>F: FnOnce() -&gt; Vec&lt;StatusCode&gt;
+	{
+		<span class="attribute">#[inline]
+		</span><span class="kw">fn </span>status_codes(<span class="self">self</span>) -&gt; Vec&lt;StatusCode&gt; {
+			<span class="self">self</span>()
+		}
 	}
 }
 
