@@ -543,8 +543,10 @@
 <span id="541">541</span>
 <span id="542">542</span>
 <span id="543">543</span>
+<span id="544">544</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::AuthError;
 
+<span class="kw">use </span>base64::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>cookie::CookieJar;
 <span class="kw">use </span>futures_util::{
 	future,
@@ -798,7 +800,7 @@
 		<span class="comment">// get the secret from the handler, possibly decoding claims ourselves
 		</span><span class="kw">let </span>secret = <span class="self">self</span>.handler.jwt_secret(state, || {
 			<span class="kw">let </span>b64 = token.split(<span class="string">&#39;.&#39;</span>).nth(<span class="number">1</span>)<span class="question-mark">?</span>;
-			<span class="kw">let </span>raw = base64::decode_config(b64, base64::URL_SAFE_NO_PAD).ok()<span class="question-mark">?</span>;
+			<span class="kw">let </span>raw = BASE64_URL_SAFE_NO_PAD.decode(b64).ok()<span class="question-mark">?</span>;
 			serde_json::from_slice(<span class="kw-2">&amp;</span>raw).ok()<span class="question-mark">?
 		</span>});
 
