@@ -1,5 +1,6 @@
 #![cfg_attr(not(feature = "auth"), allow(unused_imports))]
 use super::SECURITY_NAME;
+use base64::prelude::*;
 use futures_util::{future, future::FutureExt};
 use gotham::{
 	anyhow,
@@ -160,7 +161,7 @@ fn redoc_handler(
 
 	let mut etag = Sha256::new();
 	etag.update(&html);
-	let etag = format!("\"{}\"", base64::encode(etag.finalize()));
+	let etag = format!("\"{}\"", BASE64_STANDARD.encode(etag.finalize()));
 
 	if state
 		.borrow::<HeaderMap>()

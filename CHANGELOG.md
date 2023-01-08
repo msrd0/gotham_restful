@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## Unreleased
+### Updated
+ - Updated `base64` to 0.21
+
 ## [0.8.1] - 2023-01-01
 ### Updated
  - Fixed proc macro UI that regressed between Rust 1.64 and 1.66: The compiler produced unhelpful and misleading suggestions

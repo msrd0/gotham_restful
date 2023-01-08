@@ -28,7 +28,7 @@ serde_json = "1.0"
 thiserror = "1.0"
 
 # non-feature optional dependencies
-base64 = { version = "0.13", optional = true }
+base64 = { version = "0.21", optional = true }
 cookie = { version = "0.15", optional = true }
 gotham_middleware_diesel = { version = "0.5", optional = true }
 gotham_restful_redoc = { version = "0.2.1", path = "./redoc", optional = true }

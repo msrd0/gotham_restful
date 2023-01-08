@@ -12,6 +12,6 @@ repository = "https://github.com/msrd0/gotham_restful"
 include = ["/src/lib.rs", "/src/script.min.js", "/LICENSE"]
 
 [dependencies]
-base64 = "0.13"
+base64 = "0.21"
 either = "1.6"
 sha2 = "0.10"

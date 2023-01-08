@@ -1,5 +1,6 @@
 use crate::AuthError;
 
+use base64::prelude::*;
 use cookie::CookieJar;
 use futures_util::{
 	future,
@@ -253,7 +254,7 @@ where
 		// get the secret from the handler, possibly decoding claims ourselves
 		let secret = self.handler.jwt_secret(state, || {
 			let b64 = token.split('.').nth(1)?;
-			let raw = base64::decode_config(b64, base64::URL_SAFE_NO_PAD).ok()?;
+			let raw = BASE64_URL_SAFE_NO_PAD.decode(b64).ok()?;
 			serde_json::from_slice(&raw).ok()?
 		});
 
