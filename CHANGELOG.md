@@ -4,8 +4,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Unreleased
+
+## [0.8.2] - 2023-03-13
 ### Updated
  - Updated `base64` to 0.21
+
+### Fixed
+ - `quote` decided to integrate breaking changes into a patch release, which breaks compiling `diesel`. We now require a non-broken version of quote.
 
 ## [0.8.1] - 2023-01-01
 ### Updated
