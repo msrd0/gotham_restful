@@ -312,8 +312,8 @@
 /// any RESTful [Resource] with a path.
 </span><span class="attr">#[_private_openapi_trait(DrawResourcesWithSchema)]
 </span><span class="kw">pub trait </span>DrawResources {
-	<span class="attr">#[openapi_bound(<span class="string">&quot;R: crate::ResourceWithSchema&quot;</span>)]
-	#[non_openapi_bound(<span class="string">&quot;R: crate::Resource&quot;</span>)]
+	<span class="attr">#[openapi_bound(R: <span class="kw">crate</span>::ResourceWithSchema)]
+	#[non_openapi_bound(R: <span class="kw">crate</span>::Resource)]
 	</span><span class="kw">fn </span>resource&lt;R&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str);
 }
 
@@ -321,8 +321,8 @@
 /// [Resource::setup] method.
 </span><span class="attr">#[_private_openapi_trait(DrawResourceRoutesWithSchema)]
 </span><span class="kw">pub trait </span>DrawResourceRoutes {
-	<span class="attr">#[openapi_bound(<span class="string">&quot;E: crate::EndpointWithSchema&quot;</span>)]
-	#[non_openapi_bound(<span class="string">&quot;E: crate::Endpoint&quot;</span>)]
+	<span class="attr">#[openapi_bound(E: <span class="kw">crate</span>::EndpointWithSchema)]
+	#[non_openapi_bound(E: <span class="kw">crate</span>::Endpoint)]
 	</span><span class="kw">fn </span>endpoint&lt;E: <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 }
 

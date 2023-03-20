@@ -1196,8 +1196,8 @@
 </span><span class="attr">#[_private_openapi_trait(ResourceWithSchema)]
 </span><span class="kw">pub trait </span>Resource {
 	<span class="doccomment">/// Register all methods handled by this resource with the underlying router.
-	</span><span class="attr">#[openapi_bound(<span class="string">&quot;D: crate::DrawResourceRoutesWithSchema&quot;</span>)]
-	#[non_openapi_bound(<span class="string">&quot;D: crate::DrawResourceRoutes&quot;</span>)]
+	</span><span class="attr">#[openapi_bound(D: <span class="kw">crate</span>::DrawResourceRoutesWithSchema)]
+	#[non_openapi_bound(D: <span class="kw">crate</span>::DrawResourceRoutes)]
 	</span><span class="kw">fn </span>setup&lt;D&gt;(route: D);
 }
 </code></pre></div>

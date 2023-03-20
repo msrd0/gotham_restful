@@ -205,7 +205,7 @@
 	</span><span class="kw">fn </span>operation_verb() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;;
 
 	<span class="doccomment">/// The output type that provides the response.
-	</span><span class="attr">#[openapi_bound(<span class="string">&quot;Output: crate::ResponseSchema&quot;</span>)]
+	</span><span class="attr">#[openapi_bound(Output: <span class="kw">crate</span>::ResponseSchema)]
 	</span><span class="kw">type </span>Output: IntoResponse + Send;
 
 	<span class="doccomment">/// Returns `true` _iff_ the URI contains placeholders. `false` by default.
@@ -214,7 +214,7 @@
 	</span>}
 	<span class="doccomment">/// The type that parses the URI placeholders. Use [NoopExtractor] if `has_placeholders()`
 	/// returns `false`.
-	</span><span class="attr">#[openapi_bound(<span class="string">&quot;Placeholders: OpenapiType&quot;</span>)]
+	</span><span class="attr">#[openapi_bound(Placeholders: OpenapiType)]
 	</span><span class="kw">type </span>Placeholders: PathExtractor&lt;Body&gt; + Clone + Sync;
 
 	<span class="doccomment">/// Returns `true` _iff_ the request parameters should be parsed. `false` by default.
@@ -223,7 +223,7 @@
 	</span>}
 	<span class="doccomment">/// The type that parses the request parameters. Use [NoopExtractor] if `needs_params()`
 	/// returns `false`.
-	</span><span class="attr">#[openapi_bound(<span class="string">&quot;Params: OpenapiType&quot;</span>)]
+	</span><span class="attr">#[openapi_bound(Params: OpenapiType)]
 	</span><span class="kw">type </span>Params: QueryStringExtractor&lt;Body&gt; + Clone + Sync;
 
 	<span class="doccomment">/// Returns `true` _iff_ the request body should be parsed. `false` by default.
