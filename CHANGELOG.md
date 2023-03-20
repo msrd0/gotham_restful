@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Unreleased
 
+## [0.8.3] - 2023-03-20
+### Updated
+ - `syn` has been updated to 2.0
+ - The requirement on `quote` has been relaxed after `diesel` got updated.
+
 ## [0.8.2] - 2023-03-13
 ### Updated
  - Updated `base64` to 0.21
