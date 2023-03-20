@@ -594,7 +594,7 @@ pub use types::{FromBody, RequestBody, ResponseBody};
 #[_private_openapi_trait(ResourceWithSchema)]
 pub trait Resource {
 	/// Register all methods handled by this resource with the underlying router.
-	#[openapi_bound("D: crate::DrawResourceRoutesWithSchema")]
-	#[non_openapi_bound("D: crate::DrawResourceRoutes")]
+	#[openapi_bound(D: crate::DrawResourceRoutesWithSchema)]
+	#[non_openapi_bound(D: crate::DrawResourceRoutes)]
 	fn setup<D>(route: D);
 }

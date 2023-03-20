@@ -1,9 +1,9 @@
-use crate::util::{remove_parens, CollectToResult};
+use crate::{util::CollectToResult, AttributeArgs};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::{
-	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, ItemTrait, LitStr, Meta,
-	NestedMeta, PredicateType, Result, TraitItem, WherePredicate
+	spanned::Spanned, Attribute, Error, ItemTrait, Meta, PredicateType, Result, TraitItem,
+	WherePredicate
 };
 
 struct TraitItemAttrs {
@@ -21,24 +21,25 @@ impl TraitItemAttrs {
 		let mut other = Vec::new();
 
 		for attr in attrs {
-			if attr.path.is_ident("openapi_only") {
-				openapi_only = true;
-			} else if attr.path.is_ident("openapi_bound") {
-				let attr_arg: LitStr = syn::parse2(remove_parens(attr.tokens))?;
-				let predicate = attr_arg.parse_with(WherePredicate::parse)?;
-				openapi_bound.push(match predicate {
-					WherePredicate::Type(ty) => ty,
-					_ => return Err(Error::new(predicate.span(), "Expected type bound"))
-				});
-			} else if attr.path.is_ident("non_openapi_bound") {
-				let attr_arg: LitStr = syn::parse2(remove_parens(attr.tokens))?;
-				let predicate = attr_arg.parse_with(WherePredicate::parse)?;
-				non_openapi_bound.push(match predicate {
-					WherePredicate::Type(ty) => ty,
-					_ => return Err(Error::new(predicate.span(), "Expected type bound"))
-				});
-			} else {
-				other.push(attr);
+			match attr.meta {
+				Meta::Path(path) if path.is_ident("openapi_only") => {
+					openapi_only = true;
+				},
+				Meta::List(list) if list.path.is_ident("openapi_bound") => {
+					let predicate: WherePredicate = syn::parse2(list.tokens)?;
+					openapi_bound.push(match predicate {
+						WherePredicate::Type(ty) => ty,
+						_ => return Err(Error::new(predicate.span(), "Expected type bound"))
+					});
+				},
+				Meta::List(list) if list.path.is_ident("non_openapi_bound") => {
+					let predicate: WherePredicate = syn::parse2(list.tokens)?;
+					non_openapi_bound.push(match predicate {
+						WherePredicate::Type(ty) => ty,
+						_ => return Err(Error::new(predicate.span(), "Expected type bound"))
+					});
+				},
+				_ => other.push(attr)
 			}
 		}
 
@@ -52,9 +53,11 @@ impl TraitItemAttrs {
 }
 
 pub(crate) fn expand_private_openapi_trait(
-	mut attrs: AttributeArgs,
+	AttributeArgs(attrs): AttributeArgs,
 	tr8: ItemTrait
 ) -> Result<TokenStream> {
+	let mut attrs = attrs.into_iter();
+
 	let tr8_attrs = &tr8.attrs;
 	let vis = &tr8.vis;
 	let ident = &tr8.ident;
@@ -68,11 +71,17 @@ pub(crate) fn expand_private_openapi_trait(
 			"Expected one argument. Example: #[_private_openapi_trait(OpenapiTraitName)]"
 		));
 	}
-	let openapi_ident = match attrs.remove(0) {
-		NestedMeta::Meta(Meta::Path(path)) => path,
-		p => {
+	let openapi_ident = match attrs.next() {
+		Some(Meta::Path(path)) => path,
+		Some(p) => {
 			return Err(Error::new(
 				p.span(),
+				"Expected name of the Resource struct this method belongs to"
+			));
+		},
+		None => {
+			return Err(Error::new(
+				Span::call_site(),
 				"Expected name of the Resource struct this method belongs to"
 			));
 		}
@@ -85,7 +94,7 @@ pub(crate) fn expand_private_openapi_trait(
 			.into_iter()
 			.map(|item| {
 				Ok(match item {
-					TraitItem::Method(mut method) => {
+					TraitItem::Fn(mut method) => {
 						let attrs = TraitItemAttrs::parse(method.attrs)?;
 						method.attrs = attrs.other_attrs;
 						for bound in attrs.non_openapi_bound {
@@ -105,7 +114,7 @@ pub(crate) fn expand_private_openapi_trait(
 						if attrs.openapi_only {
 							None
 						} else {
-							Some(TraitItem::Method(method))
+							Some(TraitItem::Fn(method))
 						}
 					},
 					TraitItem::Type(mut ty) => {
@@ -134,7 +143,7 @@ pub(crate) fn expand_private_openapi_trait(
 			.into_iter()
 			.map(|item| {
 				Ok(match item {
-					TraitItem::Method(mut method) => {
+					TraitItem::Fn(mut method) => {
 						let attrs = TraitItemAttrs::parse(method.attrs)?;
 						method.attrs = attrs.other_attrs;
 						for bound in attrs.openapi_bound {
@@ -151,7 +160,7 @@ pub(crate) fn expand_private_openapi_trait(
 								})
 								.for_each(|param| param.bounds.extend(bound.bounds.clone()));
 						}
-						TraitItem::Method(method)
+						TraitItem::Fn(method)
 					},
 					TraitItem::Type(mut ty) => {
 						let attrs = TraitItemAttrs::parse(ty.attrs)?;

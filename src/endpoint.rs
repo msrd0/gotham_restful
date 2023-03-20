@@ -53,7 +53,7 @@ pub trait Endpoint {
 	fn operation_verb() -> Option<&'static str>;
 
 	/// The output type that provides the response.
-	#[openapi_bound("Output: crate::ResponseSchema")]
+	#[openapi_bound(Output: crate::ResponseSchema)]
 	type Output: IntoResponse + Send;
 
 	/// Returns `true` _iff_ the URI contains placeholders. `false` by default.
@@ -62,7 +62,7 @@ pub trait Endpoint {
 	}
 	/// The type that parses the URI placeholders. Use [NoopExtractor] if `has_placeholders()`
 	/// returns `false`.
-	#[openapi_bound("Placeholders: OpenapiType")]
+	#[openapi_bound(Placeholders: OpenapiType)]
 	type Placeholders: PathExtractor<Body> + Clone + Sync;
 
 	/// Returns `true` _iff_ the request parameters should be parsed. `false` by default.
@@ -71,7 +71,7 @@ pub trait Endpoint {
 	}
 	/// The type that parses the request parameters. Use [NoopExtractor] if `needs_params()`
 	/// returns `false`.
-	#[openapi_bound("Params: OpenapiType")]
+	#[openapi_bound(Params: OpenapiType)]
 	type Params: QueryStringExtractor<Body> + Clone + Sync;
 
 	/// Returns `true` _iff_ the request body should be parsed. `false` by default.

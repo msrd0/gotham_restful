@@ -1,12 +1,15 @@
-use crate::util::{CollectToResult, ExpectLit, IntoIdent};
+use crate::{
+	util::{CollectToResult, ExpectLit, IntoIdent},
+	AttributeArgs
+};
 use lazy_regex::regex_is_match;
 use paste::paste;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote, quote_spanned, ToTokens};
 use std::str::FromStr;
 use syn::{
-	parse::Parse, spanned::Spanned, Attribute, AttributeArgs, Error, Expr, FnArg, ItemFn, LitBool,
-	LitStr, Meta, NestedMeta, PatType, Result, ReturnType, Type
+	parse::Parse, spanned::Spanned, Attribute, Error, Expr, FnArg, ItemFn, LitBool, LitStr, Meta,
+	PatType, Result, ReturnType, Type
 };
 use unindent::Unindent;
 
@@ -284,7 +287,7 @@ struct HandlerArg {
 	ty: HandlerArgType
 }
 
-impl Spanned for HandlerArg {
+impl HandlerArg {
 	fn span(&self) -> Span {
 		self.ident_span
 	}
@@ -293,13 +296,16 @@ impl Spanned for HandlerArg {
 fn interpret_arg_ty(attrs: &[Attribute], name: &str, ty: Type) -> Result<HandlerArgType> {
 	let attr = attrs
 		.iter()
-		.find(|arg| {
-			arg.path
-				.segments
-				.iter()
-				.any(|path| &path.ident.to_string() == "rest_arg")
+		.filter_map(|attr| {
+			match &attr.meta {
+				Meta::List(meta) if meta.path.is_ident("rest_arg") => {
+					// TODO shouldn't this be parsed properly?
+					Some(meta.tokens.to_string())
+				},
+				_ => None
+			}
 		})
-		.map(|arg| arg.tokens.to_string());
+		.next();
 
 	// TODO issue a warning for _state usage once diagnostics become stable
 	if attr.as_deref() == Some("state") || (attr.is_none() && (name == "state" || name == "_state"))
@@ -416,7 +422,7 @@ macro_rules! error_if_not_openapi {
 #[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_collect))]
 fn expand_endpoint_type(
 	mut ty: EndpointType,
-	attrs: AttributeArgs,
+	AttributeArgs(attrs): AttributeArgs,
 	fun: &ItemFn
 ) -> Result<TokenStream> {
 	// reject unsafe functions
@@ -435,28 +441,28 @@ fn expand_endpoint_type(
 	let mut wants_auth: Option<LitBool> = None;
 	for meta in attrs {
 		match meta {
-			NestedMeta::Meta(Meta::NameValue(kv)) => {
+			Meta::NameValue(kv) => {
 				if kv.path.is_ident("debug") {
-					debug = kv.lit.expect_bool()?.value;
+					debug = kv.value.expect_bool()?.value;
 				} else if kv.path.is_ident("operation_id") {
-					operation_id = Some(kv.lit.expect_str()?);
+					operation_id = Some(kv.value.expect_str()?);
 				} else if kv.path.is_ident("schema") {
-					schema = Some(kv.lit.expect_str()?.into_ident())
+					schema = Some(kv.value.expect_str()?.into_ident())
 				} else if kv.path.is_ident("status_codes") {
-					status_codes = Some(kv.lit.expect_str()?.into_ident())
+					status_codes = Some(kv.value.expect_str()?.into_ident())
 				} else if kv.path.is_ident("wants_auth") {
-					wants_auth = Some(kv.lit.expect_bool()?);
+					wants_auth = Some(kv.value.expect_bool()?);
 				} else if kv.path.is_ident("method") {
 					ty.set_method(
 						kv.path.span(),
-						kv.lit.expect_str()?.parse_with(Expr::parse)?
+						kv.value.expect_str()?.parse_with(Expr::parse)?
 					)?;
 				} else if kv.path.is_ident("uri") {
-					ty.set_uri(kv.path.span(), kv.lit.expect_str()?)?;
+					ty.set_uri(kv.path.span(), kv.value.expect_str()?)?;
 				} else if kv.path.is_ident("params") {
-					ty.set_params(kv.path.span(), kv.lit.expect_bool()?)?;
+					ty.set_params(kv.path.span(), kv.value.expect_bool()?)?;
 				} else if kv.path.is_ident("body") {
-					ty.set_body(kv.path.span(), kv.lit.expect_bool()?)?;
+					ty.set_body(kv.path.span(), kv.value.expect_bool()?)?;
 				} else {
 					return Err(Error::new(kv.path.span(), "Unknown attribute"));
 				}
@@ -477,15 +483,11 @@ fn expand_endpoint_type(
 	// extract the documentation
 	let mut doc: Vec<String> = vec![String::new()];
 	for attr in &fun.attrs {
-		if attr.path.is_ident("doc") {
-			if let Some(lit) = attr.parse_meta().and_then(|meta| {
-				Ok(match meta {
-					Meta::NameValue(kv) => Some(kv.lit.expect_str()?),
-					_ => None
-				})
-			})? {
-				doc.push(lit.value());
-			}
+		match &attr.meta {
+			Meta::NameValue(kv) if kv.path.is_ident("doc") => {
+				doc.push(kv.value.clone().expect_str()?.value())
+			},
+			_ => {}
 		}
 	}
 	let doc = doc.join("\n").unindent();
@@ -794,7 +796,11 @@ fn expand_endpoint_type(
 	Ok(code)
 }
 
-pub fn expand_endpoint(ty: EndpointType, attrs: AttributeArgs, fun: ItemFn) -> Result<TokenStream> {
+pub(crate) fn expand_endpoint(
+	ty: EndpointType,
+	attrs: AttributeArgs,
+	fun: ItemFn
+) -> Result<TokenStream> {
 	let endpoint_type = match expand_endpoint_type(ty, attrs, &fun) {
 		Ok(code) => code,
 		Err(err) => err.to_compile_error()

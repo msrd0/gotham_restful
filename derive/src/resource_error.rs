@@ -1,10 +1,10 @@
-use crate::util::{remove_parens, CollectToResult};
+use crate::util::CollectToResult;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use std::iter;
 use syn::{
-	spanned::Spanned, Attribute, Data, DeriveInput, Error, Fields, GenericParam, LitStr, Path,
-	PathSegment, Result, Type, Variant
+	parse::Parse, spanned::Spanned, Attribute, Data, DeriveInput, Error, Fields, GenericParam,
+	LitStr, Meta, Path, PathSegment, Result, Type, Variant
 };
 
 struct ErrorVariantField {
@@ -22,18 +22,21 @@ struct ErrorVariant {
 	display: Option<LitStr>
 }
 
+fn find_attr<T: Parse>(variant: &Variant, ident: &str) -> syn::Result<Option<T>> {
+	variant
+		.attrs
+		.iter()
+		.filter_map(|attr| match &attr.meta {
+			Meta::List(list) if list.path.is_ident(ident) => Some(syn::parse2(list.tokens.clone())),
+			_ => None
+		})
+		.next()
+		.transpose()
+}
+
 fn process_variant(variant: Variant) -> Result<ErrorVariant> {
-	let status = match variant.attrs.iter().find(|attr| {
-		attr.path
-			.segments
-			.iter()
-			.last()
-			.map(|segment| segment.ident.to_string())
-			== Some("status".to_string())
-	}) {
-		Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
-		None => None
-	};
+	let status = find_attr(&variant, "status")?;
+	let display = find_attr(&variant, "display")?;
 
 	let mut is_named = false;
 	let mut fields = Vec::new();
@@ -67,27 +70,12 @@ fn process_variant(variant: Variant) -> Result<ErrorVariant> {
 		.iter()
 		.enumerate()
 		.find(|(_, field)| {
-			field.attrs.iter().any(|attr| {
-				attr.path
-					.segments
-					.last()
-					.map(|segment| segment.ident.to_string())
-					== Some("from".to_string())
-			})
+			field
+				.attrs
+				.iter()
+				.any(|attr| matches!(&attr.meta, Meta::Path(path) if path.is_ident("from")))
 		})
 		.map(|(i, field)| (i, field.ty.clone()));
-
-	let display = match variant.attrs.iter().find(|attr| {
-		attr.path
-			.segments
-			.iter()
-			.last()
-			.map(|segment| segment.ident.to_string())
-			== Some("display".to_string())
-	}) {
-		Some(attr) => Some(syn::parse2(remove_parens(attr.tokens.clone()))?),
-		None => None
-	};
 
 	Ok(ErrorVariant {
 		ident: variant.ident,
