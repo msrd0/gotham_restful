@@ -45,8 +45,8 @@ pub trait WithOpenapi<D> {
 /// any RESTful [Resource] with a path.
 #[_private_openapi_trait(DrawResourcesWithSchema)]
 pub trait DrawResources {
-	#[openapi_bound("R: crate::ResourceWithSchema")]
-	#[non_openapi_bound("R: crate::Resource")]
+	#[openapi_bound(R: crate::ResourceWithSchema)]
+	#[non_openapi_bound(R: crate::Resource)]
 	fn resource<R>(&mut self, path: &str);
 }
 
@@ -54,8 +54,8 @@ pub trait DrawResources {
 /// [Resource::setup] method.
 #[_private_openapi_trait(DrawResourceRoutesWithSchema)]
 pub trait DrawResourceRoutes {
-	#[openapi_bound("E: crate::EndpointWithSchema")]
-	#[non_openapi_bound("E: crate::Endpoint")]
+	#[openapi_bound(E: crate::EndpointWithSchema)]
+	#[non_openapi_bound(E: crate::Endpoint)]
 	fn endpoint<E: 'static>(&mut self);
 }
 

@@ -1,7 +1,5 @@
-use either::Either;
-use proc_macro2::{Delimiter, Ident, TokenStream, TokenTree};
-use std::iter;
-use syn::{Error, Lit, LitBool, LitStr, Result};
+use proc_macro2::Ident;
+use syn::{spanned::Spanned as _, Error, Expr, Lit, LitBool, LitStr, Result};
 
 pub(crate) trait CollectToResult {
 	type Item;
@@ -62,14 +60,19 @@ impl ExpectLit for Lit {
 	}
 }
 
-pub(crate) fn remove_parens(input: TokenStream) -> TokenStream {
-	let iter = input.into_iter().flat_map(|tt| {
-		if let TokenTree::Group(group) = &tt {
-			if group.delimiter() == Delimiter::Parenthesis {
-				return Either::Left(group.stream().into_iter());
-			}
-		}
-		Either::Right(iter::once(tt))
-	});
-	iter.collect()
+fn expect_lit(expr: Expr) -> syn::Result<Lit> {
+	match expr {
+		Expr::Lit(lit) => Ok(lit.lit),
+		_ => Err(syn::Error::new(expr.span(), "Expected literal"))
+	}
+}
+
+impl ExpectLit for Expr {
+	fn expect_bool(self) -> syn::Result<LitBool> {
+		expect_lit(self)?.expect_bool()
+	}
+
+	fn expect_str(self) -> syn::Result<LitStr> {
+		expect_lit(self)?.expect_str()
+	}
 }

@@ -1,4 +1,5 @@
 #![cfg(all(feature = "auth", feature = "openapi"))]
+#![allow(clippy::approx_constant)]
 
 #[macro_use]
 extern crate pretty_assertions;

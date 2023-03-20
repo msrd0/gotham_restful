@@ -4,20 +4,16 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::iter;
 use syn::{
-	parenthesized,
 	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
-	DeriveInput, Result, Token
+	DeriveInput, Meta, Result, Token
 };
 
 struct MethodList(Punctuated<Ident, Token![,]>);
 
 impl Parse for MethodList {
 	fn parse(input: ParseStream<'_>) -> Result<Self> {
-		let content;
-		let _paren = parenthesized!(content in input);
-		let list = Punctuated::parse_separated_nonempty(&content)?;
-		Ok(Self(list))
+		Ok(Self(Punctuated::parse_separated_nonempty(input)?))
 	}
 }
 
@@ -27,8 +23,11 @@ pub fn expand_resource(input: DeriveInput) -> Result<TokenStream> {
 	let methods = input
 		.attrs
 		.into_iter()
-		.filter(|attr| attr.path.is_ident("resource"))
-		.map(|attr| syn::parse2(attr.tokens).map(|m: MethodList| m.0.into_iter()))
+		.filter_map(|attr| match attr.meta {
+			Meta::List(list) if list.path.is_ident("resource") => Some(list.tokens),
+			_ => None
+		})
+		.map(|tokens| syn::parse2(tokens).map(|m: MethodList| m.0.into_iter()))
 		.flat_map(|list| match list {
 			Ok(iter) => Either::Left(iter.map(|method| {
 				let ident = endpoint_ident(&method);

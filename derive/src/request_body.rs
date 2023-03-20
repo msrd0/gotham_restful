@@ -7,7 +7,7 @@ use syn::{
 	parse::{Parse, ParseStream},
 	punctuated::Punctuated,
 	spanned::Spanned,
-	DeriveInput, Error, Generics, Path, Result, Token
+	DeriveInput, Error, Generics, Meta, Path, Result, Token
 };
 
 struct MimeList(Punctuated<Path, Token![,]>);
@@ -45,26 +45,24 @@ pub fn expand_request_body(input: DeriveInput) -> Result<TokenStream> {
 	let types = input
 		.attrs
 		.into_iter()
-		.filter(|attr| {
-			attr.path
-				.segments
-				.iter()
-				.last()
-				.map(|segment| segment.ident.to_string())
-				== Some("supported_types".to_string())
-		})
-		.flat_map(|attr| {
+		.filter_map(|attr| {
 			let span = attr.span();
-			attr.parse_args::<MimeList>()
-				.map(|list| Either::Left(list.0.into_iter().map(Ok)))
-				.unwrap_or_else(|mut err| {
-					err.combine(Error::new(
-						span,
-						"Hint: Types list should look like #[supported_types(TEXT_PLAIN, APPLICATION_JSON)]"
-					));
-					Either::Right(iter::once(Err(err)))
-				})
+			match attr.meta {
+				Meta::List(list) if list.path.is_ident("supported_types") => Some(
+					syn::parse2::<MimeList>(list.tokens)
+						.map(|list| Either::Left(list.0.into_iter().map(Ok)))
+						.unwrap_or_else(|mut err| {
+							err.combine(Error::new(
+								span,
+								"Hint: Types list should look like #[supported_types(TEXT_PLAIN, APPLICATION_JSON)]"
+							));
+							Either::Right(iter::once(Err(err)))
+						})
+				),
+				_ => None
+			}
 		})
+		.flatten()
 		.collect_to_result()?;
 
 	let types = match types {

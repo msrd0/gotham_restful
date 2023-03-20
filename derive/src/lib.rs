@@ -4,7 +4,12 @@
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use syn::{parse_macro_input, parse_macro_input::ParseMacroInput, DeriveInput, Result};
+use syn::{
+	parse::{Parse, ParseStream},
+	parse_macro_input,
+	punctuated::Punctuated,
+	DeriveInput, Meta, Result, Token
+};
 
 mod util;
 
@@ -26,6 +31,14 @@ use resource_error::expand_resource_error;
 mod private_openapi_trait;
 use private_openapi_trait::expand_private_openapi_trait;
 
+struct AttributeArgs(Punctuated<Meta, Token![,]>);
+
+impl Parse for AttributeArgs {
+	fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
+		Ok(Self(Punctuated::parse_terminated(input)?))
+	}
+}
+
 #[inline]
 fn print_tokens(tokens: TokenStream2) -> TokenStream {
 	// eprintln!("{tokens}");
@@ -44,8 +57,8 @@ where
 fn expand_macro<F, A, I>(attrs: TokenStream, item: TokenStream, expand: F) -> TokenStream
 where
 	F: FnOnce(A, I) -> Result<TokenStream2>,
-	A: ParseMacroInput,
-	I: ParseMacroInput
+	A: Parse,
+	I: Parse
 {
 	print_tokens(
 		expand(parse_macro_input!(attrs), parse_macro_input!(item))
