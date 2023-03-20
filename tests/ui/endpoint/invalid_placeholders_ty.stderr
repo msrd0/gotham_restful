@@ -17,8 +17,8 @@ error[E0277]: the trait bound `FooPlaceholders: OpenapiType` is not satisfied
 note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
   --> src/endpoint.rs
    |
-   |     #[openapi_bound("Placeholders: OpenapiType")]
-   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |     #[openapi_bound(Placeholders: OpenapiType)]
+   |                                   ^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: Clone` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -30,7 +30,7 @@ note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
   --> src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                                              ^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |                                              ^^^^^ required by this bound in `EndpointWithSchema::Placeholders`
 help: consider annotating `FooPlaceholders` with `#[derive(Clone)]`
    |
 10 | #[derive(Clone)]
@@ -52,11 +52,12 @@ error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
              IdPlaceholder<ID>
              Method
            and $N others
+   = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Placeholders` to implement `PathExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
   --> src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -71,11 +72,12 @@ error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not s
              NoopPathExtractor
              NoopQueryStringExtractor
              NoopResponseExtender
+   = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Placeholders` to implement `PathExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
   --> src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Placeholders`
 
 error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<'de>` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
@@ -93,8 +95,9 @@ error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<
              (T0, T1, T2, T3)
              (T0, T1, T2, T3, T4)
            and $N others
+   = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Placeholders` to implement `PathExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
   --> src/endpoint.rs
    |
    |     type Placeholders: PathExtractor<Body> + Clone + Sync;
-   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Placeholders`
+   |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Placeholders`

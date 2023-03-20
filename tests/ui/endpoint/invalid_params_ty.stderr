@@ -17,8 +17,8 @@ error[E0277]: the trait bound `FooParams: OpenapiType` is not satisfied
 note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
   --> src/endpoint.rs
    |
-   |     #[openapi_bound("Params: OpenapiType")]
-   |                     ^^^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Params`
+   |     #[openapi_bound(Params: OpenapiType)]
+   |                             ^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Params`
 
 error[E0277]: the trait bound `FooParams: Clone` is not satisfied
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
@@ -30,7 +30,7 @@ note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
   --> src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Clone + Sync;
-   |                                               ^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Params`
+   |                                               ^^^^^ required by this bound in `EndpointWithSchema::Params`
 help: consider annotating `FooParams` with `#[derive(Clone)]`
    |
 10 | #[derive(Clone)]
@@ -52,11 +52,12 @@ error[E0277]: the trait bound `FooParams: StateData` is not satisfied
              IdPlaceholder<ID>
              Method
            and $N others
+   = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params` to implement `QueryStringExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
   --> src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Clone + Sync;
-   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Params`
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Params`
 
 error[E0277]: the trait bound `FooParams: StaticResponseExtender` is not satisfied
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
@@ -71,11 +72,12 @@ error[E0277]: the trait bound `FooParams: StaticResponseExtender` is not satisfi
              NoopPathExtractor
              NoopQueryStringExtractor
              NoopResponseExtender
+   = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params` to implement `QueryStringExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
   --> src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Clone + Sync;
-   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Params`
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Params`
 
 error[E0277]: the trait bound `for<'de> FooParams: serde::de::Deserialize<'de>` is not satisfied
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
@@ -93,8 +95,9 @@ error[E0277]: the trait bound `for<'de> FooParams: serde::de::Deserialize<'de>` 
              (T0, T1, T2, T3)
              (T0, T1, T2, T3, T4)
            and $N others
+   = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params` to implement `QueryStringExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
   --> src/endpoint.rs
    |
    |     type Params: QueryStringExtractor<Body> + Clone + Sync;
-   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `gotham_restful::EndpointWithSchema::Params`
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Params`

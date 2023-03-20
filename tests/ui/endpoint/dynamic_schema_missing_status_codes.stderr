@@ -7,7 +7,10 @@ error: `schema` and `status_codes` may only be used together
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
  --> tests/ui/endpoint/dynamic_schema_missing_status_codes.rs:8:12
   |
-7 | #[derive(Resource)]
-  |                  - help: you might be missing a type parameter: `<read_all___gotham_restful_endpoint>`
 8 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope
+  |
+help: you might be missing a type parameter
+  |
+7 | #[derive(Resource<read_all___gotham_restful_endpoint>)]
+  |                  ++++++++++++++++++++++++++++++++++++

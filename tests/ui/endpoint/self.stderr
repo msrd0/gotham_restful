@@ -15,7 +15,10 @@ error: `self` parameter is only allowed in associated functions
 error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
  --> tests/ui/endpoint/self.rs:5:12
   |
-4 | #[derive(Resource)]
-  |                  - help: you might be missing a type parameter: `<read_all___gotham_restful_endpoint>`
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope
+  |
+help: you might be missing a type parameter
+  |
+4 | #[derive(Resource<read_all___gotham_restful_endpoint>)]
+  |                  ++++++++++++++++++++++++++++++++++++
