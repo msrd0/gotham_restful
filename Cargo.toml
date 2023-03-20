@@ -39,7 +39,7 @@ parking_lot = { version = "0.12", optional = true }
 sha2 = { version = "0.10", optional = true }
 
 # we don't need this but we opt out of breaking change anyways
-quote = ">=1.0.0, <=1.0.23"
+quote = ">=1.0.0, <=1.0.27"
 
 [dev-dependencies]
 diesel = { version = "2.0", features = ["postgres"] }
