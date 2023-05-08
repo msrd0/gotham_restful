@@ -4,5 +4,5 @@ error[E0308]: mismatched types
 8 | #[endpoint(method = "String::new()", uri = "custom_read")]
   | --------------------^^^^^^^^^^^^^^^-----------------------
   | |                   |
-  | |                   expected struct `Method`, found struct `String`
+  | |                   expected `Method`, found `String`
   | expected `Method` because of return type
