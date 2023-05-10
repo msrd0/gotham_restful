@@ -1,5 +1,5 @@
 use super::SECURITY_NAME;
-use crate::{response::OrAllTypes, EndpointWithSchema, IntoResponse, RequestBody};
+use crate::{response::OrAllTypes, EndpointWithSchema, RequestBody};
 use gotham::{hyper::StatusCode, mime::Mime};
 use openapi_type::{
 	indexmap::IndexMap,
@@ -97,8 +97,7 @@ pub(crate) struct OperationDescription {
 	operation_id: Option<String>,
 	description: Option<String>,
 
-	accepted_types: Option<Vec<Mime>>,
-	responses: HashMap<StatusCode, ReferenceOr<Schema>>,
+	responses: HashMap<StatusCode, Vec<(Mime, ReferenceOr<Schema>)>>,
 	params: OperationParams,
 	body_schema: Option<ReferenceOr<Schema>>,
 	supported_types: Option<Vec<Mime>>,
@@ -109,7 +108,7 @@ impl OperationDescription {
 	/// Create a new operation description for the given endpoint type and schema. If the endpoint
 	/// does not specify an operation id, the path is used to generate one.
 	pub(crate) fn new<E: EndpointWithSchema>(
-		responses: HashMap<StatusCode, ReferenceOr<Schema>>,
+		responses: HashMap<StatusCode, Vec<(Mime, ReferenceOr<Schema>)>>,
 		path: &str
 	) -> Self {
 		let operation_id = E::operation_id().or_else(|| {
@@ -120,7 +119,6 @@ impl OperationDescription {
 			operation_id,
 			description: E::description(),
 
-			accepted_types: E::Output::accepted_types(),
 			responses,
 			params: Default::default(),
 			body_schema: None,
@@ -142,13 +140,10 @@ impl OperationDescription {
 		self.supported_types = Body::supported_types();
 	}
 
-	fn schema_to_content(
-		types: Vec<Mime>,
-		schema: ReferenceOr<Schema>
-	) -> IndexMap<String, MediaType> {
+	fn schema_to_content(schemas: Vec<(Mime, ReferenceOr<Schema>)>) -> IndexMap<String, MediaType> {
 		let mut content: IndexMap<String, MediaType> = IndexMap::new();
-		for ty in types {
-			content.insert(ty.to_string(), MediaType {
+		for (mime, schema) in schemas {
+			content.insert(mime.to_string(), MediaType {
 				schema: Some(schema.clone()),
 				..Default::default()
 			});
@@ -161,7 +156,6 @@ impl OperationDescription {
 		let (
 			operation_id,
 			description,
-			accepted_types,
 			responses,
 			params,
 			body_schema,
@@ -170,7 +164,6 @@ impl OperationDescription {
 		) = (
 			self.operation_id,
 			self.description,
-			self.accepted_types,
 			self.responses,
 			self.params,
 			self.body_schema,
@@ -180,9 +173,8 @@ impl OperationDescription {
 
 		let responses: IndexMap<OAStatusCode, ReferenceOr<Response>> = responses
 			.into_iter()
-			.map(|(code, schema)| {
-				let content =
-					Self::schema_to_content(accepted_types.clone().or_all_types(), schema);
+			.map(|(code, schemas)| {
+				let content = Self::schema_to_content(schemas);
 				(
 					OAStatusCode::Code(code.as_u16()),
 					Item(Response {
@@ -199,7 +191,13 @@ impl OperationDescription {
 
 		let request_body = body_schema.map(|schema| {
 			Item(OARequestBody {
-				content: Self::schema_to_content(supported_types.or_all_types(), schema),
+				content: Self::schema_to_content(
+					supported_types
+						.or_all_types()
+						.into_iter()
+						.map(|mime| (mime, schema.clone()))
+						.collect()
+				),
 				required: true,
 				..Default::default()
 			})
@@ -232,14 +230,27 @@ impl OperationDescription {
 #[cfg(test)]
 mod test {
 	use super::*;
-	use crate::{NoContent, Raw, ResponseSchema};
+	use crate::{IntoResponse, MimeAndSchema, NoContent, Raw, ResponseSchema};
+
+	fn schema_to_content(schema: Vec<MimeAndSchema>) -> IndexMap<String, MediaType> {
+		OperationDescription::schema_to_content(
+			schema
+				.into_iter()
+				.map(|mime_schema| {
+					(
+						mime_schema.mime,
+						ReferenceOr::Item(mime_schema.schema.schema)
+					)
+				})
+				.collect()
+		)
+	}
 
 	#[test]
 	fn no_content_schema_to_content() {
 		let types = NoContent::accepted_types();
 		let schema = <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT);
-		let content =
-			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
+		let content = schema_to_content(schema);
 		assert!(content.is_empty());
 	}
 
@@ -247,8 +258,7 @@ mod test {
 	fn raw_schema_to_content() {
 		let types = Raw::<&str>::accepted_types();
 		let schema = <Raw<&str> as ResponseSchema>::schema(StatusCode::OK);
-		let content =
-			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
+		let content = schema_to_content(schema);
 		assert_eq!(content.len(), 1);
 		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);
