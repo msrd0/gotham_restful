@@ -3,11 +3,13 @@
 	"extends": [
 		"config:base"
 	],
+
+	"schedule": ["before 5am on monday"],
 	"prHourlyLimit": 10,
 	"packageRules": [
 		{
 			"matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-			"matchLanguages": ["javascript"],
+			"matchLanguages": ["js", "javascript", "ts", "typescript", "node", "npm", "nodejs"],
 			"automerge": true
 		}
 	]
