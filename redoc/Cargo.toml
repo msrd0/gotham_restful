@@ -13,5 +13,5 @@ include = ["/src/lib.rs", "/src/script.min.js", "/LICENSE"]
 
 [dependencies]
 base64 = "0.21"
-either = "1.6"
+either = "1.8"
 sha2 = "0.10"
