@@ -8,9 +8,21 @@
 	"prHourlyLimit": 10,
 	"packageRules": [
 		{
-			"matchUpdateTypes": ["minor", "patch", "pin", "digest"],
 			"matchLanguages": ["js", "javascript", "ts", "typescript", "node", "npm", "nodejs"],
+			"matchUpdateTypes": ["minor", "patch", "pin", "digest"],
 			"automerge": true
+		},
+		{
+			"matchLanguages": ["rs", "rust", "cargo"],
+			"matchCurrentVersion": ">=1.0.0",
+			"matchUpdateTypes": ["patch", "minor"],
+			"enabled": false
+		},
+		{
+			"matchLanguages": ["rs", "rust", "cargo"],
+			"matchCurrentVersion": ">=0.1.0",
+			"matchUpdateTypes": ["patch"],
+			"enabled": false
 		}
 	]
 }
