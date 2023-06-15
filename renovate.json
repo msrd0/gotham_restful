@@ -6,6 +6,7 @@
 
 	"schedule": ["before 5am on monday"],
 	"prHourlyLimit": 10,
+	"labels": ["dependencies"],
 	"packageRules": [
 		{
 			"matchLanguages": ["js", "javascript", "ts", "typescript", "node", "npm", "nodejs"],
