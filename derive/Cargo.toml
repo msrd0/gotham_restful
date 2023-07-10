@@ -16,7 +16,7 @@ proc-macro = true
 
 [dependencies]
 either = "1.6"
-lazy-regex = "2.2.1"
+lazy-regex = "3.0.0"
 paste = "1.0"
 proc-macro2 = "1.0"
 quote = "1.0"
