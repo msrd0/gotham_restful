@@ -9,8 +9,8 @@
 	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-main-blue.svg"/>
 	</a>
-	<a href="https://blog.rust-lang.org/2022/11/03/Rust-1.65.0.html">
-		<img alt="Rust 1.65+" src="https://img.shields.io/badge/rustc-1.65+-orange.svg"/>
+	<a href="https://blog.rust-lang.org/2023/01/26/Rust-1.67.0.html">
+		<img alt="Rust 1.67+" src="https://img.shields.io/badge/rustc-1.67+-orange.svg"/>
 	</a>
 	<a href="https://www.apache.org/licenses/LICENSE-2.0">
 	   <img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"/>
@@ -413,7 +413,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG4Z32Sdl8XpAG3mqtXejbbqOG18FZEQH693jGwJVrQge6zMvYXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuOC4zgmxvcGVuYXBpX3R5cGVlMC40LjKCanNlcmRlX2pzb25mMS4wLjk0
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEGxN68uBN_fO7G8JzHK6SzF8qG40S-8DQpnCcG3_bAwH754-4YXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjGCbmdvdGhhbV9yZXN0ZnVsZTAuOC4zgmxvcGVuYXBpX3R5cGVlMC40LjKCanNlcmRlX2pzb25nMS4wLjEwNA
  [__link0]: https://crates.io/crates/gotham/0.7.1
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
@@ -424,7 +424,7 @@ limitations under the License.
  [__link3]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=RequestBody
  [__link4]: https://docs.rs/gotham/0.7.1/gotham/?search=extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.1/gotham/?search=state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.94
+ [__link6]: https://crates.io/crates/serde_json/1.0.104
  [__link7]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=Response::header
  [__link8]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=cors::CorsRoute
  [__link9]: https://diesel.rs/
