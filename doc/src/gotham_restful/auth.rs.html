@@ -543,17 +543,16 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 <a href="#541" id="541">541</a>
 <a href="#542" id="542">542</a>
 <a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::AuthError;
 
 <span class="kw">use </span>base64::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>cookie::CookieJar;
 <span class="kw">use </span>futures_util::{
 	future,
 	future::{FutureExt, TryFutureExt}
 };
 <span class="kw">use </span>gotham::{
 	anyhow,
+	cookie::CookieJar,
 	handler::HandlerFuture,
 	hyper::header::{HeaderMap, HeaderName, AUTHORIZATION},
 	middleware::{cookie::CookieParser, Middleware, NewMiddleware},
@@ -863,8 +862,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
 	<span class="kw">use super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use </span>cookie::Cookie;
-	<span class="kw">use </span>gotham::hyper::header::COOKIE;
+	<span class="kw">use </span>gotham::{cookie::Cookie, hyper::header::COOKIE};
 	<span class="kw">use </span>jsonwebtoken::errors::ErrorKind;
 	<span class="kw">use </span>std::fmt::Debug;
 
