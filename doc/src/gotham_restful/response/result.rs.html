@@ -259,13 +259,13 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 
 	<span class="attr">#[test]
 	</span><span class="kw">fn </span>result_err() {
-		<span class="kw">let </span>err: <span class="prelude-ty">Result</span>&lt;Msg, MsgError&gt; = <span class="prelude-val">Err</span>(MsgError::default());
+		<span class="kw">let </span>err: <span class="prelude-ty">Result</span>&lt;Msg, MsgError&gt; = <span class="prelude-val">Err</span>(MsgError);
 		<span class="kw">let </span>res = block_on(err.into_response()).expect(<span class="string">&quot;didn&#39;t expect error response&quot;</span>);
 		<span class="macro">assert_eq!</span>(res.status, StatusCode::INTERNAL_SERVER_ERROR);
 		<span class="macro">assert_eq!</span>(res.mime, <span class="prelude-val">Some</span>(APPLICATION_JSON));
 		<span class="macro">assert_eq!</span>(
 			res.full_body().unwrap(),
-			<span class="macro">format!</span>(<span class="string">r#&quot;{{&quot;error&quot;:true,&quot;message&quot;:&quot;{}&quot;}}&quot;#</span>, MsgError::default()).as_bytes()
+			<span class="macro">format!</span>(<span class="string">r#&quot;{{&quot;error&quot;:true,&quot;message&quot;:&quot;{}&quot;}}&quot;#</span>, MsgError).as_bytes()
 		);
 	}
 
