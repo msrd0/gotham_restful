@@ -118,13 +118,13 @@ mod test {
 
 	#[test]
 	fn result_err() {
-		let err: Result<Msg, MsgError> = Err(MsgError::default());
+		let err: Result<Msg, MsgError> = Err(MsgError);
 		let res = block_on(err.into_response()).expect("didn't expect error response");
 		assert_eq!(res.status, StatusCode::INTERNAL_SERVER_ERROR);
 		assert_eq!(res.mime, Some(APPLICATION_JSON));
 		assert_eq!(
 			res.full_body().unwrap(),
-			format!(r#"{{"error":true,"message":"{}"}}"#, MsgError::default()).as_bytes()
+			format!(r#"{{"error":true,"message":"{}"}}"#, MsgError).as_bytes()
 		);
 	}
 
