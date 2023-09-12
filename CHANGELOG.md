@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Unreleased
 
+## [0.8.4] - 2023-09-13
+### Updated
+ - Some dependency versions were increased to ensure compatibility with `-Z minimal-versions`
+
 ## [0.8.3] - 2023-03-20
 ### Updated
  - `syn` has been updated to 2.0
