@@ -1,13 +1,13 @@
 use crate::AuthError;
 
 use base64::prelude::*;
-use cookie::CookieJar;
 use futures_util::{
 	future,
 	future::{FutureExt, TryFutureExt}
 };
 use gotham::{
 	anyhow,
+	cookie::CookieJar,
 	handler::HandlerFuture,
 	hyper::header::{HeaderMap, HeaderName, AUTHORIZATION},
 	middleware::{cookie::CookieParser, Middleware, NewMiddleware},
@@ -317,8 +317,7 @@ where
 #[cfg(test)]
 mod test {
 	use super::*;
-	use cookie::Cookie;
-	use gotham::hyper::header::COOKIE;
+	use gotham::{cookie::Cookie, hyper::header::COOKIE};
 	use jsonwebtoken::errors::ErrorKind;
 	use std::fmt::Debug;
 
