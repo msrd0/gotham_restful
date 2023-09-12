@@ -13,6 +13,7 @@ where
 {
 	type Item = Item;
 
+	#[allow(clippy::manual_try_fold)] // false positive
 	fn collect_to_result(self) -> Result<Vec<Item>> {
 		self.fold(Ok(Vec::new()), |res, code| match (code, res) {
 			(Ok(code), Ok(mut codes)) => {

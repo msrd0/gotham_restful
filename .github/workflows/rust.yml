@@ -33,7 +33,7 @@ jobs:
       matrix:
         rust:
           - name: MSRV
-            toolchain: "1.67"
+            toolchain: "1.65"
             nightly: false
           - name: Stable
             toolchain: stable
@@ -56,6 +56,10 @@ jobs:
     continue-on-error: ${{matrix.rust.nightly}}
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        if: matrix.rust.name == 'MSRV'
+      - run: cargo -Z minimal-versions update
+        if: matrix.rust.name == 'MSRV'
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust.toolchain}}
@@ -67,7 +71,15 @@ jobs:
             ~/.cargo/registry
             target
           key: "${{runner.os}} Rust ${{steps.rust-toolchain.outputs.cachekey}}"
-      - run: RUSTFLAGS="$RUSTFLAGS --cfg gotham_restful_deny_warnings" cargo test ${{matrix.features.flags}}
+      - name: cargo test ${{matrix.features.flags}}
+        run: |
+          set -x
+          locked=
+          if [ "${{matrix.rust.name}}" == "MSRV" ]; then
+            export RUSTFLAGS="$RUSTFLAGS --cfg gotham_restful_deny_warnings"
+            locked="--locked"
+          fi
+          cargo test $locked ${{matrix.features.flags}}
   
   test-trybuild:
     runs-on: ubuntu-latest
@@ -75,7 +87,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.69"
+          toolchain: "1.72"
         id: rust-toolchain
       - uses: actions/cache@v3
         with:
@@ -92,7 +104,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.69"
+          toolchain: "1.72"
           components: clippy
         id: rust-toolchain
       - uses: actions/cache@v3

@@ -1,5 +1,13 @@
 error: Endpoint handler functions that are async must not take `&State` as an argument, consider taking `&mut State`
-  --> $DIR/async_state.rs:10:19
+  --> tests/ui/endpoint/async_state.rs:10:19
    |
 10 | async fn read_all(state: &State) {}
    |                   ^^^^^
+
+warning: unused variable: `state`
+  --> tests/ui/endpoint/async_state.rs:10:19
+   |
+10 | async fn read_all(state: &State) {}
+   |                   ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+   |
+   = note: `#[warn(unused_variables)]` on by default
