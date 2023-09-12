@@ -46,11 +46,11 @@ error[E0277]: the trait bound `FooParams: StateData` is not satisfied
              AuthSource
              AuthStatus<T>
              Body
+             CookieJar
              CorsConfig
              FilePathExtractor
              HeaderMap
              IdPlaceholder<ID>
-             Method
            and $N others
    = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params` to implement `QueryStringExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
