@@ -381,18 +381,18 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG7r2iEgBUb4sGwlJGpGKMeUqGyjjfh32iKfMGzyjGNIepIf1YXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjKCbmdvdGhhbV9yZXN0ZnVsZTAuOC4zgmxvcGVuYXBpX3R5cGVlMC40LjOCanNlcmRlX2pzb25nMS4wLjEwNg
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG7r2iEgBUb4sGwlJGpGKMeUqGyjjfh32iKfMGzyjGNIepIf1YXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjKCbmdvdGhhbV9yZXN0ZnVsZTAuOC40gmxvcGVuYXBpX3R5cGVlMC40LjOCanNlcmRlX2pzb25nMS4wLjEwNg
  [__link0]: https://crates.io/crates/gotham/0.7.2
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.2/gotham/?search=state::State
  [__link11]: https://docs.rs/openapi_type/0.4.3/openapi_type/?search=OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=EndpointWithSchema
+ [__link12]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/string/struct.String.html
- [__link3]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=RequestBody
+ [__link3]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=RequestBody
  [__link4]: https://docs.rs/gotham/0.7.2/gotham/?search=extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.2/gotham/?search=state::State
  [__link6]: https://crates.io/crates/serde_json/1.0.106
- [__link7]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=Response::header
- [__link8]: https://docs.rs/gotham_restful/0.8.3/gotham_restful/?search=cors::CorsRoute
+ [__link7]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=Response::header
+ [__link8]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=cors::CorsRoute
  [__link9]: https://diesel.rs/
