@@ -157,7 +157,7 @@ jobs:
           test -e ~/.cargo/bin/cargo-tarpaulin || cargo install cargo-tarpaulin --version ${{steps.tarpaulin-version.outputs.version}}
       - name: Run Tarpaulin coverage tests
         run: |
-          cargo tarpaulin -v \
+          cargo tarpaulin --verbose \
             --target-dir target/tarpaulin \
             --no-default-features \
             --features full \
