@@ -164,7 +164,7 @@ jobs:
             --exclude-files 'derive/*' \
             --exclude-files 'target/*' \
             --ignore-panics --ignore-tests \
-            --out Html --out Json
+            --out html --out json
       - uses: actions/upload-artifact@v3
         with:
           name: tarpaulin-report
