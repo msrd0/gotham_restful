@@ -43,7 +43,7 @@ futures-executor = "0.3.19"
 gotham = { version = "0.7.2", features = ["testing"], default-features = false }
 paste = "1.0"
 pretty_assertions = "1.0"
-pretty_env_logger = "0.5"
+simple_logger = "4.3"
 tokio = { version = "1.17", features = ["time"], default-features = false }
 thiserror = "1.0.2"
 trybuild = "=1.0.89"

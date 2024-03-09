@@ -10,6 +10,7 @@ use gotham_restful::*;
 #[cfg(feature = "openapi")]
 use openapi_type::OpenapiType;
 use serde::Deserialize;
+use simple_logger::SimpleLogger;
 use tokio::time::{sleep, Duration};
 
 mod util {
@@ -96,7 +97,7 @@ async fn state_test(state: &mut State) -> Raw<&'static [u8]> {
 
 #[test]
 fn async_methods() {
-	let _ = pretty_env_logger::try_init_timed();
+	_ = SimpleLogger::new().env().with_local_timestamps().init();
 
 	let server = TestServer::new(build_simple_router(|router| {
 		router.resource::<FooResource>("foo");
