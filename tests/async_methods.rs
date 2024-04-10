@@ -97,7 +97,8 @@ async fn state_test(state: &mut State) -> Raw<&'static [u8]> {
 
 #[test]
 fn async_methods() {
-	_ = SimpleLogger::new().env().with_local_timestamps().init();
+	// TODO no idea why with_local_timestamps fails here
+	_ = SimpleLogger::new().env().with_utc_timestamps().init();
 
 	let server = TestServer::new(build_simple_router(|router| {
 		router.resource::<FooResource>("foo");
