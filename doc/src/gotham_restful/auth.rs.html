@@ -1,6 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/auth.rs`."><title>auth.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/auth.rs`."><title>auth.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><script id="default-settings" 
 data-theme="ayu"
-data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gotham_restful" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gotham_restful" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../gotham_restful/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -567,7 +569,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 
 <span class="doccomment">/// The authentication status returned by the auth middleware for each request.
 </span><span class="attr">#[derive(Debug, StateData)]
-</span><span class="kw">pub enum </span>AuthStatus&lt;T: Send + <span class="lifetime">&#39;static</span>&gt; {
+</span><span class="kw">pub enum </span>AuthStatus&lt;T: Send + <span class="lifetime">'static</span>&gt; {
 	<span class="doccomment">/// The auth status is unknown. This is likely because no secret was provided
 	/// that could be used to verify the token of the client.
 	</span>Unknown,
@@ -587,7 +589,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 
 <span class="kw">impl</span>&lt;T&gt; Clone <span class="kw">for </span>AuthStatus&lt;T&gt;
 <span class="kw">where
-	</span>T: Clone + Send + <span class="lifetime">&#39;static
+	</span>T: Clone + Send + <span class="lifetime">'static
 </span>{
 	<span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
 		<span class="comment">// TODO why is this manually implemented?
@@ -600,12 +602,12 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	}
 }
 
-<span class="kw">impl</span>&lt;T: Send + <span class="lifetime">&#39;static</span>&gt; AuthStatus&lt;T&gt; {
+<span class="kw">impl</span>&lt;T: Send + <span class="lifetime">'static</span>&gt; AuthStatus&lt;T&gt; {
 	<span class="kw">pub fn </span>ok(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, AuthError&gt; {
 		<span class="kw">match </span><span class="self">self </span>{
-			<span class="self">Self</span>::Unknown =&gt; <span class="prelude-val">Err</span>(AuthError::new(<span class="string">&quot;The authentication could not be determined&quot;</span>)),
-			<span class="self">Self</span>::Unauthenticated =&gt; <span class="prelude-val">Err</span>(AuthError::new(<span class="string">&quot;Missing token&quot;</span>)),
-			<span class="self">Self</span>::Invalid(err) =&gt; <span class="prelude-val">Err</span>(AuthError::new(<span class="macro">format!</span>(<span class="string">&quot;Invalid token: {err}&quot;</span>))),
+			<span class="self">Self</span>::Unknown =&gt; <span class="prelude-val">Err</span>(AuthError::new(<span class="string">"The authentication could not be determined"</span>)),
+			<span class="self">Self</span>::Unauthenticated =&gt; <span class="prelude-val">Err</span>(AuthError::new(<span class="string">"Missing token"</span>)),
+			<span class="self">Self</span>::Invalid(err) =&gt; <span class="prelude-val">Err</span>(AuthError::new(<span class="macro">format!</span>(<span class="string">"Invalid token: {err}"</span>))),
 			<span class="self">Self</span>::Authenticated(data) =&gt; <span class="prelude-val">Ok</span>(data)
 		}
 	}
@@ -618,9 +620,9 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	</span>Cookie(String),
 	<span class="doccomment">/// Take the token from a header with the given name.
 	</span>Header(HeaderName),
-	<span class="doccomment">/// Take the token from the HTTP Authorization header. This is different from `Header(&quot;Authorization&quot;)`
+	<span class="doccomment">/// Take the token from the HTTP Authorization header. This is different from `Header("Authorization")`
 	/// as it will follow the `scheme param` format from the HTTP specification. The `scheme` will
-	/// be discarded, so its value doesn&#39;t matter.
+	/// be discarded, so its value doesn't matter.
 	</span>AuthorizationHeader
 }
 
@@ -631,7 +633,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 /// ```
 /// # use gotham_restful::{AuthHandler, gotham::state::State};
 /// #
-/// const SECRET: &amp;&#39;static [u8; 32] = b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;;
+/// const SECRET: &amp;'static [u8; 32] = b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc";
 ///
 /// struct CustomAuthHandler;
 /// impl&lt;T&gt; AuthHandler&lt;T&gt; for CustomAuthHandler {
@@ -700,20 +702,20 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 ///
 /// #[read_all]
 /// fn read_all(auth: &amp;AuthStatus&lt;AuthData&gt;) -&gt; Success&lt;String&gt; {
-/// 	format!(&quot;{auth:?}&quot;).into()
+/// 	format!("{auth:?}").into()
 /// }
 ///
 /// fn main() {
 /// 	let auth: AuthMiddleware&lt;AuthData, _&gt; = AuthMiddleware::new(
 /// 		AuthSource::AuthorizationHeader,
 /// 		AuthValidation::default(),
-/// 		StaticAuthHandler::from_array(b&quot;zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc&quot;)
+/// 		StaticAuthHandler::from_array(b"zlBsA2QXnkmpe0QTh8uCvtAEa4j33YAc")
 /// 	);
 /// 	let (chain, pipelines) = single_pipeline(new_pipeline().add(auth).build());
 /// 	gotham::start(
-/// 		&quot;127.0.0.1:8080&quot;,
+/// 		"127.0.0.1:8080",
 /// 		build_router(chain, pipelines, |route| {
-/// 			route.resource::&lt;AuthResource&gt;(&quot;auth&quot;);
+/// 			route.resource::&lt;AuthResource&gt;("auth");
 /// 		})
 /// 	);
 /// }
@@ -798,7 +800,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 
 		<span class="comment">// get the secret from the handler, possibly decoding claims ourselves
 		</span><span class="kw">let </span>secret = <span class="self">self</span>.handler.jwt_secret(state, || {
-			<span class="kw">let </span>b64 = token.split(<span class="string">&#39;.&#39;</span>).nth(<span class="number">1</span>)<span class="question-mark">?</span>;
+			<span class="kw">let </span>b64 = token.split(<span class="string">'.'</span>).nth(<span class="number">1</span>)<span class="question-mark">?</span>;
 			<span class="kw">let </span>raw = BASE64_URL_SAFE_NO_PAD.decode(b64).ok()<span class="question-mark">?</span>;
 			serde_json::from_slice(<span class="kw-2">&amp;</span>raw).ok()<span class="question-mark">?
 		</span>});
@@ -826,7 +828,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 
 <span class="kw">impl</span>&lt;Data, Handler&gt; Middleware <span class="kw">for </span>AuthMiddleware&lt;Data, Handler&gt;
 <span class="kw">where
-	</span>Data: DeserializeOwned + Send + <span class="lifetime">&#39;static</span>,
+	</span>Data: DeserializeOwned + Send + <span class="lifetime">'static</span>,
 	Handler: AuthHandler&lt;Data&gt;
 {
 	<span class="kw">fn </span>call&lt;Chain&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>state: State, chain: Chain) -&gt; Pin&lt;Box&lt;HandlerFuture&gt;&gt;
@@ -867,12 +869,12 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	<span class="kw">use </span>std::fmt::Debug;
 
 	<span class="comment">// 256-bit random string
-	</span><span class="kw">const </span>JWT_SECRET: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8; <span class="number">32</span>] = <span class="string">b&quot;Lyzsfnta0cdxyF0T9y6VGxp3jpgoMUuW&quot;</span>;
+	</span><span class="kw">const </span>JWT_SECRET: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[u8; <span class="number">32</span>] = <span class="string">b"Lyzsfnta0cdxyF0T9y6VGxp3jpgoMUuW"</span>;
 
 	<span class="comment">// some known tokens
-	</span><span class="kw">const </span>VALID_TOKEN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk&quot;</span>;
-	<span class="kw">const </span>EXPIRED_TOKEN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0&quot;</span>;
-	<span class="kw">const </span>INVALID_TOKEN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9&quot;</span>;
+	</span><span class="kw">const </span>VALID_TOKEN: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9.8h8Ax-nnykqEQ62t7CxmM3ja6NzUQ4L0MLOOzddjLKk"</span>;
+	<span class="kw">const </span>EXPIRED_TOKEN: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4MzcxMDB9.eV1snaGLYrJ7qUoMk74OvBY3WUU9M0Je5HTU2xtX1v0"</span>;
+	<span class="kw">const </span>INVALID_TOKEN: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtc3JkMCIsInN1YiI6ImdvdGhhbS1yZXN0ZnVsIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjQxMDI0NDQ4MDB9"</span>;
 
 	<span class="attr">#[derive(Debug, Deserialize, PartialEq)]
 	</span><span class="kw">struct </span>TestData {
@@ -885,8 +887,8 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	<span class="kw">impl </span>Default <span class="kw">for </span>TestData {
 		<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
 			<span class="self">Self </span>{
-				iss: <span class="string">&quot;msrd0&quot;</span>.to_owned(),
-				sub: <span class="string">&quot;gotham-restful&quot;</span>.to_owned(),
+				iss: <span class="string">"msrd0"</span>.to_owned(),
+				sub: <span class="string">"gotham-restful"</span>.to_owned(),
 				iat: <span class="number">1577836800</span>,
 				exp: <span class="number">4102444800
 			</span>}
@@ -914,7 +916,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span><span class="kw-2">mut </span>headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				<span class="macro">format!</span>(<span class="string">&quot;Bearer {VALID_TOKEN}&quot;</span>).parse().unwrap()
+				<span class="macro">format!</span>(<span class="string">"Bearer {VALID_TOKEN}"</span>).parse().unwrap()
 			);
 			state.put(headers);
 			middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
@@ -946,7 +948,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span><span class="kw-2">mut </span>headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				<span class="macro">format!</span>(<span class="string">&quot;Bearer {VALID_TOKEN}&quot;</span>).parse().unwrap()
+				<span class="macro">format!</span>(<span class="string">"Bearer {VALID_TOKEN}"</span>).parse().unwrap()
 			);
 			state.put(headers);
 			middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
@@ -971,7 +973,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Unauthenticated =&gt; {},
-				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Unauthenticated, got {status:?}&quot;</span>)
+				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected AuthStatus::Unauthenticated, got {status:?}"</span>)
 			};
 		});
 	}
@@ -983,14 +985,14 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span><span class="kw-2">mut </span>headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				<span class="macro">format!</span>(<span class="string">&quot;Bearer {EXPIRED_TOKEN}&quot;</span>).parse().unwrap()
+				<span class="macro">format!</span>(<span class="string">"Bearer {EXPIRED_TOKEN}"</span>).parse().unwrap()
 			);
 			state.put(headers);
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Invalid(err) <span class="kw">if </span><span class="kw-2">*</span>err.kind() == ErrorKind::ExpiredSignature =&gt; {},
 				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(
-					<span class="string">&quot;Expected AuthStatus::Invalid(..) with ErrorKind::ExpiredSignature, got {status:?}&quot;
+					<span class="string">"Expected AuthStatus::Invalid(..) with ErrorKind::ExpiredSignature, got {status:?}"
 				</span>)
 			};
 		});
@@ -1003,14 +1005,14 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span><span class="kw-2">mut </span>headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				<span class="macro">format!</span>(<span class="string">&quot;Bearer {INVALID_TOKEN}&quot;</span>).parse().unwrap()
+				<span class="macro">format!</span>(<span class="string">"Bearer {INVALID_TOKEN}"</span>).parse().unwrap()
 			);
 			state.put(headers);
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Invalid(err) <span class="kw">if </span><span class="kw-2">*</span>err.kind() == ErrorKind::InvalidToken =&gt; {},
 				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(
-					<span class="string">&quot;Expected AuthStatus::Invalid(..) with ErrorKind::InvalidToken, got {status:?}&quot;
+					<span class="string">"Expected AuthStatus::Invalid(..) with ErrorKind::InvalidToken, got {status:?}"
 				</span>)
 			};
 		});
@@ -1023,20 +1025,20 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span><span class="kw-2">mut </span>headers = HeaderMap::new();
 			headers.insert(
 				AUTHORIZATION,
-				<span class="macro">format!</span>(<span class="string">&quot;Bearer {VALID_TOKEN}&quot;</span>).parse().unwrap()
+				<span class="macro">format!</span>(<span class="string">"Bearer {VALID_TOKEN}"</span>).parse().unwrap()
 			);
 			state.put(headers);
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Authenticated(data) =&gt; <span class="macro">assert_eq!</span>(data, TestData::default()),
-				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
+				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected AuthStatus::Authenticated, got {status:?}"</span>)
 			};
 		})
 	}
 
 	<span class="attr">#[test]
 	</span><span class="kw">fn </span>test_auth_middleware_header_token() {
-		<span class="kw">let </span>header_name = <span class="string">&quot;x-znoiprwmvfexju&quot;</span>;
+		<span class="kw">let </span>header_name = <span class="string">"x-znoiprwmvfexju"</span>;
 		<span class="kw">let </span>middleware =
 			new_middleware::&lt;TestData&gt;(AuthSource::Header(HeaderName::from_static(header_name)));
 		State::with_new(|<span class="kw-2">mut </span>state| {
@@ -1046,14 +1048,14 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Authenticated(data) =&gt; <span class="macro">assert_eq!</span>(data, TestData::default()),
-				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
+				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected AuthStatus::Authenticated, got {status:?}"</span>)
 			};
 		})
 	}
 
 	<span class="attr">#[test]
 	</span><span class="kw">fn </span>test_auth_middleware_cookie_token() {
-		<span class="kw">let </span>cookie_name = <span class="string">&quot;znoiprwmvfexju&quot;</span>;
+		<span class="kw">let </span>cookie_name = <span class="string">"znoiprwmvfexju"</span>;
 		<span class="kw">let </span>middleware = new_middleware::&lt;TestData&gt;(AuthSource::Cookie(cookie_name.to_owned()));
 		State::with_new(|<span class="kw-2">mut </span>state| {
 			<span class="kw">let </span><span class="kw-2">mut </span>jar = CookieJar::new();
@@ -1062,26 +1064,26 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Authenticated(data) =&gt; <span class="macro">assert_eq!</span>(data, TestData::default()),
-				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
+				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected AuthStatus::Authenticated, got {status:?}"</span>)
 			};
 		})
 	}
 
 	<span class="attr">#[test]
 	</span><span class="kw">fn </span>test_auth_middleware_cookie_no_jar() {
-		<span class="kw">let </span>cookie_name = <span class="string">&quot;znoiprwmvfexju&quot;</span>;
+		<span class="kw">let </span>cookie_name = <span class="string">"znoiprwmvfexju"</span>;
 		<span class="kw">let </span>middleware = new_middleware::&lt;TestData&gt;(AuthSource::Cookie(cookie_name.to_owned()));
 		State::with_new(|<span class="kw-2">mut </span>state| {
 			<span class="kw">let </span><span class="kw-2">mut </span>headers = HeaderMap::new();
 			headers.insert(
 				COOKIE,
-				<span class="macro">format!</span>(<span class="string">&quot;{cookie_name}={VALID_TOKEN}&quot;</span>).parse().unwrap()
+				<span class="macro">format!</span>(<span class="string">"{cookie_name}={VALID_TOKEN}"</span>).parse().unwrap()
 			);
 			state.put(headers);
 			<span class="kw">let </span>status = middleware.auth_status(<span class="kw-2">&amp;mut </span>state);
 			<span class="kw">match </span>status {
 				AuthStatus::Authenticated(data) =&gt; <span class="macro">assert_eq!</span>(data, TestData::default()),
-				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected AuthStatus::Authenticated, got {status:?}&quot;</span>)
+				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected AuthStatus::Authenticated, got {status:?}"</span>)
 			};
 		})
 	}

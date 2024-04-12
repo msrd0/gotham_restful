@@ -1,6 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/handler/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/openapi/handler/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><script id="default-settings" 
 data-theme="ayu"
-data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="gotham_restful" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="gotham_restful" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../gotham_restful/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -200,7 +202,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
-</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(not(feature = <span class="string">&quot;auth&quot;</span>), allow(unused_imports))]
+</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(not(feature = <span class="string">"auth"</span>), allow(unused_imports))]
 </span><span class="kw">use </span><span class="kw">super</span>::SECURITY_NAME;
 <span class="kw">use </span>base64::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>futures_util::{future, future::FutureExt};
@@ -227,7 +229,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 <span class="kw">use </span>sha2::{Digest, Sha256};
 <span class="kw">use </span>std::{panic::RefUnwindSafe, pin::Pin, sync::Arc};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;auth&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"auth"</span>)]
 </span><span class="kw">fn </span>get_security(state: <span class="kw-2">&amp;</span>State) -&gt; IndexMap&lt;String, ReferenceOr&lt;SecurityScheme&gt;&gt; {
 	<span class="kw">use </span><span class="kw">crate</span>::AuthSource;
 	<span class="kw">use </span>gotham::state::FromState;
@@ -249,8 +251,8 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			description: <span class="prelude-val">None
 		</span>},
 		AuthSource::AuthorizationHeader =&gt; SecurityScheme::HTTP {
-			scheme: <span class="string">&quot;bearer&quot;</span>.to_owned(),
-			bearer_format: <span class="prelude-val">Some</span>(<span class="string">&quot;JWT&quot;</span>.to_owned()),
+			scheme: <span class="string">"bearer"</span>.to_owned(),
+			bearer_format: <span class="prelude-val">Some</span>(<span class="string">"JWT"</span>.to_owned()),
 			description: <span class="prelude-val">None
 		</span>}
 	};
@@ -261,7 +263,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	security_schemes
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;auth&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"auth"</span>))]
 </span><span class="kw">fn </span>get_security(_state: <span class="kw-2">&amp;</span>State) -&gt; IndexMap&lt;String, ReferenceOr&lt;SecurityScheme&gt;&gt; {
 	Default::default()
 }
@@ -286,16 +288,16 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 		<span class="prelude-val">Ok</span>(body) =&gt; {
 			<span class="kw">let </span><span class="kw-2">mut </span>res = create_response(state, StatusCode::OK, APPLICATION_JSON, body);
 			<span class="kw">let </span>headers = res.headers_mut();
-			headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static(<span class="string">&quot;nosniff&quot;</span>));
+			headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static(<span class="string">"nosniff"</span>));
 			res
 		},
 		<span class="prelude-val">Err</span>(e) =&gt; {
-			<span class="macro">error!</span>(<span class="string">&quot;Unable to handle OpenAPI request due to error: {e}&quot;</span>);
+			<span class="macro">error!</span>(<span class="string">"Unable to handle OpenAPI request due to error: {e}"</span>);
 			create_response(
 				state,
 				StatusCode::INTERNAL_SERVER_ERROR,
 				TEXT_PLAIN_UTF_8,
-				<span class="string">&quot;&quot;
+				<span class="string">""
 			</span>)
 		}
 	}
@@ -363,7 +365,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 
 	<span class="kw">let </span><span class="kw-2">mut </span>etag = Sha256::new();
 	etag.update(<span class="kw-2">&amp;</span>html);
-	<span class="kw">let </span>etag = <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, BASE64_STANDARD.encode(etag.finalize()));
+	<span class="kw">let </span>etag = <span class="macro">format!</span>(<span class="string">"\"{}\""</span>, BASE64_STANDARD.encode(etag.finalize()));
 
 	<span class="kw">if </span>state
 		.borrow::&lt;HeaderMap&gt;()
@@ -378,17 +380,17 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	<span class="kw">let </span>headers = res.headers_mut();
 	headers.insert(
 		CACHE_CONTROL,
-		HeaderValue::from_static(<span class="string">&quot;public,max-age=2592000&quot;</span>)
+		HeaderValue::from_static(<span class="string">"public,max-age=2592000"</span>)
 	);
 	headers.insert(
 		CONTENT_SECURITY_POLICY,
 		<span class="macro">format!</span>(
-			<span class="string">&quot;default-src &#39;none&#39;;base-uri &#39;none&#39;;script-src &#39;unsafe-inline&#39; https://cdn.jsdelivr.net &#39;sha256-{script_hash}&#39; &#39;strict-dynamic&#39;;style-src &#39;unsafe-inline&#39; https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src &#39;self&#39;;img-src blob: data:&quot;</span>,
+			<span class="string">"default-src 'none';base-uri 'none';script-src 'unsafe-inline' https://cdn.jsdelivr.net 'sha256-{script_hash}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:"</span>,
 		).parse().unwrap()
 	);
 	headers.insert(ETAG, etag.parse().unwrap());
-	headers.insert(REFERRER_POLICY, HeaderValue::from_static(<span class="string">&quot;no-referrer&quot;</span>));
-	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static(<span class="string">&quot;nosniff&quot;</span>));
+	headers.insert(REFERRER_POLICY, HeaderValue::from_static(<span class="string">"no-referrer"</span>));
+	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static(<span class="string">"nosniff"</span>));
 	<span class="prelude-val">Ok</span>(res)
 }
 
