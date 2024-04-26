@@ -32,47 +32,47 @@ This repository contains the following crates:
 
 # gotham-restful
 
-This crate is an extension to the popular [gotham web framework][__link0] for Rust. It allows you to create resources with assigned endpoints that aim to be a more convenient way of creating handlers for requests.
-
+This crate is an extension to the popular [gotham web framework][__link0] for Rust. It allows you to
+create resources with assigned endpoints that aim to be a more convenient way of creating handlers
+for requests.
 
 ## Features
 
- - Automatically parse **JSON** request and produce response bodies
- - Allow using **raw** request and response bodies
- - Convenient **macros** to create responses that can be registered with gotham’s router
- - Auto-Generate an **OpenAPI** specification for your API
- - Manage **CORS** headers so you don’t have to
- - Manage **Authentication** with JWT
- - Integrate diesel connection pools for easy **database** integration
-
+* Automatically parse **JSON** request and produce response bodies
+* Allow using **raw** request and response bodies
+* Convenient **macros** to create responses that can be registered with gotham’s router
+* Auto-Generate an **OpenAPI** specification for your API
+* Manage **CORS** headers so you don’t have to
+* Manage **Authentication** with JWT
+* Integrate diesel connection pools for easy **database** integration
 
 ## Safety
 
-This crate is just as safe as you’d expect from anything written in safe Rust - and `#![forbid(unsafe_code)]` ensures that no unsafe was used.
-
+This crate is just as safe as you’d expect from anything written in safe Rust - and
+`#![forbid(unsafe_code)]` ensures that no unsafe was used.
 
 ## Endpoints
 
-There are a set of pre-defined endpoints that should cover the majority of REST APIs. However, it is also possible to define your own endpoints.
-
+There are a set of pre-defined endpoints that should cover the majority of REST APIs. However,
+it is also possible to define your own endpoints.
 
 ### Pre-defined Endpoints
 
 Assuming you assign `/foobar` to your resource, the following pre-defined endpoints exist:
 
-| Endpoint Name | Required Arguments | HTTP Verb | HTTP Path |
-| --- | --- | --- | --- |
-| read_all |  | GET | /foobar |
-| read | id | GET | /foobar/:id |
-| search | query | GET | /foobar/search |
-| create | body | POST | /foobar |
-| update_all | body | PUT | /foobar |
-| update | id, body | PUT | /foobar/:id |
-| delete_all |  | DELETE | /foobar |
-| delete | id | DELETE | /foobar/:id |
+|Endpoint Name|Required Arguments|HTTP Verb|HTTP Path|
+|-------------|------------------|---------|---------|
+|read_all||GET|/foobar|
+|read|id|GET|/foobar/:id|
+|search|query|GET|/foobar/search|
+|create|body|POST|/foobar|
+|update_all|body|PUT|/foobar|
+|update|id, body|PUT|/foobar/:id|
+|delete_all||DELETE|/foobar|
+|delete|id|DELETE|/foobar/:id|
 
-Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A simple example looks like this:
-
+Each of those endpoints has a macro that creates the neccessary boilerplate for the Resource. A
+simple example looks like this:
 
 ```rust
 /// Our RESTful resource.
@@ -93,11 +93,10 @@ fn read(id: u64) -> Success<Foo> {
 }
 ```
 
-
 ### Custom Endpoints
 
-Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that of the pre-defined endpoints, but you need to give it more context:
-
+Defining custom endpoints is done with the `#[endpoint]` macro. The syntax is similar to that
+of the pre-defined endpoints, but you need to give it more context:
 
 ```rust
 use gotham_restful::gotham::hyper::Method;
@@ -123,22 +122,25 @@ fn custom_endpoint(path: CustomPath) -> Success<String> {
 }
 ```
 
-
 ## Arguments
 
 Some endpoints require arguments. Those should be
 
- - **id** Should be a deserializable json-primitive like [`i64`][__link1] or [`String`][__link2].
- - **body** Should be any deserializable object, or any type implementing [`RequestBody`][__link3].
- - **query** Should be any deserializable object whose variables are json-primitives. It will however not be parsed from json, but from HTTP GET parameters like in `search?id=1`. The type needs to implement [`QueryStringExtractor`][__link4].
+* **id** Should be a deserializable json-primitive like [`i64`][__link1] or [`String`][__link2].
+* **body** Should be any deserializable object, or any type implementing [`RequestBody`][__link3].
+* **query** Should be any deserializable object whose variables are json-primitives. It will
+  however not be parsed from json, but from HTTP GET parameters like in `search?id=1`. The
+  type needs to implement [`QueryStringExtractor`][__link4].
 
-Additionally, all handlers may take a reference to gotham’s [`State`][__link5]. Please note that for async handlers, it needs to be a mutable reference until rustc’s lifetime checks across await bounds improve.
-
+Additionally, all handlers may take a reference to gotham’s [`State`][__link5]. Please note that for async
+handlers, it needs to be a mutable reference until rustc’s lifetime checks across await bounds
+improve.
 
 ## Uploads and Downloads
 
-By default, every request body is parsed from json, and every respone is converted to json using [serde_json][__link6]. However, you may also use raw bodies. This is an example where the request body is simply returned as the response again, no json parsing involved:
-
+By default, every request body is parsed from json, and every respone is converted to json using
+[serde_json][__link6]. However, you may also use raw bodies. This is an example where the request body
+is simply returned as the response again, no json parsing involved:
 
 ```rust
 #[derive(Resource)]
@@ -158,11 +160,10 @@ fn create(body: RawImage) -> Raw<Vec<u8>> {
 }
 ```
 
-
 ## Custom HTTP Headers
 
-You can read request headers from the state as you would in any other gotham handler, and specify custom response headers using [Response::header][__link7].
-
+You can read request headers from the state as you would in any other gotham handler, and specify
+custom response headers using [Response::header][__link7].
 
 ```rust
 #[derive(Resource)]
@@ -180,26 +181,28 @@ async fn read_all(state: &mut State) -> NoContent {
 }
 ```
 
-
 ## Features
 
-To make life easier for common use-cases, this create offers a few features that might be helpful when you implement your web server.  The complete feature list is
+To make life easier for common use-cases, this create offers a few features that might be helpful
+when you implement your web server.  The complete feature list is
 
- - [`auth`](#authentication-feature) Advanced JWT middleware
- - [`cors`](#cors-feature) CORS handling for all endpoint handlers
- - [`database`](#database-feature) diesel middleware support
- - `errorlog` log errors returned from endpoint handlers
- - `full` enables all features except `without-openapi`
- - [`openapi`](#openapi-feature) router additions to generate an openapi spec
- - `without-openapi` (**default**) disables `openapi` support.
-
+* [`auth`](#authentication-feature) Advanced JWT middleware
+* [`cors`](#cors-feature) CORS handling for all endpoint handlers
+* [`database`](#database-feature) diesel middleware support
+* `errorlog` log errors returned from endpoint handlers
+* `full` enables all features except `without-openapi`
+* [`openapi`](#openapi-feature) router additions to generate an openapi spec
+* `without-openapi` (**default**) disables `openapi` support.
 
 ### Authentication Feature
 
-In order to enable authentication support, enable the `auth` feature gate. This allows you to register a middleware that can automatically check for the existence of an JWT authentication token. Besides being supported by the endpoint macros, it supports to lookup the required JWT secret with the JWT data, hence you can use several JWT secrets and decide on the fly which secret to use. None of this is currently supported by gotham’s own JWT middleware.
+In order to enable authentication support, enable the `auth` feature gate. This allows you to
+register a middleware that can automatically check for the existence of an JWT authentication
+token. Besides being supported by the endpoint macros, it supports to lookup the required JWT secret
+with the JWT data, hence you can use several JWT secrets and decide on the fly which secret to use.
+None of this is currently supported by gotham’s own JWT middleware.
 
 A simple example that uses only a single secret looks like this:
-
 
 ```rust
 #[derive(Resource)]
@@ -241,13 +244,14 @@ fn main() {
 }
 ```
 
-
 ### CORS Feature
 
-The cors feature allows an easy usage of this web server from other origins. By default, only the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired configuration as a middleware.
+The cors feature allows an easy usage of this web server from other origins. By default, only
+the `Access-Control-Allow-Methods` header is touched. To change the behaviour, add your desired
+configuration as a middleware.
 
-A simple example that allows authentication from every origin (note that `*` always disallows authentication), and every content type, looks like this:
-
+A simple example that allows authentication from every origin (note that `*` always disallows
+authentication), and every content type, looks like this:
 
 ```rust
 #[derive(Resource)]
@@ -277,15 +281,17 @@ fn main() {
 }
 ```
 
-The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`][__link8] for an example.
-
+The cors feature can also be used for non-resource handlers. Take a look at [`CorsRoute`][__link8]
+for an example.
 
 ### Database Feature
 
-The database feature allows an easy integration of [diesel][__link9] into your handler functions. Please note however that due to the way gotham’s diesel middleware implementation, it is not possible to run async code while holding a database connection. If you need to combine async and database, you’ll need to borrow the connection from the [`State`][__link10] yourself and return a boxed future.
+The database feature allows an easy integration of [diesel][__link9] into your handler functions. Please
+note however that due to the way gotham’s diesel middleware implementation, it is not possible
+to run async code while holding a database connection. If you need to combine async and database,
+you’ll need to borrow the connection from the [`State`][__link10] yourself and return a boxed future.
 
 A simple non-async example looks like this:
-
 
 ```rust
 #[derive(Resource)]
@@ -320,13 +326,16 @@ fn main() {
 }
 ```
 
-
 ### OpenAPI Feature
 
-The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section carefully both as a binary as well as a library author to avoid unwanted suprises.
+The OpenAPI feature is probably the most powerful one of this crate. Definitely read this section
+carefully both as a binary as well as a library author to avoid unwanted suprises.
 
-In order to automatically create an openapi specification, gotham-restful needs knowledge over all routes and the types returned. `serde` does a great job at serialization but doesn’t give enough type information, so all types used in the router need to implement [`OpenapiType`][__link11]. This can be derived for almoust any type and there should be no need to implement it manually. A simple example looks like this:
-
+In order to automatically create an openapi specification, gotham-restful needs knowledge over
+all routes and the types returned. `serde` does a great job at serialization but doesn’t give
+enough type information, so all types used in the router need to implement
+[`OpenapiType`][__link11]. This can be derived for almoust any type and there
+should be no need to implement it manually. A simple example looks like this:
 
 ```rust
 #[derive(Resource)]
@@ -366,27 +375,30 @@ fn main() {
 }
 ```
 
-Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`. The first one will return the generated openapi specification in JSON format, allowing you to easily generate clients in different languages without worying to exactly replicate your api in each of those languages. The second one will return documentation in HTML format, so you can easily view your api and share it with other people.
-
+Above example adds the resource as before, but adds two other endpoints as well: `/openapi` and `/`.
+The first one will return the generated openapi specification in JSON format, allowing you to easily
+generate clients in different languages without worying to exactly replicate your api in each of those
+languages. The second one will return documentation in HTML format, so you can easily view your
+api and share it with other people.
 
 #### Gotchas
 
 The openapi feature has some gotchas you should be aware of.
 
- - The name of a struct is used as a “link” in the openapi specification. Therefore, if you have two structs with the same name in your project, the openapi specification will be invalid as only one of the two will make it into the spec.
-	
-	
- - By default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the `openapi` feature will add additional type bounds and method requirements to some of the traits and types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass both features through and conditionally enable the openapi code, like this:
-	
-	
-	```rust
-	#[derive(Deserialize, Serialize)]
-	#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
-	struct Foo;
-	```
-	
-	
+* The name of a struct is used as a “link” in the openapi specification. Therefore, if you have two
+  structs with the same name in your project, the openapi specification will be invalid as only one
+  of the two will make it into the spec.
 
+* By default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the
+  `openapi` feature will add additional type bounds and method requirements to some of the traits and
+  types in this crate, for example instead of [`Endpoint`][__link12] you now have to implement
+  [`EndpointWithSchema`][__link13]. This means that some code might only compile on either feature, but not
+  on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass
+  both features through and conditionally enable the openapi code, like this:
+  
+  ```rust
+  #[derive(Deserialize, Serialize)]#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]struct Foo;
+```
 
 
 ## Versioning
@@ -413,18 +425,18 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG4Z32Sdl8XpAG3mqtXejbbqOG18FZEQH693jGwJVrQge6zMvYXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjKCbmdvdGhhbV9yZXN0ZnVsZTAuOC40gmxvcGVuYXBpX3R5cGVlMC40LjOCanNlcmRlX2pzb25nMS4wLjEwNg
- [__link0]: https://crates.io/crates/gotham/0.7.2
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG4Z32Sdl8XpAG3mqtXejbbqOG18FZEQH693jGwJVrQge6zMvYXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjSCbmdvdGhhbV9yZXN0ZnVsZTAuOC41gmxvcGVuYXBpX3R5cGVlMC40LjOCanNlcmRlX2pzb25nMS4wLjExNg
+ [__link0]: https://crates.io/crates/gotham/0.7.4
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
- [__link10]: https://docs.rs/gotham/0.7.2/gotham/?search=state::State
+ [__link10]: https://docs.rs/gotham/0.7.4/gotham/?search=state::State
  [__link11]: https://docs.rs/openapi_type/0.4.3/openapi_type/?search=OpenapiType
- [__link12]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=Endpoint
- [__link13]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=EndpointWithSchema
+ [__link12]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=Endpoint
+ [__link13]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=EndpointWithSchema
  [__link2]: https://doc.rust-lang.org/stable/std/string/struct.String.html
- [__link3]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=RequestBody
- [__link4]: https://docs.rs/gotham/0.7.2/gotham/?search=extractor::QueryStringExtractor
- [__link5]: https://docs.rs/gotham/0.7.2/gotham/?search=state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.106
- [__link7]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=Response::header
- [__link8]: https://docs.rs/gotham_restful/0.8.4/gotham_restful/?search=cors::CorsRoute
+ [__link3]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=RequestBody
+ [__link4]: https://docs.rs/gotham/0.7.4/gotham/?search=extractor::QueryStringExtractor
+ [__link5]: https://docs.rs/gotham/0.7.4/gotham/?search=state::State
+ [__link6]: https://crates.io/crates/serde_json/1.0.116
+ [__link7]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=Response::header
+ [__link8]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=cors::CorsRoute
  [__link9]: https://diesel.rs/

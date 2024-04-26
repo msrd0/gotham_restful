@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Unreleased
 
+## [0.8.5] - 2024-04-26
+### Updated
+ - `base64` has been updated to 0.22
+
 ## [0.8.4] - 2023-09-13
 ### Updated
  - Some dependency versions were increased to ensure compatibility with `-Z minimal-versions`
