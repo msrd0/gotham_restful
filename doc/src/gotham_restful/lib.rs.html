@@ -607,7 +607,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 </span><span class="comment">// deny warnings in CI
 </span><span class="attr">#![cfg_attr(gotham_restful_deny_warnings, deny(warnings))]
 </span><span class="comment">// clippy doesn't like our code style
-</span><span class="attr">#![cfg_attr(feature = <span class="string">"cargo-clippy"</span>, allow(clippy::tabs_in_doc_comments))]
+</span><span class="attr">#![allow(clippy::tabs_in_doc_comments)]
 </span><span class="comment">// intra-doc links only fully work when OpenAPI is enabled
 </span><span class="attr">#![cfg_attr(feature = <span class="string">"openapi"</span>, deny(rustdoc::broken_intra_doc_links))]
 #![cfg_attr(not(feature = <span class="string">"openapi"</span>), allow(rustdoc::broken_intra_doc_links))]

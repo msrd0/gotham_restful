@@ -301,8 +301,6 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>gotham::{
 	handler::HandlerFuture,
 	helpers::http::response::create_empty_response,
@@ -353,7 +351,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="self">Self</span>::Single(origin) =&gt; <span class="prelude-val">Some</span>(origin.parse().unwrap()),
 			<span class="self">Self</span>::Copy =&gt; {
 				<span class="kw">let </span>headers = HeaderMap::borrow_from(state);
-				headers.get(ORIGIN).map(Clone::clone)
+				headers.get(ORIGIN).cloned()
 			}
 		}
 	}
@@ -392,9 +390,7 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 			<span class="self">Self</span>::List(list) =&gt; <span class="prelude-val">Some</span>(list.join(<span class="string">","</span>).parse().unwrap()),
 			<span class="self">Self</span>::Copy =&gt; {
 				<span class="kw">let </span>headers = HeaderMap::borrow_from(state);
-				headers
-					.get(ACCESS_CONTROL_REQUEST_HEADERS)
-					.map(Clone::clone)
+				headers.get(ACCESS_CONTROL_REQUEST_HEADERS).cloned()
 			}
 		}
 	}
