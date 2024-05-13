@@ -48,7 +48,7 @@ impl Origin {
 			Self::Single(origin) => Some(origin.parse().unwrap()),
 			Self::Copy => {
 				let headers = HeaderMap::borrow_from(state);
-				headers.get(ORIGIN).map(Clone::clone)
+				headers.get(ORIGIN).cloned()
 			}
 		}
 	}
@@ -87,9 +87,7 @@ impl Headers {
 			Self::List(list) => Some(list.join(",").parse().unwrap()),
 			Self::Copy => {
 				let headers = HeaderMap::borrow_from(state);
-				headers
-					.get(ACCESS_CONTROL_REQUEST_HEADERS)
-					.map(Clone::clone)
+				headers.get(ACCESS_CONTROL_REQUEST_HEADERS).cloned()
 			}
 		}
 	}

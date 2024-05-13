@@ -86,7 +86,7 @@ fn response_from(res: Response, state: &State) -> gotham::hyper::Response<Body> 
 	r
 }
 
-async fn endpoint_handler<E: Endpoint>(
+async fn endpoint_handler<E>(
 	state: &mut State
 ) -> Result<gotham::hyper::Response<Body>, HandlerError>
 where

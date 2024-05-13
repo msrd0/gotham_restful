@@ -9,8 +9,3 @@ error[E0412]: cannot find type `read___gotham_restful_endpoint` in this scope
   |
 5 | #[resource(read)]
   |            ^^^^ not found in this scope
-  |
-help: you might be missing a type parameter
-  |
-4 | #[derive(Resource<read___gotham_restful_endpoint>)]
-  |                  ++++++++++++++++++++++++++++++++

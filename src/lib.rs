@@ -3,7 +3,7 @@
 // deny warnings in CI
 #![cfg_attr(gotham_restful_deny_warnings, deny(warnings))]
 // clippy doesn't like our code style
-#![cfg_attr(feature = "cargo-clippy", allow(clippy::tabs_in_doc_comments))]
+#![allow(clippy::tabs_in_doc_comments)]
 // intra-doc links only fully work when OpenAPI is enabled
 #![cfg_attr(feature = "openapi", deny(rustdoc::broken_intra_doc_links))]
 #![cfg_attr(not(feature = "openapi"), allow(rustdoc::broken_intra_doc_links))]

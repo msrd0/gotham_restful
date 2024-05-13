@@ -419,7 +419,7 @@ macro_rules! error_if_not_openapi {
 }
 
 // clippy doesn't realize that vectors can be used in closures
-#[cfg_attr(feature = "cargo-clippy", allow(clippy::needless_collect))]
+#[allow(clippy::needless_collect)]
 fn expand_endpoint_type(
 	mut ty: EndpointType,
 	AttributeArgs(attrs): AttributeArgs,

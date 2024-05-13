@@ -11,8 +11,3 @@ error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scop
   |
 5 | #[resource(read_all)]
   |            ^^^^^^^^ not found in this scope
-  |
-help: you might be missing a type parameter
-  |
-4 | #[derive(Resource<read_all___gotham_restful_endpoint>)]
-  |                  ++++++++++++++++++++++++++++++++++++

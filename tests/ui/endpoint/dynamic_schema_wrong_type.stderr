@@ -10,6 +10,10 @@ error[E0631]: type mismatch in function arguments
    = note: expected function signature `fn(StatusCode) -> _`
               found function signature `fn(u16) -> _`
    = note: required for `fn(u16) -> std::string::String {schema}` to implement `CustomSchema`
+help: consider wrapping the function in a closure
+   |
+16 | #[read_all(schema = |arg0: StatusCode| "schema"(/* u16 */), status_codes = "status_codes")]
+   |                     ++++++++++++++++++         +++++++++++
 
 error[E0271]: expected `status_codes` to be a fn item that returns `Vec<StatusCode>`, but it returns `Vec<u16>`
   --> tests/ui/endpoint/dynamic_schema_wrong_type.rs:16:46

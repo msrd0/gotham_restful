@@ -66,7 +66,7 @@ pub fn expand_from_body(input: DeriveInput) -> Result<TokenStream> {
 	let mut body_ident = format_ident!("_body");
 	let mut type_ident = format_ident!("_type");
 
-	if let Some(body_field) = fields.fields.get(0) {
+	if let Some(body_field) = fields.fields.first() {
 		body_ident = body_field.0.clone();
 		let body_ty = &body_field.1;
 		where_clause = quote! {
