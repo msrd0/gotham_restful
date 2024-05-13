@@ -8,7 +8,7 @@ name = "gotham_restful"
 version = "0.8.5"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
-rust-version = "1.70.0"
+rust-version = "1.73.0"
 description = "RESTful additions for the gotham web framework"
 keywords = ["gotham", "rest", "restful", "web", "http"]
 categories = ["web-programming", "web-programming::http-server"]
@@ -31,7 +31,7 @@ thiserror = "1.0.2"
 base64 = { version = "0.22", optional = true }
 gotham_middleware_diesel = { version = "0.5.1", optional = true }
 gotham_restful_redoc = { version = "0.2.5", path = "./redoc", optional = true }
-jsonwebtoken = { version = "8.0", default-features = false, optional = true }
+jsonwebtoken = { version = "9.3", default-features = false, optional = true }
 lazy-regex = { version = "3.0", optional = true }
 openapi_type = { version = "0.4.3", optional = true }
 parking_lot = { version = "0.12", optional = true }
