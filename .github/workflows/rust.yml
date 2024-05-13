@@ -61,7 +61,7 @@ jobs:
       - name: cargo -Z minimal-versions update
         run: |
           cargo -Z minimal-versions update
-          cargo update --precise 1.3.0 lazy-static
+          cargo update --precise 1.3.0 lazy_static
         if: matrix.rust.name == 'MSRV'
       - run: cat Cargo.lock
         if: matrix.rust.name == 'MSRV'
