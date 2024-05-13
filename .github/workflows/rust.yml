@@ -33,7 +33,7 @@ jobs:
       matrix:
         rust:
           - name: MSRV
-            toolchain: "1.70"
+            toolchain: "1.73"
             nightly: false
           - name: Stable
             toolchain: stable
