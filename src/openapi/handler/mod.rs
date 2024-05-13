@@ -39,17 +39,20 @@ fn get_security(state: &State) -> IndexMap<String, ReferenceOr<SecurityScheme>> 
 		AuthSource::Cookie(name) => SecurityScheme::APIKey {
 			location: APIKeyLocation::Cookie,
 			name: name.to_string(),
-			description: None
+			description: None,
+			extensions: Default::default()
 		},
 		AuthSource::Header(name) => SecurityScheme::APIKey {
 			location: APIKeyLocation::Header,
 			name: name.to_string(),
-			description: None
+			description: None,
+			extensions: Default::default()
 		},
 		AuthSource::AuthorizationHeader => SecurityScheme::HTTP {
 			scheme: "bearer".to_owned(),
 			bearer_format: Some("JWT".to_owned()),
-			description: None
+			description: None,
+			extensions: Default::default()
 		}
 	};
 
