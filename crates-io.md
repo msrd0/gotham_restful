@@ -365,8 +365,10 @@ The openapi feature has some gotchas you should be aware of.
   both features through and conditionally enable the openapi code, like this:
   
   ```rust
-  #[derive(Deserialize, Serialize)]#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]struct Foo;
-```
+  #[derive(Deserialize, Serialize)]
+  #[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
+  struct Foo;
+  ```
 
 
 ## Versioning
@@ -393,7 +395,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG7r2iEgBUb4sGwlJGpGKMeUqGyjjfh32iKfMGzyjGNIepIf1YXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjSCbmdvdGhhbV9yZXN0ZnVsZTAuOC41gmxvcGVuYXBpX3R5cGVlMC40LjOCanNlcmRlX2pzb25nMS4wLjExNg
+ [__cargo_doc2readme_dependencies_info]: ggGkYW0BYXSEG7r2iEgBUb4sGwlJGpGKMeUqGyjjfh32iKfMGzyjGNIepIf1YXKEG5SJ8EcO8pvsG6aAql37ujSmG2rGlxSAmKbZG4WCYbMMmkI6YWSEgmZnb3RoYW1lMC43LjSCbmdvdGhhbV9yZXN0ZnVsZTAuOC41gmxvcGVuYXBpX3R5cGVlMC40LjOCanNlcmRlX2pzb25nMS4wLjExNw
  [__link0]: https://crates.io/crates/gotham/0.7.4
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.4/gotham/?search=state::State
@@ -404,7 +406,7 @@ limitations under the License.
  [__link3]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=RequestBody
  [__link4]: https://docs.rs/gotham/0.7.4/gotham/?search=extractor::QueryStringExtractor
  [__link5]: https://docs.rs/gotham/0.7.4/gotham/?search=state::State
- [__link6]: https://crates.io/crates/serde_json/1.0.116
+ [__link6]: https://crates.io/crates/serde_json/1.0.117
  [__link7]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=Response::header
  [__link8]: https://docs.rs/gotham_restful/0.8.5/gotham_restful/?search=cors::CorsRoute
  [__link9]: https://diesel.rs/
