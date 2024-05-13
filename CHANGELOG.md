@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Unreleased
 
+## [0.9.0] - TBD
+### Updated
+ - `openapi_type` has been updated to 0.5
+ - `jsonwebtoken` has been updated to 9.3
+
 ## [0.8.5] - 2024-04-26
 ### Updated
  - `base64` has been updated to 0.22
