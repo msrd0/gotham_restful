@@ -129,10 +129,13 @@ impl OperationDescription {
 			OperationId::Manual(id) => (Some(id), None)
 		};
 		if let Some(verb) = op_id_verb {
-			operation_id = Some(format!(
-				"{verb}_{}",
-				path.replace('/', "_").trim_start_matches('_')
-			));
+			let op_path = path.replace('/', "_");
+			let op_path = op_path.trim_start_matches('_');
+			if verb.starts_with(op_path) || verb.ends_with(op_path) {
+				operation_id = Some(verb.into_owned());
+			} else {
+				operation_id = Some(format!("{verb}_{op_path}"));
+			}
 		}
 
 		Self {
