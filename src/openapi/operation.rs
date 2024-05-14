@@ -10,7 +10,7 @@ use openapi_type::{
 	},
 	OpenapiSchema
 };
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 fn new_parameter_data(
 	name: String,
@@ -93,6 +93,17 @@ impl OperationParams {
 	}
 }
 
+#[derive(Debug, Default)]
+pub enum OperationId {
+	/// Automatically generate the operation id based on path and operation verb.
+	#[default]
+	FullAuto,
+	/// Automatically generate the operation id based on path and the provided string.
+	SemiAuto(Cow<'static, str>),
+	/// Use the provided operation id.
+	Manual(String)
+}
+
 pub(crate) struct OperationDescription {
 	operation_id: Option<String>,
 	description: Option<String>,
@@ -112,10 +123,21 @@ impl OperationDescription {
 		responses: HashMap<StatusCode, ReferenceOr<Schema>>,
 		path: &str
 	) -> Self {
-		let operation_id = E::operation_id().or_else(|| {
-			E::operation_verb()
-				.map(|verb| format!("{verb}_{}", path.replace("/", "_").trim_start_matches('_')))
-		});
+		let (mut operation_id, op_id_verb) = match E::operation_id() {
+			OperationId::FullAuto => (None, E::operation_verb().map(Cow::Borrowed)),
+			OperationId::SemiAuto(verb) => (None, Some(verb)),
+			OperationId::Manual(id) => (Some(id), None)
+		};
+		if let Some(verb) = op_id_verb {
+			let op_path = path.replace('/', "_");
+			let op_path = op_path.trim_start_matches('_');
+			if verb.starts_with(op_path) || verb.ends_with(op_path) {
+				operation_id = Some(verb.into_owned());
+			} else {
+				operation_id = Some(format!("{verb}_{op_path}"));
+			}
+		}
+
 		Self {
 			operation_id,
 			description: E::description(),

@@ -1,3 +1,5 @@
+#[cfg(feature = "openapi")]
+use crate::openapi::operation::OperationId;
 use crate::{IntoResponse, RequestBody};
 use futures_util::future::BoxFuture;
 use gotham::{
@@ -89,8 +91,8 @@ pub trait Endpoint {
 	/// Replace the automatically generated operation id with a custom one. Only relevant for the
 	/// OpenAPI Specification.
 	#[openapi_only]
-	fn operation_id() -> Option<String> {
-		None
+	fn operation_id() -> OperationId {
+		OperationId::FullAuto
 	}
 
 	/// Add a description to the openapi specification. Usually taken from the rustdoc comment

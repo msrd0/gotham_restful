@@ -564,7 +564,7 @@ pub use cors::{handle_cors, CorsConfig, CorsRoute};
 #[cfg(feature = "openapi")]
 mod openapi;
 #[cfg(feature = "openapi")]
-pub use openapi::{builder::OpenapiInfo, router::GetOpenapi};
+pub use openapi::{builder::OpenapiInfo, operation::OperationId, router::GetOpenapi};
 
 mod endpoint;
 #[cfg(feature = "openapi")]

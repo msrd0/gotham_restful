@@ -46,7 +46,7 @@
   "paths": {
     "/coffee": {
       "get": {
-        "operationId": "read_all_coffee",
+        "operationId": "coffee_read_all",
         "responses": {
           "418": {
             "content": {
@@ -64,6 +64,7 @@
     },
     "/custom": {
       "patch": {
+        "operationId": "custom_patch",
         "requestBody": {
           "content": {
             "application/json": {
@@ -83,6 +84,7 @@
     },
     "/custom/read/{from}/with/{id}": {
       "get": {
+        "operationId": "custom_read_with",
         "parameters": [
           {
             "in": "path",
