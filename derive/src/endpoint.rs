@@ -372,18 +372,31 @@ fn expand_operation_verb(_: TokenStream) -> Option<TokenStream> {
 }
 
 #[cfg(feature = "openapi")]
-fn expand_operation_id(operation_id: Option<LitStr>) -> Option<TokenStream> {
-	operation_id.map(|operation_id| {
-		quote! {
-			fn operation_id() -> ::core::option::Option<::std::string::String> {
-				::core::option::Option::Some(::std::string::String::from(#operation_id))
+fn expand_operation_id(fun_ident: &Ident, operation_id: Option<LitStr>) -> Option<TokenStream> {
+	let op_id = match operation_id {
+		Some(operation_id) => quote! {
+			::gotham_restful::OperationId::Manual(
+				::std::string::String::from(#operation_id)
+			)
+		},
+		None => {
+			let verb = fun_ident.to_string();
+			quote! {
+				::gotham_restful::OperationId::SemiAuto(
+					::std::borrow::Cow::Borrowed(#verb)
+				)
 			}
+		}
+	};
+	Some(quote! {
+		fn operation_id() -> ::gotham_restful::OperationId {
+			#op_id
 		}
 	})
 }
 
 #[cfg(not(feature = "openapi"))]
-fn expand_operation_id(_: Option<LitStr>) -> Option<TokenStream> {
+fn expand_operation_id(_: &Ident, _: Option<LitStr>) -> Option<TokenStream> {
 	None
 }
 
@@ -736,7 +749,7 @@ fn expand_endpoint_type(
 		quote!(::gotham_restful::Endpoint)
 	};
 	let operation_verb = expand_operation_verb(ty.operation_verb());
-	let operation_id = expand_operation_id(operation_id);
+	let operation_id = expand_operation_id(fun_ident, operation_id);
 	let wants_auth = expand_wants_auth(wants_auth, args.iter().any(|arg| arg.ty.is_auth_status()));
 	let code = quote! {
 		#[doc(hidden)]
