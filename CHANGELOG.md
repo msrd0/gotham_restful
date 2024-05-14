@@ -5,7 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## Unreleased
 
-## [0.9.0] - TBD
+## [0.9.0] - 2024-05-14
+### Changed
+ - The OpenAPI operation id will now be generated from the function name instead of the
+   operation verb
+
 ### Updated
  - `openapi_type` has been updated to 0.5
  - `jsonwebtoken` has been updated to 9.3

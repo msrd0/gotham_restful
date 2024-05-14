@@ -5,7 +5,7 @@ members = [".", "./derive", "./redoc"]
 
 [package]
 name = "gotham_restful"
-version = "0.8.5"
+version = "0.9.0"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 rust-version = "1.73.0"
@@ -21,7 +21,7 @@ include = ["/src/**/*.rs", "/LICENSE", "/crates-io.md"]
 futures-core = "0.3.19"
 futures-util = "0.3.19"
 gotham = { version = "0.7.4", features = ["derive"], default-features = false }
-gotham_restful_derive = { version = "0.8.3", path = "./derive" }
+gotham_restful_derive = { version = "0.9.0", path = "./derive" }
 log = "0.4.12"
 serde = { version = "1.0.186", features = ["derive"] }
 serde_json = "1.0"
@@ -30,7 +30,7 @@ thiserror = "1.0.2"
 # non-feature optional dependencies
 base64 = { version = "0.22", optional = true }
 gotham_middleware_diesel = { version = "0.5.1", optional = true }
-gotham_restful_redoc = { version = "0.2.5", path = "./redoc", optional = true }
+gotham_restful_redoc = { version = "0.2.6", path = "./redoc", optional = true }
 jsonwebtoken = { version = "9.3", default-features = false, optional = true }
 lazy-regex = { version = "3.0", optional = true }
 openapi_type = { version = "0.5.0", optional = true }
@@ -40,7 +40,7 @@ sha2 = { version = "0.10", optional = true }
 [dev-dependencies]
 diesel = { version = "2.1", features = ["postgres"] }
 futures-executor = "0.3.19"
-gotham = { version = "0.7.2", features = ["testing"], default-features = false }
+gotham = { version = "0.7.4", features = ["testing"], default-features = false }
 paste = "1.0"
 pretty_assertions = "1.0"
 simple_logger = "5.0"
