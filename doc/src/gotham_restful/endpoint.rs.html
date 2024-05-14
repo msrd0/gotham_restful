@@ -152,7 +152,11 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{IntoResponse, RequestBody};
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"openapi"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::openapi::operation::OperationId;
+<span class="kw">use crate</span>::{IntoResponse, RequestBody};
 <span class="kw">use </span>futures_util::future::BoxFuture;
 <span class="kw">use </span>gotham::{
 	extractor::{PathExtractor, QueryStringExtractor},
@@ -243,9 +247,9 @@ data-use_system_theme="false"></script><meta name="rustdoc-vars" data-root-path=
 	<span class="doccomment">/// Replace the automatically generated operation id with a custom one. Only relevant for the
 	/// OpenAPI Specification.
 	</span><span class="attr">#[openapi_only]
-	</span><span class="kw">fn </span>operation_id() -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-		<span class="prelude-val">None
-	</span>}
+	</span><span class="kw">fn </span>operation_id() -&gt; OperationId {
+		OperationId::FullAuto
+	}
 
 	<span class="doccomment">/// Add a description to the openapi specification. Usually taken from the rustdoc comment
 	/// when using the proc macro.
