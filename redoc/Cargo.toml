@@ -3,7 +3,7 @@
 [package]
 workspace = ".."
 name = "gotham_restful_redoc"
-version = "0.2.6+2.1.4"
+version = "0.2.7+2.1.5"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2021"
 description = "Private implementation detail of gotham_restful"
