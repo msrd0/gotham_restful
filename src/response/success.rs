@@ -128,10 +128,8 @@ mod test {
 
 	#[test]
 	fn success_accepts_json() {
-		assert!(
-			<Success<Msg>>::accepted_types()
-				.or_all_types()
-				.contains(&APPLICATION_JSON)
-		)
+		assert!(<Success<Msg>>::accepted_types()
+			.or_all_types()
+			.contains(&APPLICATION_JSON))
 	}
 }
