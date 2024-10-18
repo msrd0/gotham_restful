@@ -46,7 +46,7 @@ pretty_assertions = "1.0"
 simple_logger = "5.0"
 tokio = { version = "1.17", features = ["time"], default-features = false }
 thiserror = "1.0.2"
-trybuild = "=1.0.96"
+trybuild = { version = "=1.0.96", features = ["diff"] }
 
 [features]
 default = ["cors", "errorlog", "without-openapi"]
