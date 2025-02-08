@@ -43,7 +43,7 @@ error[E0277]: the trait bound `FooParams: StateData` is not satisfied
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
    |
 15 | fn endpoint(_: FooParams) {
-   |                ^^^^^^^^^ the trait `StateData` is not implemented for `FooParams`, which is required by `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params: QueryStringExtractor<Body>`
+   |                ^^^^^^^^^ the trait `StateData` is not implemented for `FooParams`
    |
    = help: the following other types implement trait `StateData`:
              AuthSource
@@ -66,7 +66,7 @@ error[E0277]: the trait bound `FooParams: StaticResponseExtender` is not satisfi
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
    |
 15 | fn endpoint(_: FooParams) {
-   |                ^^^^^^^^^ the trait `StaticResponseExtender` is not implemented for `FooParams`, which is required by `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params: QueryStringExtractor<Body>`
+   |                ^^^^^^^^^ the trait `StaticResponseExtender` is not implemented for `FooParams`
    |
    = help: the following other types implement trait `StaticResponseExtender`:
              FilePathExtractor
@@ -86,7 +86,7 @@ error[E0277]: the trait bound `for<'de> FooParams: serde::de::Deserialize<'de>` 
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
    |
 15 | fn endpoint(_: FooParams) {
-   |                ^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooParams`, which is required by `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Params: QueryStringExtractor<Body>`
+   |                ^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooParams`
    |
    = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `FooParams` type
    = note: for types from other crates check whether the crate offers a `serde` feature flag

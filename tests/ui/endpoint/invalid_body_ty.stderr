@@ -2,7 +2,7 @@ error[E0277]: the trait bound `FooBody: OpenapiType` is not satisfied
   --> tests/ui/endpoint/invalid_body_ty.rs:15:16
    |
 15 | fn endpoint(_: FooBody) {
-   |                ^^^^^^^ the trait `OpenapiType` is not implemented for `FooBody`, which is required by `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Body: RequestBody`
+   |                ^^^^^^^ the trait `OpenapiType` is not implemented for `FooBody`
    |
    = help: the following other types implement trait `OpenapiType`:
              &'a T
@@ -26,7 +26,7 @@ error[E0277]: the trait bound `FooBody: RequestBody` is not satisfied
   --> tests/ui/endpoint/invalid_body_ty.rs:15:16
    |
 15 | fn endpoint(_: FooBody) {
-   |                ^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooBody`, which is required by `FooBody: RequestBody`
+   |                ^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooBody`
    |
    = help: the following other types implement trait `serde::de::Deserialize<'de>`:
              &'a Path

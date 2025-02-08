@@ -2,7 +2,7 @@ error[E0277]: the trait bound `AuthData: Clone` is not satisfied
   --> tests/ui/endpoint/auth_data_non_clone.rs:15:25
    |
 15 | async fn read_all(auth: AuthStatus<AuthData>) -> Result<NoContent, AuthError> {
-   |                         ^^^^^^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `AuthData`, which is required by `gotham_restful::AuthStatus<AuthData>: Clone`
+   |                         ^^^^^^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `AuthData`
    |
    = note: required for `gotham_restful::AuthStatus<AuthData>` to implement `Clone`
 note: required by a bound in `clone_from_state`
