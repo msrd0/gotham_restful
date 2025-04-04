@@ -135,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker://ghcr.io/msrd0/cargo-doc2readme
+      - uses: docker://codeberg.org/msrd0/cargo-doc2readme
         with:
           entrypoint: ./readme.sh
           args: --check
