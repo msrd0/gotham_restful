@@ -1,8 +1,8 @@
 use crate::{IntoResponseError, Response};
+#[cfg(feature = "openapi")]
+use crate::{MimeAndSchema, Raw, ResponseSchema};
 use gotham::{hyper::StatusCode, mime::TEXT_PLAIN_UTF_8};
 use gotham_restful_derive::ResourceError;
-#[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
 
 /// This is an error type that always yields a _403 Forbidden_ response. This type
 /// is best used in combination with [`AuthSuccess`] or [`AuthResult`].
@@ -26,16 +26,17 @@ impl IntoResponseError for AuthError {
 			Some(TEXT_PLAIN_UTF_8)
 		))
 	}
+}
 
-	#[cfg(feature = "openapi")]
+#[cfg(feature = "openapi")]
+impl ResponseSchema for AuthError {
 	fn status_codes() -> Vec<StatusCode> {
 		vec![StatusCode::FORBIDDEN]
 	}
 
-	#[cfg(feature = "openapi")]
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		assert_eq!(code, StatusCode::FORBIDDEN);
-		<super::Raw<String> as OpenapiType>::schema()
+		<Raw<String> as ResponseSchema>::schema(StatusCode::OK)
 	}
 }
 

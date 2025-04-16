@@ -176,9 +176,20 @@ pub trait IntoResponse {
 	fn into_response(self) -> BoxFuture<'static, Result<Response, Self::Err>>;
 
 	/// Return a list of supported mime types.
+	#[cfg_attr(
+		feature = "openapi",
+		doc = "\n Note that this does not influence the auto-generated OpenAPI specification."
+	)]
 	fn accepted_types() -> Option<Vec<Mime>> {
 		None
 	}
+}
+
+#[cfg(feature = "openapi")]
+#[derive(Debug)]
+pub struct MimeAndSchema {
+	pub mime: Mime,
+	pub schema: OpenapiSchema
 }
 
 /// Additional details for [IntoResponse] to be used with an OpenAPI-aware router.
@@ -192,7 +203,7 @@ pub trait ResponseSchema {
 	/// Return the schema of the response for the given status code. The code may
 	/// only be one that was previously returned by [Self::status_codes]. The
 	/// implementation should panic if that is not the case.
-	fn schema(code: StatusCode) -> OpenapiSchema;
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema>;
 }
 
 #[cfg(feature = "openapi")]
@@ -281,7 +292,7 @@ where
 		Res::status_codes()
 	}
 
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		Res::schema(code)
 	}
 }
