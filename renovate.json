@@ -1,28 +1,57 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": [
-		"config:base"
+		"config:recommended"
 	],
-
-	"schedule": ["before 5am on monday"],
+	"schedule": [
+		"before 5am on monday"
+	],
 	"prHourlyLimit": 10,
-	"labels": ["dependencies"],
+	"labels": [
+		"dependencies"
+	],
 	"packageRules": [
 		{
-			"matchLanguages": ["js", "javascript", "ts", "typescript", "node", "npm", "nodejs"],
-			"matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+			"matchCategories": [
+				"js",
+				"javascript",
+				"ts",
+				"typescript",
+				"node",
+				"npm",
+				"nodejs"
+			],
+			"matchUpdateTypes": [
+				"minor",
+				"patch",
+				"pin",
+				"digest"
+			],
 			"automerge": true
 		},
 		{
-			"matchLanguages": ["rs", "rust", "cargo"],
+			"matchCategories": [
+				"rs",
+				"rust",
+				"cargo"
+			],
 			"matchCurrentVersion": ">=1.0.0",
-			"matchUpdateTypes": ["patch", "minor"],
+			"matchUpdateTypes": [
+				"patch",
+				"minor"
+			],
 			"enabled": false
 		},
 		{
-			"matchLanguages": ["rs", "rust", "cargo"],
+			"matchCategories": [
+				"rs",
+				"rust",
+				"cargo"
+			],
 			"matchCurrentVersion": ">=0.1.0",
-			"matchUpdateTypes": ["patch"],
+			"matchUpdateTypes": [
+				"patch"
+			],
 			"enabled": false
 		}
 	]
