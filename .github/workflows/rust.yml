@@ -20,7 +20,7 @@ jobs:
   webpack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -55,7 +55,7 @@ jobs:
     name: Test on Rust ${{matrix.rust.name}} with ${{matrix.features.name}} features
     continue-on-error: ${{matrix.rust.nightly}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@nightly
         if: matrix.rust.name == 'MSRV'
       - name: cargo -Z minimal-versions update
@@ -89,7 +89,7 @@ jobs:
   test-trybuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.84"
@@ -106,7 +106,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.84"
@@ -124,7 +124,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
@@ -134,7 +134,7 @@ jobs:
   readme:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker://codeberg.org/msrd0/cargo-doc2readme
         with:
           entrypoint: ./readme.sh
@@ -143,7 +143,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         id: rust-toolchain
       - name: Get Tarpaulin Version
@@ -180,7 +180,7 @@ jobs:
   doc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/cache@v4
         with:
@@ -200,7 +200,7 @@ jobs:
     needs: [coverage, doc]
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: gh-pages
       - uses: actions/download-artifact@v5
