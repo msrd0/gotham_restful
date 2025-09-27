@@ -92,7 +92,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.84"
+          toolchain: "1.90"
         id: rust-toolchain
       - uses: actions/cache@v4
         with:

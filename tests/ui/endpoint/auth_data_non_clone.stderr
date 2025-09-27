@@ -15,6 +15,6 @@ note: required by a bound in `clone_from_state`
    |                        ^^^^^ required by this bound in `clone_from_state`
 help: consider annotating `AuthData` with `#[derive(Clone)]`
    |
-9   + #[derive(Clone)]
-10  | struct AuthData {
+  9 + #[derive(Clone)]
+ 10 | struct AuthData {
     |

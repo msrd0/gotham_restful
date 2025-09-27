@@ -82,15 +82,15 @@ note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
    |     type Placeholders: PathExtractor<Body> + Clone + Sync;
    |                        ^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Placeholders`
 
-error[E0277]: the trait bound `for<'de> FooPlaceholders: serde::de::Deserialize<'de>` is not satisfied
+error[E0277]: the trait bound `FooPlaceholders: serde::Deserialize<'de>` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
    |
 15 | fn endpoint(_: FooPlaceholders) {
-   |                ^^^^^^^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooPlaceholders`
+   |                ^^^^^^^^^^^^^^^ the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooPlaceholders`
    |
    = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `FooPlaceholders` type
    = note: for types from other crates check whether the crate offers a `serde` feature flag
-   = help: the following other types implement trait `serde::de::Deserialize<'de>`:
+   = help: the following other types implement trait `serde_core::de::Deserialize<'de>`:
              &'a Path
              &'a [u8]
              &'a str

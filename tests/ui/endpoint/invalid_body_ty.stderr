@@ -26,9 +26,9 @@ error[E0277]: the trait bound `FooBody: RequestBody` is not satisfied
   --> tests/ui/endpoint/invalid_body_ty.rs:15:16
    |
 15 | fn endpoint(_: FooBody) {
-   |                ^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooBody`
+   |                ^^^^^^^ the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooBody`
    |
-   = help: the following other types implement trait `serde::de::Deserialize<'de>`:
+   = help: the following other types implement trait `serde_core::de::Deserialize<'de>`:
              &'a Path
              &'a [u8]
              &'a str
@@ -38,7 +38,7 @@ error[E0277]: the trait bound `FooBody: RequestBody` is not satisfied
              (T0, T1, T2)
              (T0, T1, T2, T3)
            and $N others
-   = note: required for `FooBody` to implement `serde::de::DeserializeOwned`
+   = note: required for `FooBody` to implement `serde_core::de::DeserializeOwned`
    = note: required for `FooBody` to implement `RequestBody`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Body`
   --> src/endpoint.rs

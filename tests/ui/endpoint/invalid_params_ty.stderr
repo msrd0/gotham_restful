@@ -82,15 +82,15 @@ note: required by a bound in `gotham_restful::EndpointWithSchema::Params`
    |     type Params: QueryStringExtractor<Body> + Clone + Sync;
    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `EndpointWithSchema::Params`
 
-error[E0277]: the trait bound `for<'de> FooParams: serde::de::Deserialize<'de>` is not satisfied
+error[E0277]: the trait bound `FooParams: serde::Deserialize<'de>` is not satisfied
   --> tests/ui/endpoint/invalid_params_ty.rs:15:16
    |
 15 | fn endpoint(_: FooParams) {
-   |                ^^^^^^^^^ the trait `for<'de> serde::de::Deserialize<'de>` is not implemented for `FooParams`
+   |                ^^^^^^^^^ the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooParams`
    |
    = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `FooParams` type
    = note: for types from other crates check whether the crate offers a `serde` feature flag
-   = help: the following other types implement trait `serde::de::Deserialize<'de>`:
+   = help: the following other types implement trait `serde_core::de::Deserialize<'de>`:
              &'a Path
              &'a [u8]
              &'a str
