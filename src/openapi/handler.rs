@@ -9,7 +9,7 @@ use gotham::{
 	hyper::{
 		header::{
 			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, ETAG, IF_NONE_MATCH,
-			REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS
+			REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS, X_FRAME_OPTIONS
 		},
 		Body, Response, StatusCode
 	},
@@ -184,12 +184,18 @@ fn redoc_handler(
 	headers.insert(
 		CONTENT_SECURITY_POLICY,
 		format!(
-			"default-src 'none';base-uri 'none';script-src 'unsafe-inline' https://cdn.jsdelivr.net 'sha256-{script_hash}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:",
+			"default-src 'none';base-uri 'none';script-src 'unsafe-inline' 'sha256-{script_hash}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:",
 		).parse().unwrap()
 	);
 	headers.insert(ETAG, etag.parse().unwrap());
+	// https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#floc-federated-learning-of-cohorts
+	headers.insert(
+		"Permissions-Policy",
+		HeaderValue::from_static("interest-cohort=()")
+	);
 	headers.insert(REFERRER_POLICY, HeaderValue::from_static("no-referrer"));
 	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
+	headers.insert(X_FRAME_OPTIONS, HeaderValue::from_static("DENY"));
 	Ok(res)
 }
 
