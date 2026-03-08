@@ -142,8 +142,8 @@ jobs:
       - uses: actions/checkout@v5
       - uses: docker://codeberg.org/msrd0/cargo-doc2readme
         with:
-          entrypoint: ./readme.sh
-          args: --check
+          entrypoint: cargo
+          args: doc2readme --check
   
   coverage:
     runs-on: ubuntu-latest

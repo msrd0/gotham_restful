@@ -1,0 +1,7 @@
+[[out]]
+out = "README.md"
+template = "README.j2"
+
+[[out]]
+out = "crates-io.md"
+template = "crates-io.j2"
