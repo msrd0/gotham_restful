@@ -577,7 +577,7 @@ pub use response::{
 	NoContent, Raw, Redirect, Response, Success
 };
 #[cfg(feature = "openapi")]
-pub use response::{IntoResponseWithSchema, ResponseSchema};
+pub use response::{IntoResponseWithSchema, MimeAndSchema, ResponseSchema};
 
 mod routing;
 pub use routing::{DrawResourceRoutes, DrawResources};

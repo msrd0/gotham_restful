@@ -1,16 +1,16 @@
 use super::{handle_error, IntoResponse};
-#[cfg(feature = "openapi")]
-use crate::ResponseSchema;
 use crate::{IntoResponseError, Response};
-use futures_util::{future, future::FutureExt};
 #[cfg(feature = "openapi")]
-use gotham::hyper::StatusCode;
+use crate::{MimeAndSchema, ResponseSchema};
+use futures_util::{future, future::FutureExt};
 use gotham::{
 	hyper::header::{HeaderMap, HeaderValue, IntoHeaderName},
 	mime::Mime
 };
 #[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType};
+use gotham::{hyper::StatusCode, mime::STAR_STAR};
+#[cfg(feature = "openapi")]
+use openapi_type::OpenapiType;
 use std::{fmt::Debug, future::Future, pin::Pin};
 
 /// This is the return type of a resource that doesn't actually return something. It will result
@@ -77,9 +77,12 @@ impl ResponseSchema for NoContent {
 	}
 
 	/// Returns the schema of the `()` type.
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		assert_eq!(code, StatusCode::NO_CONTENT);
-		<()>::schema()
+		vec![MimeAndSchema {
+			mime: STAR_STAR,
+			schema: <()>::schema()
+		}]
 	}
 }
 
@@ -106,7 +109,7 @@ where
 #[cfg(feature = "openapi")]
 impl<E> ResponseSchema for Result<NoContent, E>
 where
-	E: Debug + IntoResponseError<Err = serde_json::Error>
+	E: Debug + IntoResponseError<Err = serde_json::Error> + ResponseSchema
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();
@@ -114,7 +117,7 @@ where
 		status_codes
 	}
 
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		match code {
 			StatusCode::NO_CONTENT => <NoContent as ResponseSchema>::schema(StatusCode::NO_CONTENT),
 			code => E::schema(code)

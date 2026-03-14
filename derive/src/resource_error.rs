@@ -308,38 +308,32 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 
 		from_impls.push(quote! {
 			impl #generics ::std::convert::From<#from_ty> for #ident #generics
-			where #( #fields_where ),*
+			where #(#fields_where),*
 			{
 				fn from(#from_ident: #from_ty) -> Self {
-					#( #fields_let )*
+					#(#fields_let)*
 					Self::#var_ident #fields_pat
 				}
 			}
 		});
 	}
 
-	let status_codes = if cfg!(feature = "openapi") {
+	let were = variants
+		.iter()
+		.filter_map(|variant| variant.were())
+		.collect::<Vec<_>>();
+
+	let response_schema = if cfg!(feature = "openapi") {
 		let codes = variants.iter().map(|v| match v.status() {
 			Some(code) => quote!(status_codes.push(#code);),
 			None => {
 				// we would've errored before if from_ty was not set
 				let from_ty = &v.from_ty.as_ref().unwrap().1;
-				quote!(status_codes.extend(<#from_ty as ::gotham_restful::IntoResponseError>::status_codes());)
+				quote!(status_codes.extend(<#from_ty as ::gotham_restful::ResponseSchema>::status_codes());)
 			}
 		});
-		Some(quote! {
-			fn status_codes() -> ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> {
-				let mut status_codes = <::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode>>::new();
-				#(#codes)*
-				status_codes
-			}
-		})
-	} else {
-		None
-	};
 
-	let schema = if cfg!(feature = "openapi") {
-		let codes = variants.iter().map(|v| match v.status() {
+		let codes_schema = variants.iter().map(|v| match v.status() {
 			Some(code) => quote! {
 				#code => <::gotham_restful::NoContent as ::gotham_restful::ResponseSchema>::schema(
 					::gotham_restful::gotham::hyper::StatusCode::NO_CONTENT
@@ -349,17 +343,28 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 				// we would've errored before if from_ty was not set
 				let from_ty = &v.from_ty.as_ref().unwrap().1;
 				quote! {
-					code if <#from_ty as ::gotham_restful::IntoResponseError>::status_codes().contains(&code) => {
-						<#from_ty as ::gotham_restful::IntoResponseError>::schema(code)
+					code if <#from_ty as ::gotham_restful::ResponseSchema>::status_codes().contains(&code) => {
+						<#from_ty as ::gotham_restful::ResponseSchema>::schema(code)
 					}
 				}
 			}
 		});
+
 		Some(quote! {
-			fn schema(code: ::gotham_restful::gotham::hyper::StatusCode) -> ::gotham_restful::private::OpenapiSchema {
-				match code {
-					#(#codes,)*
-					code => panic!("Invalid status code {}", code)
+			impl #generics ::gotham_restful::ResponseSchema for #ident #generics
+			where #(#were),*
+			{
+				fn status_codes() -> ::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode> {
+					let mut status_codes = <::std::vec::Vec<::gotham_restful::gotham::hyper::StatusCode>>::new();
+					#(#codes)*
+					status_codes
+				}
+
+				fn schema(code: ::gotham_restful::gotham::hyper::StatusCode) -> ::std::vec::Vec<::gotham_restful::MimeAndSchema> {
+					match code {
+						#(#codes_schema,)*
+						code => panic!("Invalid status code {}", code)
+					}
 				}
 			}
 		})
@@ -367,10 +372,6 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		None
 	};
 
-	let were = variants
-		.iter()
-		.filter_map(|variant| variant.were())
-		.collect::<Vec<_>>();
 	let variants = variants
 		.into_iter()
 		.map(|variant| variant.into_match_arm(&ident))
@@ -380,21 +381,20 @@ pub fn expand_resource_error(input: DeriveInput) -> Result<TokenStream> {
 		#display_impl
 
 		impl #generics ::gotham_restful::IntoResponseError for #ident #generics
-		where #( #were ),*
+		where #(#were),*
 		{
 			type Err = ::gotham_restful::private::serde_json::Error;
 
 			fn into_response_error(self) -> ::std::result::Result<::gotham_restful::Response, Self::Err>
 			{
 				match self {
-					#( #variants ),*
+					#(#variants),*
 				}
 			}
-
-			#status_codes
-			#schema
 		}
 
-		#( #from_impls )*
+		#response_schema
+
+		#(#from_impls)*
 	})
 }
