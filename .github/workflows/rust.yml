@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.90"
+          toolchain: "1.95"
         id: rust-toolchain
       - uses: actions/cache@v4
         with:
@@ -113,7 +113,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.84"
+          toolchain: "1.95"
           components: clippy
         id: rust-toolchain
       - uses: actions/cache@v4
@@ -125,6 +125,7 @@ jobs:
           key: "${{runner.os}} Rust ${{steps.rust-toolchain.outputs.cachekey}} (clippy)"
       - run: cargo --config 'resolver.incompatible-rust-versions="fallback"' update
       - run: cargo clippy --workspace --profile test -- -Dclippy::all
+      - run: cargo clippy --workspace --profile test --no-default-features --features full -- -Dclippy::all
   
   rustfmt:
     runs-on: ubuntu-latest

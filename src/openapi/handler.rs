@@ -126,8 +126,8 @@ impl NewHandler for OpenapiSpecHandler {
 }
 
 impl Handler for OpenapiSpecHandler {
-	fn handle(self, mut state: State) -> Pin<Box<HandlerFuture>> {
-		let res = create_openapi_response(&mut state, &self.openapi);
+	fn handle(self, state: State) -> Pin<Box<HandlerFuture>> {
+		let res = create_openapi_response(&state, &self.openapi);
 		future::ok((state, res)).boxed()
 	}
 }
@@ -169,7 +169,7 @@ fn redoc_handler(
 	if state
 		.borrow::<HeaderMap>()
 		.get(IF_NONE_MATCH)
-		.map_or(false, |header| header.as_bytes() == etag.as_bytes())
+		.is_some_and(|header| header.as_bytes() == etag.as_bytes())
 	{
 		let res = create_empty_response(state, StatusCode::NOT_MODIFIED);
 		return Ok(res);

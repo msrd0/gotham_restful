@@ -1,11 +1,16 @@
-error[E0277]: the trait bound `FooPlaceholders: OpenapiType` is not satisfied
+error[E0277]: the trait bound `FooPlaceholders: gotham_restful::private::OpenapiType` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
    |
 15 | fn endpoint(_: FooPlaceholders) {
-   |                ^^^^^^^^^^^^^^^ the trait `OpenapiType` is not implemented for `FooPlaceholders`
+   |                ^^^^^^^^^^^^^^^ unsatisfied trait bound
    |
-   = help: the following other types implement trait `OpenapiType`:
-             &'a T
+help: the trait `gotham_restful::private::OpenapiType` is not implemented for `FooPlaceholders`
+  --> tests/ui/endpoint/invalid_placeholders_ty.rs:10:1
+   |
+10 | struct FooPlaceholders {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+   = help: the following other types implement trait `gotham_restful::private::OpenapiType`:
+             &T
              ()
              BTreeMap<K, V>
              BTreeSet<T>
@@ -43,8 +48,13 @@ error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
    |
 15 | fn endpoint(_: FooPlaceholders) {
-   |                ^^^^^^^^^^^^^^^ the trait `StateData` is not implemented for `FooPlaceholders`
+   |                ^^^^^^^^^^^^^^^ unsatisfied trait bound
    |
+help: the trait `StateData` is not implemented for `FooPlaceholders`
+  --> tests/ui/endpoint/invalid_placeholders_ty.rs:10:1
+   |
+10 | struct FooPlaceholders {
+   | ^^^^^^^^^^^^^^^^^^^^^^
    = help: the following other types implement trait `StateData`:
              AuthSource
              AuthStatus<T>
@@ -53,7 +63,7 @@ error[E0277]: the trait bound `FooPlaceholders: StateData` is not satisfied
              CorsConfig
              FilePathExtractor
              HeaderMap
-             IdPlaceholder<ID>
+             Method
            and $N others
    = note: required for `<endpoint___gotham_restful_endpoint as EndpointWithSchema>::Placeholders` to implement `PathExtractor<Body>`
 note: required by a bound in `gotham_restful::EndpointWithSchema::Placeholders`
@@ -66,11 +76,15 @@ error[E0277]: the trait bound `FooPlaceholders: StaticResponseExtender` is not s
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
    |
 15 | fn endpoint(_: FooPlaceholders) {
-   |                ^^^^^^^^^^^^^^^ the trait `StaticResponseExtender` is not implemented for `FooPlaceholders`
+   |                ^^^^^^^^^^^^^^^ unsatisfied trait bound
    |
+help: the trait `StaticResponseExtender` is not implemented for `FooPlaceholders`
+  --> tests/ui/endpoint/invalid_placeholders_ty.rs:10:1
+   |
+10 | struct FooPlaceholders {
+   | ^^^^^^^^^^^^^^^^^^^^^^
    = help: the following other types implement trait `StaticResponseExtender`:
              FilePathExtractor
-             IdPlaceholder<ID>
              NoopExtractor
              NoopPathExtractor
              NoopQueryStringExtractor
@@ -86,8 +100,13 @@ error[E0277]: the trait bound `FooPlaceholders: serde::Deserialize<'de>` is not 
   --> tests/ui/endpoint/invalid_placeholders_ty.rs:15:16
    |
 15 | fn endpoint(_: FooPlaceholders) {
-   |                ^^^^^^^^^^^^^^^ the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooPlaceholders`
+   |                ^^^^^^^^^^^^^^^ unsatisfied trait bound
    |
+help: the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooPlaceholders`
+  --> tests/ui/endpoint/invalid_placeholders_ty.rs:10:1
+   |
+10 | struct FooPlaceholders {
+   | ^^^^^^^^^^^^^^^^^^^^^^
    = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `FooPlaceholders` type
    = note: for types from other crates check whether the crate offers a `serde` feature flag
    = help: the following other types implement trait `serde_core::de::Deserialize<'de>`:

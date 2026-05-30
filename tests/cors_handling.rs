@@ -55,15 +55,11 @@ fn test_response<TS, C>(
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_ORIGIN)
-			.and_then(|value| value.to_str().ok())
-			.as_deref(),
+			.and_then(|value| value.to_str().ok()),
 		origin
 	);
 	assert_eq!(
-		headers
-			.get(VARY)
-			.and_then(|value| value.to_str().ok())
-			.as_deref(),
+		headers.get(VARY).and_then(|value| value.to_str().ok()),
 		vary
 	);
 	assert_eq!(
@@ -105,22 +101,17 @@ fn test_preflight(
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_METHODS)
-			.and_then(|value| value.to_str().ok())
-			.as_deref(),
+			.and_then(|value| value.to_str().ok()),
 		Some(method)
 	);
 	assert_eq!(
 		headers
 			.get(ACCESS_CONTROL_ALLOW_ORIGIN)
-			.and_then(|value| value.to_str().ok())
-			.as_deref(),
+			.and_then(|value| value.to_str().ok()),
 		origin
 	);
 	assert_eq!(
-		headers
-			.get(VARY)
-			.and_then(|value| value.to_str().ok())
-			.as_deref(),
+		headers.get(VARY).and_then(|value| value.to_str().ok()),
 		Some(vary)
 	);
 	assert_eq!(
@@ -170,18 +161,14 @@ fn test_preflight_headers(
 		assert_eq!(
 			headers
 				.get(ACCESS_CONTROL_ALLOW_HEADERS)
-				.and_then(|value| value.to_str().ok())
-				.as_deref(),
+				.and_then(|value| value.to_str().ok()),
 			Some(hdr)
 		)
 	} else {
 		assert!(!headers.contains_key(ACCESS_CONTROL_ALLOW_HEADERS));
 	}
 	assert_eq!(
-		headers
-			.get(VARY)
-			.and_then(|value| value.to_str().ok())
-			.as_deref(),
+		headers.get(VARY).and_then(|value| value.to_str().ok()),
 		Some(vary)
 	);
 }

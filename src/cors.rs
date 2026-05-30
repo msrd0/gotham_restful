@@ -21,9 +21,10 @@ use std::{panic::RefUnwindSafe, pin::Pin};
 /// Specify the allowed origins of the request. It is up to the browser to check the validity of the
 /// origin. This, when sent to the browser, will indicate whether or not the request's origin was
 /// allowed to make the request.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub enum Origin {
 	/// Do not send any `Access-Control-Allow-Origin` headers.
+	#[default]
 	None,
 	/// Send `Access-Control-Allow-Origin: *`. Note that browser will not send credentials.
 	Star,
@@ -31,12 +32,6 @@ pub enum Origin {
 	Single(String),
 	/// Copy the `Origin` header into the `Access-Control-Allow-Origin` header.
 	Copy
-}
-
-impl Default for Origin {
-	fn default() -> Self {
-		Self::None
-	}
 }
 
 impl Origin {
@@ -61,9 +56,10 @@ impl Origin {
 
 /// Specify the allowed headers of the request. It is up to the browser to check that only the allowed
 /// headers are sent with the request.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub enum Headers {
 	/// Do not send any `Access-Control-Allow-Headers` headers.
+	#[default]
 	None,
 	/// Set the `Access-Control-Allow-Headers` header to the following header list. If empty, this
 	/// is treated as if it was [None].
@@ -71,12 +67,6 @@ pub enum Headers {
 	/// Copy the `Access-Control-Request-Headers` header into the `Access-Control-Allow-Header`
 	/// header.
 	Copy
-}
-
-impl Default for Headers {
-	fn default() -> Self {
-		Self::None
-	}
 }
 
 impl Headers {

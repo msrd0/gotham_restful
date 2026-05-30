@@ -3,9 +3,3 @@ error: Too few arguments for this endpoint handler
   |
 9 | fn read() {}
   |    ^^^^
-
-error[E0412]: cannot find type `read___gotham_restful_endpoint` in this scope
- --> tests/ui/endpoint/too_few_args.rs:5:12
-  |
-5 | #[resource(read)]
-  |            ^^^^ not found in this scope

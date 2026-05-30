@@ -444,10 +444,10 @@
 //!     of the two will make it into the spec.
 //!   - By default, the `without-openapi` feature of this crate is enabled. Disabling it in favour of the
 //!     `openapi` feature will add additional type bounds and method requirements to some of the traits and
-//! 	types in this crate, for example instead of [`Endpoint`] you now have to implement
-//! 	[`EndpointWithSchema`]. This means that some code might only compile on either feature, but not
+//!     types in this crate, for example instead of [`Endpoint`] you now have to implement
+//!     [`EndpointWithSchema`]. This means that some code might only compile on either feature, but not
 //!     on both. If you are writing a library that uses gotham-restful, it is strongly recommended to pass
-//! 	both features through and conditionally enable the openapi code, like this:
+//!     both features through and conditionally enable the openapi code, like this:
 //!
 //!     ```rust
 //!     # #[macro_use] extern crate gotham_restful;

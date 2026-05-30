@@ -2,8 +2,13 @@ error[E0277]: the trait bound `FooResponse: ResponseSchema` is not satisfied
   --> tests/ui/endpoint/invalid_return_type.rs:12:18
    |
 12 | fn endpoint() -> FooResponse {
-   |                  ^^^^^^^^^^^ the trait `ResponseSchema` is not implemented for `FooResponse`
+   |                  ^^^^^^^^^^^ unsatisfied trait bound
    |
+help: the trait `ResponseSchema` is not implemented for `FooResponse`
+  --> tests/ui/endpoint/invalid_return_type.rs:9:1
+   |
+ 9 | struct FooResponse;
+   | ^^^^^^^^^^^^^^^^^^
    = help: the following other types implement trait `ResponseSchema`:
              NoContent
              Pin<Box<(dyn Future<Output = Res> + Send + 'static)>>
@@ -26,8 +31,13 @@ error[E0277]: the trait bound `FooResponse: gotham_restful::IntoResponse` is not
   --> tests/ui/endpoint/invalid_return_type.rs:12:18
    |
 12 | fn endpoint() -> FooResponse {
-   |                  ^^^^^^^^^^^ the trait `gotham_restful::IntoResponse` is not implemented for `FooResponse`
+   |                  ^^^^^^^^^^^ unsatisfied trait bound
    |
+help: the trait `gotham_restful::IntoResponse` is not implemented for `FooResponse`
+  --> tests/ui/endpoint/invalid_return_type.rs:9:1
+   |
+ 9 | struct FooResponse;
+   | ^^^^^^^^^^^^^^^^^^
    = help: the following other types implement trait `gotham_restful::IntoResponse`:
              NoContent
              Pin<Box<(dyn Future<Output = Res> + Send + 'static)>>

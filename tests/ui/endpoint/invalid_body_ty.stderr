@@ -1,11 +1,16 @@
-error[E0277]: the trait bound `FooBody: OpenapiType` is not satisfied
+error[E0277]: the trait bound `FooBody: gotham_restful::private::OpenapiType` is not satisfied
   --> tests/ui/endpoint/invalid_body_ty.rs:15:16
    |
 15 | fn endpoint(_: FooBody) {
-   |                ^^^^^^^ the trait `OpenapiType` is not implemented for `FooBody`
+   |                ^^^^^^^ unsatisfied trait bound
    |
-   = help: the following other types implement trait `OpenapiType`:
-             &'a T
+help: the trait `gotham_restful::private::OpenapiType` is not implemented for `FooBody`
+  --> tests/ui/endpoint/invalid_body_ty.rs:10:1
+   |
+10 | struct FooBody {
+   | ^^^^^^^^^^^^^^
+   = help: the following other types implement trait `gotham_restful::private::OpenapiType`:
+             &T
              ()
              BTreeMap<K, V>
              BTreeSet<T>
@@ -26,8 +31,13 @@ error[E0277]: the trait bound `FooBody: RequestBody` is not satisfied
   --> tests/ui/endpoint/invalid_body_ty.rs:15:16
    |
 15 | fn endpoint(_: FooBody) {
-   |                ^^^^^^^ the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooBody`
+   |                ^^^^^^^ unsatisfied trait bound
    |
+help: the trait `for<'de> serde_core::de::Deserialize<'de>` is not implemented for `FooBody`
+  --> tests/ui/endpoint/invalid_body_ty.rs:10:1
+   |
+10 | struct FooBody {
+   | ^^^^^^^^^^^^^^
    = help: the following other types implement trait `serde_core::de::Deserialize<'de>`:
              &'a Path
              &'a [u8]

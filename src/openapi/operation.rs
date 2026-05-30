@@ -272,7 +272,7 @@ mod test {
 		let content =
 			OperationDescription::schema_to_content(types.or_all_types(), Item(schema.schema));
 		assert_eq!(content.len(), 1);
-		let json = serde_json::to_string(&content.values().nth(0).unwrap()).unwrap();
+		let json = serde_json::to_string(&content.values().next().unwrap()).unwrap();
 		assert_eq!(json, r#"{"schema":{"type":"string","format":"binary"}}"#);
 	}
 }

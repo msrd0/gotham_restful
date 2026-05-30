@@ -9,7 +9,7 @@ error[E0631]: type mismatch in function arguments
    |
    = note: expected function signature `fn(StatusCode) -> _`
               found function signature `fn(u16) -> _`
-   = note: required for `fn(u16) -> std::string::String {schema}` to implement `CustomSchema`
+   = note: required for `fn(u16) -> String {schema}` to implement `gotham_restful::private::CustomSchema`
 help: consider wrapping the function in a closure
    |
 16 | #[read_all(schema = |arg0: StatusCode| "schema"(/* u16 */), status_codes = "status_codes")]
@@ -23,4 +23,4 @@ error[E0271]: expected `status_codes` to return `Vec<StatusCode>`, but it return
    |
    = note: expected struct `Vec<StatusCode>`
               found struct `Vec<u16>`
-   = note: required for `fn() -> Vec<u16> {status_codes}` to implement `CustomStatusCodes`
+   = note: required for `fn() -> Vec<u16> {status_codes}` to implement `gotham_restful::private::CustomStatusCodes`

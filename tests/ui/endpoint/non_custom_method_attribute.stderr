@@ -3,9 +3,3 @@ error: `method` can only be used on custom endpoints
   |
 8 | #[read_all(method = "gotham_restful::gotham::hyper::Method::GET")]
   |            ^^^^^^
-
-error[E0412]: cannot find type `read_all___gotham_restful_endpoint` in this scope
- --> tests/ui/endpoint/non_custom_method_attribute.rs:5:12
-  |
-5 | #[resource(read_all)]
-  |            ^^^^^^^^ not found in this scope
