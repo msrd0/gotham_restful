@@ -8,15 +8,14 @@ use gotham::{
 	helpers::http::response::{create_empty_response, create_response},
 	hyper::{
 		header::{
-			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, ETAG, IF_NONE_MATCH,
-			REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS, X_FRAME_OPTIONS
+			HeaderMap, HeaderValue, CACHE_CONTROL, CONTENT_SECURITY_POLICY, CONTENT_TYPE, ETAG,
+			IF_NONE_MATCH, REFERRER_POLICY, X_CONTENT_TYPE_OPTIONS, X_FRAME_OPTIONS
 		},
 		Body, Response, StatusCode
 	},
 	mime::{APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8},
 	state::State
 };
-use gotham_restful_redoc::Redoc;
 use openapi_type::{
 	indexmap::IndexMap,
 	openapiv3::{APIKeyLocation, OpenAPI, ReferenceOr, SecurityScheme}
@@ -160,10 +159,10 @@ fn redoc_handler(
 	openapi: &Arc<RwLock<OpenAPI>>
 ) -> Result<Response<Body>, HandlerError> {
 	let spec = openapi_string(state, openapi)?;
-	let Redoc { html, script_hash } = gotham_restful_redoc::html(spec);
+	let redoc = gotham_restful_redoc::html(spec);
 
 	let mut etag = Sha256::new();
-	etag.update(&html);
+	etag.update(&redoc.html);
 	let etag = format!("\"{}\"", BASE64_STANDARD.encode(etag.finalize()));
 
 	if state
@@ -175,18 +174,14 @@ fn redoc_handler(
 		return Ok(res);
 	}
 
-	let mut res = create_response(state, StatusCode::OK, TEXT_HTML_UTF_8, html);
+	let mut res = create_empty_response(state, StatusCode::OK);
 	let headers = res.headers_mut();
+	headers.insert(CONTENT_TYPE, TEXT_HTML_UTF_8.as_ref().parse().unwrap());
 	headers.insert(
 		CACHE_CONTROL,
 		HeaderValue::from_static("public,max-age=2592000")
 	);
-	headers.insert(
-		CONTENT_SECURITY_POLICY,
-		format!(
-			"default-src 'none';base-uri 'none';script-src 'unsafe-inline' 'sha256-{script_hash}' 'strict-dynamic';style-src 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;connect-src 'self';img-src blob: data:",
-		).parse().unwrap()
-	);
+	headers.insert(CONTENT_SECURITY_POLICY, redoc.csp().parse().unwrap());
 	headers.insert(ETAG, etag.parse().unwrap());
 	// https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#floc-federated-learning-of-cohorts
 	headers.insert(
@@ -196,6 +191,7 @@ fn redoc_handler(
 	headers.insert(REFERRER_POLICY, HeaderValue::from_static("no-referrer"));
 	headers.insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
 	headers.insert(X_FRAME_OPTIONS, HeaderValue::from_static("DENY"));
+	*res.body_mut() = redoc.html.into();
 	Ok(res)
 }
 

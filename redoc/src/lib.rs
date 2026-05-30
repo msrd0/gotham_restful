@@ -16,6 +16,24 @@ pub struct Redoc {
 	pub script_hash: String
 }
 
+impl Redoc {
+	/// Return the value that should be set for the `Content-Security-Policy` header.
+	pub fn csp(&self) -> String {
+		format!(
+			concat!(
+				"default-src 'none';",
+				"base-uri 'none';",
+				"script-src 'unsafe-inline' 'sha256-{}' 'strict-dynamic';",
+				"style-src 'unsafe-inline' https://fonts.googleapis.com;",
+				"font-src https://fonts.gstatic.com;",
+				"connet-src 'self';",
+				"img-src blob: data:;"
+			),
+			self.script_hash
+		)
+	}
+}
+
 #[doc(hidden)]
 pub fn html(spec: String) -> Redoc {
 	let encoded_spec = spec
