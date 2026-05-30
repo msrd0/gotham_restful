@@ -154,7 +154,13 @@ jobs:
         id: rust-toolchain
       - name: Get Tarpaulin Version
         id: tarpaulin-version
-        run: echo "version=$(wget -qO- 'https://crates.io/api/v1/crates/cargo-tarpaulin' | jq -r '.crate.max_stable_version')" >>$GITHUB_OUTPUT
+        run: |
+          set -o pipefail
+          echo "version=$(curl \
+            -H 'User-Agent: CI of https://github.com/msrd0/gotham_restful' \
+            'https://crates.io/api/v1/crates/cargo-tarpaulin' \
+            | jq -r '.crate.max_stable_version'\
+          )" >>$GITHUB_OUTPUT
       - uses: actions/cache@v4
         with:
           path: |
