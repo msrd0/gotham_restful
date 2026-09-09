@@ -1,3 +1,5 @@
+// TODO format this file
+
 use gotham::{
 	hyper::Body,
 	test::TestServer
@@ -44,6 +46,7 @@ pub fn test_delete_response(server : &TestServer, path : &str, expected : &[u8])
 }
 
 #[cfg(feature = "openapi")]
+#[allow(dead_code)] // TODO figure out why
 pub fn test_openapi_response(server : &TestServer, path : &str, output_file : &str)
 {
 	info!("GET {path}");

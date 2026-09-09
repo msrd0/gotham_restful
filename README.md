@@ -9,8 +9,8 @@
 	<a href="https://msrd0.github.io/gotham_restful/doc/gotham_restful/index.html">
 		<img alt="rustdoc" src="https://img.shields.io/badge/docs-main-blue.svg"/>
 	</a>
-	<a href="https://blog.rust-lang.org/2023/10/05/Rust-1.73.0.html">
-		<img alt="Rust 1.73+" src="https://img.shields.io/badge/rustc-1.73+-orange.svg"/>
+	<a href="https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/">
+		<img alt="Rust 1.85+" src="https://img.shields.io/badge/rustc-1.85+-orange.svg"/>
 	</a>
 	<a href="https://www.apache.org/licenses/LICENSE-2.0">
 	   <img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"/>
@@ -410,7 +410,7 @@ the MSRV (minimum supported rust version) is not considered a breaking change.
 
 ## License
 
-Copyright (C) 2019-2025 Dominic Meiser and [contributors].
+Copyright (C) 2019-2026 Dominic Meiser and [contributors].
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -427,7 +427,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGmYW0CYXZlMC43LjJhdIQbKD39C5yC8EsbWWHk0dNwL0sb7oMXmi8d4iQb9d05RsQW0CRhYvRhcoQb0IN0K94YAdgbstl6HhGT27Ibvee0rSJVfcMbTm9oargHpblhZISCZmdvdGhhbWUwLjcuNIJuZ290aGFtX3Jlc3RmdWxlMC45LjGCbG9wZW5hcGlfdHlwZWUwLjUuMoJqc2VyZGVfanNvbmcxLjAuMTUw
+ [__cargo_doc2readme_dependencies_info]: ggGmYW0CYXZlMC43LjNhdIQbjiiNn5kq6Xobyb0gEhRj1BMbm_nodzTwLSIbIK9vbYRK63NhYvRhcoQb0IN0K94YAdgbstl6HhGT27Ibvee0rSJVfcMbTm9oargHpblhZISCZmdvdGhhbWUwLjcuNIJuZ290aGFtX3Jlc3RmdWxlMC45LjGCbG9wZW5hcGlfdHlwZWUwLjUuMoJqc2VyZGVfanNvbmcxLjAuMTUw
  [__link0]: https://crates.io/crates/gotham/0.7.4
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.4/gotham/?search=state::State
