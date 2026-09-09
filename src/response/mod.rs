@@ -1,11 +1,13 @@
 use futures_util::future::{self, BoxFuture, FutureExt};
+#[cfg(any(feature = "openapi", test))]
+use gotham::mime::STAR_STAR;
 use gotham::{
 	handler::HandlerError,
 	hyper::{
 		header::{HeaderMap, HeaderName, HeaderValue},
 		Body, StatusCode
 	},
-	mime::{Mime, APPLICATION_JSON, STAR_STAR}
+	mime::{Mime, APPLICATION_JSON}
 };
 #[cfg(feature = "openapi")]
 use openapi_type::{OpenapiSchema, OpenapiType};
@@ -38,10 +40,12 @@ mod success;
 #[allow(unreachable_pub)]
 pub use success::Success;
 
+#[cfg(any(feature = "openapi", test))]
 pub(crate) trait OrAllTypes {
 	fn or_all_types(self) -> Vec<Mime>;
 }
 
+#[cfg(any(feature = "openapi", test))]
 impl OrAllTypes for Option<Vec<Mime>> {
 	fn or_all_types(self) -> Vec<Mime> {
 		self.unwrap_or_else(|| vec![STAR_STAR])
@@ -294,12 +298,14 @@ mod test {
 
 	#[derive(Debug, Default, Deserialize, Serialize)]
 	#[cfg_attr(feature = "openapi", derive(openapi_type::OpenapiType))]
+	#[allow(dead_code)] // these probably test the derive or something
 	struct Msg {
 		msg: String
 	}
 
 	#[derive(Debug, Default, Error)]
 	#[error("An Error")]
+	#[allow(dead_code)] // these probably test the derive or something
 	struct MsgError;
 
 	#[test]

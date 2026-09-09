@@ -15,7 +15,7 @@ use gotham::{
 	prelude::*,
 	router::{
 		builder::{RouterBuilder, ScopeBuilder},
-		route::matcher::{AcceptHeaderRouteMatcher, ContentTypeHeaderRouteMatcher, RouteMatcher},
+		route::matcher::{AcceptHeaderRouteMatcher, RouteMatcher},
 		RouteNonMatch
 	},
 	state::{FromState, State}
@@ -163,34 +163,6 @@ impl MaybeMatchAcceptHeader {
 }
 
 impl From<Option<Vec<Mime>>> for MaybeMatchAcceptHeader {
-	fn from(types: Option<Vec<Mime>>) -> Self {
-		Self::new(types)
-	}
-}
-
-#[derive(Clone)]
-struct MaybeMatchContentTypeHeader {
-	matcher: Option<ContentTypeHeaderRouteMatcher>
-}
-
-impl RouteMatcher for MaybeMatchContentTypeHeader {
-	fn is_match(&self, state: &State) -> Result<(), RouteNonMatch> {
-		match &self.matcher {
-			Some(matcher) => matcher.is_match(state),
-			None => Ok(())
-		}
-	}
-}
-
-impl MaybeMatchContentTypeHeader {
-	fn new(types: Option<Vec<Mime>>) -> Self {
-		Self {
-			matcher: types.map(|types| ContentTypeHeaderRouteMatcher::new(types).allow_no_type())
-		}
-	}
-}
-
-impl From<Option<Vec<Mime>>> for MaybeMatchContentTypeHeader {
 	fn from(types: Option<Vec<Mime>>) -> Self {
 		Self::new(types)
 	}
