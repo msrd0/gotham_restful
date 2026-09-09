@@ -28,7 +28,7 @@ serde_json = "1.0"
 thiserror = "2.0"
 
 # non-feature optional dependencies
-base64 = { version = "0.22", optional = true }
+base64 = { version = "0.23", optional = true }
 gotham_middleware_diesel = { version = "0.5.1", optional = true }
 gotham_restful_redoc = { version = "0.2.14", path = "./redoc", optional = true }
 jsonwebtoken = { version = "9.3", default-features = false, optional = true }
