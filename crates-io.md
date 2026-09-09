@@ -1,4 +1,4 @@
-# gotham-restful [![Rust 1.73+](https://img.shields.io/badge/rustc-1.73+-orange.svg)](https://blog.rust-lang.org/2023/10/05/Rust-1.73.0.html) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
+# gotham-restful [![Rust 1.85+](https://img.shields.io/badge/rustc-1.85+-orange.svg)](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/) [![License Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![GitHub](https://img.shields.io/badge/Code-On%20Github-blue?logo=GitHub)](https://github.com/msrd0/gotham_restful)
 
 This crate is an extension to the popular [gotham web framework][__link0] for Rust. It allows you to
 create resources with assigned endpoints that aim to be a more convenient way of creating handlers
@@ -378,7 +378,7 @@ the MSRV (minimum supported rust version) is not considered a breaking change.
 
 ## License
 
-Copyright (C) 2019-2025 Dominic Meiser and [contributors].
+Copyright (C) 2019-2026 Dominic Meiser and [contributors].
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -395,7 +395,7 @@ limitations under the License.
 ```
 
  [contributors]: https://github.com/msrd0/gotham_restful/graphs/contributors
- [__cargo_doc2readme_dependencies_info]: ggGmYW0CYXZlMC43LjJhdIQbeWVgJJn6C7wb8_Nav34P1IMbfIec3gbY58EbjNww3mTeSm9hYvRhcoQb0IN0K94YAdgbstl6HhGT27Ibvee0rSJVfcMbTm9oargHpblhZISCZmdvdGhhbWUwLjcuNIJuZ290aGFtX3Jlc3RmdWxlMC45LjGCbG9wZW5hcGlfdHlwZWUwLjUuMoJqc2VyZGVfanNvbmcxLjAuMTUw
+ [__cargo_doc2readme_dependencies_info]: ggGmYW0CYXZlMC43LjNhdIQb5zNe2AKasnYb3eiTso01ROcbmsriGZEsD5sbf9JTM3Vic31hYvRhcoQb0IN0K94YAdgbstl6HhGT27Ibvee0rSJVfcMbTm9oargHpblhZISCZmdvdGhhbWUwLjcuNIJuZ290aGFtX3Jlc3RmdWxlMC45LjGCbG9wZW5hcGlfdHlwZWUwLjUuMoJqc2VyZGVfanNvbmcxLjAuMTUw
  [__link0]: https://crates.io/crates/gotham/0.7.4
  [__link1]: https://doc.rust-lang.org/stable/std/primitive.i64.html
  [__link10]: https://docs.rs/gotham/0.7.4/gotham/?search=state::State
