@@ -73,7 +73,7 @@ jobs:
         with:
           toolchain: ${{matrix.rust.toolchain}}
         id: rust-toolchain
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/git
@@ -98,7 +98,7 @@ jobs:
         with:
           toolchain: "1.98"
         id: rust-toolchain
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/git
@@ -116,7 +116,7 @@ jobs:
           toolchain: "1.98"
           components: clippy
         id: rust-toolchain
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/git
@@ -161,7 +161,7 @@ jobs:
             'https://crates.io/api/v1/crates/cargo-tarpaulin' \
             | jq -r '.crate.max_stable_version'\
           )" >>$GITHUB_OUTPUT
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/bin/cargo-tarpaulin
@@ -194,7 +194,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo
