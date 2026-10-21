@@ -1,9 +1,11 @@
 use super::{handle_error, IntoResponse, IntoResponseError};
 use crate::{types::ResourceType, FromBody, RequestBody, Response};
 #[cfg(feature = "openapi")]
-use crate::{IntoResponseWithSchema, ResponseSchema};
+use crate::{IntoResponseWithSchema, MimeAndSchema, ResponseSchema};
 use futures_core::future::Future;
 use futures_util::{future, future::FutureExt};
+#[cfg(feature = "openapi")]
+use gotham::mime::STAR_STAR;
 use gotham::{
 	hyper::{
 		body::{Body, Bytes},
@@ -12,7 +14,7 @@ use gotham::{
 	mime::Mime
 };
 #[cfg(feature = "openapi")]
-use openapi_type::{OpenapiSchema, OpenapiType, Visitor};
+use openapi_type::{OpenapiType, Visitor};
 use serde_json::error::Error as SerdeJsonError;
 use std::{convert::Infallible, fmt::Debug, pin::Pin};
 
@@ -113,9 +115,12 @@ impl<T: Into<Body>> ResponseSchema for Raw<T>
 where
 	Self: Send
 {
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		assert_eq!(code, StatusCode::OK);
-		<Self as OpenapiType>::schema()
+		vec![MimeAndSchema {
+			mime: STAR_STAR,
+			schema: <Self as OpenapiType>::schema()
+		}]
 	}
 }
 
@@ -138,7 +143,7 @@ where
 impl<T, E> ResponseSchema for Result<Raw<T>, E>
 where
 	Raw<T>: IntoResponseWithSchema,
-	E: Debug + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err>
+	E: Debug + IntoResponseError<Err = <Raw<T> as IntoResponse>::Err> + ResponseSchema
 {
 	fn status_codes() -> Vec<StatusCode> {
 		let mut status_codes = E::status_codes();
@@ -146,7 +151,7 @@ where
 		status_codes
 	}
 
-	fn schema(code: StatusCode) -> OpenapiSchema {
+	fn schema(code: StatusCode) -> Vec<MimeAndSchema> {
 		match code {
 			StatusCode::OK => <Raw<T> as ResponseSchema>::schema(StatusCode::OK),
 			code => E::schema(code)

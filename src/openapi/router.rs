@@ -100,7 +100,15 @@ macro_rules! implOpenapiRouter {
 				for code in E::Output::status_codes() {
 					responses.insert(
 						code,
-						(self.0).openapi_builder.add_schema(E::Output::schema(code))
+						E::Output::schema(code)
+							.into_iter()
+							.map(|mime_schema| {
+								(
+									mime_schema.mime,
+									(self.0).openapi_builder.add_schema(mime_schema.schema)
+								)
+							})
+							.collect()
 					);
 				}
 				let mut path = format!("{}/{}", self.0.scope.unwrap_or_default(), self.1);
